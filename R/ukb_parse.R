@@ -231,6 +231,7 @@ ukb_mapping_generator <- function(.ukb_df, .ukb_data_dict) {
 #' @import dplyr
 #' @import tidyr
 #' @import tidyselect
+#' @import purrr
 #'
 #' @examples
 ukb_parse <- function(ukb_df,
@@ -321,7 +322,7 @@ ukb_parse <- function(ukb_df,
   ### in which case it's ok, they just do not get/need to be reordered), before assigning levels
 
   ukb_codings_filt_nested <- ukb_codings_filt_nested %>%
-    dplyr::mutate(data = map(.x = data,
+    dplyr::mutate(data = purrr::map(.x = data,
                                  .f = ~ suppressWarnings(.x %>% arrange(as.integer(
                                    Value
                                  )))))
