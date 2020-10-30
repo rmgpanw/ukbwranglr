@@ -7,8 +7,6 @@
 ukb_mapping_generator(.ukb_df, .ukb_data_dict)
 }
 \arguments{
-\item{.ukb_df}{}
-
 \item{.ukb_data_dict}{}
 }
 \value{

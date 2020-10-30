@@ -25,13 +25,13 @@
 process_ukb_df_header <- function(.ukb_df, return_header_only = TRUE) {
 # extract header
 header <- names(.ukb_df)
-  
+
 # only process if colnames start with 'f.'
   if (all(startsWith(names(.ukb_df), prefix = 'f.'))) {
   # process
     stringr::str_sub(header, start = 3L, end = -1L) %>% # remove 'f.'
       stringr::str_replace('\\.', '-') # replace the first '.' with '-'
-  
+
     # return renamed .ukb_df or header only
     if (return_header_only == TRUE) {
       # return header
@@ -39,7 +39,7 @@ header <- names(.ukb_df)
       } else {
         # replace .ukb_df header
         names(.ukb_df) <- header
-        
+
         # return .ukb_df
         return(.ukb_df)
       }
@@ -48,7 +48,7 @@ header <- names(.ukb_df)
   } else {
     # print informative error message
     cat('No changes made to raw column names as they do not start with "f."')
-    
+
     # return renamed .ukb_df or header only
     if (return_header_only == TRUE) {
       # return header
@@ -69,64 +69,64 @@ header <- names(.ukb_df)
 
 #' Title
 #'
-#' @param .ukb_df 
-#' @param .ukb_data_dict 
+#' @param .ukb_df
+#' @param .ukb_data_dict
 #'
 #' @return
 #' @export
 #' @import stringr
-#' @import tidyr 
+#' @import tidyr
 #' @import dplyr
 #'
 #' @examples
 ukb_mapping_generator <- function(.ukb_df, .ukb_data_dict) {
-  
-  # Function to mutate descriptive_colnames column in 
+
+  # Function to mutate descriptive_colnames column in
   ukb_rename_columns <- function(.mapping_df) {
     # create vector of column names and Field_FieldID names from Field descriptions/instance.array_indices
-    column_names <- paste(.mapping_df$Field, 
-                          .mapping_df$FieldID, 
+    column_names <- paste(.mapping_df$Field,
+                          .mapping_df$FieldID,
                           .mapping_df$instance.array_indices)
-    
-    Field_FieldID_names <- paste(.mapping_df$Field, 
+
+    Field_FieldID_names <- paste(.mapping_df$Field,
                                  .mapping_df$FieldID)
-    
+
     # replace the first with 'eid'
     column_names[1] <- 'eid'
     Field_FieldID_names[1] <- 'eid'
-    
+
     # replace special characters
     ## characters to be replaced with "_"
     to_underscore <- c(" ",
                        "/")
-    
+
     for (string in to_underscore) {
       column_names <- str_replace_all(column_names, string, "_")
       Field_FieldID_names <- str_replace_all(Field_FieldID_names, string, "_")
       }
-    
+
     ## characters to replace with "" (i.e. to remove)
-    to_remove <- c("\\(", 
-                   "\\)", 
+    to_remove <- c("\\(",
+                   "\\)",
                    "\\-",
                    ",")
-    
+
     for (string in to_remove) {
-      column_names <- stingr::str_replace_all(column_names, string, "")
-      Field_FieldID_names <- stingr::str_replace_all(Field_FieldID_names, string, "")
+      column_names <- stringr::str_replace_all(column_names, string, "")
+      Field_FieldID_names <- stringr::str_replace_all(Field_FieldID_names, string, "")
       }
-    
+
     # mutate column with new, 'descriptive' column names and Field_FieldID_names
     .mapping_df[['descriptive_colnames']] <- column_names
     .mapping_df[['Field_FieldID']] <- Field_FieldID_names
-    
+
     # return .ukb_df
     return(.mapping_df)
     }
-  
+
   # main body of function
   ## make .ukb_df column names into a tibble and append 'mapping' columns
-  mapping_df <- tibble(field_id_full = names(.ukb_df)) %>% 
+  mapping_df <- tibble(field_id_full = names(.ukb_df)) %>%
     # separate FieldID from full column names
     tidyr::separate(
       col = 'field_id_full',
@@ -136,23 +136,23 @@ ukb_mapping_generator <- function(.ukb_df, .ukb_data_dict) {
       fill = 'right' # 'eid' column will not separate so will raise an error without this option
     ) %>%
     # append 'mapping' columns
-    dplyr::left_join(y = .ukb_data_dict, by = 'FieldID') 
-  
+    dplyr::left_join(y = .ukb_data_dict, by = 'FieldID')
+
   ## mutate 'descriptive_colnames' column
   mapping_df <- ukb_rename_columns(.mapping_df = mapping_df)
-  
-  ## mutate 'cont_int_to_na' column: indicates whether all special codings for a continuous/integer 
+
+  ## mutate 'cont_int_to_na' column: indicates whether all special codings for a continuous/integer
     ## variable can be cleaned to 'NA' (see also `ukb_select_codings_to_na.Rmd`)
-  mapping_df <- mapping_df %>% 
+  mapping_df <- mapping_df %>%
     dplyr::mutate(cont_int_to_na  = case_when(
-      
+
       # CONVERT TO NA -------------------------------
       Coding %in% c(
         # Continuous
         '13',
         '909',
         '1317',
-        # Integer  
+        # Integer
         '100291',
         '100586',
         '37', # **NOTE: also see notes under 'Other notes' (below) re 'polymorphic data fields'
@@ -166,10 +166,10 @@ ukb_mapping_generator <- function(.ukb_df, .ukb_data_dict) {
         '100584',
         '218'
       ) ~ TRUE,
-      
+
       # DO *NOT* CONVERT TO NA  -------------------------------
       Coding %in% c(
-        # Continuous  
+        # Continuous
         '488',
         # Integer
         '100373', # -10 <- 'Less than one'
@@ -204,7 +204,7 @@ ukb_mapping_generator <- function(.ukb_df, .ukb_data_dict) {
       ) ~ FALSE,
       TRUE ~ FALSE
     ))
-  
+
   ## return mapping_df
   return(mapping_df)
 }
@@ -231,7 +231,7 @@ ukb_mapping_generator <- function(.ukb_df, .ukb_data_dict) {
 #' @import dplyr
 #' @import tidyr
 #' @import tidyselect
-#' 
+#'
 #' @examples
 ukb_parse <- function(ukb_df,
                       ukb_data_dict,
@@ -248,34 +248,34 @@ ukb_parse <- function(ukb_df,
   ## clean_dates: if TRUE, convert 'nonsense' dates to 'NA'
   ## clean_selected_continuous_and_integers: if TRUE, convert special values to 'NA', see 'ukb_mapping_generator'
   ### for list of which codings I have chosen where any special values get converted to 'NA'
-  
+
 
   # Notes -------------------------------------------------------------------
   ## all columns should be of type 'character' for ukb_df, ukb_data_dict' and 'ukb_codings'
-  
+
   print('Setting up...')
-  
+
   # Functions ---------------------------------------------------------------
-  
+
   ## filters ukb data dictionary for only fields in dataset. Requires a mapping_df generated by ukb_mapping_generator
   filter_data_dictionary <- function(.ukb_data_dict, .mapping_df) {
     .ukb_data_dict %>%
       dplyr::filter(FieldID %in% .mapping_df$FieldID)
   }
-  
+
   ## filters ukb_codings for only codings in dataset
   filter_codings <- function(.ukb_codings, .mapping_df) {
     .ukb_codings %>%
       dplyr::filter(Coding %in% unique(.mapping_df$Coding))
   }
-  
+
   ## extracts codings from a filtered ukb_data_dict nested by ValueType
   extract_codings <-
     function(.ukb_data_dict_filt_nested,
              .valuetype) {
       .ukb_data_dict_filt_nested[(.ukb_data_dict_filt_nested$ValueType == .valuetype), ]$data[[1]]$Coding
     }
-  
+
   ## extracts Values/Meanings for a specified Coding from a filtered ukb_codings nested by 'Coding'
   extract_value_meaning <-
     function(.ukb_codings_filt_nested,
@@ -284,9 +284,9 @@ ukb_parse <- function(ukb_df,
       # options: 'Value', 'Meaning')
       .ukb_codings_filt_nested[(.ukb_codings_filt_nested$Coding == .coding), ][[2]][[1]][[.value_meaning]]
     }
-  
+
   # Main: setup --------------------------------------------------------------------
-  
+
   # process header if of the form 'f.5912.0.0'
   if (reformat_header == TRUE) {
     names(ukb_df) <- process_ukb_df_header(.ukb_df = ukb_df)
@@ -309,7 +309,7 @@ ukb_parse <- function(ukb_df,
                    .mapping_df = mapping_df) %>%
     dplyr::group_by(Coding) %>%
     tidyr::nest()
-  
+
   # IMPORTANT: now reorder ukb_codings_filt_nested by Value
   ## ...otherwise, Fields like month of birth (ID = 52) will be correctly labelled BUT incorrectly levelled
   ## Notes on this:
@@ -319,8 +319,8 @@ ukb_parse <- function(ukb_df,
   ### - Selecting levels/labels in the order provided by `Codings.tsv` returns the wrong levels for these variables
   ### - ...in `ukb_parse.R` I therefore reorder these by integer value where possible (some cannot be converted to integer,
   ### in which case it's ok, they just do not get/need to be reordered), before assigning levels
-  
-  ukb_codings_filt_nested <- ukb_codings_filt_nested %>% 
+
+  ukb_codings_filt_nested <- ukb_codings_filt_nested %>%
     dplyr::mutate(data = map(.x = data,
                                  .f = ~ suppressWarnings(.x %>% arrange(as.integer(
                                    Value
@@ -374,14 +374,14 @@ ukb_parse <- function(ukb_df,
       selected_cols <- mapping_df %>%
         dplyr::filter(Coding == coding) %>%
         .$field_id_full
-      
+
       ### now convert selected columns to labelled factors
       ukb_df <- ukb_df %>%
         dplyr::mutate(dplyr::across(tidyselect::all_of(selected_cols),
                       function(.x) {
                         ordered(.x, levels = .levels, labels = .labels)
                       }))
-      
+
     # clean date variables ---------------------------------------------------
     ## Only execute this if clean_dates = TRUE
     } else if (
@@ -417,20 +417,20 @@ ukb_parse <- function(ukb_df,
         ukb_df <- ukb_df %>%
           dplyr::mutate(across(all_of(selected_cols),
                         special_values_to_na))
-      
+
         # continuous variables ---------------------------------------------------
       ## continuous - note, only a few continuous FieldIDs have an associated coding, one of which
         ## should not be automatically set to NA
       ## Only execute this if clean_selected_continuous_and_integers = TRUE
     } else if (
-      (clean_selected_continuous_and_integers == TRUE) & 
+      (clean_selected_continuous_and_integers == TRUE) &
       # (coding %in% extract_codings(
       #   .ukb_data_dict_filt_nested = ukb_data_dict_filt_nested,
       #   .valuetype = 'Continuous')
       # ) &
-      (mapping_df %>% 
-       dplyr::filter(ValueType == 'Continuous' & Coding == coding) %>% 
-       dplyr::slice(1L) %>% 
+      (mapping_df %>%
+       dplyr::filter(ValueType == 'Continuous' & Coding == coding) %>%
+       dplyr::slice(1L) %>%
        .$cont_int_to_na %>% # 'isTRUE' will return 'FALSE' if this statement returns 'logical(0)' i.e. no rows returned, whereas '== TRUE' throws an error
        isTRUE)) {
 
@@ -456,23 +456,23 @@ ukb_parse <- function(ukb_df,
       ukb_df <- ukb_df %>%
         dplyr::mutate(dplyr::across(tidyselect::all_of(selected_cols),
                       special_values_to_na))
-  
+
       # integer variables ---------------------------------------------------
       ## see ukb_mapping_generator() and ukb_select_codings_to_na.Rmd for details re which
       ## Codings I think can be automatically set to NA
       ## Only execute this if clean_selected_continuous_and_integers = TRUE
     } else if (
-      (clean_selected_continuous_and_integers == TRUE) & 
+      (clean_selected_continuous_and_integers == TRUE) &
       # (coding %in% extract_codings(
       #   .ukb_data_dict_filt_nested = ukb_data_dict_filt_nested,
       #   .valuetype = 'Integer')
       # ) &
-      (mapping_df %>% 
-       dplyr::filter(ValueType == 'Integer' & Coding == coding) %>% 
-       dplyr::slice(1L) %>% 
+      (mapping_df %>%
+       dplyr::filter(ValueType == 'Integer' & Coding == coding) %>%
+       dplyr::slice(1L) %>%
        .$cont_int_to_na %>% # 'isTRUE' will return 'FALSE' if this statement returns 'logical(0)' i.e. no rows returned, whereas '== TRUE' throws an error
        isTRUE)) {
-      
+
       ### extract special coding values
       .values <-
         extract_value_meaning(
@@ -480,24 +480,24 @@ ukb_parse <- function(ukb_df,
           .coding = coding,
           .value_meaning = "Value"
         )
-      
+
       ### create anonymous function to replace these special values
       special_values_to_na <- function(.x) {
         replace(.x, .x %in% .values, NA)
       }
-      
+
       ### identify Fields that use this coding
       selected_cols <- mapping_df %>%
         dplyr::filter(Coding == coding) %>%
         .$field_id_full
-      
+
       ### replace special coding values with 'NA' for selected columns
       ukb_df <- ukb_df %>%
         dplyr::mutate(dplyr::across(tidyselect::all_of(selected_cols),
                       special_values_to_na))
     }
 }
-  
+
   # Main: convert dates/continuous/integer variables -------------------------------------------------
     # Dates -------------------------------------------------------------------
     print('Converting dates...')
@@ -542,7 +542,7 @@ ukb_parse <- function(ukb_df,
   }
 
   print('...Complete!')
-  
+
   # Message re 'uncleaned' cols if in 'cleaning mode' i.e. number of continuous/integer columns with special values NOT set to 'NA'
   if (clean_selected_continuous_and_integers == TRUE) {
     cat(
