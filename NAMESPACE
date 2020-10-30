@@ -2,9 +2,12 @@
 
 export(process_ukb_df_header)
 export(ukb_mapping_generator)
+export(ukb_mutate_dob)
+export(ukb_mutate_numerical_means)
 export(ukb_parse)
 export(ukb_rename)
 import(dplyr)
+import(lubridate)
 import(progress)
 import(purrr)
 import(stringr)
