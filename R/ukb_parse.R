@@ -71,6 +71,9 @@ header <- names(.ukb_df)
 #'
 #' @param .ukb_df
 #' @param .ukb_data_dict
+#' @param reformat_header if TRUE, process header as for the .tab ukb data file
+#'   made for R, where headers are of the form e.g. 'f.5912.0.0'. This would be
+#'   converted to '5912-0.0'
 #'
 #' @return
 #' @export
@@ -79,7 +82,7 @@ header <- names(.ukb_df)
 #' @import dplyr
 #'
 #' @examples
-ukb_mapping_generator <- function(.ukb_df, .ukb_data_dict) {
+ukb_mapping_generator <- function(.ukb_df, .ukb_data_dict, reformat_header) {
 
   # Function to mutate descriptive_colnames column in
   ukb_rename_columns <- function(.mapping_df) {
@@ -125,6 +128,12 @@ ukb_mapping_generator <- function(.ukb_df, .ukb_data_dict) {
     }
 
   # main body of function
+
+  # process header if of the form 'f.5912.0.0'
+  if (reformat_header == TRUE) {
+    names(.ukb_df) <- process_ukb_df_header(.ukb_df = .ukb_df)
+  }
+
   ## make .ukb_df column names into a tibble and append 'mapping' columns
   mapping_df <- tibble(field_id_full = names(.ukb_df)) %>%
     # separate FieldID from full column names
