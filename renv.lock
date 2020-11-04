@@ -158,10 +158,10 @@
     },
     "rlang": {
       "Package": "rlang",
-      "Version": "0.4.6",
+      "Version": "0.4.8",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "aa263e3ce17b177c49e0daade2ee3cdc"
+      "Hash": "843a6af51414bce7f8a8e372f11d6cd0"
     },
     "stringi": {
       "Package": "stringi",
