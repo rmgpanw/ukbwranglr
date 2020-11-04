@@ -27,9 +27,9 @@ process_ukb_df_header <- function(.ukb_df, return_header_only = TRUE) {
 header <- names(.ukb_df)
 
 # only process if colnames start with 'f.'
-  if (all(startsWith(names(.ukb_df), prefix = 'f.'))) {
+  if (all(startsWith(header, prefix = 'f.'))) {
   # process
-    stringr::str_sub(header, start = 3L, end = -1L) %>% # remove 'f.'
+    header <- stringr::str_sub(header, start = 3L, end = -1L) %>% # remove 'f.'
       stringr::str_replace('\\.', '-') # replace the first '.' with '-'
 
     # return renamed .ukb_df or header only
