@@ -82,7 +82,7 @@ header <- names(.ukb_df)
 #' @import dplyr
 #'
 #' @examples
-ukb_mapping_generator <- function(.ukb_df, .ukb_data_dict, reformat_header) {
+ukb_mapping_generator <- function(.ukb_df, .ukb_data_dict, reformat_header = TRUE) {
 
   # Function to mutate descriptive_colnames column in
   ukb_rename_columns <- function(.mapping_df) {
