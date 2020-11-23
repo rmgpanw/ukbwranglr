@@ -519,7 +519,7 @@ ukb_parse <- function(ukb_df,
     ### convert selected columns to date
     ukb_df <- ukb_df %>%
       dplyr::mutate(dplyr::across(tidyselect::all_of(selected_cols),
-                    as.Date))
+                    lubridate::as_date))
 
     # Continuous -------------------------------------------------------------------
     print('Converting continuous variables...')
