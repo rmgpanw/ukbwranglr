@@ -1,0 +1,574 @@
+# NOTES -------------------------------------------------------------------
+
+#TODO
+# - Add col of dates being coverted to NA in pheno_data_dict - perhaps these
+#should NOT be converted to NA (presence of a date indicates an event probably
+#happened, even if the date is unknown)
+#
+#
+
+# EXPORTED FUNCTIONS ----------------------------------------------------
+
+#' Generate a data dictionary from a raw UK Biobank phenotype file
+#'
+#' @param path The path to a tab-delimited UKB phenotype file.
+#' @param ukb_data_dict The path to a tab-delimited UKB data dictionary. By
+#'   default, this is downloaded directly from the
+#'   \href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{UKB
+#'   website}.
+#'
+#' @return A data dictionary (data table) specific to the specified UKB
+#'   phenotype. This includes a column of descriptive names. TODO: flesh this
+#'   out
+#' @export
+pheno_data_dict <- function(path,
+                            ukb_data_dict = "https://biobank.ctsu.ox.ac.uk/~bbdatan/Data_Dictionary_Showcase.tsv") {
+
+  # read column names only
+  colheaders_raw <- data.table::fread(
+    path,
+    colClasses = c('character'),
+    na.strings = c("", "NA"),
+    sep = "\t",
+    header = TRUE,
+    data.table = TRUE,
+    showProgress = TRUE,
+    nrows=0
+  )
+
+  colheaders_raw <- names(colheaders_raw)
+
+  # read ukb data dictionary from URL
+  message("Downloading data dictionary from UKB website")
+  ukb_data_dict <- data.table::fread(
+    ukb_data_dict,
+    colClasses = c('character'),
+    na.strings = c("", "NA"),
+    sep = "\t",
+  )
+
+  # process header to this form: 'f.5912.0.0'
+  colheaders <- format_ukb_df_header(colheaders_raw)
+
+  # make mapping df
+  # convert column names to a tibble and append 'mapping' columns
+  mapping_df <- tibble(
+    field_id_full_raw = colheaders_raw,
+    field_id_full = colheaders
+    ) %>%
+    # Make columns for FieldID, instance and array
+    tidyr::separate(col = "field_id_full",
+                    sep = "\\.",
+                    into = c("temp", "FieldID", "instance", "array"),
+                    remove= FALSE,
+                    fill = "right" # 'eid' column will not separate so will raise an error without this option
+                    ) %>%
+
+    # Remove column of "f"'s
+    select(-temp) %>%
+
+    # join with full ukb data dictionary
+    dplyr::left_join(y = ukb_data_dict,
+                     by = "FieldID")
+
+
+  # mutate 'descriptive_colnames' column
+  mapping_df <- ukb_rename_columns(pheno_data_dict = mapping_df)
+
+  # mutate 'cont_int_to_na' column: indicates whether all special codings for a
+  # continuous/integer variable can be cleaned to 'NA' (see also
+  # `ukb_select_codings_to_na.Rmd`)
+  mapping_df <- mapping_df %>%
+    dplyr::mutate(cont_int_to_na  = case_when(
+
+      # CONVERT TO NA
+      Coding %in% c(
+        # Continuous
+        '13',
+        '909',
+        '1317',
+        # Integer
+        '100291',
+        '100586',
+        '37',
+        ## **NOTEre 37: also see notes under 'Other notes' in
+        ## `ukb_select_codings_to_na.Rmd` re 'polymorphic data fields'
+        '513',
+        '485',
+        '584',
+        '100696',
+        '170',
+        '42',
+        '525',
+        '100584',
+        '218'
+      ) ~ TRUE,
+
+      # DO *NOT* CONVERT TO NA
+      Coding %in% c(
+        # Continuous
+        '488',
+        # Integer
+        '100373', # -10 <- 'Less than one'
+        '100329', # -10 <- 'Less than an hour a day'
+        '528',
+        '100290',
+        '100306',
+        '100567',
+        '100569',
+        '100353', # number of cigarettes previously smoked daily
+        '487',
+        '100298',
+        '100300',
+        '100307',
+        '100355', # number of cigarettes currently smoked daily
+        '100504',
+        '100537',
+        '100582',
+        '100585',
+        '100595',
+        '100598',
+        '530',
+        '946',
+        '957',
+        '100698',
+        '17',
+        '1990',
+        '402',
+        '511',
+        '517',
+        '6361'
+      ) ~ FALSE,
+      TRUE ~ FALSE
+    ))
+
+  ## return mapping_df
+  return(mapping_df)
+}
+
+
+
+read_pheno <- function(path,
+                       pheno_data_dict,
+                       ukb_data_dict = "https://biobank.ctsu.ox.ac.uk/~bbdatan/Data_Dictionary_Showcase.tsv",
+                       ukb_codings = "https://biobank.ctsu.ox.ac.uk/~bbdatan/Codings.tsv",
+                       clean_dates = TRUE,
+                       clean_selected_continuous_and_integers = TRUE
+                       ) {
+
+# Helper functions ---------------------------------------------------------------
+
+  # extracts codings from a filtered ukb_data_dict nested by ValueType
+  extract_codings <-
+    function(.ukb_data_dict_filt_nested,
+             .valuetype) {
+      # try statement avoids failure if the dataset does not contain a ValueType
+      # (e.g. if there are no "Categorical multiple" ValueTypes)
+      try(
+        .ukb_data_dict_filt_nested[(.ukb_data_dict_filt_nested$ValueType == .valuetype), ]$data[[1]]$Coding,
+        silent = TRUE
+        )
+    }
+
+  # extracts Values/Meanings for a specified Coding from a filtered ukb_codings
+  # nested by 'Coding'
+  extract_value_meaning <-
+    function(.ukb_codings_filt_nested,
+             .coding,
+             .value_meaning) {
+      # options: 'Value', 'Meaning')
+      .ukb_codings_filt_nested[(.ukb_codings_filt_nested$Coding == .coding), ][[2]][[1]][[.value_meaning]]
+    }
+
+# Setup --------------------------------------------------------------------
+
+#SETUP
+  # read selected columns from raw phenotype file
+  message("Reading selected columns for raw phenotype data")
+  ukb_df <- data.table::fread(
+    path,
+    select = pheno_data_dict$field_id_full_raw, # selected cols
+    colClasses = c('character'),
+    na.strings = c("", "NA"),
+    sep = "\t"
+  )
+
+  # filter ukb data dictionary file for fields in dataset and nest by ValueType
+  message("Downloading data dictionary from UKB website")
+  ukb_data_dict <- data.table::fread(
+    ukb_data_dict,
+    colClasses = c('character'),
+    sep = "\t",
+    na.strings = c("", "NA")
+  )
+
+  ukb_data_dict_filt_nested <- ukb_data_dict %>%
+    dplyr::filter(FieldID %in% pheno_data_dict$FieldID) %>%
+    dplyr::group_by(ValueType) %>%
+    tidyr::nest()
+
+  # filter ukb codings file for codings in dataset and nest by Coding
+  message("Downloading data dictionary from UKB website")
+  ukb_codings <- data.table::fread(
+    ukb_codings,
+    colClasses = c('character'),
+    sep = "\t",
+    quote = " ",
+    na.strings = c("", "NA")
+  )
+
+  ukb_codings_filt_nested <- ukb_codings %>%
+    dplyr::filter(Coding %in% unique(pheno_data_dict$Coding)) %>%
+    dplyr::group_by(Coding) %>%
+    tidyr::nest()
+
+  # IMPORTANT: now reorder ukb_codings_filt_nested by Value ...otherwise, Fields
+  # like month of birth (ID = 52) will be correctly labelled BUT incorrectly
+  # levelled Notes on this: - Some codings (e.g. [Month of
+  # Birth](http://biobank.ctsu.ox.ac.uk/crystal/coding.cgi?id=8)) should be
+  # ordered, whereas others are not (e.g. coding 3,
+  # ['Cancer'](http://biobank.ctsu.ox.ac.uk/crystal/coding.cgi?id=3)) - Values
+  # for Codings are read as 'character' type and therefore coercing to integer
+  # returns some NA's. - Selecting levels/labels in the order provided by
+  # `Codings.tsv` returns the wrong levels for these variables - ...in
+  # `ukb_parse.R` I therefore reorder these by integer value where possible
+  # (some cannot be converted to integer, in which case it's ok, they just do
+  # not get/need to be reordered), before assigning levels
+
+  ukb_codings_filt_nested <- ukb_codings_filt_nested %>%
+    dplyr::mutate(data = purrr::map(
+      .x = data,
+      .f = ~ suppressWarnings(.x %>%
+                                dplyr::arrange(as.integer(Value)))
+    ))
+
+
+# LOOP BY CODING ----------------------------------------------------------
+# Categorical variables: convert to labelled factors
+# Dates: remove nonsense dates (if clean_dates == TRUE)
+#
+
+  message('Processing categorical variables +/- cleaning dates/continuous variables...')
+
+  # Set up progress bar
+  pb <- progress::progress_bar$new(format = "[:bar] :current/:total (:percent)",
+                                   total = length(unique(na.omit(pheno_data_dict$Coding))))
+  pb$tick(0)
+
+  # loop through codings and parse columns depending on associated ValueType
+  for (coding in unique(na.omit(pheno_data_dict$Coding))) {
+
+    # progress bar
+    pb$tick(1)
+
+    # Relabel categorical variables --------------------------------------------------------------------
+    if ((
+      coding %in% extract_codings(
+        .ukb_data_dict_filt_nested = ukb_data_dict_filt_nested,
+        .valuetype = 'Categorical multiple'
+      )
+    ) |
+    (
+      coding %in% extract_codings(
+        .ukb_data_dict_filt_nested = ukb_data_dict_filt_nested,
+        .valuetype = 'Categorical single'
+      )
+    )) {
+      ### define levels and labels
+      .levels <-
+        extract_value_meaning(
+          .ukb_codings_filt_nested = ukb_codings_filt_nested,
+          .coding = coding,
+          .value_meaning = "Value"
+        )
+
+      .labels <-
+        extract_value_meaning(
+          .ukb_codings_filt_nested = ukb_codings_filt_nested,
+          .coding = coding,
+          .value_meaning = "Meaning"
+        )
+
+      ### identify Fields that use this coding
+      selected_cols <- pheno_data_dict %>%
+        dplyr::filter(Coding == coding) %>%
+        .$field_id_full_raw
+
+      ### now convert selected columns to labelled factors
+      ukb_df <- ukb_df %>%
+        dplyr::mutate(dplyr::across(tidyselect::all_of(selected_cols),
+                                    function(.x) {
+                                      ordered(.x, levels = .levels, labels = .labels)
+                                    }))
+
+# Clean dates (if requested) ------------------------------------
+    } else if (
+      ((coding %in% extract_codings(.ukb_data_dict_filt_nested = ukb_data_dict_filt_nested,
+                                    .valuetype = 'Date')) &
+       (clean_dates == TRUE))
+    ) {
+
+      ### identify Fields that use this coding
+      selected_cols <- pheno_data_dict %>%
+        dplyr::filter(Coding == coding) %>%
+        .$field_id_full_raw
+
+      #### vector of 'nonsense dates'
+      nonsense_dates <- c(
+        '1904-04-04',
+        '1900-01-01',
+        '1910-01-01',
+        '1920-01-01',
+        '1930-01-01',
+        '1901-01-01',
+        '1902-02-02',
+        '1903-03-03',
+        '2037-07-07'
+      )
+
+      #### temp function to remove 'nonsense' dates
+      special_values_to_na <- function(.x) {
+        replace(.x, .x %in% nonsense_dates, NA)
+      }
+
+      #### remove 'nonsense' dates
+      ukb_df <- ukb_df %>%
+        dplyr::mutate(across(all_of(selected_cols),
+                             special_values_to_na))
+
+# Clean selected continuous values (if requested) -------------
+      ## continuous - note, only a few continuous FieldIDs have an associated coding, one of which
+      ## should not be automatically set to NA
+      ## Only execute this if clean_selected_continuous_and_integers = TRUE
+
+      } else if (
+      (clean_selected_continuous_and_integers == TRUE) &
+      # (coding %in% extract_codings(
+      #   .ukb_data_dict_filt_nested = ukb_data_dict_filt_nested,
+      #   .valuetype = 'Continuous')
+      # ) &
+      (pheno_data_dict %>%
+       dplyr::filter(ValueType == 'Continuous' & Coding == coding) %>%
+       dplyr::slice(1L) %>%
+       .$cont_int_to_na %>% # 'isTRUE' will return 'FALSE' if this statement returns 'logical(0)' i.e. no rows returned, whereas '== TRUE' throws an error
+       isTRUE)) {
+
+      ### extract special coding values
+      .values <-
+        extract_value_meaning(
+          .ukb_codings_filt_nested = ukb_codings_filt_nested,
+          .coding = coding,
+          .value_meaning = "Value"
+        )
+
+      ### temp function to replace these special values
+      special_values_to_na <- function(.x) {
+        replace(.x, .x %in% .values, NA)
+      }
+
+      ### identify Fields that use this coding
+      selected_cols <- pheno_data_dict %>%
+        dplyr::filter(Coding == coding) %>%
+        .$field_id_full_raw
+
+      ### replace special coding values with 'NA' for selected columns
+      ukb_df <- ukb_df %>%
+        dplyr::mutate(dplyr::across(tidyselect::all_of(selected_cols),
+                                    special_values_to_na))
+
+# Clean selected integer values (if requested) -------------
+      ## see ukb_mapping_generator() and ukb_select_codings_to_na.Rmd for details re which
+      ## Codings I think can be automatically set to NA
+      ## Only execute this if clean_selected_continuous_and_integers = TRUE
+    } else if (
+      (clean_selected_continuous_and_integers == TRUE) &
+      # (coding %in% extract_codings(
+      #   .ukb_data_dict_filt_nested = ukb_data_dict_filt_nested,
+      #   .valuetype = 'Integer')
+      # ) &
+      (pheno_data_dict %>%
+       dplyr::filter(ValueType == 'Integer' & Coding == coding) %>%
+       dplyr::slice(1L) %>%
+       .$cont_int_to_na %>% # 'isTRUE' will return 'FALSE' if this statement returns 'logical(0)' i.e. no rows returned, whereas '== TRUE' throws an error
+       isTRUE)) {
+
+      ### extract special coding values
+      .values <-
+        extract_value_meaning(
+          .ukb_codings_filt_nested = ukb_codings_filt_nested,
+          .coding = coding,
+          .value_meaning = "Value"
+        )
+
+      ### create anonymous function to replace these special values
+      special_values_to_na <- function(.x) {
+        replace(.x, .x %in% .values, NA)
+      }
+
+      ### identify Fields that use this coding
+      selected_cols <- pheno_data_dict %>%
+        dplyr::filter(Coding == coding) %>%
+        .$field_id_full_raw
+
+      ### replace special coding values with 'NA' for selected columns
+      ukb_df <- ukb_df %>%
+        dplyr::mutate(dplyr::across(tidyselect::all_of(selected_cols),
+                                    special_values_to_na))
+    }
+  }
+
+# CHANGE COLUMN TYPES -----------------------------------------------------
+# Dates -------------------------------------------------------------------
+  message('Converting dates...')
+  # extract column names
+  selected_cols <- pheno_data_dict %>%
+    dplyr::filter(ValueType == 'Date') %>%
+    .$field_id_full_raw
+
+  ### convert selected columns to date
+  ukb_df <- ukb_df %>%
+    dplyr::mutate(dplyr::across(tidyselect::all_of(selected_cols),
+                                lubridate::as_date))
+
+
+# Continuous --------------------------------------------------------------
+  message('Converting continuous variables...')
+  # extract column names
+  selected_cols <- pheno_data_dict %>%
+    dplyr::filter(ValueType == 'Continuous') %>%
+    .$field_id_full_raw
+
+  ### convert selected columns to numeric
+  ukb_df <- ukb_df %>%
+    dplyr::mutate(dplyr::across(tidyselect::all_of(selected_cols),
+                                as.numeric))
+
+
+# Integer -----------------------------------------------------------------
+
+  message('Converting integer variables...')
+  # extract column names
+  selected_cols <- pheno_data_dict %>%
+    dplyr::filter(ValueType == 'Integer') %>%
+    .$field_id_full_raw
+
+  ### convert selected columns to integer
+  ukb_df <- ukb_df %>%
+    dplyr::mutate(dplyr::across(tidyselect::all_of(selected_cols),
+                                as.integer))
+
+# Rename columns ----------------------------------------------------------
+  message('Renaming columns...')
+  names(ukb_df) <- pheno_data_dict$descriptive_colnames
+
+  message('...Complete!')
+
+  # Message re 'uncleaned' cols if in 'cleaning mode' i.e. number of continuous/integer columns with special values NOT set to 'NA'
+  if (clean_selected_continuous_and_integers == TRUE) {
+    message(
+      '\n\nNumber of continuous/integer fields in this dataset that still have "uncleaned" special values: ',
+      pheno_data_dict %>%
+        dplyr::filter(
+          ValueType %in% c('Continuous', 'Integer') &
+            !is.na(Coding) &
+            cont_int_to_na == FALSE
+        ) %>%
+        nrow()
+    )
+  }
+
+  # Return output -----------------------------------------------------------
+  return(ukb_df)
+}
+
+# PRIVATE FUNCTIONS -------------------------------------------------------
+
+#' Mutates a column of descriptive colnames
+#'
+#' @param pheno_data_dict A data dictionary formed by joining the column names
+#'   from a raw ukb pheno file with the ukb data dictionary
+#'   (https://biobank.ctsu.ox.ac.uk/~bbdatan/Data_Dictionary_Showcase.tsv)
+#'
+#' Helper function for \code{pheno_data_dict()}
+#'
+ukb_rename_columns <- function(pheno_data_dict) {
+
+  # Create vector of column names and Field_FieldID names from Field
+  # descriptions/instance/array indices
+  column_names <- paste(pheno_data_dict$Field,
+                        pheno_data_dict$FieldID,
+                        pheno_data_dict$instance,
+                        pheno_data_dict$array)
+
+  Field_FieldID_names <- paste(pheno_data_dict$Field,
+                               pheno_data_dict$FieldID)
+
+  # Replace the first with 'eid'
+  column_names[1] <- 'eid'
+  Field_FieldID_names[1] <- 'eid'
+
+  # Replace special characters
+  ## characters to be replaced with "_"
+  to_underscore <- c(" ",
+                     "/",
+                     "\\.")
+
+  for (string in to_underscore) {
+    column_names <- str_replace_all(column_names, string, "_")
+    Field_FieldID_names <- str_replace_all(Field_FieldID_names, string, "_")
+  }
+
+  ## characters to replace with "" (i.e. to remove)
+  to_remove <- c("\\(",
+                 "\\)",
+                 "\\-",
+                 ",")
+
+  for (string in to_remove) {
+    column_names <- stringr::str_replace_all(column_names, string, "")
+    Field_FieldID_names <- stringr::str_replace_all(Field_FieldID_names, string, "")
+  }
+
+  # make lowercase
+  column_names <- tolower(column_names)
+  Field_FieldID_names <- tolower(Field_FieldID_names)
+
+  # mutate column with new, 'descriptive' column names and Field_FieldID_names
+  pheno_data_dict[['descriptive_colnames']] <- column_names
+  pheno_data_dict[['Field_FieldID']] <- Field_FieldID_names
+
+  # Rearrange columns
+  pheno_data_dict <- pheno_data_dict %>%
+    dplyr::select(
+      descriptive_colnames,
+      Field_FieldID,
+      everything()
+    )
+
+  return(pheno_data_dict)
+}
+
+
+
+#' Processes a ukb pheno file header to match the form 'f.5912.0.0'
+#'
+#' @param colheaders A character vector.
+#'
+#' @return A ukb pheno file header (character vector) of the form 'f.5912.0.0'.
+#'   Returns the header unaltered if already in this form
+#'
+#' Helper function for \code{pheno_data_dict()}
+#'
+format_ukb_df_header <- function(colheaders) {
+
+  # Process colheaders if not of the form 'f.5912.0.0'
+  if (!all(startsWith(colheaders, prefix = 'f.'))) {
+    colheaders <- paste0("f.", gsub("-", ".", colheaders))
+  }
+
+  # TODO: add tests for colheaders:
+  # - all valid headers? (i.e. are all present in ukb data dictionary)
+  # - any repeated?
+
+  return(colheaders)
+}

@@ -283,7 +283,12 @@ ukb_parse <- function(ukb_df,
   extract_codings <-
     function(.ukb_data_dict_filt_nested,
              .valuetype) {
-      .ukb_data_dict_filt_nested[(.ukb_data_dict_filt_nested$ValueType == .valuetype), ]$data[[1]]$Coding
+      # try statement avoids failure if the dataset does not contain a ValueType
+      # (e.g. if there are no "Categorical multiple" ValueTypes)
+      try(
+        .ukb_data_dict_filt_nested[(.ukb_data_dict_filt_nested$ValueType == .valuetype), ]$data[[1]]$Coding,
+        silent = TRUE
+      )
     }
 
   ## extracts Values/Meanings for a specified Coding from a filtered ukb_codings nested by 'Coding'
@@ -332,7 +337,7 @@ ukb_parse <- function(ukb_df,
 
   ukb_codings_filt_nested <- ukb_codings_filt_nested %>%
     dplyr::mutate(data = purrr::map(.x = data,
-                                 .f = ~ suppressWarnings(.x %>% arrange(as.integer(
+                                 .f = ~ suppressWarnings(.x %>% dplyr::arrange(as.integer(
                                    Value
                                  )))))
 

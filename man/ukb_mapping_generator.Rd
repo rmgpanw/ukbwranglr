@@ -4,10 +4,12 @@
 \alias{ukb_mapping_generator}
 \title{Title}
 \usage{
-ukb_mapping_generator(.ukb_df, .ukb_data_dict)
+ukb_mapping_generator(.ukb_df, .ukb_data_dict, reformat_header = TRUE)
 }
 \arguments{
-\item{.ukb_data_dict}{}
+\item{reformat_header}{if TRUE, process header as for the .tab ukb data file
+made for R, where headers are of the form e.g. 'f.5912.0.0'. This would be
+converted to '5912-0.0'}
 }
 \value{
 
