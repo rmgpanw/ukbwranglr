@@ -19,12 +19,6 @@
 #'
 #' @return the ukb df with a new (DOB) column
 #' @export
-#'
-#' @import dplyr
-#' @import tidyr
-#' @import lubridate
-#'
-#' @examples
 ukb_mutate_dob <- function(ukb_df, ukb_mapping_df) {
   # Mutates approximate DOB column from FieldID's 34 and 52 (year and month of birth)
 
@@ -66,12 +60,6 @@ ukb_mutate_dob <- function(ukb_df, ukb_mapping_df) {
 #'
 #' @return the UKB df with additional columns with mean values across instances for numerical UKB fields
 #' @export
-#'
-#' @import dplyr
-#' @import tidyr
-#' @import tidyselect
-#'
-#' @examples
 ukb_mutate_numerical_means <- function(ukb_df,
                                ukb_mapping_df) {
   # Function to mutate mean values for numerical fields in a ukb phenotype file ***WITHOUT SPECIAL CODING VALUES***

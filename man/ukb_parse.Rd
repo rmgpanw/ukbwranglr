@@ -34,7 +34,7 @@ made for R, where headers are of the form e.g. 'f.5912.0.0'. This would be
 converted to '5912-0.0'}
 }
 \value{
-
+A parsed UKB df
 }
 \description{
 Parse a raw ukb df

@@ -13,3 +13,13 @@ Suggests:
     knitr,
     rmarkdown
 VignetteBuilder: knitr
+Imports: 
+    data.table,
+    dplyr,
+    lubridate,
+    magrittr,
+    progress,
+    purrr,
+    stringr,
+    tidyr,
+    tidyselect

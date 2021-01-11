@@ -1,0 +1,235 @@
+---
+title: "test_ukbtools_and ukbwranglr"
+output: html_notebook
+---
+
+```{r setup}
+# library(ukbwranglr)
+library(ukbtools)
+```
+
+# ukbtools
+
+```{r}
+path_to_example_data <- system.file("extdata", package = "ukbtools")
+my_ukb_data <- ukb_df("ukbxxxx", path = path_to_example_data)
+```
+
+```{r}
+mapper <- ukb_df_field("ukbxxxx", path = path_to_example_data)
+```
+
+```{r}
+ukb_context(data = my_ukb_data, subset.var = my_ukb_data$sex_f31_0_0 == "Male")
+
+# ukb_context(data = test_read_pheno, subset.var = test_read_pheno$sex_f31_0_0 == "Male")
+# 
+# ukb_context(data = test_read_pheno, subset.var = (test_read_pheno$systolic_brachial_blood_pressure_during_pwa_f12674_2_0 > 120))
+```
+
+
+# ukbwranglr
+
+## Make pheno_data_dict
+
+````{r}
+small_file_path <- "/Users/alasdair/OneDrive - University College London/Lenovo backup 181219/WellcomePhD/Year2/ukbiobank/ukb_dr_gwas/data/ukb_main_filter.txt"
+
+big_file_path <- "/Users/alasdair/Documents/Data/UKB/ICS/raw/ukb29341_29374_34321_37340_37076_37077_37079_37080_37755.txt"
+
+data_dict <- pheno_data_dict(small_file_path)
+
+# data_dict_filter <- data_dict[1:10,]
+
+test_read_pheno <- read_pheno(small_file_path, pheno_data_dict = data_dict)
+```
+
+```{r}
+# FOR TESTING BIGGER UKB PHENO FILE
+# data_dict <- pheno_data_dict(big_file_path)
+# 
+# data_dict_filter <- data_dict[1:2000,]
+# 
+# test_read_pheno <- read_pheno(big_file_path, pheno_data_dict = data_dict_filter)
+```
+
+## Mutate DOB
+
+```{r}
+ukb_main_filter_parsed_CLEAN <- ukb_mutate_dob(ukb_df = test_read_pheno,
+                                        ukb_mapping_df = data_dict)
+```
+
+## Numerical means col summaries (uses `rowMeans()`)
+
+```{r}
+system.time(
+  ukb_main_filter_parsed_CLEAN_summary_cols <- ukb_mutate_numerical_means(ukb_df = ukb_main_filter_parsed_CLEAN, 
+                                                                        ukb_mapping_df = data_dict)
+)
+```
+
+## Rowise colsummarise (uses `apply()`)
+
+Notes:
+
+- Generating custom summary functions:
+  
+  - Make sure they include '...' as an argument, otherwise will get an 'unused argument' error, for example if supplying `na.rm = TRUE`
+  - Beware rows with only `NA` values
+
+```{r}
+# need to add '...' to avoid throwing an error with na.rm ('unused argument')
+n_not_na <- function(x, ...) {
+  sum(!is.na(x))
+}
+
+summarise_test_read_pheno <- summarise_rowise(
+  ukb_pheno = test_read_pheno,
+  functions = c("mean", "sd", "n_not_na"),
+  data_dict = data_dict,
+  grouping_col = "Field_FieldID",
+  selected_col_groups = data_dict %>% 
+    dplyr::filter(ValueType %in% c("Continuous", "Integer")) %>% 
+    .$Field_FieldID %>% 
+    unique(),
+  na.rm = TRUE
+)
+
+summarise_numerical_test_read_pheno_mean <-
+  summarise_rowise_numerical_mean_min_max(ukb_df = test_read_pheno,
+                                          ukb_mapping_df = data_dict,
+                                          mean_min_max = "rowMeans")
+
+summarise_numerical_test_read_pheno_min <-
+  summarise_rowise_numerical_mean_min_max(ukb_df = test_read_pheno,
+                                          ukb_mapping_df = data_dict,
+                                          mean_min_max = "pmin")
+
+summarise_numerical_test_read_pheno_max <-
+  summarise_rowise_numerical_mean_min_max(ukb_df = test_read_pheno,
+                                          ukb_mapping_df = data_dict,
+                                          mean_min_max = "pmax")
+```
+
+### TESTS
+
+```{r}
+copy_test_read_pheno <- test_read_pheno
+```
+
+### rough idea for one function to one set of cols
+
+```{r}
+# job list
+functions <- c('mean')
+columns <- test_read_pheno %>% 
+  dplyr::select(systolic_blood_pressure_automated_reading_f4080_0_0:systolic_blood_pressure_automated_reading_f4080_3_1) %>%
+  names()
+column_group_name <- "f4080"
+new_columns = paste(functions, column_group_name, sep = "_")
+
+job_list <- list(columns, new_columns)
+names(job_list) <- c('columns', 'new_columns')
+
+# rowwise function
+rowwise_fn <- function(fn, cols, ...) {
+  apply(cols, MARGIN = 1, fn, ...)
+}
+```
+
+```{r}
+message("New cols na.rm = TRUE")
+test_read_pheno[, job_list$new_columns := purrr::map(functions, rowwise_fn, .SD, na.rm = TRUE), .SDcols = job_list$columns]
+head(test_read_pheno$mean_f4080)
+
+test_read_pheno <- copy_test_read_pheno
+
+message("New cols na.rm = FALSE")
+test_read_pheno[, job_list$new_columns := purrr::map(job_list$functions, rowwise_fn, .SD, na.rm = FALSE), .SDcols = job_list$columns]
+head(test_read_pheno$mean_f4080)
+```
+
+#### Benchmark - compare rowMeans() with apply()
+
+- rowMeans() is ~50x faster
+
+```{r}
+# benchmark - apply
+test_read_pheno <- copy_test_read_pheno
+system.time(
+  test_read_pheno[, job_list$new_columns := purrr::map(functions, rowwise_fn, .SD, na.rm = TRUE), .SDcols = job_list$columns]
+  )
+head(test_read_pheno$mean_f4080)
+
+# benchmark - rowmeans
+test_read_pheno <- copy_test_read_pheno
+system.time(
+  test_read_pheno2 <- test_read_pheno %>%
+    dplyr::mutate(new_mean_col = rowMeans(dplyr::across(tidyselect::all_of(job_list$columns)),
+                                     na.rm = TRUE))
+)
+```
+
+```{r}
+# now multiple functions
+functions <- c('mean', 'sd')
+new_columns = paste(functions, column_group_name, sep = "_")
+job_list <- list(columns, new_columns)
+names(job_list) <- c('columns', 'new_columns')
+
+# benchmark - apply
+system.time(
+  test_read_pheno[, job_list$new_columns := purrr::map(functions, rowwise_fn, .SD, na.rm = TRUE), .SDcols = job_list$columns]
+  )
+head(test_read_pheno$mean_f4080)
+
+# benchmark - rowmeans
+test_read_pheno <- copy_test_read_pheno
+system.time(
+  test_read_pheno2 <- test_read_pheno %>%
+    dplyr::mutate(new_mean_col = rowMeans(dplyr::across(tidyselect::all_of(job_list$columns)),
+                                     na.rm = TRUE))
+)
+```
+
+
+### now apply to multiple groups of columns
+
+```{r}
+# job list
+functions <- c('mean', 'sd')
+columns_diastolic <- test_read_pheno %>% 
+  dplyr::select(diastolic_blood_pressure_automated_reading_f4079_0_0:diastolic_blood_pressure_automated_reading_f4079_3_1) %>% 
+  names()
+column_group_name <- "f4079"
+new_columns = paste(functions, column_group_name, sep = "_")
+
+job_list_distolic <- list(columns_diastolic, new_columns)
+names(job_list_distolic) <- c('columns_diastolic', 'new_columns')
+
+job_list_of_lists <- list(job_list, job_list_distolic)
+
+names(job_list_of_lists) <- c("systolic", "diastolic")
+
+for (i in seq_along(job_list_of_lists)) {
+  print(names(job_list_of_lists[[i]]))
+}
+
+for (id in job_list_of_lists) {
+  print(id)
+}
+
+
+pb <- progress::progress_bar$new(format = "[:bar] :current/:total (:percent)",
+                                   total = length(job_list_of_lists))
+pb$tick(0)
+
+for (i in seq_along(job_list_of_lists)) {
+  pb$tick(1)
+  test_read_pheno[, job_list_of_lists[[i]]$new_columns := purrr::map(functions, rowwise_fn, .SD, na.rm = TRUE), .SDcols = job_list_of_lists[[i]]$columns]
+}
+```
+
+
+

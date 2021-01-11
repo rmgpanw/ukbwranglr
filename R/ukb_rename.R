@@ -14,10 +14,6 @@
 #'
 #' @return a renamed ukb df
 #' @export
-#'
-#' @import stringr
-#'
-#' @examples
 ukb_rename <- function(ukb_df, ukb_df_dict) {
   # Parameters
   ## ukb_df: a UKB main dataset

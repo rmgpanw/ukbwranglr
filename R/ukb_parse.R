@@ -19,9 +19,6 @@
 #'
 #' @return returns either the header as a vector or a renamed ukb df
 #' @export
-#' @import stringr
-#'
-#' @examples would convert headers of the form 'f.5912.0.0' to 5912-0.0. Returns error message if headers not start with 'f.'
 process_ukb_df_header <- function(.ukb_df, return_header_only = TRUE) {
 # extract header
 header <- names(.ukb_df)
@@ -63,25 +60,17 @@ header <- names(.ukb_df)
 # ukb_mapping_generator() ----------------------------------------
 # creates mapping df for FieldID / Codings / Column names (FieldID_instance) / descriptive_colnames in ukb_df
 # also mutate a column called 'cont_int_to_na', indicating whether these fields will have special values converted to 'NA' using ukb_parse() in 'cleaning mode'
-# Parameters:
-## .ukb_df: a raw ukb phenotypes file
-## .ukb_data_dict: the ukb data dictionary file
 
 #' Title
 #'
-#' @param .ukb_df
-#' @param .ukb_data_dict
+#' @param .ukb_df A raw ukb phenotypes file
+#' @param .ukb_data_dict The ukb data dictionary file
 #' @param reformat_header if TRUE, process header as for the .tab ukb data file
 #'   made for R, where headers are of the form e.g. 'f.5912.0.0'. This would be
 #'   converted to '5912-0.0'
 #'
-#' @return
+#' @return Mapping df
 #' @export
-#' @import stringr
-#' @import tidyr
-#' @import dplyr
-#'
-#' @examples
 ukb_mapping_generator <- function(.ukb_df, .ukb_data_dict, reformat_header = TRUE) {
 
   # Function to mutate descriptive_colnames column in
@@ -104,8 +93,8 @@ ukb_mapping_generator <- function(.ukb_df, .ukb_data_dict, reformat_header = TRU
                        "/")
 
     for (string in to_underscore) {
-      column_names <- str_replace_all(column_names, string, "_")
-      Field_FieldID_names <- str_replace_all(Field_FieldID_names, string, "_")
+      column_names <- stringr::str_replace_all(column_names, string, "_")
+      Field_FieldID_names <- stringr::str_replace_all(Field_FieldID_names, string, "_")
       }
 
     ## characters to replace with "" (i.e. to remove)
@@ -135,7 +124,7 @@ ukb_mapping_generator <- function(.ukb_df, .ukb_data_dict, reformat_header = TRU
   }
 
   ## make .ukb_df column names into a tibble and append 'mapping' columns
-  mapping_df <- tibble(field_id_full = names(.ukb_df)) %>%
+  mapping_df <- dplyr::tibble(field_id_full = names(.ukb_df)) %>%
     # separate FieldID from full column names
     tidyr::separate(
       col = 'field_id_full',
@@ -153,7 +142,7 @@ ukb_mapping_generator <- function(.ukb_df, .ukb_data_dict, reformat_header = TRU
   ## mutate 'cont_int_to_na' column: indicates whether all special codings for a continuous/integer
     ## variable can be cleaned to 'NA' (see also `ukb_select_codings_to_na.Rmd`)
   mapping_df <- mapping_df %>%
-    dplyr::mutate(cont_int_to_na  = case_when(
+    dplyr::mutate(cont_int_to_na  = dplyr::case_when(
 
       # CONVERT TO NA -------------------------------
       Coding %in% c(
@@ -233,16 +222,10 @@ ukb_mapping_generator <- function(.ukb_df, .ukb_data_dict, reformat_header = TRU
 #'   made for R, where headers are of the form e.g. 'f.5912.0.0'. This would be
 #'   converted to '5912-0.0'
 #'
-#' @return
+#' @return A parsed UKB df
 #' @export
 #'
-#' @import progress
-#' @import dplyr
-#' @import tidyr
-#' @import tidyselect
-#' @import purrr
-#'
-#' @examples
+#' @importFrom magrittr "%>%"
 ukb_parse <- function(ukb_df,
                       ukb_data_dict,
                       ukb_codings,
@@ -347,11 +330,11 @@ ukb_parse <- function(ukb_df,
 
   # Set up progress bar
   pb <- progress::progress_bar$new(format = "[:bar] :current/:total (:percent)",
-                         total = length(unique(na.omit(mapping_df$Coding))))
+                         total = length(unique(stats::na.omit(mapping_df$Coding))))
   pb$tick(0)
 
   # loop through codings and parse columns depending on associated ValueType
-  for (coding in unique(na.omit(mapping_df$Coding))) {
+  for (coding in unique(stats::na.omit(mapping_df$Coding))) {
 
     # progress bar
     pb$tick(1)
@@ -430,7 +413,7 @@ ukb_parse <- function(ukb_df,
 
         #### remove 'nonsense' dates
         ukb_df <- ukb_df %>%
-          dplyr::mutate(across(all_of(selected_cols),
+          dplyr::mutate(dplyr::across(tidyselect::all_of(selected_cols),
                         special_values_to_na))
 
         # continuous variables ---------------------------------------------------

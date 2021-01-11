@@ -17,6 +17,3 @@ returns either the header as a vector or a renamed ukb df
 \description{
 Process UKB header
 }
-\examples{
-would convert headers of the form 'f.5912.0.0' to 5912-0.0. Returns error message if headers not start with 'f.'
-}
