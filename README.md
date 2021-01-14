@@ -1,13 +1,13 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# ukbwranglr
+# ukbwranglr <img src="test.png" align="right" width="100" />
 
 <!-- badges: start -->
 
 <!-- badges: end -->
 
-The goal of ukbwranglr is to …
+The goal of ukbwranglr is to make …
 
 ## Installation
 
