@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# ukbwranglr
+# ukbwranglr <img src="test.png" align="right" width="100" />
 
 <!-- badges: start -->
 <!-- badges: end -->
@@ -39,7 +39,7 @@ devtools::install_github("rmgpanw/ukbwranglr")
 This is a basic example which shows you how to solve a common problem:
 
 ```{r example}
-library(ukbwranglr)
+# library(ukbwranglr)
 ## basic example code
 ```
 

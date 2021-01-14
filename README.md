@@ -30,7 +30,7 @@ devtools::install_github("rmgpanw/ukbwranglr")
 This is a basic example which shows you how to solve a common problem:
 
 ``` r
-library(ukbwranglr)
+# library(ukbwranglr)
 ## basic example code
 ```
 
@@ -57,3 +57,9 @@ You can also embed plots, for example:
 
 In that case, don’t forget to commit and push the resulting figure
 files, so they display on GitHub\!
+
+## TODO
+
+  - Add globalvariables() to remove notes when runnning `check()` (see
+    <https://www.r-bloggers.com/2019/08/no-visible-binding-for-global-variable/>)
+  - Redo `read_pheno()` to use data.table syntax
