@@ -27,6 +27,11 @@ ukb_context(data = my_ukb_data, subset.var = my_ukb_data$sex_f31_0_0 == "Male")
 # ukb_context(data = test_read_pheno, subset.var = (test_read_pheno$systolic_brachial_blood_pressure_during_pwa_f12674_2_0 > 120))
 ```
 
+```{r}
+# icd codes
+ukb_icd_diagnosis(data = test_read_pheno, id = "2928752", icd.version = 10)
+```
+
 
 # ukbwranglr
 
@@ -99,20 +104,59 @@ summarise_test_read_pheno <- summarise_rowise(
 )
 
 summarise_numerical_test_read_pheno_mean <-
-  summarise_rowise_numerical_mean_min_max(ukb_df = test_read_pheno,
+  summarise_rowise_numerical_mean_min_max(ukb_pheno = test_read_pheno,
                                           ukb_mapping_df = data_dict,
                                           mean_min_max = "rowMeans")
 
 summarise_numerical_test_read_pheno_min <-
-  summarise_rowise_numerical_mean_min_max(ukb_df = test_read_pheno,
+  summarise_rowise_numerical_mean_min_max(ukb_pheno = test_read_pheno,
                                           ukb_mapping_df = data_dict,
                                           mean_min_max = "pmin")
 
 summarise_numerical_test_read_pheno_max <-
-  summarise_rowise_numerical_mean_min_max(ukb_df = test_read_pheno,
+  summarise_rowise_numerical_mean_min_max(ukb_pheno = test_read_pheno,
                                           ukb_mapping_df = data_dict,
                                           mean_min_max = "pmax")
 ```
+
+```{r}
+# number of noncancer diagnoses
+test_noncancer <- summarise_rowise(
+  ukb_pheno = test_read_pheno,
+  functions = c("n_not_na"),
+  data_dict = data_dict,
+  grouping_col = "Field_FieldID",
+  selected_col_groups = data_dict %>% 
+    dplyr::filter(FieldID == 20002) %>% 
+    .$Field_FieldID %>% 
+    unique(),
+  na.rm = TRUE
+)
+
+# eid with many diagnoses
+id <- test_noncancer %>% 
+  dplyr::arrange(desc(n_not_na_noncancer_illness_code_selfreported_20002)) %>% 
+  .$eid %>% 
+  head(n = 1)
+
+# code adapted from ukbtools
+individual_codes <- test_read_pheno %>%
+      dplyr::filter(eid %in% id) %>%
+      dplyr::select(
+        tidyselect::contains("noncancer_illness")) %>%
+      t() %>%
+      tibble::as_tibble() %>%
+      tidyr::drop_na()
+
+colnames(individual_codes) <- id
+
+# ...now make dummy icd10 data and use ukbtools to convert to icd10 meanings
+test_icd10 <- data.frame("3366654" = c("E14", "E13", "E12"))
+test <- test_icd10 %>%
+  purrr::map( ~ ukb_icd_code_meaning(c(.), 10)) %>%
+  dplyr::bind_rows(.id = "sample")
+```
+
 
 ## Diabetes 
 
@@ -135,9 +179,9 @@ test_read_pheno %>%
 #### Mutate indicator column and assess DM numbers
 
 ```{r}
-test_read_pheno <- diabetes_type(test_read_pheno, data_dict)
+test_read_pheno <- diabetes_type_first_occurrence(test_read_pheno, data_dict)
 
-table(test_read_pheno$dm_type_first_occurrence)
+table(test_read_pheno$diabetes_type_first_occurrence)
 ```
 
 #### Date of diagnosis
