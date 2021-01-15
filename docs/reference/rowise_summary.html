@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Mutate DOB column from a processed UKB df — ukb_mutate_dob • ukbwranglr</title>
+<title>Summarise a group of column row-wise — rowise_summary • ukbwranglr</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Mutate DOB column from a processed UKB df — ukb_mutate_dob" />
-<meta property="og:description" content="Mutate DOB column from a processed UKB df" />
+<meta property="og:title" content="Summarise a group of column row-wise — rowise_summary" />
+<meta property="og:description" content="Summarise a group of column row-wise" />
 
 
 
@@ -124,33 +124,44 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Mutate DOB column from a processed UKB df</h1>
+    <h1>Summarise a group of column row-wise</h1>
     
-    <div class="hidden name"><code>ukb_mutate_dob.Rd</code></div>
+    <div class="hidden name"><code>rowise_summary.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Mutate DOB column from a processed UKB df</p>
+    <p>Summarise a group of column row-wise</p>
     </div>
 
-    <pre class="usage"><span class='fu'>ukb_mutate_dob</span><span class='op'>(</span><span class='va'>ukb_df</span>, <span class='va'>ukb_mapping_df</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>rowise_summary</span><span class='op'>(</span><span class='va'>ukb_pheno</span>, <span class='va'>function_name</span>, <span class='va'>selected_cols</span>, <span class='va'>new_colname</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>ukb_df</th>
-      <td><p>a **cleaned** and **renamed** ukb phenotypes_file</p></td>
+      <th>ukb_pheno</th>
+      <td><p>a **cleaned** and **renamed** ukb phenotype dataset. Must be a
+data.table::datatable</p></td>
     </tr>
     <tr>
-      <th>ukb_mapping_df</th>
-      <td><p>a ukb mapping file generated with ukb_mapping_generator()</p></td>
+      <th>function_name</th>
+      <td><p>A function name as a character</p></td>
+    </tr>
+    <tr>
+      <th>selected_cols</th>
+      <td><p>Character vector of column names</p></td>
+    </tr>
+    <tr>
+      <th>new_colname</th>
+      <td><p>Name of new column to be created</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>the ukb df with a new (DOB) column</p>
+    
+
+
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

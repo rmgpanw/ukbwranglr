@@ -5,3 +5,4 @@
 ^LICENSE\.md$
 ^README\.Rmd$
 ^\.github$
+^vignettes/articles$

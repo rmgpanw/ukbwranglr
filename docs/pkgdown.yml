@@ -3,5 +3,8 @@ pkgdown: 1.6.1
 pkgdown_sha: ~
 articles:
   diabetes_type: diabetes_type.html
-last_built: 2021-01-14T21:07Z
+  ukb_disease_outcomes: ukb_disease_outcomes.html
+  ukb_medications: ukb_medications.html
+  ukbwranglr: ukbwranglr.html
+last_built: 2021-01-15T16:50Z
 

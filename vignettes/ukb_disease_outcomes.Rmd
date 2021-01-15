@@ -1,0 +1,39 @@
+---
+title: "UKB disease outcomes"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{UKB disease outcomes}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(ukbwranglr)
+```
+
+# Overview
+
+Disease outcomes in UKB may be primarily ascertained from the following sources:
+
+- [Self-report data](https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=100074): [cancer](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=20001) and [non-cancer](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=20002) (**Note: the preceding links are self-report data obtained from verbal interviews. Self-report data also includes [touchscreen](https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=100025) responses, however UKB [resource 596](https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=596) recommends that verbal interview data fields are used in preference**)
+- [Primary care data](https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=3000)
+- [Hospital inpatient data](https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=2000)
+- [Death register records](https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=100093)
+
+UKB also provides a set of ['first occurrences'](https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=1712) fields, which record the earliest date a 3-character ICD-10 code (e.g. ICD-10 code 'E11' = 'Non-insulin-dependent diabetes mellitus') appears in one of the categories listed above. **Note: this does not include cancer codes, as these are comprehensively captured by the [cancer register data](https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=100092)
+
+Other sources to consider include: 
+
+- ['Algorithmically-defined outcomes'](https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=42)
+- Medication history (e.g. classify participants as having diabetes if they take insulin) - see `vignette("ukb_medications")`
+
+The rest of this article discusses how disease outcomes may be extracted from each of the data sources outlined above.
+
+# 

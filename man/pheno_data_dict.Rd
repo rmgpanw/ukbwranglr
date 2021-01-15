@@ -6,11 +6,14 @@
 \usage{
 pheno_data_dict(
   path,
+  delim = "\\t",
   ukb_data_dict = "https://biobank.ctsu.ox.ac.uk/~bbdatan/Data_Dictionary_Showcase.tsv"
 )
 }
 \arguments{
-\item{path}{The path to a tab-delimited UKB phenotype file.}
+\item{path}{The path to a UKB phenotype file.}
+
+\item{delim}{Delimiter for the UKB phenotype file. Default is "\\t"}
 
 \item{ukb_data_dict}{The path to a tab-delimited UKB data dictionary. By
 default, this is downloaded directly from the

@@ -2,7 +2,7 @@
 title: "Ascertaining and subclassifying diabetes in the UKB"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{diabetes_in_ukb}
+  %\VignetteIndexEntry{Ascertaining and subclassifying diabetes in the UKB}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

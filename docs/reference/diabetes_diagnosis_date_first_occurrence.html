@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Mutate DOB column from a processed UKB df — ukb_mutate_dob • ukbwranglr</title>
+<title>Get date of diabetes diagnosis based on first occurrence fields — diabetes_diagnosis_date_first_occurrence • ukbwranglr</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,10 @@
 
 
 
-<meta property="og:title" content="Mutate DOB column from a processed UKB df — ukb_mutate_dob" />
-<meta property="og:description" content="Mutate DOB column from a processed UKB df" />
+<meta property="og:title" content="Get date of diabetes diagnosis based on first occurrence fields — diabetes_diagnosis_date_first_occurrence" />
+<meta property="og:description" content="Wrapper around rowise_min_max_date. Extracts the earliest date
+across FieldID's 130706, 130708, 130712, 130710, 130714, 132202. See
+documentation for diabetes_type_first_occurrence also." />
 
 
 
@@ -124,33 +126,36 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Mutate DOB column from a processed UKB df</h1>
+    <h1>Get date of diabetes diagnosis based on first occurrence fields</h1>
     
-    <div class="hidden name"><code>ukb_mutate_dob.Rd</code></div>
+    <div class="hidden name"><code>diabetes_diagnosis_date_first_occurrence.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Mutate DOB column from a processed UKB df</p>
+    <p>Wrapper around <code><a href='rowise_min_max_date.html'>rowise_min_max_date</a></code>. Extracts the earliest date
+across FieldID's 130706, 130708, 130712, 130710, 130714, 132202. See
+documentation for <code><a href='diabetes_type_first_occurrence.html'>diabetes_type_first_occurrence</a></code> also.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>ukb_mutate_dob</span><span class='op'>(</span><span class='va'>ukb_df</span>, <span class='va'>ukb_mapping_df</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>diabetes_diagnosis_date_first_occurrence</span><span class='op'>(</span><span class='va'>ukb_pheno</span>, <span class='va'>data_dict</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>ukb_df</th>
-      <td><p>a **cleaned** and **renamed** ukb phenotypes_file</p></td>
+      <th>ukb_pheno</th>
+      <td><p>a UK Biobank phenotype dataset</p></td>
     </tr>
     <tr>
-      <th>ukb_mapping_df</th>
-      <td><p>a ukb mapping file generated with ukb_mapping_generator()</p></td>
+      <th>data_dict</th>
+      <td><p>a data dictionary for <code>ukb_pheno</code></p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>the ukb df with a new (DOB) column</p>
+    <p>The input UK Biobank dataset with an additional column for date of
+  diabetes diagnosis based on first occurrence fields</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
