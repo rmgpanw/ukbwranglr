@@ -1,0 +1,14 @@
+---
+title: "UKB: Load selected columns"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(ukbwranglr)
+```

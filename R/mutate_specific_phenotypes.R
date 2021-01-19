@@ -5,6 +5,8 @@
 
 # EXPORTED FUNCTIONS ----------------------------------------------------
 
+
+
 #' Ascertain diabetes type from first occurrence fields
 #'
 #' Mutates an indicator column for diabetes type based on UKB first occurrence
@@ -32,12 +34,12 @@ diabetes_type_first_occurrence <- function(
 ) {
 
   # Fields
-  date_E10_first_reported_insulindependent_diabetes_mellitus_f130706_0_0 = get_colname("130706", data_dict)
-  date_E11_first_reported_noninsulindependent_diabetes_mellitus_f130708_0_0 = get_colname("130708", data_dict)
-  date_E13_first_reported_other_specified_diabetes_mellitus_f130712_0_0 = get_colname("130712", data_dict)
-  date_E12_first_reported_malnutritionrelated_diabetes_mellitus_f130710_0_0 = get_colname("130710", data_dict)
-  date_E14_first_reported_unspecified_diabetes_mellitus_f130714_0_0 = get_colname("130714", data_dict)
-  date_O24_first_reported_diabetes_mellitus_in_pregnancy_f132202_0_0 = get_colname("132202", data_dict)
+  date_E10_first_reported_insulindependent_diabetes_mellitus_f130706_0_0 = get_colnames_for_fieldid("130706", data_dict)
+  date_E11_first_reported_noninsulindependent_diabetes_mellitus_f130708_0_0 = get_colnames_for_fieldid("130708", data_dict)
+  date_E13_first_reported_other_specified_diabetes_mellitus_f130712_0_0 = get_colnames_for_fieldid("130712", data_dict)
+  date_E12_first_reported_malnutritionrelated_diabetes_mellitus_f130710_0_0 = get_colnames_for_fieldid("130710", data_dict)
+  date_E14_first_reported_unspecified_diabetes_mellitus_f130714_0_0 = get_colnames_for_fieldid("130714", data_dict)
+  date_O24_first_reported_diabetes_mellitus_in_pregnancy_f132202_0_0 = get_colnames_for_fieldid("132202", data_dict)
 
   # Muate indicator column for diabetes subtype
   ukb_pheno <- ukb_pheno %>%
@@ -169,12 +171,12 @@ diabetes_type_first_occurrence <- function(
 diabetes_diagnosis_date_first_occurrence <- function(ukb_pheno,
                                                      data_dict) {
   # Fields
-  date_E10_first_reported_insulindependent_diabetes_mellitus_f130706_0_0 = get_colname("130706", data_dict)
-  date_E11_first_reported_noninsulindependent_diabetes_mellitus_f130708_0_0 = get_colname("130708", data_dict)
-  date_E13_first_reported_other_specified_diabetes_mellitus_f130712_0_0 = get_colname("130712", data_dict)
-  date_E12_first_reported_malnutritionrelated_diabetes_mellitus_f130710_0_0 = get_colname("130710", data_dict)
-  date_E14_first_reported_unspecified_diabetes_mellitus_f130714_0_0 = get_colname("130714", data_dict)
-  date_O24_first_reported_diabetes_mellitus_in_pregnancy_f132202_0_0 = get_colname("132202", data_dict)
+  date_E10_first_reported_insulindependent_diabetes_mellitus_f130706_0_0 = get_colnames_for_fieldid("130706", data_dict)
+  date_E11_first_reported_noninsulindependent_diabetes_mellitus_f130708_0_0 = get_colnames_for_fieldid("130708", data_dict)
+  date_E13_first_reported_other_specified_diabetes_mellitus_f130712_0_0 = get_colnames_for_fieldid("130712", data_dict)
+  date_E12_first_reported_malnutritionrelated_diabetes_mellitus_f130710_0_0 = get_colnames_for_fieldid("130710", data_dict)
+  date_E14_first_reported_unspecified_diabetes_mellitus_f130714_0_0 = get_colnames_for_fieldid("130714", data_dict)
+  date_O24_first_reported_diabetes_mellitus_in_pregnancy_f132202_0_0 = get_colnames_for_fieldid("132202", data_dict)
 
   # combine into single vector
   diabetes_first_occurrence_datecols = c(

@@ -60,7 +60,10 @@
       <a href="articles/diabetes_type.html">Ascertaining and subclassifying diabetes in the UKB</a>
     </li>
     <li>
-      <a href="articles/ukb_disease_outcomes.html">UKB disease outcomes</a>
+      <a href="articles/ukb_disease_outcomes.html">UKB: Disease outcomes</a>
+    </li>
+    <li>
+      <a href="articles/ukb_load_pheno_subset.html">UKB: Load selected columns</a>
     </li>
     <li>
       <a href="articles/ukb_medications.html">UKB medication history</a>
@@ -81,25 +84,7 @@
       </header><div class="row">
   <div class="contents col-md-9">
 
-<ul>
-<li><a href="#ukbwranglr">ukbwranglr <img src="test.png" align="right" width="100"></a></li>
-<li>
-<a href="#overview">Overview</a>
-<ul>
-<li><a href="#installation">Installation</a></li>
-<li>
-<a href="#basic-usage---reading-a-uk-biobank-dataset-into-r">Basic usage - reading a UK Biobank dataset into R</a>
-<ul>
-<li><a href="#create-data-dictionary">Create data dictionary</a></li>
-<li><a href="#filter-for-required-variables-optional">Filter for required variables (optional)</a></li>
-<li><a href="#read-selected-columns-into-r">Read selected columns into R</a></li>
-</ul>
-</li>
-<li><a href="#todo">TODO</a></li>
-</ul>
-</li>
-</ul>
-<!-- README.md is generated from README.Rmd. Please edit that file --><div id="ukbwranglr-" class="section level1">
+<div id="ukbwranglr-" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
 <a href="#ukbwranglr-" class="anchor"></a>ukbwranglr <img src="test.png" align="right" width="100">
 </h1></div>
@@ -109,33 +94,33 @@
 <div id="overview" class="section level1">
 <h1 class="hasAnchor">
 <a href="#overview" class="anchor"></a>Overview</h1>
-<p>The goal of <code>ukbwranglr</code> is to make getting started with UK Biobank data easier. A raw UK Biobank phenotype file (or subset of) can be loaded into R with human-readable labels without requiring any additional dependencies. A basic usage example for this provided below.</p>
+<p>The goal of <code>ukbwranglr</code> is to make getting started with UK Biobank phenotype data easier. A raw UK Biobank phenotype file (or subset of) can be loaded into R with human-readable labels without requiring any additional dependencies. A basic usage example for this provided below.</p>
 <p>Raw data appearance:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co">#&gt;      eid 31-0.0 34-0.0 21000-0.0 20002-0.0 21001-0.0</span></span>
-<span id="cb1-2"><a href="#cb1-2"></a><span class="co">#&gt; 1: fake1      0   1969      3001      1466   32.0150</span></span>
-<span id="cb1-3"><a href="#cb1-3"></a><span class="co">#&gt; 2: fake2      1   1955         1      1531        NA</span></span>
-<span id="cb1-4"><a href="#cb1-4"></a><span class="co">#&gt; 3: fake3      0   1959      3001      1574   24.1923</span></span>
-<span id="cb1-5"><a href="#cb1-5"></a><span class="co">#&gt; 4: fake4      0   1952      4001      1159   19.2004</span></span>
-<span id="cb1-6"><a href="#cb1-6"></a><span class="co">#&gt; 5: fake5      1   1946        -1      1207        NA</span></span></code></pre></div>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="co">#&gt; 1: fake1      1     NA         2      1366   25.0105</span></span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="co">#&gt; 2: fake2      1   1941      4001        NA   23.1302</span></span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="co">#&gt; 3: fake3      1   1946      2001      1575   24.8198</span></span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="co">#&gt; 4: fake4      0   1959      2002      1421   27.9837</span></span>
+<span id="cb1-6"><a href="#cb1-6"></a><span class="co">#&gt; 5: fake5      0   1955        NA      1312   18.4092</span></span></code></pre></div>
 <p>Appearance when loaded using <code><a href="reference/read_pheno.html">ukbwranglr::read_pheno()</a></code>:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co">#&gt;      eid sex_f31_0_0 year_of_birth_f34_0_0 ethnic_background_f21000_0_0</span></span>
-<span id="cb2-2"><a href="#cb2-2"></a><span class="co">#&gt; 1: fake1      Female                  1969                       Indian</span></span>
-<span id="cb2-3"><a href="#cb2-3"></a><span class="co">#&gt; 2: fake2        Male                  1955                        White</span></span>
-<span id="cb2-4"><a href="#cb2-4"></a><span class="co">#&gt; 3: fake3      Female                  1959                       Indian</span></span>
-<span id="cb2-5"><a href="#cb2-5"></a><span class="co">#&gt; 4: fake4      Female                  1952                    Caribbean</span></span>
-<span id="cb2-6"><a href="#cb2-6"></a><span class="co">#&gt; 5: fake5        Male                  1946                  Do not know</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="co">#&gt; 1: fake1        Male                    NA                        Mixed</span></span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="co">#&gt; 2: fake2        Male                  1941                    Caribbean</span></span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="co">#&gt; 3: fake3        Male                  1946    White and Black Caribbean</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a><span class="co">#&gt; 4: fake4      Female                  1959      White and Black African</span></span>
+<span id="cb2-6"><a href="#cb2-6"></a><span class="co">#&gt; 5: fake5      Female                  1955                         &lt;NA&gt;</span></span>
 <span id="cb2-7"><a href="#cb2-7"></a><span class="co">#&gt;    noncancer_illness_code_selfreported_f20002_0_0</span></span>
-<span id="cb2-8"><a href="#cb2-8"></a><span class="co">#&gt; 1:                                           gout</span></span>
-<span id="cb2-9"><a href="#cb2-9"></a><span class="co">#&gt; 2:                          post-natal depression</span></span>
-<span id="cb2-10"><a href="#cb2-10"></a><span class="co">#&gt; 3:                                     diphtheria</span></span>
-<span id="cb2-11"><a href="#cb2-11"></a><span class="co">#&gt; 4:                              bile duct disease</span></span>
-<span id="cb2-12"><a href="#cb2-12"></a><span class="co">#&gt; 5:                  prostate problem (not cancer)</span></span>
+<span id="cb2-8"><a href="#cb2-8"></a><span class="co">#&gt; 1:                            fibrocystic disease</span></span>
+<span id="cb2-9"><a href="#cb2-9"></a><span class="co">#&gt; 2:                                           &lt;NA&gt;</span></span>
+<span id="cb2-10"><a href="#cb2-10"></a><span class="co">#&gt; 3:                                 herpes simplex</span></span>
+<span id="cb2-11"><a href="#cb2-11"></a><span class="co">#&gt; 4:                              meniere's disease</span></span>
+<span id="cb2-12"><a href="#cb2-12"></a><span class="co">#&gt; 5:                    prolapsed disc/slipped disc</span></span>
 <span id="cb2-13"><a href="#cb2-13"></a><span class="co">#&gt;    body_mass_index_bmi_f21001_0_0</span></span>
-<span id="cb2-14"><a href="#cb2-14"></a><span class="co">#&gt; 1:                        32.0150</span></span>
-<span id="cb2-15"><a href="#cb2-15"></a><span class="co">#&gt; 2:                             NA</span></span>
-<span id="cb2-16"><a href="#cb2-16"></a><span class="co">#&gt; 3:                        24.1923</span></span>
-<span id="cb2-17"><a href="#cb2-17"></a><span class="co">#&gt; 4:                        19.2004</span></span>
-<span id="cb2-18"><a href="#cb2-18"></a><span class="co">#&gt; 5:                             NA</span></span></code></pre></div>
+<span id="cb2-14"><a href="#cb2-14"></a><span class="co">#&gt; 1:                        25.0105</span></span>
+<span id="cb2-15"><a href="#cb2-15"></a><span class="co">#&gt; 2:                        23.1302</span></span>
+<span id="cb2-16"><a href="#cb2-16"></a><span class="co">#&gt; 3:                        24.8198</span></span>
+<span id="cb2-17"><a href="#cb2-17"></a><span class="co">#&gt; 4:                        27.9837</span></span>
+<span id="cb2-18"><a href="#cb2-18"></a><span class="co">#&gt; 5:                        18.4092</span></span></code></pre></div>
 <p>Also included are functions to help with pre-processing the data into an analysable format. Please see <a href="">‘getting started’</a> on the <a href="https://rmgpanw.github.io/ukbwranglr/index.html">package documentation website</a> for further details.</p>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
@@ -148,14 +133,14 @@
 <div id="basic-usage---reading-a-uk-biobank-dataset-into-r" class="section level2">
 <h2 class="hasAnchor">
 <a href="#basic-usage---reading-a-uk-biobank-dataset-into-r" class="anchor"></a>Basic usage - reading a UK Biobank dataset into R</h2>
-<p>The basic work flow is to:</p>
+<p>Steps:</p>
 <ol>
 <li>Create a data dictionary specific to your UK Biobank file - this is generated by downloading the full UK Biobank data dictionary, available on their website <a href="https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide">here</a>
 </li>
 <li>Filter this for the variables you require (optional)</li>
 <li>Read your selected columns into R</li>
 </ol>
-<p>This process is outlined below. Details of how to do this using dummy UK Biobank data (included with this package) are <a href="TODO">here</a></p>
+<p>This process is outlined below for dummy data generated using the <a href="https://github.com/spiros/tofu">tofu library</a>. Details of how to do this using dummy UK Biobank data (included with this package) are <a href="TODO">here</a></p>
 <div id="create-data-dictionary" class="section level3">
 <h3 class="hasAnchor">
 <a href="#create-data-dictionary" class="anchor"></a>Create data dictionary</h3>

@@ -397,8 +397,6 @@ rowise_min_max_date <- function(ukb_pheno,
 #'
 #' @return
 #' @export
-#'
-#' @examples
 rowise_summary <- function(ukb_pheno,
                    function_name,
                    selected_cols,

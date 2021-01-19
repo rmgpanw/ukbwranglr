@@ -5,13 +5,13 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>UKB disease outcomes • ukbwranglr</title>
+<title>UKB: Disease outcomes • ukbwranglr</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="UKB disease outcomes">
+<script src="../pkgdown.js"></script><meta property="og:title" content="UKB: Disease outcomes">
 <meta property="og:description" content="ukbwranglr">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -60,7 +60,10 @@
       <a href="../articles/diabetes_type.html">Ascertaining and subclassifying diabetes in the UKB</a>
     </li>
     <li>
-      <a href="../articles/ukb_disease_outcomes.html">UKB disease outcomes</a>
+      <a href="../articles/ukb_disease_outcomes.html">UKB: Disease outcomes</a>
+    </li>
+    <li>
+      <a href="../articles/ukb_load_pheno_subset.html">UKB: Load selected columns</a>
     </li>
     <li>
       <a href="../articles/ukb_medications.html">UKB medication history</a>
@@ -81,7 +84,7 @@
       </header><script src="ukb_disease_outcomes_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1 data-toc-skip>UKB disease outcomes</h1>
+      <h1 data-toc-skip>UKB: Disease outcomes</h1>
             
       
       
@@ -91,8 +94,6 @@
 
     
     
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">ukbwranglr</span><span class="op">)</span></code></pre></div>
 <div id="overview" class="section level1">
 <h1 class="hasAnchor">
 <a href="#overview" class="anchor"></a>Overview</h1>
@@ -104,17 +105,83 @@
 <li><a href="https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=2000">Hospital inpatient data</a></li>
 <li><a href="https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=100093">Death register records</a></li>
 </ul>
-<p>UKB also provides a set of <a href="https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=1712">‘first occurrences’</a> fields, which record the earliest date a 3-character ICD-10 code (e.g. ICD-10 code ‘E11’ = ‘Non-insulin-dependent diabetes mellitus’) appears in one of the categories listed above. **Note: this does not include cancer codes, as these are comprehensively captured by the <a href="https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=100092">cancer register data</a></p>
+<p>UKB also provides a set of ‘<a href="https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=1712">first occurrences</a>’ fields, which record the earliest date a 3-character ICD-10 code (e.g. ICD-10 code ‘E11’ = ‘Non-insulin-dependent diabetes mellitus’) appears in one of the categories listed above. <strong>Note: this does not include cancer codes, as these are comprehensively captured by the <a href="https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=100092">cancer register data</a></strong></p>
 <p>Other sources to consider include:</p>
 <ul>
-<li><a href="https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=42">‘Algorithmically-defined outcomes’</a></li>
+<li>‘<a href="https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=42">Algorithmically-defined outcomes</a>’</li>
 <li>Medication history (e.g. classify participants as having diabetes if they take insulin) - see <code><a href="../articles/ukb_medications.html">vignette("ukb_medications")</a></code>
 </li>
 </ul>
 <p>The rest of this article discusses how disease outcomes may be extracted from each of the data sources outlined above.</p>
 </div>
-<div id="section" class="section level1">
-<h1></h1>
+<div id="self-report-data-verbal-interview" class="section level1">
+<h1 class="hasAnchor">
+<a href="#self-report-data-verbal-interview" class="anchor"></a>Self-report data (<a href="https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=100074">verbal interview</a>)</h1>
+<p>FieldID’s for self-reported (verbal interview) disease outcomes are categorised into ‘non-cancer’ and ‘cancer’:</p>
+<table class="table">
+<thead><tr class="header">
+<th align="left">Field</th>
+<th>Non-cancer</th>
+<th>Cancer</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">Illness code, self-reported</td>
+<td>
+<a href="https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=20002">20002</a> (<a href="https://biobank.ndph.ox.ac.uk/ukb/coding.cgi?id=6">data-coding 6</a>)</td>
+<td>
+<a href="https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=20001">20001</a> ( <a href="https://biobank.ndph.ox.ac.uk/ukb/coding.cgi?id=3">data-coding 3</a>
+</td>
+</tr>
+<tr class="even">
+<td align="left">Interpolated age when first diagnosed</td>
+<td><a href="https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=20009">20009</a></td>
+<td><a href="https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=20007">20007</a></td>
+</tr>
+<tr class="odd">
+<td align="left">Interpolated year when first diagnosed</td>
+<td><a href="https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=20008">20008</a></td>
+<td><a href="https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=20006">20006</a></td>
+</tr>
+</tbody>
+</table>
+<p>UK Biobank also provides mappings from self-reported illness codes to 3-character ICD-10 codes (<a href="https://biobank.ndph.ox.ac.uk/showcase/coding.cgi?id=609">data-coding 609</a>).</p>
+<blockquote>
+<p><strong>NOTE:</strong> Not all the self-report codes are mapped to ICD-10. For example, the non-cancer illness code <code>1065</code> refers to ‘hypertension’, which cannot be mapped to ICD-10 as it is too vague. Code <code>1072</code>, which refers to ‘essential hypertension’ however <em>is</em> mappable (maps to ICD-10 code <code>I10</code>). Code to filter for these codes is shown below:</p>
+</blockquote>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># get UKB codings dictionary</span>
+<span class="co"># (https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide),</span>
+<span class="co"># filtered for coding 609</span>
+<span class="va">ukb_codings_609</span> <span class="op">&lt;-</span>
+  <span class="fu">readr</span><span class="fu">::</span><span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html">read_tsv</a></span><span class="op">(</span>
+    <span class="st">"https://biobank.ctsu.ox.ac.uk/~bbdatan/Codings.tsv"</span>,
+    col_types <span class="op">=</span> <span class="fu">cols</span><span class="op">(</span>.default <span class="op">=</span> <span class="st">"c"</span><span class="op">)</span>,
+    quote <span class="op">=</span> <span class="st">""</span>
+  <span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">Coding</span> <span class="op">==</span> <span class="st">"609"</span><span class="op">)</span>
+
+<span class="co"># get the full set of UKB self-report non-cancer illness codes form website</span>
+<span class="co"># https://biobank.ndph.ox.ac.uk/ukb/coding.cgi?id=6</span>
+<span class="va">html_page</span> <span class="op">&lt;-</span>
+  <span class="fu">xml2</span><span class="fu">::</span><span class="fu"><a href="http://xml2.r-lib.org/reference/read_xml.html">read_html</a></span><span class="op">(</span><span class="st">"https://biobank.ndph.ox.ac.uk/ukb/coding.cgi?id=6"</span><span class="op">)</span>
+<span class="va">table_nodes</span> <span class="op">&lt;-</span> <span class="fu">xml2</span><span class="fu">::</span><span class="fu"><a href="http://xml2.r-lib.org/reference/xml_find_all.html">xml_find_all</a></span><span class="op">(</span><span class="va">html_page</span>, <span class="st">"//table"</span><span class="op">)</span>
+<span class="va">ukb_selfreport_codings_readable</span> <span class="op">&lt;-</span>
+  <span class="fu">rvest</span><span class="fu">::</span><span class="fu"><a href="https://rvest.tidyverse.org/reference/html_table.html">html_table</a></span><span class="op">(</span><span class="va">table_nodes</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>
+
+<span class="co"># filter for those that were selectable (i.e. no 'special' values like -1)</span>
+<span class="va">ukb_selfreport_codings_readable_no_special_values</span> <span class="op">&lt;-</span>
+  <span class="va">ukb_selfreport_codings_readable</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">Selectable</span> <span class="op">==</span> <span class="st">"Yes"</span><span class="op">)</span>
+
+<span class="co"># filter for those NOT included in the UKB codings file - there are &gt;100 e.g.</span>
+<span class="co"># 1065 = 'hypertension', which is NOT in ukb codings file as too vague, 1072 =</span>
+<span class="co"># 'essential hypertension' is there instead</span>
+<span class="va">ukb_selfreport_codings_readable_no_special_values_not_in_ukb_codings_609</span> <span class="op">&lt;-</span>
+  <span class="va">ukb_selfreport_codings_readable_no_special_values</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="op">!</span><span class="op">(</span><span class="va">Coding</span> <span class="op">%in%</span> <span class="va">ukb_codings_609</span><span class="op">$</span><span class="va">Value</span><span class="op">)</span><span class="op">)</span>
+
+<span class="fu"><a href="https://rdrr.io/r/utils/View.html">View</a></span><span class="op">(</span><span class="va">ukb_selfreport_codings_readable_no_special_values_not_in_ukb_codings_609</span><span class="op">)</span></code></pre></div>
 </div>
   </div>
 
