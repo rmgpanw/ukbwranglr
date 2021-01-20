@@ -25,6 +25,11 @@ A dataframe with 3 columns: \itemize{ \item eid \item column names
   '_value') }
 }
 \description{
-Selects the columns relating to a specified FieldID (plus the 'eid' column)
-and applies \code{\link[dplyr]{pivot_longer}}.
+Helper function. Selects the columns relating to a specified FieldID (plus the 'eid' column)
+and applies \code{\link[tidyr]{pivot_longer}}.
 }
+\seealso{
+Other extract disease outcomes helpers: 
+\code{\link{field_id_pivot_longer_multi}()}
+}
+\concept{extract disease outcomes helpers}

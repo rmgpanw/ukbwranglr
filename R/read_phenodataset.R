@@ -548,7 +548,8 @@ ukb_rename_columns <- function(pheno_data_dict) {
 
   # Replace special characters
   ## characters to be replaced with "_"
-  to_underscore <- c(" ",
+  to_underscore <- c(" - ",
+                     " ",
                      "/",
                      "\\.")
 

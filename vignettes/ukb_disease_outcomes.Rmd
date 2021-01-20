@@ -10,7 +10,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
+```{r setup, include = FALSE}
 library(ukbwranglr)
 library(tidyverse)
 library(readr)
@@ -125,86 +125,54 @@ all(ukb_codings_609$Value %in% ukb_selfreport_icd_map$Coding)
 - join with ICD codes
 
 ```{r}
-# cols for fieldid 20002
-test_self_report <- dummy_ukb_data %>%
-  select(eid,
-         all_of(
-           get_colnames_for_fieldid(field_id = "20002",
-                                    data_dict = dummy_data_dict)
-         ))
+# self_report_non_cancer
+self_report_non_cancer_fields_ids <- c("20002", "20008", "20009")
 
-# get UKB codings
-f20002_codings <- extract_codings_for_fieldid(field_id = "20002", ukb_data_dict = dummy_data_dict, ukb_codings = ukb_codings)
+self_report_non_cancer_diagnoses <- field_id_pivot_longer_multi(
+  field_ids = self_report_non_cancer_fields_ids,
+  ukb_pheno = dummy_ukb_data,
+  data_dict = dummy_data_dict,
+  ukb_codings = ukb_codings
+)
 
-test <- f20002_codings %>% filter(Value != -1)
-
-length(unique(test$Value))
-length(unique(f20002_codings$Value))
-
-# pivot longer - includes extra cols for manual checking
-test_self_report_long <- test_self_report %>% 
-  pivot_longer(
-    cols = all_of(get_colname(field_id = "20002", ukb_mapping_df = dummy_data_dict)),
-    # values_drop_na = TRUE
-  ) %>% 
-  left_join(f20002_codings, by = c("value" = "Meaning"))
-
-# now without extra cols, as function
-# self_report_to_icd10 <- function(ukb_pheno,
-#                                  field_id,
-#                                  data_dict,
-#                                  ukb_codings) {
-#   
-#   # filter ukb_pheno for selected cols (eid + fieldid cols)
-#   selected_cols <- get_colname(field_id = field_id,
-#                        ukb_mapping_df = data_dict)
-#   
-#   ukb_pheno <- ukb_pheno %>%
-#   select(eid,
-#          all_of(selected_cols))
-#   
-#   # get codings for fieldid
-#   field_id_codings <- ukb_codings %>% 
-#   filter(Coding == (data_dict %>% 
-#                       filter(FieldID == field_id) %>% 
-#                       .$Coding %>% 
-#                       head(n = 1)))
-#   
-#   ukb_pheno <- ukb_pheno %>% 
-#     pivot_longer(
-#       cols = all_of(selected_cols),
-#       values_to = paste(paste0("f", field_id), "value", sep = "_")
-#     ) %>% 
-#     mutate(instance_array = colname_to_field_inst_array_df(name)$instance_array)
-#   
-#   # rename
-#   names(ukb_pheno)[which(names(ukb_pheno) == 'name')] <- paste0("f", field_id)
-#   
-#   return(ukb_pheno)
-# }
-
-test_self_report_long <- field_id_pivot_longer(ukb_pheno = dummy_ukb_data, 
-                     field_id = "20002", 
-                     data_dict = dummy_data_dict, 
-                     ukb_codings = ukb_codings)
-
-
-test <- recode_ukbcol(df = test_self_report_long, col_to_recode = "f20002_value", field_id = "20002", ukb_data_dict = dummy_data_dict, ukb_codings = ukb_codings, mapping_direction = "meaning_code")
-
-test2 <- recode_ukbcol(df = test_self_report_long, col_to_recode = "f20002_value", field_id = "20002", ukb_data_dict = dummy_data_dict, ukb_codings = ukb_codings, mapping_direction = "meaning_code")
-
-# now multiple field_ids
-fields_ids <- c("20002", "20008", "20009")
-
-test <- fields_ids %>% 
-  map(field_id_pivot_longer, ukb_pheno = dummy_ukb_data,
-                     data_dict = dummy_data_dict, 
-                     ukb_codings = ukb_codings) %>% 
-  reduce(inner_join, "eid", "instance_array")
-
-  # %>% 
-  #   left_join(field_id_codings, by = c("value" = "Meaning")) %>% 
-  #   select(eid, coding = Value) %>% 
-  #   left_join(self_report_icd_map, by = "coding") %>% 
-  #   rename(icd10code = meaning)
+test <- get_self_report_non_cancer_diagnoses(
+  dummy_ukb_data,
+  dummy_data_dict,
+  ukb_codings
+)
 ```
+
+# Hospital inpatient data - summary diagnoses
+
+These fields ([category 2002](https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=2002)) summarise diagnoses made during hospital inpatient admissions, recorded as either ICD9 or ICD10 codes: 
+
+| Field | ICD9 | ICD10 |
+|:------|------|-------|
+| Diagnoses | [41271](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=41271) ([data-coding 87](https://biobank.ndph.ox.ac.uk/ukb/coding.cgi?id=87)) | [41270](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=41270) ([data-coding 19](https://biobank.ndph.ox.ac.uk/ukb/coding.cgi?id=19))|
+| Date of first in-patient diagnosis | [41281](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=41281) | [41280](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=41280) |
+
+>**Note:** Diagnoses are categorised into main and secondary diagnoses, with separate FieldIDs provided for both (further subdivided into ICD-9 and ICD-10). The table above lists those summary fields which include both main and secondary diagnoses.
+
+*See also [resource 141140](https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=141140) for further details re hospital inpatient data*
+
+```{r}
+# self_report_non_cancer
+hes_icd10_fields_ids <- c("41270", "41280")
+
+hes_icd10_diagnoses <- field_id_pivot_longer_multi(
+  field_ids = hes_icd10_fields_ids,
+  ukb_pheno = dummy_ukb_data,
+  data_dict = dummy_data_dict,
+  ukb_codings = ukb_codings
+)
+
+test <- get_hes_icd10_diagnoses(
+  dummy_ukb_data,
+  dummy_data_dict,
+  ukb_codings
+)
+
+hm <- get_diagnoses_set_index_code_date_cols(get_diagnoses_df = hes_icd10_diagnoses, index_col = "f41270", code_col = "f41270_value", date_col = "f41280_value", code_type = "ICD10"
+)
+```
+

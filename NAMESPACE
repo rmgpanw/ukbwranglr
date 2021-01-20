@@ -2,7 +2,9 @@
 
 export(diabetes_diagnosis_date_first_occurrence)
 export(diabetes_type_first_occurrence)
-export(get_colnames_for_fieldid)
+export(extract_codings_for_fieldids)
+export(field_id_pivot_longer_multi)
+export(get_colnames_for_fieldids)
 export(my_skim)
 export(pheno_data_dict)
 export(process_ukb_df_header)

@@ -9,12 +9,11 @@
 
 # Overview
 
-The goal of `ukbwranglr` is to make getting started with UK Biobank
-phenotype data easier. A raw UK Biobank phenotype file (or subset of)
-can be loaded into R with human-readable labels without requiring any
-additional dependencies. A basic usage example for this provided below.
+The goal of `ukbwranglr` is to facilitate exploratory analyses with UK
+Biobank phenotype data. A raw UK Biobank phenotype file (or a subset of
+selected columns) can be loaded into R with human-readable labels:
 
-Raw data appearance:
+*Raw data appearance:*
 
     #>      eid 31-0.0 34-0.0 21000-0.0 20002-0.0 21001-0.0
     #> 1: fake1      1     NA         2      1366   25.0105
@@ -23,7 +22,7 @@ Raw data appearance:
     #> 4: fake4      0   1959      2002      1421   27.9837
     #> 5: fake5      0   1955        NA      1312   18.4092
 
-Appearance when loaded using `ukbwranglr::read_pheno()`:
+*Appearance when loaded using `ukbwranglr::read_pheno()`:*
 
     #>      eid sex_f31_0_0 year_of_birth_f34_0_0 ethnic_background_f21000_0_0
     #> 1: fake1        Male                    NA                        Mixed
@@ -45,9 +44,18 @@ Appearance when loaded using `ukbwranglr::read_pheno()`:
     #> 5:                        18.4092
 
 Also included are functions to help with pre-processing the data into an
-analysable format. Please see [‘getting started’]() on the [package
-documentation website](https://rmgpanw.github.io/ukbwranglr/index.html)
-for further details.
+analysable format. For example:
+
+  - Identify participants with certain health conditions or taking
+    certain medications (with dates)
+  - Summarise repeated biomarker measurements (e.g. extract the mean
+    systolic blood pressure measurement)
+
+Please see [‘getting
+started’](https://rmgpanw.github.io/ukbwranglr/articles/ukbwranglr.html)
+on the [package documentation
+website](https://rmgpanw.github.io/ukbwranglr/index.html) for further
+details.
 
 ## Installation
 
@@ -73,7 +81,7 @@ Steps:
 This process is outlined below for dummy data generated using the [tofu
 library](https://github.com/spiros/tofu). Details of how to do this
 using dummy UK Biobank data (included with this package) are
-[here](TODO)
+[here](TODO).
 
 ### Create data dictionary
 
@@ -82,13 +90,13 @@ using dummy UK Biobank data (included with this package) are
 library(ukbwranglr)
 
 # create data dictionary
-data_dict <- pheno_data_dict("PATH_TO_MY_UKB_FILE.tab")
+data_dict <- pheno_data_dict("MY_UKB_FILE.tab")
 ```
 
-### Filter for required variables (optional)
+### Filter data dictionary for required variables (optional)
 
-*Note: you could also write the data dictionary to a `.csv` file and
-filter manually in excel*
+> *Note: you could also write the data dictionary to a `.csv` file and
+> filter for your required fields manually in excel*
 
 ``` r
 # Filter for sex, year of birth, BMI and self-reported noncancer-illness fields
@@ -102,7 +110,7 @@ data_dict <- data_dict %>%
 ### Read selected columns into R
 
 ``` r
-ukb_pheno <- read_pheno(path = "PATH_TO_MY_UKB_FILE.tab", 
+ukb_pheno <- read_pheno(path = "MY_UKB_FILE.tab", 
                         ukb_data_dict = data_dict)
 ```
 
@@ -111,3 +119,4 @@ ukb_pheno <- read_pheno(path = "PATH_TO_MY_UKB_FILE.tab",
   - Add globalvariables() to remove notes when runnning `check()` (see
     <https://www.r-bloggers.com/2019/08/no-visible-binding-for-global-variable/>)
   - Redo `read_pheno()` to use data.table syntax
+  - Labelling categorical values: fieldID 20002 has multiple labels for

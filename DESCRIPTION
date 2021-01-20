@@ -13,7 +13,8 @@ Suggests:
     knitr,
     rmarkdown
 VignetteBuilder: knitr
-Imports: 
+Imports:
+    assertthat,
     data.table,
     dplyr,
     lubridate,

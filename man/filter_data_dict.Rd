@@ -16,8 +16,6 @@ filter_data_dict(data_dict, filter_col, filter_value, return_col)
 
 \item{return_col}{Character. The column in `data_dict` to return after
 filtering.}
-
-\item{field_id}{Character. A UK Biobank Field ID}
 }
 \value{
 A vector.
@@ -30,7 +28,7 @@ from another column
 General helper function.
 }
 \seealso{
-Other Data dictionary functions: 
-\code{\link{get_colnames_for_fieldid}()}
+Other data dictionary helper functions: 
+\code{\link{get_colnames_for_fieldids}()}
 }
-\concept{Data dictionary functions}
+\concept{data dictionary helper functions}

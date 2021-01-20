@@ -33,3 +33,9 @@ default, this is downloaded directly from the
 \description{
 Generates a `mapping_df` for \code{\link{recode_ukbcol}}
 }
+\seealso{
+Other recode UKB values: 
+\code{\link{recode_column}()},
+\code{\link{recode_ukbcol}()}
+}
+\concept{recode UKB values}

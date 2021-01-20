@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{my_skim}
 \alias{my_skim}
-\title{Summarise a dataframe by column type}
+\title{Quickly summarise a dataframe}
 \usage{
 my_skim(data, ...)
 }
@@ -10,6 +10,9 @@ my_skim(data, ...)
 \item{data}{a dataframe}
 }
 \description{
+A tidyverse-friendly summary function that summarises a dataframe by column type
+}
+\details{
 Works with \code{dplyr::group_by()} and the pipe. See the
 \code{\link[skimr]{skim}} documentation for more details. Adapts the
 \code{skimr::skim()} function to include proportion counts for factor

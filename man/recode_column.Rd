@@ -21,7 +21,7 @@ Returns the input dataframe with recoded values in the specified
 Uses a `mapping_df` to recode the values for a selected column
 (`col_to_recode`) in a dataframe (`df`). The `mapping_df` should only contain
 2 columns named "old_vals" (containing values in `df[[col_to_recode]]` to be
-recoded) and "new_vals" (replacement values).
+recoded) and "new_vals" (replacement values). There should also be no duplicated values in either column.
 
 A warning is generated if `mapping_df$old_vals` does not contain all values
 in `df`, or if the return value has more rows than the original `df` (i.e. a
@@ -34,3 +34,9 @@ mutating join has been performed)
   retaining the "new_vals" in `mapping_df`.
 }
 
+\seealso{
+Other recode UKB values: 
+\code{\link{recode_column_coding_meaning_value_mapping_df}()},
+\code{\link{recode_ukbcol}()}
+}
+\concept{recode UKB values}

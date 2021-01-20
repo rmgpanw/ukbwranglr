@@ -44,8 +44,16 @@ The UK Biobank codings for a given FieldID (`field_id`) are extracted into
   a `mapping_df`, which is formatted for use with
   \code{\link{recode_column}}. This then recodes the specified column
   (`col_to_recode`) in `df` from either meaning to raw UK Biobank codings
-  (default) or vice versa. See also columns "Value" and "Meaning" in the
-  \href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{UKB
-   codings dictionary}
+  (default) or vice versa.
 }
 
+\seealso{
+columns "Value" and "Meaning" in the
+  \href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{UKB
+   codings dictionary}
+
+Other recode UKB values: 
+\code{\link{recode_column_coding_meaning_value_mapping_df}()},
+\code{\link{recode_column}()}
+}
+\concept{recode UKB values}

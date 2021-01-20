@@ -5,7 +5,6 @@ output: html_notebook
 
 ```{r setup}
 library(ukbwranglr)
-library(ukbtools)
 library(configr)
 library(tidyverse)
 
@@ -26,38 +25,25 @@ ukb_codings <- data.table::fread(
     quote = " ",
     na.strings = c("", "NA")
   )
+
+ukb_data_dict <- data.table::fread(
+    "https://biobank.ctsu.ox.ac.uk/~bbdatan/Data_Dictionary_Showcase.tsv",
+    colClasses = c('character'),
+    sep = "\t",
+    quote = " ",
+    na.strings = c("", "NA")
+  )
 ```
 
-# ukbtools
+# Overview
 
-```{r}
-path_to_example_data <- system.file("extdata", package = "ukbtools")
-my_ukb_data <- ukb_df("ukbxxxx", path = path_to_example_data)
-```
-
-```{r}
-mapper <- ukb_df_field("ukbxxxx", path = path_to_example_data)
-```
-
-```{r}
-ukb_context(data = my_ukb_data, subset.var = my_ukb_data$sex_f31_0_0 == "Male")
-
-# ukb_context(data = test_read_pheno, subset.var = test_read_pheno$sex_f31_0_0 == "Male")
-# 
-# ukb_context(data = test_read_pheno, subset.var = (test_read_pheno$systolic_brachial_blood_pressure_during_pwa_f12674_2_0 > 120))
-```
-
-```{r}
-# icd codes
-ukb_icd_diagnosis(data = test_read_pheno, id = "2928752", icd.version = 10)
-```
-
+Testing notebook for ukbwranglr
 
 # ukbwranglr
 
 ## Functions
 
-### Make pheno_data_dict
+### `pheno_data_dict()` and `read_pheno()`
 
 ````{r}
 small_file_path <- "/Users/alasdair/OneDrive - University College London/Lenovo backup 181219/WellcomePhD/Year2/ukbiobank/ukb_dr_gwas/data/ukb_main_filter.txt"
@@ -80,7 +66,7 @@ test_read_pheno <- read_pheno(small_file_path, pheno_data_dict = data_dict)
 # test_read_pheno <- read_pheno(big_file_path, pheno_data_dict = data_dict_filter)
 ```
 
-### Mutate DOB
+### `ukb_mutate_dob()`
 
 ```{r}
 ukb_main_filter_parsed_CLEAN <- ukb_mutate_dob(ukb_df = test_read_pheno,
