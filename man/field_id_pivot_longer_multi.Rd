@@ -4,10 +4,10 @@
 \alias{field_id_pivot_longer_multi}
 \title{Apply pivot_longer across multiple sets of columns}
 \usage{
-field_id_pivot_longer_multi(fields_ids, ukb_pheno, data_dict, ukb_codings)
+field_id_pivot_longer_multi(field_ids, ukb_pheno, data_dict, ukb_codings)
 }
 \arguments{
-\item{fields_ids}{Character vector of FieldIDs}
+\item{field_ids}{Character vector of FieldIDs}
 
 \item{ukb_pheno}{a UK Biobank phenotype dataset}
 

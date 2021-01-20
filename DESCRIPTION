@@ -1,6 +1,6 @@
 Package: ukbwranglr
 Type: Package
-Title: Working with raw UKB data
+Title: Explore UKB data
 Version: 0.1.0
 Authors@R: 
   person("Alasdair", "Warwick", email = "alasdair.warwick06@gmail.com", role = c("aut", "cre"))

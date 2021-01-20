@@ -38,9 +38,10 @@ ukb_codings <- data.table::fread(
 Disease outcomes in UKB may be primarily ascertained from the following sources:
 
 - [Self-report data](https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=100074): [cancer](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=20001) and [non-cancer](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=20002) 
-- [Primary care data](https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=3000)
 - [Hospital inpatient data](https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=2000)
 - [Death register records](https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=100093)
+- [Cancer register data](https://biobank.ndph.ox.ac.uk/showcase/label.cgi?id=100092)
+- [Primary care data](https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=3000)
 
 >**Note:** the preceding links for self-report data relate to verbal interview responses. Self-report data also includes [touchscreen](https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=100025) responses, however UKB [resource 596](https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=596) recommends that the verbal interview data fields are used in preference
 
@@ -65,11 +66,9 @@ FieldID's for self-reported (verbal interview) disease outcomes are categorised 
 | Interpolated year when first diagnosed | [20008](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=20008) | [20006](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=20006) |
 | Interpolated age when first diagnosed | [20009](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=20009) | [20007](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=20007) |
 
-## Mapping to ICD-10 codes
+UK Biobank also provides mappings from self-reported non-cancer illness codes to 3-character ICD-10 codes ([data-coding 609](https://biobank.ndph.ox.ac.uk/showcase/coding.cgi?id=609)). 
 
-UK Biobank also provides mappings from self-reported illness codes to 3-character ICD-10 codes ([data-coding 609](https://biobank.ndph.ox.ac.uk/showcase/coding.cgi?id=609)). 
-
->**NOTE:** Not all the self-report codes are mapped to ICD-10 (111 out of 447). For example, the non-cancer illness code `1065` refers to 'hypertension', which cannot be mapped to ICD-10 as it is too non-specific Code `1072`, which refers to 'essential hypertension' however *is* mappable (maps to ICD-10 code `I10`). Code to filter for these codes is shown below:
+>**NOTE:** Not all the self-report codes are mapped to ICD-10 (111 out of 447). For example, the non-cancer illness code `1065` refers to 'hypertension', which cannot be mapped to ICD-10 as it is too non-specific Code `1072`, which refers to 'essential hypertension' however *is* mappable (maps to ICD-10 code `I10`). Self-report codes that do not map to ICD-10 may be identified as follows:
 
 ```{r eval=FALSE}
 # get UKB codings dictionary
@@ -117,32 +116,83 @@ ukb_selfreport_icd_map <- rvest::html_table(table_nodes[[2]])
 all(ukb_codings_609$Value %in% ukb_selfreport_icd_map$Coding)
 ```
 
-## Identifying disease outcomes by ICD-10 code
+>**NOTE:** Self-reported cancer conditions are _not_ mapped to ICD10 as they are comprehensively captured by the cancer register. They are also _not_ included in the 'first occurrences' data fields (see [resource 593](https://biobank.ndph.ox.ac.uk/showcase/refer.cgi?id=593))
 
-- Get FieldID's 20002, 20008 and 20009 separately
-- Pivot longer
-- row_bind
-- join with ICD codes
+## Identifying health outcomes using diagnostic codes
 
-```{r}
-# self_report_non_cancer
-self_report_non_cancer_fields_ids <- c("20002", "20008", "20009")
+### Non-cancer medical conditions
 
-self_report_non_cancer_diagnoses_test <- field_id_pivot_longer_multi(
-  field_ids = self_report_non_cancer_fields_ids,
-  ukb_pheno = dummy_ukb_data,
-  data_dict = dummy_data_dict,
-  ukb_codings = ukb_codings
-)
+**Step 1:** A long format table summarising all self-reported non-cancer medical conditions (coded as per [data coding 6](https://biobank.ndph.ox.ac.uk/showcase/coding.cgi?id=6)) for each UK Biobank participant can be created as follows:
+
+```{r eval = FALSE}
+# get UKB codings file
+ukb_codings <- data.table::fread(
+    "https://biobank.ctsu.ox.ac.uk/~bbdatan/Codings.tsv",
+    colClasses = c('character'),
+    sep = "\t",
+    quote = " ",
+    na.strings = c("", "NA")
+  )
 
 self_report_non_cancer_diagnoses <- get_self_report_non_cancer_diagnoses(
-  dummy_ukb_data,
-  dummy_data_dict,
-  ukb_codings
+  ukb_pheno, # dataset read into R using read_pheno()
+  data_dict, # data dictionary created with pheno_data_dict()
+  ukb_codings # the UKB codings file
 )
 ```
 
+Alternatively, this can be created using [ICD10 code mappings](https://biobank.ndph.ox.ac.uk/showcase/coding.cgi?id=609) (see note above):
+
+```{r eval = FALSE}
+self_report_non_cancer_diagnoses_icd10 <- get_self_report_non_cancer_diagnoses_icd10(
+  ukb_pheno, # dataset read into R using read_pheno()
+  data_dict, # data dictionary created with pheno_data_dict()
+  ukb_codings # the UKB codings file
+)
+```
+
+```{r include = FALSE}
+self_report_non_cancer_diagnoses_icd10 <- get_self_report_non_cancer_diagnoses_icd10(
+  ukb_pheno = dummy_ukb_data, 
+  data_dict = dummy_data_dict, 
+  ukb_codings = ukb_codings
+)
+```
+
+**Step 2:** These may then be used to retrieve UK Biobank participants with one or more specified codes in these records, as well as the earliest recorded date (i.e. the earliest date for any one of these codes):
+
+```{r}
+# select ICD10 codes
+selected_codes <- c("A014", "N12", "L86")
+
+# extract eids with these codes, as well as the earliest recorded date
+get_first_diagnostic_code_record(self_report_non_cancer_diagnoses_icd10,
+                                 selected_codes) %>% 
+  head() # display first few rows only
+```
+
+### Cancer
+
+Follow the same work flow as for non-cancer medical conditions, using `get_self_report_cancer_diagnoses` instead for step 1.
+
+```{r eval=FALSE, include=FALSE}
+self_report_cancer_codes <- as.character(1000:1030)
+
+self_report_cancer_diagnoses <- get_self_report_cancer_diagnoses(
+  ukb_pheno = dummy_ukb_data, 
+  data_dict = dummy_data_dict, 
+  ukb_codings = ukb_codings
+)
+
+# extract eids with these codes, as well as the earliest recorded date
+get_first_diagnostic_code_record(self_report_cancer_diagnoses,
+                                 self_report_cancer_codes) %>% 
+  head() # display first few rows only
+```
+
 # Hospital inpatient data - summary diagnoses
+
+## Introduction
 
 These fields ([category 2002](https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=2002)) summarise diagnoses made during hospital inpatient admissions, recorded as either ICD9 or ICD10 codes: 
 
@@ -155,21 +205,136 @@ These fields ([category 2002](https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=200
 
 *See also [resource 141140](https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=141140) for further details re hospital inpatient data*
 
-```{r}
-# self_report_non_cancer
-hes_icd10_fields_ids <- c("41270", "41280")
+## Identifying health outcomes using diagnostic codes
 
-hes_icd10_diagnoses_test <- field_id_pivot_longer_multi(
-  field_ids = hes_icd10_fields_ids,
-  ukb_pheno = dummy_ukb_data,
-  data_dict = dummy_data_dict,
-  ukb_codings = ukb_codings
-)
+Use the same work flow as described for self-report data. To generate a long format table summarising all self-reported non-cancer medical conditions for each UK Biobank participant, use `get_hes_icd10_diagnoses()` or `get_hes_icd9_diagnoses()`:
 
+```{r eval = FALSE}
 hes_icd10_diagnoses <- get_hes_icd10_diagnoses(
-  dummy_ukb_data,
-  dummy_data_dict,
-  ukb_codings
+  ukb_pheno, # dataset read into R using read_pheno()
+  data_dict, # data dictionary created with pheno_data_dict()
+  ukb_codings # the UKB codings file
 )
 ```
+
+```{r include = FALSE}
+hes_icd10_diagnoses <- get_hes_icd10_diagnoses(
+  ukb_pheno = dummy_ukb_data, 
+  data_dict = dummy_data_dict, 
+  ukb_codings =  ukb_codings
+)
+```
+
+Then use `get_first_diagnostic_code_record()`:
+
+```{r}
+# select ICD10 codes
+selected_codes <- c("A014", "N12", "L86")
+
+# extract eids with these codes, as well as the earliest recorded date
+get_first_diagnostic_code_record(hes_icd10_diagnoses,
+                                 selected_codes) %>%
+  head() # display first few rows only
+```
+
+# Death register records
+
+## Introduction
+
+Cause of death data [category 100093](https://biobank.ndph.ox.ac.uk/showcase/label.cgi?id=100093) is available as part of a main UK Biobank dataset as ICD10 codes under FieldIDs [40001](https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=40001) (primary cause of death) and [40002](https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=40002) (secondary causes of death).
+
+See also [resource 115559](https://biobank.ndph.ox.ac.uk/showcase/refer.cgi?id=115559) for more information.
+
+## Identifying health outcomes using diagnostic codes
+
+Use the same work flow as described for self-report data. To generate a long format table summarising all self-reported non-cancer medical conditions for each UK Biobank participant, use `get_death_data_icd10_diagnoses()`:
+
+```{r eval = FALSE}
+death_data_icd10_diagnoses <- get_death_data_icd10_diagnoses(
+  ukb_pheno, # dataset read into R using read_pheno()
+  data_dict, # data dictionary created with pheno_data_dict()
+  ukb_codings # the UKB codings file
+)
+```
+
+```{r include = FALSE}
+death_data_icd10_diagnoses <- get_death_data_icd10_diagnoses(
+  ukb_pheno = dummy_ukb_data, 
+  data_dict = dummy_data_dict, 
+  ukb_codings = ukb_codings
+)
+```
+
+Then use `get_first_diagnostic_code_record()`:
+
+```{r}
+# select ICD10 codes
+selected_codes <- c("A014", "N12", "L86", "M7704")
+
+# extract eids with these codes, as well as the earliest recorded date
+get_first_diagnostic_code_record(death_data_icd10_diagnoses,
+                                 selected_codes) %>%
+  head() # display first few rows only
+```
+
+# Cancer register records
+
+## Introduction
+
+Coded data on cancer diagnoses ([category 100092](https://biobank.ndph.ox.ac.uk/showcase/label.cgi?id=100092)) obtained through linkage to the national cancer registries are available from the following fields:
+
+| FieldID | Description |
+|---------|:------------|
+| [40013](https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=40013) | Type of cancer: ICD9 |
+| [40006](https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=40006) | Type of cancer: ICD10 |
+| [40008](https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=40008) | Age at cancer diagnosis |
+| [40005](https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=40005) | Date of cancer diagnosis |
+
+*See also [resource 115558](https://biobank.ndph.ox.ac.uk/showcase/refer.cgi?id=115558) for further details re cancer register data*
+
+## Identifying health outcomes using diagnostic codes
+
+Use the same work flow as described for self-report data. To generate a long format tables (ICD-9 and ICD-10) summarising all cancer conditions recorded for each UK Biobank participant, use `get_cancer_register_icd9_diagnoses()` and `get_cancer_register_icd10_diagnoses()`:
+
+```{r eval=FALSE}
+cancer_register_icd9_diagnoses <- get_cancer_register_icd9_diagnoses(
+  ukb_pheno, # dataset read into R using read_pheno()
+  data_dict, # data dictionary created with pheno_data_dict()
+  ukb_codings # the UKB codings file
+)
+
+cancer_register_icd10_diagnoses <- get_cancer_register_icd10_diagnoses(
+  ukb_pheno, # dataset read into R using read_pheno()
+  data_dict, # data dictionary created with pheno_data_dict()
+  ukb_codings # the UKB codings file
+)
+```
+
+```{r include=FALSE}
+# cancer_register_icd9_diagnoses <- get_cancer_register_icd9_diagnoses(
+#   ukb_pheno = dummy_ukb_data, 
+#   data_dict = dummy_data_dict, 
+#   ukb_codings = ukb_codings
+# )
+
+cancer_register_icd10_diagnoses <- get_cancer_register_icd10_diagnoses(
+  ukb_pheno = dummy_ukb_data, 
+  data_dict = dummy_data_dict, 
+  ukb_codings = ukb_codings
+)
+```
+
+Then use `get_first_diagnostic_code_record()`:
+
+```{r}
+# select ICD10 codes
+selected_codes <- c("C15", "C16", "C17")
+
+# extract eids with these codes, as well as the earliest recorded date
+get_first_diagnostic_code_record(cancer_data_icd10_diagnoses,
+                                 selected_codes) %>%
+  head() # display first few rows only
+```
+
+# Development area
 

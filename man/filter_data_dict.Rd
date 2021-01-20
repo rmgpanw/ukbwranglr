@@ -22,10 +22,11 @@ A vector.
 }
 \description{
 Filters a UK Biobank data dictionary on one column and returns the values
-from another column
+from another column (e.g. filter data dictionary for a FieldID, and return
+the corresponding descriptive column name(s))
 }
 \details{
-General helper function.
+General helper function. Raises an error if produces and empty vector
 }
 \seealso{
 Other data dictionary helper functions: 

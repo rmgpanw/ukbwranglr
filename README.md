@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# ukbwranglr <img src="test.png" align="right" width="100" />
+# ukbwranglr <img src="man/figures/test.png" align="right" width="100" />
 
 <!-- badges: start -->
 
@@ -16,32 +16,32 @@ selected columns) can be loaded into R with human-readable labels:
 *Raw data appearance:*
 
     #>      eid 31-0.0 34-0.0 21000-0.0 20002-0.0 21001-0.0
-    #> 1: fake1      1     NA         2      1366   25.0105
-    #> 2: fake2      1   1941      4001        NA   23.1302
-    #> 3: fake3      1   1946      2001      1575   24.8198
-    #> 4: fake4      0   1959      2002      1421   27.9837
-    #> 5: fake5      0   1955        NA      1312   18.4092
+    #> 1: fake1      0   1946      2002      1139   26.1735
+    #> 2: fake2      0   1946         3      1287   13.8933
+    #> 3: fake3      0   1946      4003      1663   25.8040
+    #> 4: fake4      1     NA      3003      1086   29.4059
+    #> 5: fake5      0   1956      3001        NA   24.8359
 
 *Appearance when loaded using `ukbwranglr::read_pheno()`:*
 
     #>      eid sex_f31_0_0 year_of_birth_f34_0_0 ethnic_background_f21000_0_0
-    #> 1: fake1        Male                    NA                        Mixed
-    #> 2: fake2        Male                  1941                    Caribbean
-    #> 3: fake3        Male                  1946    White and Black Caribbean
-    #> 4: fake4      Female                  1959      White and Black African
-    #> 5: fake5      Female                  1955                         <NA>
+    #> 1: fake1      Female                  1946      White and Black African
+    #> 2: fake2      Female                  1946       Asian or Asian British
+    #> 3: fake3      Female                  1946   Any other Black background
+    #> 4: fake4        Male                    NA                  Bangladeshi
+    #> 5: fake5      Female                  1956                       Indian
     #>    noncancer_illness_code_selfreported_f20002_0_0
-    #> 1:                            fibrocystic disease
-    #> 2:                                           <NA>
-    #> 3:                                 herpes simplex
-    #> 4:                              meniere's disease
-    #> 5:                    prolapsed disc/slipped disc
+    #> 1:               oesophagitis/barretts oesophagus
+    #> 2:                          anxiety/panic attacks
+    #> 3:                        abnormal smear (cervix)
+    #> 4:                       subarachnoid haemorrhage
+    #> 5:                                           <NA>
     #>    body_mass_index_bmi_f21001_0_0
-    #> 1:                        25.0105
-    #> 2:                        23.1302
-    #> 3:                        24.8198
-    #> 4:                        27.9837
-    #> 5:                        18.4092
+    #> 1:                        26.1735
+    #> 2:                        13.8933
+    #> 3:                        25.8040
+    #> 4:                        29.4059
+    #> 5:                        24.8359
 
 Also included are functions to help with pre-processing the data into an
 analysable format. For example:
@@ -113,10 +113,3 @@ data_dict <- data_dict %>%
 ukb_pheno <- read_pheno(path = "MY_UKB_FILE.tab", 
                         ukb_data_dict = data_dict)
 ```
-
-## TODO
-
-  - Add globalvariables() to remove notes when runnning `check()` (see
-    <https://www.r-bloggers.com/2019/08/no-visible-binding-for-global-variable/>)
-  - Redo `read_pheno()` to use data.table syntax
-  - Labelling categorical values: fieldID 20002 has multiple labels for

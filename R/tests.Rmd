@@ -237,109 +237,15 @@ test5 <- rowise_summary(ukb_pheno = test4, function_name = "n_not_na", selected_
 
 ### Self-report
 
-- Get FieldID's 20002, 20008 and 20009 separately
-- Pivot longer
-- row_bind
-- join with ICD codes
-
-```{r}
-# cols for fieldid 20002
-test_self_report <- dummy_ukb_data %>%
-  select(eid,
-         all_of(
-           get_colname(field_id = "20002",
-                       ukb_mapping_df = dummy_data_dict)
-         ))
-
-# get ukb_codings - TODO MAKE FUNCTION TO EXTRACT CODING FOR FIELDID (what if returns NULL?)
-f20002_codings <- ukb_codings %>% 
-  filter(Coding == (dummy_data_dict %>% filter(FieldID == "20002") %>% .$Coding %>% head(n = 1)))
-
-# pivot longer - includes extra cols for manual checking
-test_self_report_long <- test_self_report %>% 
-  pivot_longer(
-    cols = all_of(get_colname(field_id = "20002", ukb_mapping_df = dummy_data_dict)),
-    # values_drop_na = TRUE
-  ) %>% 
-  left_join(f20002_codings, by = c("value" = "Meaning")) %>% 
-  select(eid, coding = Value, value) %>% 
-  left_join(self_report_icd_map, by = "coding") %>% 
-  rename(code = meaning) %>% 
-  left_join(icd10codes, by = "code")
-
-# now without extra cols, as function
-self_report_to_icd10 <- function(ukb_pheno,
-                                 field_id,
-                                 data_dict,
-                                 ukb_codings, 
-                                 self_report_icd_map) {
-  
-  selected_cols <- get_colname(field_id = field_id,
-                       ukb_mapping_df = data_dict)
-  
-  ukb_pheno <- ukb_pheno %>%
-  select(eid,
-         all_of(selected_cols))
-  
-  field_id_codings <- ukb_codings %>% 
-  filter(Coding == (data_dict %>% 
-                      filter(FieldID == field_id) %>% 
-                      .$Coding %>% 
-                      head(n = 1)))
-  
-  ukb_pheno <- ukb_pheno %>% 
-    pivot_longer(
-      cols = all_of(selected_cols),
-      values_to = paste(paste0("f", field_id), "value", sep = "_")
-    ) %>% 
-    mutate(instance_array = colname_to_field_inst_array_df(name)$instance_array)
-}
-
-test_self_report_long <- self_report_to_icd10(ukb_pheno = dummy_ukb_data, 
-                     field_id = "20002", 
-                     data_dict = dummy_data_dict, 
-                     ukb_codings = ukb_codings, 
-                     self_report_icd_map = self_report_icd_map)
-
-# now multiple field_ids
-fields_ids <- c("20002", "20008", "20009")
-
-test <- fields_ids %>% 
-  map(self_report_to_icd10, ukb_pheno = dummy_ukb_data,
-                     data_dict = dummy_data_dict, 
-                     ukb_codings = ukb_codings, 
-                     self_report_icd_map = self_report_icd_map) %>% 
-  reduce(inner_join, by = c("eid", "instance_array"))
-
-  # %>% 
-  #   left_join(field_id_codings, by = c("value" = "Meaning")) %>% 
-  #   select(eid, coding = Value) %>% 
-  #   left_join(self_report_icd_map, by = "coding") %>% 
-  #   rename(icd10code = meaning)
-```
-
-```{r}
-# delete soon!
-# make function to extract field_id, instance, array from colnames
-# descriptive_names <- names(dummy_ukb_data)[2:4]
-# 
-# test <- str_extract(descriptive_names, pattern = "_f[:digit:]+_[:digit:]+_[:digit:]+$") %>% 
-#   str_sub(3L, -1L)
-#   
-# test <- tibble(fieldid_instance_array = test)
-# 
-# test <- test %>% 
-#   separate(col = "fieldid_instance_array", 
-#            into = c("fieldid", "instance", "array"), 
-#            sep = "_", 
-#            remove = FALSE) %>% 
-#   mutate(
-#     fieldid_instance = paste(fieldid, instance, sep = "_"),
-#     instance_array = paste(instance, array, sep = "_"))
-```
-
 
 TODO  - how many unspecified first occurrence dm have self-reported T1 vs T2 DM?
+
+# TODO
+
+- Add globalvariables() to remove notes when runnning `check()` (see https://www.r-bloggers.com/2019/08/no-visible-binding-for-global-variable/)
+- Redo `read_pheno()` to use data.table syntax
+- Labelling categorical values: fieldID 20002 has multiple labels for 
+
 
 # TESTS
 
