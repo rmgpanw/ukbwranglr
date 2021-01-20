@@ -1,6 +1,6 @@
 Package: ukbwranglr
 Type: Package
-Title: Explore UKB data
+Title: Exploring UKB data
 Version: 0.1.0
 Authors@R: 
   person("Alasdair", "Warwick", email = "alasdair.warwick06@gmail.com", role = c("aut", "cre"))
@@ -22,6 +22,7 @@ Imports:
     progress,
     purrr,
     rlang,
+    skimr,
     stringr,
     tidyr,
     tidyselect

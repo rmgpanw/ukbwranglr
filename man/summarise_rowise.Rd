@@ -30,9 +30,6 @@ column groups to summarise}
 \item{...}{arguments to passed on to summary functions listed in
 \code{functions}}
 }
-\value{
-
-}
 \description{
 Allows the user to summarise row-wise across a set of column "groups". e.g.
 calculate standard deviation values for all systolic and diastolic blood

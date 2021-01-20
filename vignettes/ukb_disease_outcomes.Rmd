@@ -336,5 +336,34 @@ get_first_diagnostic_code_record(cancer_register_icd10_diagnoses,
   head() # display first few rows only
 ```
 
+# Ascertaining disease outcomes from multiple sources
+
+Supply a list of functions from the 'get all diagnostic codes' family to `get_all_diagnostic_codes_multi()` (see function documentation for defaults), then apply `get_first_diagnostic_code_record()` to the result:
+
+```{r}
+# list of functions
+list_of_get_diagnostic_codes_functions <-
+  list(
+    get_self_report_non_cancer_diagnoses_icd10,
+    get_hes_icd10_diagnoses,
+    get_cancer_register_icd10_diagnoses
+  )
+
+# select ICD10 codes
+selected_codes <- c("A001", "A156", "E111")
+
+# get all diagnostic codes for selected data sources
+diagnostic_codes_multiple_sources <-
+  get_all_diagnostic_codes_multi(ukb_pheno = dummy_ukb_data,
+                                 data_dict = dummy_data_dict,
+                                 ukb_codings = ukb_codings)
+
+# extract eids with these codes, as well as the earliest recorded date
+get_first_diagnostic_code_record(diagnostic_codes_multiple_sources,
+                                 selected_codes) %>%
+  head() # display first few rows only
+```
+
+
 # Development area
 

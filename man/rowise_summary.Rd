@@ -2,7 +2,7 @@
 % Please edit documentation in R/rowwise_pheno_summaries.R
 \name{rowise_summary}
 \alias{rowise_summary}
-\title{Summarise a group of column row-wise}
+\title{Summarise a group of columns row-wise}
 \usage{
 rowise_summary(ukb_pheno, function_name, selected_cols, new_colname)
 }
@@ -16,9 +16,6 @@ data.table::datatable}
 
 \item{new_colname}{Name of new column to be created}
 }
-\value{
-
-}
 \description{
-Summarise a group of column row-wise
+Summarise a group of columns row-wise
 }

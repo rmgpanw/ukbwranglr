@@ -27,9 +27,6 @@ default, this is downloaded directly from the
 \item{mapping_direction}{Character. Either "meaning_code" (default) or
 "code_meaning"}
 }
-\value{
-
-}
 \description{
 Generates a `mapping_df` for \code{\link{recode_ukbcol}}
 }

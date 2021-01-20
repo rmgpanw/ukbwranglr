@@ -148,7 +148,6 @@ filter_data_dict <- function(data_dict,
 #'
 #' @inheritParams recode_ukbcol
 #'
-#' @return
 #' @family recode UKB values
 recode_column_coding_meaning_value_mapping_df <- function(field_id,
                                                            ukb_data_dict,

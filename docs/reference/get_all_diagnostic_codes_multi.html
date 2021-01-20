@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Helper function for recode_ukbcol — recode_column_coding_meaning_value_mapping_df • ukbwranglr</title>
+<title>Get all diagnostic codes from multiple data sources — get_all_diagnostic_codes_multi • ukbwranglr</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Helper function for recode_ukbcol — recode_column_coding_meaning_value_mapping_df" />
-<meta property="og:description" content="Generates a `mapping_df` for recode_ukbcol" />
+<meta property="og:title" content="Get all diagnostic codes from multiple data sources — get_all_diagnostic_codes_multi" />
+<meta property="og:description" content="Extract diagnostic codes from multiple sources" />
 
 
 
@@ -130,35 +130,34 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Helper function for <code><a href='recode_ukbcol.html'>recode_ukbcol</a></code></h1>
+    <h1>Get all diagnostic codes from multiple data sources</h1>
     
-    <div class="hidden name"><code>recode_column_coding_meaning_value_mapping_df.Rd</code></div>
+    <div class="hidden name"><code>get_all_diagnostic_codes_multi.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Generates a `mapping_df` for <code><a href='recode_ukbcol.html'>recode_ukbcol</a></code></p>
+    <p>Extract diagnostic codes from multiple sources</p>
     </div>
 
-    <pre class="usage"><span class='fu'>recode_column_coding_meaning_value_mapping_df</span><span class='op'>(</span>
-  <span class='va'>field_id</span>,
-  <span class='va'>ukb_data_dict</span>,
-  <span class='va'>ukb_codings</span>,
-  mapping_direction <span class='op'>=</span> <span class='st'>"meaning_code"</span>
+    <pre class="usage"><span class='fu'>get_all_diagnostic_codes_multi</span><span class='op'>(</span>
+  function_list <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='va'>get_self_report_non_cancer_diagnoses_icd10</span>,
+    <span class='va'>get_hes_icd9_diagnoses</span>, <span class='va'>get_hes_icd10_diagnoses</span>, <span class='va'>get_cancer_register_icd9_diagnoses</span>,
+    <span class='va'>get_cancer_register_icd10_diagnoses</span><span class='op'>)</span>,
+  <span class='va'>ukb_pheno</span>,
+  <span class='va'>data_dict</span>,
+  <span class='va'>ukb_codings</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>field_id</th>
-      <td><p>Character. A UK Biobank FieldID</p></td>
+      <th>ukb_pheno</th>
+      <td><p>a UK Biobank phenotype dataset</p></td>
     </tr>
     <tr>
-      <th>ukb_data_dict</th>
-      <td><p>The path to a tab-delimited UKB data dictionary. By
-default, this is downloaded directly from the
-<a href='https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide'>UKB
- website</a>.</p></td>
+      <th>data_dict</th>
+      <td><p>a data dictionary for <code>ukb_pheno</code></p></td>
     </tr>
     <tr>
       <th>ukb_codings</th>
@@ -167,18 +166,27 @@ default, this is downloaded directly from the
 <a href='https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide'>UKB
  website</a>.</p></td>
     </tr>
-    <tr>
-      <th>mapping_direction</th>
-      <td><p>Character. Either "meaning_code" (default) or
-"code_meaning"</p></td>
-    </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>Dataframe</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>Loops through functions from the 'get all diagnostic codes' family and
+combines the results into a single dataframe.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p>Other recode UKB values: 
-<code><a href='recode_column.html'>recode_column</a>()</code>,
-<code><a href='recode_ukbcol.html'>recode_ukbcol</a>()</code></p></div>
+    <div class='dont-index'><p>Other get all diagnostic codes: 
+<code><a href='get_cancer_register_icd10_diagnoses.html'>get_cancer_register_icd10_diagnoses</a>()</code>,
+<code><a href='get_cancer_register_icd9_diagnoses.html'>get_cancer_register_icd9_diagnoses</a>()</code>,
+<code><a href='get_death_data_icd10_diagnoses.html'>get_death_data_icd10_diagnoses</a>()</code>,
+<code><a href='get_diagnoses_set_index_code_date_cols.html'>get_diagnoses_set_index_code_date_cols</a>()</code>,
+<code><a href='get_hes_icd10_diagnoses.html'>get_hes_icd10_diagnoses</a>()</code>,
+<code><a href='get_hes_icd9_diagnoses.html'>get_hes_icd9_diagnoses</a>()</code>,
+<code><a href='get_self_report_cancer_diagnoses.html'>get_self_report_cancer_diagnoses</a>()</code>,
+<code><a href='get_self_report_non_cancer_diagnoses_icd10.html'>get_self_report_non_cancer_diagnoses_icd10</a>()</code>,
+<code><a href='get_self_report_non_cancer_diagnoses.html'>get_self_report_non_cancer_diagnoses</a>()</code></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

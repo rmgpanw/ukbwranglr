@@ -26,7 +26,6 @@
 #'   \code{functions}
 #'
 #' @importFrom data.table ":="
-#' @return
 #' @export
 #'
 #' @examples
@@ -389,13 +388,12 @@ rowise_min_max_date <- function(ukb_pheno,
 }
 
 
-#' Summarise a group of column row-wise
+#' Summarise a group of columns row-wise
 #'
 #' @param function_name A function name as a character
 #' @param selected_cols Character vector of column names
 #' @inheritParams rowise_min_max_date
 #'
-#' @return
 #' @export
 rowise_summary <- function(ukb_pheno,
                    function_name,

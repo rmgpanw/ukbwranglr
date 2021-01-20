@@ -603,6 +603,54 @@ get_cancer_register_icd10_diagnoses <- function(ukb_pheno,
 }
 
 
+#' Get all diagnostic codes from multiple data sources
+#'
+#' Extract diagnostic codes from multiple sources
+#'
+#' Loops through functions from the 'get all diagnostic codes' family and
+#' combines the results into a single dataframe.
+#'
+#' @param function_list
+#' @inheritParams get_self_report_non_cancer_diagnoses_icd10
+#'
+#' @return Dataframe
+#' @export
+#' @family get all diagnostic codes
+get_all_diagnostic_codes_multi <- function(function_list = list(get_self_report_non_cancer_diagnoses_icd10,
+                                                                get_hes_icd9_diagnoses,
+                                                                get_hes_icd10_diagnoses,
+                                                                get_cancer_register_icd9_diagnoses,
+                                                                get_cancer_register_icd10_diagnoses),
+                                           ukb_pheno,
+                                           data_dict,
+                                           ukb_codings) {
+  # initialise empty results list
+  result <- vector(mode = "list",
+                   length = length(function_list))
+
+  # initialist progress bar
+  pb <- progress::progress_bar$new(format = "[:bar] :current/:total (:percent)",
+                                                          total = length(function_list))
+  pb$tick(0)
+
+  # loop through 'get all diagnostic code' functions - populate results list
+  for (func in seq_along(function_list)){
+    # progress bar
+    pb$tick(1)
+
+    # get diagnoses
+    result[[func]] <- function_list[[func]](ukb_pheno = ukb_pheno,
+                                                 data_dict = data_dict,
+                                                 ukb_codings = ukb_codings)
+  }
+
+  # combine results into single df
+  result <- bind_rows(result)
+
+  # return result
+  return(result)
+}
+
 # PRIVATE FUNCTIONS -------------------------------------------------------
 
 #' Convert column for a FieldID to long format
