@@ -565,7 +565,7 @@ get_cancer_register_icd9_diagnoses <- function(ukb_pheno,
 #' @export
 #'
 #' @family get all diagnostic codes
-get_cancer_register_icd9_diagnoses <- function(ukb_pheno,
+get_cancer_register_icd10_diagnoses <- function(ukb_pheno,
                                                data_dict,
                                                ukb_codings) {
 

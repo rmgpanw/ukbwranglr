@@ -328,10 +328,10 @@ Then use `get_first_diagnostic_code_record()`:
 
 ```{r}
 # select ICD10 codes
-selected_codes <- c("C15", "C16", "C17")
+selected_codes <- c("A001", "A156", "E111")
 
 # extract eids with these codes, as well as the earliest recorded date
-get_first_diagnostic_code_record(cancer_data_icd10_diagnoses,
+get_first_diagnostic_code_record(cancer_register_icd10_diagnoses,
                                  selected_codes) %>%
   head() # display first few rows only
 ```

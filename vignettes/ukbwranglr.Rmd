@@ -19,3 +19,12 @@ library(ukbwranglr)
 ```
 
 # Get started
+
+- Load data into R
+- Wrangle:
+
+  - Summarise continuous variables (e.g. blood pessure)
+  - Identify participants with disease outcomes of interest
+  - Get event dates (e.g. date of diagnosis, age at diagnosis)
+  
+- Describe data

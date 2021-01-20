@@ -100,6 +100,9 @@
       <a href="../articles/diabetes_type.html">Ascertaining and subclassifying diabetes in the UKB</a>
     </li>
     <li>
+      <a href="../articles/misc_ukb_codings.html">Misc: UKB codings</a>
+    </li>
+    <li>
       <a href="../articles/ukb_disease_outcomes.html">UKB: Disease outcomes</a>
     </li>
     <li>
@@ -152,6 +155,12 @@
       <tr>
         
         <td>
+          <p><code><a href="check_required_cols_exist.html">check_required_cols_exist()</a></code> </p>
+        </td>
+        <td><p>Check required columns are present</p></td>
+      </tr><tr>
+        
+        <td>
           <p><code><a href="colname_to_field_inst_array_df.html">colname_to_field_inst_array_df()</a></code> </p>
         </td>
         <td><p>Convert descriptive colnames to dataframe of FieldID/instance/array
@@ -177,21 +186,111 @@ combinations</p></td>
       </tr><tr>
         
         <td>
+          <p><code><a href="extract_codings_for_fieldids.html">extract_codings_for_fieldids()</a></code> </p>
+        </td>
+        <td><p>Get UKB codings for one or more FieldIDs</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="field_id_pivot_longer.html">field_id_pivot_longer()</a></code> </p>
+        </td>
+        <td><p>Convert column for a FieldID to long format</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="field_id_pivot_longer_multi.html">field_id_pivot_longer_multi()</a></code> </p>
+        </td>
+        <td><p>Apply pivot_longer across multiple sets of columns</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="filter_data_dict.html">filter_data_dict()</a></code> </p>
+        </td>
+        <td><p>Generic helper function values from a data dictionary</p></td>
+      </tr><tr>
+        
+        <td>
           <p><code><a href="format_ukb_df_header.html">format_ukb_df_header()</a></code> </p>
         </td>
         <td><p>Processes a ukb pheno file header to match the form 'f.5912.0.0'</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="get_colname.html">get_colname()</a></code> </p>
+          <p><code><a href="get_cancer_register_icd10_diagnoses.html">get_cancer_register_icd10_diagnoses()</a></code> </p>
         </td>
-        <td><p>Get associated single decriptive colname for a FieldID</p></td>
+        <td><p>Get cancer register ICD10 diagnoses</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="get_cancer_register_icd9_diagnoses.html">get_cancer_register_icd9_diagnoses()</a></code> </p>
+        </td>
+        <td><p>Get cancer register ICD9 diagnoses</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="get_colnames_for_fieldids.html">get_colnames_for_fieldids()</a></code> </p>
+        </td>
+        <td><p>Get descriptive colnames associated with one or more FieldIDs</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="get_death_data_icd10_diagnoses.html">get_death_data_icd10_diagnoses()</a></code> </p>
+        </td>
+        <td><p>Get death data ICD10 diagnoses</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="get_diagnoses_set_index_code_date_cols.html">get_diagnoses_set_index_code_date_cols()</a></code> </p>
+        </td>
+        <td><p>Standardise a long format diagnoses dataframe</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="get_first_diagnostic_code_record.html">get_first_diagnostic_code_record()</a></code> </p>
+        </td>
+        <td><p>Get the earliest record date for a set of diagnostic codes</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="get_first_diagnostic_code_record_basis.html">get_first_diagnostic_code_record_basis()</a></code> </p>
+        </td>
+        <td><p>Get first record for a set of diagnostic codes (generic)</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="get_hes_icd10_diagnoses.html">get_hes_icd10_diagnoses()</a></code> </p>
+        </td>
+        <td><p>Get hospital inpatient ICD10 diagnoses</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="get_hes_icd9_diagnoses.html">get_hes_icd9_diagnoses()</a></code> </p>
+        </td>
+        <td><p>Get hospital inpatient ICD9 diagnoses</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="get_self_report_cancer_diagnoses.html">get_self_report_cancer_diagnoses()</a></code> </p>
+        </td>
+        <td><p>Get self-reported cancer diagnoses</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="get_self_report_non_cancer_diagnoses.html">get_self_report_non_cancer_diagnoses()</a></code> </p>
+        </td>
+        <td><p>Get self-reported non-cancer diagnoses</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="get_self_report_non_cancer_diagnoses_icd10.html">get_self_report_non_cancer_diagnoses_icd10()</a></code> </p>
+        </td>
+        <td><p>Get self-reported non-cancer diagnoses (ICD10)</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="my_skim.html">my_skim()</a></code> </p>
         </td>
-        <td><p>Summarise a dataframe by column type</p></td>
+        <td><p>Quickly summarise a dataframe</p></td>
       </tr><tr>
         
         <td>
@@ -210,6 +309,24 @@ combinations</p></td>
           <p><code><a href="read_pheno.html">read_pheno()</a></code> </p>
         </td>
         <td><p>Read a UK Biobank phenotype file</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="recode_column.html">recode_column()</a></code> </p>
+        </td>
+        <td><p>Recode values in a dataframe column</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="recode_column_coding_meaning_value_mapping_df.html">recode_column_coding_meaning_value_mapping_df()</a></code> </p>
+        </td>
+        <td><p>Helper function for <code>recode_ukbcol</code></p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="recode_ukbcol.html">recode_ukbcol()</a></code> </p>
+        </td>
+        <td><p>Recode values in a UK Biobank dataframe for a single column</p></td>
       </tr><tr>
         
         <td>
@@ -270,6 +387,12 @@ combinations</p></td>
           <p><code><a href="ukb_rename_columns.html">ukb_rename_columns()</a></code> </p>
         </td>
         <td><p>Mutates a column of descriptive colnames</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="ukbwranglr.html">ukbwranglr</a></code> </p>
+        </td>
+        <td><p>ukbwranglr: a package for exploring UK Biobank data</p></td>
       </tr>
     </tbody>
     </table>

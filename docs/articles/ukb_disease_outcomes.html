@@ -60,6 +60,9 @@
       <a href="../articles/diabetes_type.html">Ascertaining and subclassifying diabetes in the UKB</a>
     </li>
     <li>
+      <a href="../articles/misc_ukb_codings.html">Misc: UKB codings</a>
+    </li>
+    <li>
       <a href="../articles/ukb_disease_outcomes.html">UKB: Disease outcomes</a>
     </li>
     <li>
@@ -86,6 +89,7 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>UKB: Disease outcomes</h1>
             
+            <h4 class="date">20 January, 2021</h4>
       
       
       <div class="hidden name"><code>ukb_disease_outcomes.Rmd</code></div>
@@ -100,11 +104,16 @@
 <p>Disease outcomes in UKB may be primarily ascertained from the following sources:</p>
 <ul>
 <li>
-<a href="https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=100074">Self-report data</a>: <a href="https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=20001">cancer</a> and <a href="https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=20002">non-cancer</a> (<strong>Note: the preceding links are self-report data obtained from verbal interviews. Self-report data also includes <a href="https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=100025">touchscreen</a> responses, however UKB <a href="https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=596">resource 596</a> recommends that verbal interview data fields are used in preference</strong>)</li>
-<li><a href="https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=3000">Primary care data</a></li>
+<a href="https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=100074">Self-report data</a>: <a href="https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=20001">cancer</a> and <a href="https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=20002">non-cancer</a>
+</li>
 <li><a href="https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=2000">Hospital inpatient data</a></li>
 <li><a href="https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=100093">Death register records</a></li>
+<li><a href="https://biobank.ndph.ox.ac.uk/showcase/label.cgi?id=100092">Cancer register data</a></li>
+<li><a href="https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=3000">Primary care data</a></li>
 </ul>
+<blockquote>
+<p><strong>Note:</strong> the preceding links for self-report data relate to verbal interview responses. Self-report data also includes <a href="https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=100025">touchscreen</a> responses, however UKB <a href="https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=596">resource 596</a> recommends that the verbal interview data fields are used in preference</p>
+</blockquote>
 <p>UKB also provides a set of ‘<a href="https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=1712">first occurrences</a>’ fields, which record the earliest date a 3-character ICD-10 code (e.g. ICD-10 code ‘E11’ = ‘Non-insulin-dependent diabetes mellitus’) appears in one of the categories listed above. <strong>Note: this does not include cancer codes, as these are comprehensively captured by the <a href="https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=100092">cancer register data</a></strong></p>
 <p>Other sources to consider include:</p>
 <ul>
@@ -117,6 +126,9 @@
 <div id="self-report-data-verbal-interview" class="section level1">
 <h1 class="hasAnchor">
 <a href="#self-report-data-verbal-interview" class="anchor"></a>Self-report data (<a href="https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=100074">verbal interview</a>)</h1>
+<div id="introduction" class="section level2">
+<h2 class="hasAnchor">
+<a href="#introduction" class="anchor"></a>Introduction</h2>
 <p>FieldID’s for self-reported (verbal interview) disease outcomes are categorised into ‘non-cancer’ and ‘cancer’:</p>
 <table class="table">
 <thead><tr class="header">
@@ -130,24 +142,23 @@
 <td>
 <a href="https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=20002">20002</a> (<a href="https://biobank.ndph.ox.ac.uk/ukb/coding.cgi?id=6">data-coding 6</a>)</td>
 <td>
-<a href="https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=20001">20001</a> ( <a href="https://biobank.ndph.ox.ac.uk/ukb/coding.cgi?id=3">data-coding 3</a>
-</td>
+<a href="https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=20001">20001</a> ( <a href="https://biobank.ndph.ox.ac.uk/ukb/coding.cgi?id=3">data-coding 3</a>)</td>
 </tr>
 <tr class="even">
-<td align="left">Interpolated age when first diagnosed</td>
-<td><a href="https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=20009">20009</a></td>
-<td><a href="https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=20007">20007</a></td>
-</tr>
-<tr class="odd">
 <td align="left">Interpolated year when first diagnosed</td>
 <td><a href="https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=20008">20008</a></td>
 <td><a href="https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=20006">20006</a></td>
 </tr>
+<tr class="odd">
+<td align="left">Interpolated age when first diagnosed</td>
+<td><a href="https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=20009">20009</a></td>
+<td><a href="https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=20007">20007</a></td>
+</tr>
 </tbody>
 </table>
-<p>UK Biobank also provides mappings from self-reported illness codes to 3-character ICD-10 codes (<a href="https://biobank.ndph.ox.ac.uk/showcase/coding.cgi?id=609">data-coding 609</a>).</p>
+<p>UK Biobank also provides mappings from self-reported non-cancer illness codes to 3-character ICD-10 codes (<a href="https://biobank.ndph.ox.ac.uk/showcase/coding.cgi?id=609">data-coding 609</a>).</p>
 <blockquote>
-<p><strong>NOTE:</strong> Not all the self-report codes are mapped to ICD-10. For example, the non-cancer illness code <code>1065</code> refers to ‘hypertension’, which cannot be mapped to ICD-10 as it is too vague. Code <code>1072</code>, which refers to ‘essential hypertension’ however <em>is</em> mappable (maps to ICD-10 code <code>I10</code>). Code to filter for these codes is shown below:</p>
+<p><strong>NOTE:</strong> Not all the self-report codes are mapped to ICD-10 (111 out of 447). For example, the non-cancer illness code <code>1065</code> refers to ‘hypertension’, which cannot be mapped to ICD-10 as it is too non-specific Code <code>1072</code>, which refers to ‘essential hypertension’ however <em>is</em> mappable (maps to ICD-10 code <code>I10</code>). Self-report codes that do not map to ICD-10 may be identified as follows:</p>
 </blockquote>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># get UKB codings dictionary</span>
@@ -166,22 +177,243 @@
 <span class="va">html_page</span> <span class="op">&lt;-</span>
   <span class="fu">xml2</span><span class="fu">::</span><span class="fu"><a href="http://xml2.r-lib.org/reference/read_xml.html">read_html</a></span><span class="op">(</span><span class="st">"https://biobank.ndph.ox.ac.uk/ukb/coding.cgi?id=6"</span><span class="op">)</span>
 <span class="va">table_nodes</span> <span class="op">&lt;-</span> <span class="fu">xml2</span><span class="fu">::</span><span class="fu"><a href="http://xml2.r-lib.org/reference/xml_find_all.html">xml_find_all</a></span><span class="op">(</span><span class="va">html_page</span>, <span class="st">"//table"</span><span class="op">)</span>
-<span class="va">ukb_selfreport_codings_readable</span> <span class="op">&lt;-</span>
+<span class="va">ukb_selfreport_non_cancer_codings_readable</span> <span class="op">&lt;-</span>
   <span class="fu">rvest</span><span class="fu">::</span><span class="fu"><a href="https://rvest.tidyverse.org/reference/html_table.html">html_table</a></span><span class="op">(</span><span class="va">table_nodes</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>
 
 <span class="co"># filter for those that were selectable (i.e. no 'special' values like -1)</span>
-<span class="va">ukb_selfreport_codings_readable_no_special_values</span> <span class="op">&lt;-</span>
-  <span class="va">ukb_selfreport_codings_readable</span> <span class="op">%&gt;%</span>
+<span class="va">ukb_selfreport_non_cancer_codings_readable</span> <span class="op">&lt;-</span>
+  <span class="va">ukb_selfreport_non_cancer_codings_readable</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">Selectable</span> <span class="op">==</span> <span class="st">"Yes"</span><span class="op">)</span>
 
-<span class="co"># filter for those NOT included in the UKB codings file - there are &gt;100 e.g.</span>
-<span class="co"># 1065 = 'hypertension', which is NOT in ukb codings file as too vague, 1072 =</span>
-<span class="co"># 'essential hypertension' is there instead</span>
-<span class="va">ukb_selfreport_codings_readable_no_special_values_not_in_ukb_codings_609</span> <span class="op">&lt;-</span>
-  <span class="va">ukb_selfreport_codings_readable_no_special_values</span> <span class="op">%&gt;%</span>
+<span class="co"># filter for those NOT mapped to ICD-10</span>
+<span class="va">ukb_selfreport_non_cancer_codings_readable</span> <span class="op">&lt;-</span>
+  <span class="va">ukb_selfreport_non_cancer_codings_readable</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="op">!</span><span class="op">(</span><span class="va">Coding</span> <span class="op">%in%</span> <span class="va">ukb_codings_609</span><span class="op">$</span><span class="va">Value</span><span class="op">)</span><span class="op">)</span>
 
 <span class="fu"><a href="https://rdrr.io/r/utils/View.html">View</a></span><span class="op">(</span><span class="va">ukb_selfreport_codings_readable_no_special_values_not_in_ukb_codings_609</span><span class="op">)</span></code></pre></div>
+<blockquote>
+<p><strong>NOTE:</strong> Self-reported cancer conditions are <em>not</em> mapped to ICD10 as they are comprehensively captured by the cancer register. They are also <em>not</em> included in the ‘first occurrences’ data fields (see <a href="https://biobank.ndph.ox.ac.uk/showcase/refer.cgi?id=593">resource 593</a>)</p>
+</blockquote>
+</div>
+<div id="identifying-health-outcomes-using-diagnostic-codes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#identifying-health-outcomes-using-diagnostic-codes" class="anchor"></a>Identifying health outcomes using diagnostic codes</h2>
+<div id="non-cancer-medical-conditions" class="section level3">
+<h3 class="hasAnchor">
+<a href="#non-cancer-medical-conditions" class="anchor"></a>Non-cancer medical conditions</h3>
+<p><strong>Step 1:</strong> A long format table summarising all self-reported non-cancer medical conditions (coded as per <a href="https://biobank.ndph.ox.ac.uk/showcase/coding.cgi?id=6">data coding 6</a>) for each UK Biobank participant can be created as follows:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># get UKB codings file</span>
+<span class="va">ukb_codings</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/fread.html">fread</a></span><span class="op">(</span>
+    <span class="st">"https://biobank.ctsu.ox.ac.uk/~bbdatan/Codings.tsv"</span>,
+    colClasses <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'character'</span><span class="op">)</span>,
+    sep <span class="op">=</span> <span class="st">"\t"</span>,
+    quote <span class="op">=</span> <span class="st">" "</span>,
+    na.strings <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">""</span>, <span class="st">"NA"</span><span class="op">)</span>
+  <span class="op">)</span>
+
+<span class="va">self_report_non_cancer_diagnoses</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_self_report_non_cancer_diagnoses.html">get_self_report_non_cancer_diagnoses</a></span><span class="op">(</span>
+  <span class="va">ukb_pheno</span>, <span class="co"># dataset read into R using read_pheno()</span>
+  <span class="va">data_dict</span>, <span class="co"># data dictionary created with pheno_data_dict()</span>
+  <span class="va">ukb_codings</span> <span class="co"># the UKB codings file</span>
+<span class="op">)</span></code></pre></div>
+<p>Alternatively, this can be created using <a href="https://biobank.ndph.ox.ac.uk/showcase/coding.cgi?id=609">ICD10 code mappings</a> (see note above):</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">self_report_non_cancer_diagnoses_icd10</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_self_report_non_cancer_diagnoses_icd10.html">get_self_report_non_cancer_diagnoses_icd10</a></span><span class="op">(</span>
+  <span class="va">ukb_pheno</span>, <span class="co"># dataset read into R using read_pheno()</span>
+  <span class="va">data_dict</span>, <span class="co"># data dictionary created with pheno_data_dict()</span>
+  <span class="va">ukb_codings</span> <span class="co"># the UKB codings file</span>
+<span class="op">)</span></code></pre></div>
+<p><strong>Step 2:</strong> These may then be used to retrieve UK Biobank participants with one or more specified codes in these records, as well as the earliest recorded date (i.e. the earliest date for any one of these codes):</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># select ICD10 codes</span>
+<span class="va">selected_codes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"A014"</span>, <span class="st">"N12"</span>, <span class="st">"L86"</span><span class="op">)</span>
+
+<span class="co"># extract eids with these codes, as well as the earliest recorded date</span>
+<span class="fu"><a href="../reference/get_first_diagnostic_code_record.html">get_first_diagnostic_code_record</a></span><span class="op">(</span><span class="va">self_report_non_cancer_diagnoses_icd10</span>,
+                                 <span class="va">selected_codes</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span> <span class="co"># display first few rows only</span>
+<span class="co">#&gt; # A tibble: 6 x 4</span>
+<span class="co">#&gt;   eid   source                                          code  date      </span>
+<span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;                                           &lt;chr&gt; &lt;chr&gt;     </span>
+<span class="co">#&gt; 1 2     noncancer_illness_code_selfreported_f20002_2_20 N12   2006-02-27</span>
+<span class="co">#&gt; 2 5     noncancer_illness_code_selfreported_f20002_2_12 N12   1975-12-08</span>
+<span class="co">#&gt; 3 6     noncancer_illness_code_selfreported_f20002_1_3  N12   2021-11-04</span>
+<span class="co">#&gt; 4 7     noncancer_illness_code_selfreported_f20002_2_18 N12   &lt;NA&gt;      </span>
+<span class="co">#&gt; 5 18    noncancer_illness_code_selfreported_f20002_0_17 N12   &lt;NA&gt;      </span>
+<span class="co">#&gt; 6 20    noncancer_illness_code_selfreported_f20002_1_10 N12   1967-10-19</span></code></pre></div>
+</div>
+<div id="cancer" class="section level3">
+<h3 class="hasAnchor">
+<a href="#cancer" class="anchor"></a>Cancer</h3>
+<p>Follow the same work flow as for non-cancer medical conditions, using <code>get_self_report_cancer_diagnoses</code> instead for step 1.</p>
+</div>
+</div>
+</div>
+<div id="hospital-inpatient-data---summary-diagnoses" class="section level1">
+<h1 class="hasAnchor">
+<a href="#hospital-inpatient-data---summary-diagnoses" class="anchor"></a>Hospital inpatient data - summary diagnoses</h1>
+<div id="introduction-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#introduction-1" class="anchor"></a>Introduction</h2>
+<p>These fields (<a href="https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=2002">category 2002</a>) summarise diagnoses made during hospital inpatient admissions, recorded as either ICD9 or ICD10 codes:</p>
+<table class="table">
+<thead><tr class="header">
+<th align="left">Field</th>
+<th>ICD9</th>
+<th>ICD10</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">Diagnoses</td>
+<td>
+<a href="https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=41271">41271</a> (<a href="https://biobank.ndph.ox.ac.uk/ukb/coding.cgi?id=87">data-coding 87</a>)</td>
+<td>
+<a href="https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=41270">41270</a> (<a href="https://biobank.ndph.ox.ac.uk/ukb/coding.cgi?id=19">data-coding 19</a>)</td>
+</tr>
+<tr class="even">
+<td align="left">Date of first in-patient diagnosis</td>
+<td><a href="https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=41281">41281</a></td>
+<td><a href="https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=41280">41280</a></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Note:</strong> Diagnoses are categorised into main and secondary diagnoses, with separate FieldIDs provided for both (further subdivided into ICD-9 and ICD-10). The table above lists those summary fields which include both main and secondary diagnoses.</p>
+</blockquote>
+<p><em>See also <a href="https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=141140">resource 141140</a> for further details re hospital inpatient data</em></p>
+</div>
+<div id="identifying-health-outcomes-using-diagnostic-codes-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#identifying-health-outcomes-using-diagnostic-codes-1" class="anchor"></a>Identifying health outcomes using diagnostic codes</h2>
+<p>Use the same work flow as described for self-report data. To generate a long format table summarising all self-reported non-cancer medical conditions for each UK Biobank participant, use <code><a href="../reference/get_hes_icd10_diagnoses.html">get_hes_icd10_diagnoses()</a></code> or <code><a href="../reference/get_hes_icd9_diagnoses.html">get_hes_icd9_diagnoses()</a></code>:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">hes_icd10_diagnoses</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_hes_icd10_diagnoses.html">get_hes_icd10_diagnoses</a></span><span class="op">(</span>
+  <span class="va">ukb_pheno</span>, <span class="co"># dataset read into R using read_pheno()</span>
+  <span class="va">data_dict</span>, <span class="co"># data dictionary created with pheno_data_dict()</span>
+  <span class="va">ukb_codings</span> <span class="co"># the UKB codings file</span>
+<span class="op">)</span></code></pre></div>
+<p>Then use <code><a href="../reference/get_first_diagnostic_code_record.html">get_first_diagnostic_code_record()</a></code>:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># select ICD10 codes</span>
+<span class="va">selected_codes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"A014"</span>, <span class="st">"N12"</span>, <span class="st">"L86"</span><span class="op">)</span>
+
+<span class="co"># extract eids with these codes, as well as the earliest recorded date</span>
+<span class="fu"><a href="../reference/get_first_diagnostic_code_record.html">get_first_diagnostic_code_record</a></span><span class="op">(</span><span class="va">hes_icd10_diagnoses</span>,
+                                 <span class="va">selected_codes</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span> <span class="co"># display first few rows only</span>
+<span class="co">#&gt; # A tibble: 5 x 4</span>
+<span class="co">#&gt;   eid   source                       code  date      </span>
+<span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;                        &lt;chr&gt; &lt;chr&gt;     </span>
+<span class="co">#&gt; 1 3     diagnoses_icd10_f41270_0_84  L86   1949-10-04</span>
+<span class="co">#&gt; 2 15    diagnoses_icd10_f41270_0_116 L86   1923-03-26</span>
+<span class="co">#&gt; 3 16    diagnoses_icd10_f41270_0_136 N12   1955-04-02</span>
+<span class="co">#&gt; 4 17    diagnoses_icd10_f41270_0_146 L86   1950-12-15</span>
+<span class="co">#&gt; 5 25    diagnoses_icd10_f41270_0_91  A014  1976-02-07</span></code></pre></div>
+</div>
+</div>
+<div id="death-register-records" class="section level1">
+<h1 class="hasAnchor">
+<a href="#death-register-records" class="anchor"></a>Death register records</h1>
+<div id="introduction-2" class="section level2">
+<h2 class="hasAnchor">
+<a href="#introduction-2" class="anchor"></a>Introduction</h2>
+<p>Cause of death data <a href="https://biobank.ndph.ox.ac.uk/showcase/label.cgi?id=100093">category 100093</a> is available as part of a main UK Biobank dataset as ICD10 codes under FieldIDs <a href="https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=40001">40001</a> (primary cause of death) and <a href="https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=40002">40002</a> (secondary causes of death).</p>
+<p>See also <a href="https://biobank.ndph.ox.ac.uk/showcase/refer.cgi?id=115559">resource 115559</a> for more information.</p>
+</div>
+<div id="identifying-health-outcomes-using-diagnostic-codes-2" class="section level2">
+<h2 class="hasAnchor">
+<a href="#identifying-health-outcomes-using-diagnostic-codes-2" class="anchor"></a>Identifying health outcomes using diagnostic codes</h2>
+<p>Use the same work flow as described for self-report data. To generate a long format table summarising all self-reported non-cancer medical conditions for each UK Biobank participant, use <code><a href="../reference/get_death_data_icd10_diagnoses.html">get_death_data_icd10_diagnoses()</a></code>:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">death_data_icd10_diagnoses</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_death_data_icd10_diagnoses.html">get_death_data_icd10_diagnoses</a></span><span class="op">(</span>
+  <span class="va">ukb_pheno</span>, <span class="co"># dataset read into R using read_pheno()</span>
+  <span class="va">data_dict</span>, <span class="co"># data dictionary created with pheno_data_dict()</span>
+  <span class="va">ukb_codings</span> <span class="co"># the UKB codings file</span>
+<span class="op">)</span></code></pre></div>
+<p>Then use <code><a href="../reference/get_first_diagnostic_code_record.html">get_first_diagnostic_code_record()</a></code>:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># select ICD10 codes</span>
+<span class="va">selected_codes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"A014"</span>, <span class="st">"N12"</span>, <span class="st">"L86"</span>, <span class="st">"M7704"</span><span class="op">)</span>
+
+<span class="co"># extract eids with these codes, as well as the earliest recorded date</span>
+<span class="fu"><a href="../reference/get_first_diagnostic_code_record.html">get_first_diagnostic_code_record</a></span><span class="op">(</span><span class="va">death_data_icd10_diagnoses</span>,
+                                 <span class="va">selected_codes</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span> <span class="co"># display first few rows only</span>
+<span class="co">#&gt; # A tibble: 0 x 4</span>
+<span class="co">#&gt; # … with 4 variables: eid &lt;chr&gt;, source &lt;chr&gt;, code &lt;chr&gt;, date &lt;chr&gt;</span></code></pre></div>
+</div>
+</div>
+<div id="cancer-register-records" class="section level1">
+<h1 class="hasAnchor">
+<a href="#cancer-register-records" class="anchor"></a>Cancer register records</h1>
+<div id="introduction-3" class="section level2">
+<h2 class="hasAnchor">
+<a href="#introduction-3" class="anchor"></a>Introduction</h2>
+<p>Coded data on cancer diagnoses (<a href="https://biobank.ndph.ox.ac.uk/showcase/label.cgi?id=100092">category 100092</a>) obtained through linkage to the national cancer registries are available from the following fields:</p>
+<table class="table">
+<thead><tr class="header">
+<th>FieldID</th>
+<th align="left">Description</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><a href="https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=40013">40013</a></td>
+<td align="left">Type of cancer: ICD9</td>
+</tr>
+<tr class="even">
+<td><a href="https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=40006">40006</a></td>
+<td align="left">Type of cancer: ICD10</td>
+</tr>
+<tr class="odd">
+<td><a href="https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=40008">40008</a></td>
+<td align="left">Age at cancer diagnosis</td>
+</tr>
+<tr class="even">
+<td><a href="https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=40005">40005</a></td>
+<td align="left">Date of cancer diagnosis</td>
+</tr>
+</tbody>
+</table>
+<p><em>See also <a href="https://biobank.ndph.ox.ac.uk/showcase/refer.cgi?id=115558">resource 115558</a> for further details re cancer register data</em></p>
+</div>
+<div id="identifying-health-outcomes-using-diagnostic-codes-3" class="section level2">
+<h2 class="hasAnchor">
+<a href="#identifying-health-outcomes-using-diagnostic-codes-3" class="anchor"></a>Identifying health outcomes using diagnostic codes</h2>
+<p>Use the same work flow as described for self-report data. To generate a long format tables (ICD-9 and ICD-10) summarising all cancer conditions recorded for each UK Biobank participant, use <code><a href="../reference/get_cancer_register_icd9_diagnoses.html">get_cancer_register_icd9_diagnoses()</a></code> and <code><a href="../reference/get_cancer_register_icd10_diagnoses.html">get_cancer_register_icd10_diagnoses()</a></code>:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">cancer_register_icd9_diagnoses</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_cancer_register_icd9_diagnoses.html">get_cancer_register_icd9_diagnoses</a></span><span class="op">(</span>
+  <span class="va">ukb_pheno</span>, <span class="co"># dataset read into R using read_pheno()</span>
+  <span class="va">data_dict</span>, <span class="co"># data dictionary created with pheno_data_dict()</span>
+  <span class="va">ukb_codings</span> <span class="co"># the UKB codings file</span>
+<span class="op">)</span>
+
+<span class="va">cancer_register_icd10_diagnoses</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_cancer_register_icd10_diagnoses.html">get_cancer_register_icd10_diagnoses</a></span><span class="op">(</span>
+  <span class="va">ukb_pheno</span>, <span class="co"># dataset read into R using read_pheno()</span>
+  <span class="va">data_dict</span>, <span class="co"># data dictionary created with pheno_data_dict()</span>
+  <span class="va">ukb_codings</span> <span class="co"># the UKB codings file</span>
+<span class="op">)</span></code></pre></div>
+<p>Then use <code><a href="../reference/get_first_diagnostic_code_record.html">get_first_diagnostic_code_record()</a></code>:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># select ICD10 codes</span>
+<span class="va">selected_codes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"A001"</span>, <span class="st">"A156"</span>, <span class="st">"E111"</span><span class="op">)</span>
+
+<span class="co"># extract eids with these codes, as well as the earliest recorded date</span>
+<span class="fu"><a href="../reference/get_first_diagnostic_code_record.html">get_first_diagnostic_code_record</a></span><span class="op">(</span><span class="va">cancer_register_icd10_diagnoses</span>,
+                                 <span class="va">selected_codes</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span> <span class="co"># display first few rows only</span>
+<span class="co">#&gt; # A tibble: 4 x 4</span>
+<span class="co">#&gt;   eid   source                            code  date      </span>
+<span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;                             &lt;chr&gt; &lt;chr&gt;     </span>
+<span class="co">#&gt; 1 16    type_of_cancer:_icd10_f40006_6_0  E111  1919-01-04</span>
+<span class="co">#&gt; 2 40    type_of_cancer:_icd10_f40006_8_0  A001  &lt;NA&gt;      </span>
+<span class="co">#&gt; 3 59    type_of_cancer:_icd10_f40006_7_0  A156  1983-06-03</span>
+<span class="co">#&gt; 4 82    type_of_cancer:_icd10_f40006_10_0 A156  1949-04-10</span></code></pre></div>
+</div>
+</div>
+<div id="development-area" class="section level1">
+<h1 class="hasAnchor">
+<a href="#development-area" class="anchor"></a>Development area</h1>
 </div>
   </div>
 

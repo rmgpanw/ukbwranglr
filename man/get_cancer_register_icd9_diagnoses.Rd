@@ -5,8 +5,6 @@
 \title{Get cancer register ICD9 diagnoses}
 \usage{
 get_cancer_register_icd9_diagnoses(ukb_pheno, data_dict, ukb_codings)
-
-get_cancer_register_icd9_diagnoses(ukb_pheno, data_dict, ukb_codings)
 }
 \arguments{
 \item{ukb_pheno}{a UK Biobank phenotype dataset}
@@ -20,34 +18,18 @@ default, this is downloaded directly from the
 }
 \value{
 Dataframe
-
-Dataframe
 }
 \description{
 Returns a long format dataframe with all ICD9 cancer register diagnoses
-with associated dates for each UK Biobank participant.
-
-Returns a long format dataframe with all ICD10 cancer register diagnoses
 with associated dates for each UK Biobank participant.
 }
 \details{
 Reformats the data for FieldIDs 40013 and 40005 (cancer register diagnoses and dates, see
 \href{https://biobank.ndph.ox.ac.uk/showcase/label.cgi?id=100092}{category 100092}).
-
-Reformats the data for FieldIDs 40006 and 40005 (cancer register diagnoses and dates, see
-\href{https://biobank.ndph.ox.ac.uk/showcase/label.cgi?id=100092}{category 100092}).
 }
 \seealso{
 Other get all diagnostic codes: 
-\code{\link{get_death_data_icd10_diagnoses}()},
-\code{\link{get_diagnoses_set_index_code_date_cols}()},
-\code{\link{get_hes_icd10_diagnoses}()},
-\code{\link{get_hes_icd9_diagnoses}()},
-\code{\link{get_self_report_cancer_diagnoses}()},
-\code{\link{get_self_report_non_cancer_diagnoses_icd10}()},
-\code{\link{get_self_report_non_cancer_diagnoses}()}
-
-Other get all diagnostic codes: 
+\code{\link{get_cancer_register_icd10_diagnoses}()},
 \code{\link{get_death_data_icd10_diagnoses}()},
 \code{\link{get_diagnoses_set_index_code_date_cols}()},
 \code{\link{get_hes_icd10_diagnoses}()},

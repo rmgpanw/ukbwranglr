@@ -28,6 +28,7 @@ Selects essential columns: eid, field_id, code and date recorded.
 }
 \seealso{
 Other get all diagnostic codes: 
+\code{\link{get_cancer_register_icd10_diagnoses}()},
 \code{\link{get_cancer_register_icd9_diagnoses}()},
 \code{\link{get_death_data_icd10_diagnoses}()},
 \code{\link{get_hes_icd10_diagnoses}()},

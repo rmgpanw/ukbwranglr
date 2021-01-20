@@ -3,9 +3,10 @@ pkgdown: 1.6.1
 pkgdown_sha: ~
 articles:
   diabetes_type: diabetes_type.html
+  misc_ukb_codings: misc_ukb_codings.html
   ukb_disease_outcomes: ukb_disease_outcomes.html
   ukb_load_pheno_subset: ukb_load_pheno_subset.html
   ukb_medications: ukb_medications.html
   ukbwranglr: ukbwranglr.html
-last_built: 2021-01-18T13:14Z
+last_built: 2021-01-20T21:47Z
 
