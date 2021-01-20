@@ -281,22 +281,48 @@ recode_column <- function(df, col_to_recode, mapping_df) {
   }
 
  if(
-   # length(unique(mapping_df$old_vals)) != nrow(mapping_df) |
-    length(unique(mapping_df$new_vals)) != nrow(mapping_df)
+   length(unique(mapping_df$old_vals)) != nrow(mapping_df)
+    # length(unique(mapping_df$new_vals)) != nrow(mapping_df)
    ) {
-   stop("`mapping_df` must contain only unique values in 'new_vals' column")
+   stop("`mapping_df` must contain only unique values in 'old_vals' column")
  }
 
   # Warning if "old_vals" does not contain all values in df
   if (length(setdiff(unique(na.omit(df[[col_to_recode]])), mapping_df$old_vals)) > 0) {
-    warning("WARNING! `mapping_df` does not contain all unique values in `df[[col_to_Recode]]`. Some values will not have been recoded - is this intentional?")
+    warning("WARNING! `mapping_df` does not contain all unique values in `df[[col_to_Recode]]`.
+            Some values will not have been recoded - is this intentional?")
   }
 
   # rename col_to_recode before joining with mapper
   names(df)[which(names(df) == col_to_recode)] <- "old_vals"
 
   # join with mapper and drop old column - TODO replace this with
-  # dictionary-like function (would be faster?)
+  # a dictionary-like function (would be safer and faster?)
+
+  # TO DELETE- looping is very slow
+  # pb <- progress::progress_bar$new(format = "[:bar] :current/:total (:percent)",
+  #                        total = nrow(df))
+  # recode_helper <- function(x,
+  #                           mapping_df) {
+  #   # return the corresponding 'new_val' for an 'old_val'
+  #   pb$tick()
+  #   result <- mapping_df %>%
+  #     dplyr::filter(old_vals == x) %>%
+  #     .$new_vals
+  #
+  #   if (rlang::is_empty(result)) {
+  #     return(NA)
+  #   } else {
+  #     return(result)
+  #   }
+  # }
+  #
+  # message("\nrecoding...\n")
+  # df <- df %>%
+  #   dplyr::mutate(old_vals = map_chr(old_vals,
+  #                                    recode_helper,
+  #                                    mapping_df))
+
   df <- df %>%
     dplyr::left_join(mapping_df,
               by = "old_vals") %>%

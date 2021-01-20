@@ -128,14 +128,14 @@ all(ukb_codings_609$Value %in% ukb_selfreport_icd_map$Coding)
 # self_report_non_cancer
 self_report_non_cancer_fields_ids <- c("20002", "20008", "20009")
 
-self_report_non_cancer_diagnoses <- field_id_pivot_longer_multi(
+self_report_non_cancer_diagnoses_test <- field_id_pivot_longer_multi(
   field_ids = self_report_non_cancer_fields_ids,
   ukb_pheno = dummy_ukb_data,
   data_dict = dummy_data_dict,
   ukb_codings = ukb_codings
 )
 
-test <- get_self_report_non_cancer_diagnoses(
+self_report_non_cancer_diagnoses <- get_self_report_non_cancer_diagnoses(
   dummy_ukb_data,
   dummy_data_dict,
   ukb_codings
@@ -159,20 +159,17 @@ These fields ([category 2002](https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=200
 # self_report_non_cancer
 hes_icd10_fields_ids <- c("41270", "41280")
 
-hes_icd10_diagnoses <- field_id_pivot_longer_multi(
+hes_icd10_diagnoses_test <- field_id_pivot_longer_multi(
   field_ids = hes_icd10_fields_ids,
   ukb_pheno = dummy_ukb_data,
   data_dict = dummy_data_dict,
   ukb_codings = ukb_codings
 )
 
-test <- get_hes_icd10_diagnoses(
+hes_icd10_diagnoses <- get_hes_icd10_diagnoses(
   dummy_ukb_data,
   dummy_data_dict,
   ukb_codings
-)
-
-hm <- get_diagnoses_set_index_code_date_cols(get_diagnoses_df = hes_icd10_diagnoses, index_col = "f41270", code_col = "f41270_value", date_col = "f41280_value", code_type = "ICD10"
 )
 ```
 

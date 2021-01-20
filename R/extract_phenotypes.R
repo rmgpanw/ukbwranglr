@@ -175,12 +175,12 @@ get_self_report_non_cancer_diagnoses <- function(ukb_pheno,
     filter(!is.na(f20002_value))
 
   # recode to ukb codes
-  self_report_non_cancer_diagnoses <- recode_ukbcol(df = self_report_non_cancer_diagnoses,
+  self_report_non_cancer_diagnoses <- suppressWarnings(recode_ukbcol(df = self_report_non_cancer_diagnoses,
                                        col_to_recode = "f20002_value",
                                        field_id = "20002",
                                        ukb_data_dict = data_dict,
                                        ukb_codings = ukb_codings,
-                                       mapping_direction = "meaning_code")
+                                       mapping_direction = "meaning_code"))
 
   # ...now recode to ICD10
   mapping_df <- ukb_codings %>%
@@ -189,9 +189,9 @@ get_self_report_non_cancer_diagnoses <- function(ukb_pheno,
                   new_vals = Meaning)
 
 
-  self_report_non_cancer_diagnoses <- recode_column(df = self_report_non_cancer_diagnoses,
+  self_report_non_cancer_diagnoses <- suppressWarnings(recode_column(df = self_report_non_cancer_diagnoses,
                                                     col_to_recode = "f20002_value",
-                                                    mapping_df = mapping_df)
+                                                    mapping_df = mapping_df))
 
   # standardise
   self_report_non_cancer_diagnoses <- get_diagnoses_set_index_code_date_cols(

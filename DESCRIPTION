@@ -21,6 +21,7 @@ Imports:
     magrittr,
     progress,
     purrr,
+    rlang,
     stringr,
     tidyr,
     tidyselect
