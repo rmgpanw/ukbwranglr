@@ -6,7 +6,8 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>ukbwranglr: a package for exploring UK Biobank data — ukbwranglr • ukbwranglr</title>
+<title>Pre-processing function - reformat UK Biobank primary care clinical events
+data — gp_clinical_to_sqlite_db • ukbwranglr</title>
 
 
 <!-- jquery -->
@@ -39,8 +40,11 @@
 
 
 
-<meta property="og:title" content="ukbwranglr: a package for exploring UK Biobank data — ukbwranglr" />
-<meta property="og:description" content="This package provides three categories of important functions:" />
+<meta property="og:title" content="Pre-processing function - reformat UK Biobank primary care clinical events
+data — gp_clinical_to_sqlite_db" />
+<meta property="og:description" content="To be used with file_to_sqlite_db. Reformats the UK Biobank
+primary care clinical events dataset to match the output format for
+get_all_diagnostic_codes_multi." />
 
 
 
@@ -130,26 +134,47 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>ukbwranglr: a package for exploring UK Biobank data</h1>
+    <h1>Pre-processing function - reformat UK Biobank primary care clinical events
+data</h1>
     
-    <div class="hidden name"><code>ukbwranglr.Rd</code></div>
+    <div class="hidden name"><code>gp_clinical_to_sqlite_db.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This package provides three categories of important functions:</p>
+    <p>To be used with <code><a href='file_to_sqlite_db.html'>file_to_sqlite_db</a></code>. Reformats the UK Biobank
+primary care clinical events dataset to match the output format for
+<code><a href='get_all_diagnostic_codes_multi.html'>get_all_diagnostic_codes_multi</a></code>.</p>
     </div>
 
+    <pre class="usage"><span class='fu'>gp_clinical_to_sqlite_db</span><span class='op'>(</span><span class='va'>df</span><span class='op'>)</span></pre>
 
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>gp_clinical_df</th>
+      <td><p>A dataframe</p></td>
+    </tr>
+    </table>
 
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     
-<ol>
-<li><p>Reading UK Biobank data into R</p></li>
-<li><p>Identifying participants with certain disease outcomes</p></li>
-<li><p>Identifying participants taking certain medications</p></li>
-</ol>
 
+
+    <h2 class="hasAnchor" id="under-the-hood"><a class="anchor" href="#under-the-hood"></a>Under the hood</h2>
+
+    
+
+
+<p>The UK Biobank primary care data lists read codes in separate columns, one
+  for Read2 and one for Read3. This function reshapes the data to long format
+  so that all codes are in a single column. Note that the 3 free-text 'value'
+  columns are dropped.</p>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p>Other Generate a UKB database.: 
+<code><a href='file_to_sqlite_db.html'>file_to_sqlite_db</a>()</code></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

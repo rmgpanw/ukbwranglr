@@ -14,6 +14,166 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
+```{r setup, include=FALSE}
 library(ukbwranglr)
+library(tidyverse)
+library(readr)
+library(configr)
+
+# Constants
+config <- read.config("../config.ini")
+DUMMY_DATA_PATH <- paste0("../", config$PATHS$DUMMY_DATA_PATH)
+BNF_CHEMBL <- config$PATHS$BNF_CHEMBL
+UKB_DB <- config$PATHS$UKB_DB
+
+# Load data
+dummy_data_dict <- ukbwranglr::pheno_data_dict(DUMMY_DATA_PATH, delim = ",")
+dummy_ukb_data <- ukbwranglr::read_pheno(DUMMY_DATA_PATH, dummy_data_dict, delim = ",") 
+dummy_ukb_data$eid <- as.character(seq(1:nrow(dummy_ukb_data)))
+ukb_codings <- data.table::fread(
+    "https://biobank.ctsu.ox.ac.uk/~bbdatan/Codings.tsv",
+    colClasses = c('character'),
+    sep = "\t",
+    quote = " ",
+    na.strings = c("", "NA")
+  )
+
+dummy_ukb_data_raw <- data.table::fread(
+    DUMMY_DATA_PATH,
+    colClasses = c('character'),
+    sep = ",",
+    quote = " ",
+    na.strings = c("", "NA")
+  )
+
+# ukb_data_dict <- data.table::fread(
+#     "https://biobank.ctsu.ox.ac.uk/~bbdatan/Data_Dictionary_Showcase.tsv",
+#     colClasses = c('character'),
+#     na.strings = c("", "NA"),
+#     sep = "\t",
+#   )
 ```
+
+# Overview
+
+Medication history for UK Biobank participants may be ascertained from the following sources:
+
+- [Self-report data](https://biobank.ndph.ox.ac.uk/showcase/label.cgi?id=100075)
+- [Primary care data](https://biobank.ndph.ox.ac.uk/showcase/label.cgi?id=3000)
+
+>**Note:** the preceding links for self-report data relate to verbal interview responses. Self-report data also includes [touchscreen](https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=100025) responses, however UKB [resource 596](https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=596) recommends that the verbal interview data fields are used in preference
+
+# Self-report data ([verbal interview](https://biobank.ndph.ox.ac.uk/showcase/label.cgi?id=100075))
+
+## Introduction
+
+[FieldID 20003](https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=20003) records data on type and number of medications taken, coded with data coding(https://biobank.ndph.ox.ac.uk/showcase/coding.cgi?id=4). [FieldID 20076](https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=20076) records data on type and number of medications taken in Read code format but this does not seem to be available yet(?) Participants were not asked to provide the dates when they started these medications, however [FieldID 53](https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=53) records the date when participants attended the assessment centre.
+
+## Ascertaining medication history
+
+1. Reshape these fields to long format (see below)
+2. Filter for medications of interest (I cannot find a mapping file to convert these to Read codes)
+
+```{r eval=FALSE, include=FALSE}
+# TO DELETE 
+# THIS DOES NOT WORK - 'vitamin c product' has 2 associated codes
+# test <- field_id_pivot_longer(
+#   dummy_ukb_data,
+#   field_id = 20003,
+#   data_dict = dummy_data_dict,
+#   ukb_codings = ukb_codings
+# ) %>%
+#   recode_ukbcol(
+#     col_to_recode = "f20003_value",
+#     field_id = "20003",
+#     ukb_data_dict = dummy_data_dict,
+#     ukb_codings = ukb_codings
+#   )
+
+# get coding for fieldid 20003
+ukb_codings_4 <- ukb_codings %>% 
+  filter(Coding == 4) 
+
+# all codes are unique
+ukb_codings_4 %>% 
+  group_by(Value) %>% 
+  summarise(n = n()) %>% 
+  arrange(desc(n))
+
+# vitamin c has 2 associated codes
+ukb_codings_4 %>% 
+  group_by(Meaning) %>% 
+  summarise(n = n()) %>% 
+  arrange(desc(n))
+
+ukb_codings_4 %>% 
+  filter(grepl(pattern = "vitamin c product", Meaning))
+```
+```{r}
+field_id_pivot_longer(
+  dummy_ukb_data,
+  field_id = 20003,
+  data_dict = dummy_data_dict,
+  ukb_codings = ukb_codings
+) 
+
+# if you want to recode
+#   recode_ukbcol( 
+#     col_to_recode = "f20003_value",
+#     field_id = "20003",
+#     ukb_data_dict = dummy_data_dict,
+#     ukb_codings = ukb_codings %>% filter(Value != "1195")
+#   )
+```
+
+# Primary care data
+
+## Introduction
+
+The interim release primary care dataset covers ~50% of the full UK Biobank cohort and is provided in 3 tables:
+
+1. Clinical events
+2. Prescriptions
+3. Registrations
+
+Only the prescriptions table will be considered here. This consists of 55 million rows rows with the following columns:
+
+- `eid`: unique participant identifier
+- `data_provider`: England (Vision or TPP), Scotland or Wales
+- `issue_date`: date prescription was issued
+- `read_2`: Read 2 code
+- `bnf_code`
+- `dmd_code`
+- `drug_name` 
+- `quantity`: quantity prescribed
+
+Issues:
+
+- Each of the 4 data providers uses different coding styles [TODO: INSERT FIGURE]
+- Incorrect codes (do not match free text description)
+- Missing drug codes, necessitating reliance on free text 
+- Free text issues:
+  
+  - Proprietary drug names
+  - Niche applications e.g. beta blocker eye drops
+  - Regular expressions searches e.g. searching for "Torem" (loop diuretic) also matches "Toremifene" (breast cancer drug)
+  
+- Combination drugs only correspond to one BNF paragraph
+
+Approaches:
+
+1. Use drug codes (Read2 fpr Wales) only: 
+
+  - How many eids have free text but no drug code?
+  - Would miss combination drugs
+
+*See resources 591 and 592 for fiurther information (available from [here](https://biobank.ndph.ox.ac.uk/showcase/label.cgi?id=3000)).*
+
+## Ascertaining medication history
+
+- DMD
+
+```{r}
+bnf_chembl <- data.table::fread(BNF_CHEMBL)
+```
+

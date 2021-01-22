@@ -14,6 +14,8 @@ get_all_diagnostic_codes_multi(
 )
 }
 \arguments{
+\item{function_list}{A list of `get_XXXX_diagnoses` functions.}
+
 \item{ukb_pheno}{a UK Biobank phenotype dataset}
 
 \item{data_dict}{a data dictionary for \code{ukb_pheno}}

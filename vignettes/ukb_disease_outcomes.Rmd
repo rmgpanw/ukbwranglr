@@ -19,6 +19,9 @@ library(configr)
 # Constants
 config <- read.config("../config.ini")
 DUMMY_DATA_PATH <- paste0("../", config$PATHS$DUMMY_DATA_PATH)
+GP_CLINICAL_AK <- config$PATHS$GP_CLINICAL_AK
+GP_CLINICAL_AK_TEMP <- config$PATHS$GP_CLINICAL_AK_TEMP
+UKB_DB <- config$PATHS$UKB_DB
 
 # Load data
 dummy_data_dict <- ukbwranglr::pheno_data_dict(DUMMY_DATA_PATH, delim = ",")
@@ -31,6 +34,21 @@ ukb_codings <- data.table::fread(
     quote = " ",
     na.strings = c("", "NA")
   )
+
+dummy_ukb_data_raw <- data.table::fread(
+    DUMMY_DATA_PATH,
+    colClasses = c('character'),
+    sep = ",",
+    quote = " ",
+    na.strings = c("", "NA")
+  )
+
+# ukb_data_dict <- data.table::fread(
+#     "https://biobank.ctsu.ox.ac.uk/~bbdatan/Data_Dictionary_Showcase.tsv",
+#     colClasses = c('character'),
+#     na.strings = c("", "NA"),
+#     sep = "\t",
+#   )
 ```
 
 # Overview
@@ -50,9 +68,10 @@ UKB also provides a set of '[first occurrences](https://biobank.ndph.ox.ac.uk/uk
 Other sources to consider include: 
 
 - '[Algorithmically-defined outcomes](https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=42)'
+- Operations (self-reported; codes are otherwise included in the data sources considered here)
 - Medication history (e.g. classify participants as having diabetes if they take insulin) - see `vignette("ukb_medications")`
 
-The rest of this article discusses how disease outcomes may be extracted from each of the data sources outlined above.
+The rest of this article details how disease outcomes may be extracted from each of the data sources outlined above using `ukbwranglr`.
 
 # Self-report data ([verbal interview](https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=100074))
 
@@ -68,9 +87,11 @@ FieldID's for self-reported (verbal interview) disease outcomes are categorised 
 
 UK Biobank also provides mappings from self-reported non-cancer illness codes to 3-character ICD-10 codes ([data-coding 609](https://biobank.ndph.ox.ac.uk/showcase/coding.cgi?id=609)). 
 
->**NOTE:** Not all the self-report codes are mapped to ICD-10 (111 out of 447). For example, the non-cancer illness code `1065` refers to 'hypertension', which cannot be mapped to ICD-10 as it is too non-specific Code `1072`, which refers to 'essential hypertension' however *is* mappable (maps to ICD-10 code `I10`). Self-report codes that do not map to ICD-10 may be identified as follows:
+>**NOTE:** Not all the self-report codes are mapped to ICD-10 (111 out of 447). For example, the non-cancer illness code `1065` refers to 'hypertension', which cannot be mapped to ICD-10 as it is too non-specific Code `1072`, which refers to 'essential hypertension' however *is* mappable (maps to ICD-10 code `I10`). 
 
-```{r eval=FALSE}
+```{r eval=FALSE, include = FALSE}
+# Self-report codes that do not map to ICD-10 may be identified as follows:
+
 # get UKB codings dictionary
 # (https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide),
 # filtered for coding 609
@@ -356,14 +377,120 @@ selected_codes <- c("A001", "A156", "E111")
 diagnostic_codes_multiple_sources <-
   get_all_diagnostic_codes_multi(ukb_pheno = dummy_ukb_data,
                                  data_dict = dummy_data_dict,
-                                 ukb_codings = ukb_codings)
+                                 ukb_codings = ukb_codings,
+                                 function_list = list_of_get_diagnostic_codes_functions)
 
-# extract eids with these codes, as well as the earliest recorded date
+# extract eids with these codes, as well as the earliest recorded date (display
+# first few rows only)
 get_first_diagnostic_code_record(diagnostic_codes_multiple_sources,
                                  selected_codes) %>%
-  head() # display first few rows only
+  head()
+```
+
+# Primary care data
+
+## Introduction
+
+The interim release primary care dataset covers ~50% of the full UK Biobank cohort and is provided in 3 tables:
+
+1. Clinical events
+2. Prescriptions
+3. Registrations
+
+Only the clinical events table will be considered here. This consists of >120 million rows with the following columns:
+
+- `eid`: unique participant identifier
+- `event_dt`: record date
+- `read_2`: Read 2 code
+- `read_2`: Read 3 code
+- `value_1`, `value_2` and `value_3`: free text values (e.g. blood pressure measurements)
+
+*See resources 591 and 592 for fiurther information (available from [here](https://biobank.ndph.ox.ac.uk/showcase/label.cgi?id=3000)).*
+
+## Identifying health outcomes using diagnostic codes
+
+**Step 1:** Write the UKB primary care clinical events dataset to a table in a SQLite database (the database will be created if it does not already exist). The `file_to_sqlite_db()` function reads a file in chunks (chunk size as specified by the `chunk_size`), pre-processes the 'chunk' if the `data_processing_function` is not set to `NULL`, then writes to a SQLite database. The `gp_clinical_to_sqlite_db` function reshapes and formats the data to match output from `get_all_diagnostic_codes_multi`. 
+
+The interim release primary care clinical events file is ~4GB large with >120 million rows. Writing to a database may take ~5 minutes.
+
+```{r eval=FALSE}
+# create a database connection (this will create a new database if it does not already exist)
+con = DBI::dbConnect(RSQLite::SQLite(), "ukb.db")
+
+# write to table
+file_to_sqlite_db(file = "PATH_TO_GP_CLINICAL.TXT", 
+             db_path = "PATH_TO_DATABASE",
+             table = "gp_clinical",
+             chunk_size = 500000,
+             delim = "\t",
+             append = FALSE,
+             verbose = TRUE,
+             data_processing_function = gp_clinical_to_sqlite_db)
 ```
 
 
-# Development area
+```{r eval=FALSE, include=FALSE}
+# connect to db
+con = DBI::dbConnect(RSQLite::SQLite(), UKB_DB)
 
+# write file to table named 'gp_clinical' in database
+file_to_sqlite_db(file = GP_CLINICAL_AK_TEMP, 
+             col_types = readr::cols(.default = "c"),
+             db_path = UKB_DB,
+             table = "clinical_events",
+             chunk_size = 500000,
+             delim = "\t",
+             append = FALSE, # set to TRUE if appending to an existing table
+             verbose = TRUE,
+             data_processing_function = gp_clinical_to_sqlite_db)
+```
+
+**Step 2:** Filter for selected codes - retrieve the table using `dplyr::tbl()`, `dplyr::filter()` for selected codes, read the results into R with `dplyr::collect()` and convert the 'date' column to date format:
+
+```{r eval=FALSE}
+# retrieve table
+clinical_events <- dplyr::tbl(con, "clinical_events") 
+
+# filter for selected codes
+selected_codes <- c("Xa8Pl", "246A.")
+eids_with_selected_codes <- clinical_events %>% 
+  filter(code %in% selected_codes) %>% 
+  collect() %>% 
+  mutate(date = as.Date(date))
+```
+
+**Step 3:** Then use `get_first_diagnostic_code_record` to identify participants with specific codes of interest in their record. See the [dbplyr getting started vignette](https://dbplyr.tidyverse.org/articles/dbplyr.html) for a good overview of querying databases using `dplyr` syntax.
+
+```{r eval=FALSE, include=FALSE}
+get_first_diagnostic_code_record(eids_with_selected_codes, 
+                                 selected_codes)
+```
+
+# Combining all diagnostic codes into a SQLite database
+
+**Step 1:** Follow 'step 1' in 'Primary care data', if not already done.
+
+**Step 2:** Append to this the output from get_all_diagnostic_codes_multi (set the `append` argument in `dbWriteTable` to `TRUE`).
+
+```{r eval=FALSE}
+# get diagnostic codes from ukb pheno data
+diagnostic_codes_multiple_sources <-
+  get_all_diagnostic_codes_multi(ukb_pheno = dummy_ukb_data,
+                                 data_dict = dummy_data_dict,
+                                 ukb_codings = ukb_codings)
+
+# append to `clinical_events` table
+DBI::dbWriteTable(
+      conn = con,
+      name = "clinical_events",
+      value = diagnostic_codes_multiple_sources,
+      overwrite = FALSE, # ensure table is not inadvertently overwritten
+      append = TRUE
+)
+```
+
+**Step 3:** Then use `get_first_diagnostic_code_record_db` to identify participants with specific codes of interest in their record. See the [dbplyr getting started vignette](https://dbplyr.tidyverse.org/articles/dbplyr.html) for a good overview of querying databases using `dplyr` syntax.
+
+>**NOTE:** To improve search performance, set an index on the 'code' column (this will be filtered on most frequently) e.g. `dplyr::db_create_index(con, "clinical_events", "code").
+
+>**NOTE:** To remove a table, use `DBI::dbRemoveTable(conn, 'table_name')`.

@@ -60,6 +60,62 @@ get_first_diagnostic_code_record <- function(df,
 
 # Get all diagnostic codes -------------------------------------------------------
 
+#' Convert column for a FieldID to long format
+#'
+#' Helper function. Selects the columns relating to a specified FieldID (plus the 'eid' column)
+#' and applies \code{\link[tidyr]{pivot_longer}}.
+#'
+#' @param field_id Character. A UK Biobank Field ID
+#' @inheritParams read_pheno
+#' @inheritParams summarise_rowise
+#'
+#' @return A dataframe with 3 columns: \itemize{ \item eid \item column names
+#'   (labelled as the specified `field_id`, prefixed by 'f') \item column values
+#'   (labelled as he specified `field_id`, prefixed by 'f' and suffixed by
+#'   '_value') }
+#'
+#' @export
+#'
+#' @family extract disease outcomes helpers
+field_id_pivot_longer <- function(ukb_pheno,
+                                  field_id,
+                                  data_dict,
+                                  ukb_codings) {
+
+  # check a single field_id has been supplied
+  assertthat::is.string(field_id)
+
+  # filter ukb_pheno for selected cols (eid + fieldid cols)
+  required_cols <- get_colnames_for_fieldids(field_id = field_id,
+                                             data_dict = data_dict)
+
+  check_required_cols_exist(df = ukb_pheno,
+                            required_cols)
+
+  ukb_pheno <- ukb_pheno %>%
+    dplyr::select(eid,
+                  tidyselect::all_of(required_cols))
+
+  # get codings for fieldid
+  field_id_codings <- ukb_codings %>%
+    dplyr::filter(Coding == (data_dict %>%
+                               dplyr::filter(FieldID == field_id) %>%
+                               .$Coding %>%
+                               head(n = 1)))
+
+  ukb_pheno <- ukb_pheno %>%
+    tidyr::pivot_longer(
+      cols = tidyselect::all_of(required_cols),
+      values_to = paste(paste0("f", field_id), "value", sep = "_")
+    ) %>%
+    dplyr::mutate(instance_array = colname_to_field_inst_array_df(name)$instance_array)
+
+  # rename
+  names(ukb_pheno)[which(names(ukb_pheno) == 'name')] <- paste0("f", field_id)
+
+  return(ukb_pheno)
+}
+
 
 #' Apply pivot_longer across multiple sets of columns
 #'
@@ -610,7 +666,7 @@ get_cancer_register_icd10_diagnoses <- function(ukb_pheno,
 #' Loops through functions from the 'get all diagnostic codes' family and
 #' combines the results into a single dataframe.
 #'
-#' @param function_list
+#' @param function_list A list of `get_XXXX_diagnoses` functions.
 #' @inheritParams get_self_report_non_cancer_diagnoses_icd10
 #'
 #' @return Dataframe
@@ -651,61 +707,9 @@ get_all_diagnostic_codes_multi <- function(function_list = list(get_self_report_
   return(result)
 }
 
+
 # PRIVATE FUNCTIONS -------------------------------------------------------
 
-#' Convert column for a FieldID to long format
-#'
-#' Helper function. Selects the columns relating to a specified FieldID (plus the 'eid' column)
-#' and applies \code{\link[tidyr]{pivot_longer}}.
-#'
-#' @param field_id Character. A UK Biobank Field ID
-#' @inheritParams read_pheno
-#' @inheritParams summarise_rowise
-#'
-#' @return A dataframe with 3 columns: \itemize{ \item eid \item column names
-#'   (labelled as the specified `field_id`, prefixed by 'f') \item column values
-#'   (labelled as he specified `field_id`, prefixed by 'f' and suffixed by
-#'   '_value') }
-#'
-#' @family extract disease outcomes helpers
-field_id_pivot_longer <- function(ukb_pheno,
-                                 field_id,
-                                 data_dict,
-                                 ukb_codings) {
-
-  # check a single field_id has been supplied
-  assertthat::is.string(field_id)
-
-  # filter ukb_pheno for selected cols (eid + fieldid cols)
-  required_cols <- get_colnames_for_fieldids(field_id = field_id,
-                                            data_dict = data_dict)
-
-  check_required_cols_exist(df = ukb_pheno,
-                            required_cols)
-
-  ukb_pheno <- ukb_pheno %>%
-    dplyr::select(eid,
-           tidyselect::all_of(required_cols))
-
-  # get codings for fieldid
-  field_id_codings <- ukb_codings %>%
-    dplyr::filter(Coding == (data_dict %>%
-                        dplyr::filter(FieldID == field_id) %>%
-                        .$Coding %>%
-                        head(n = 1)))
-
-  ukb_pheno <- ukb_pheno %>%
-    tidyr::pivot_longer(
-      cols = tidyselect::all_of(required_cols),
-      values_to = paste(paste0("f", field_id), "value", sep = "_")
-    ) %>%
-    dplyr::mutate(instance_array = colname_to_field_inst_array_df(name)$instance_array)
-
-  # rename
-  names(ukb_pheno)[which(names(ukb_pheno) == 'name')] <- paste0("f", field_id)
-
-  return(ukb_pheno)
-}
 
 #' Standardise a long format diagnoses dataframe
 #'
@@ -751,6 +755,9 @@ get_first_diagnostic_code_record_basis <- function(df,
   # check there are no NA values for 'code' column
   assertthat::assert_that(sum(is.na(df$code)) == 0,
                           msg = "Error! Some rows have no diagnostic code (there should be no missing values)")
+
+  # check that date column is date type (not character)
+  assertthat::is.date(df$date)
 
   # mapping function to extract earliest diagnostic code data for each eid -
   # returns a single character.

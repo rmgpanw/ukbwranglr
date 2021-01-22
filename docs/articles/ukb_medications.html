@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ukbwranglr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9000</span>
       </span>
     </div>
 
@@ -97,13 +97,134 @@
 
     
     
+<div id="overview" class="section level1">
+<h1 class="hasAnchor">
+<a href="#overview" class="anchor"></a>Overview</h1>
+<p>Medication history for UK Biobank participants may be ascertained from the following sources:</p>
+<ul>
+<li><a href="https://biobank.ndph.ox.ac.uk/showcase/label.cgi?id=100075">Self-report data</a></li>
+<li><a href="https://biobank.ndph.ox.ac.uk/showcase/label.cgi?id=3000">Primary care data</a></li>
+</ul>
+<blockquote>
+<p><strong>Note:</strong> the preceding links for self-report data relate to verbal interview responses. Self-report data also includes <a href="https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=100025">touchscreen</a> responses, however UKB <a href="https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=596">resource 596</a> recommends that the verbal interview data fields are used in preference</p>
+</blockquote>
+</div>
+<div id="self-report-data-verbal-interview" class="section level1">
+<h1 class="hasAnchor">
+<a href="#self-report-data-verbal-interview" class="anchor"></a>Self-report data (<a href="https://biobank.ndph.ox.ac.uk/showcase/label.cgi?id=100075">verbal interview</a>)</h1>
+<div id="introduction" class="section level2">
+<h2 class="hasAnchor">
+<a href="#introduction" class="anchor"></a>Introduction</h2>
+<p><a href="https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=20003">FieldID 20003</a> records data on type and number of medications taken, coded with data coding(<a href="https://biobank.ndph.ox.ac.uk/showcase/coding.cgi?id=4" class="uri">https://biobank.ndph.ox.ac.uk/showcase/coding.cgi?id=4</a>). <a href="https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=20076">FieldID 20076</a> records data on type and number of medications taken in Read code format but this does not seem to be available yet(?) Participants were not asked to provide the dates when they started these medications, however <a href="https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=53">FieldID 53</a> records the date when participants attended the assessment centre.</p>
+</div>
+<div id="ascertaining-medication-history" class="section level2">
+<h2 class="hasAnchor">
+<a href="#ascertaining-medication-history" class="anchor"></a>Ascertaining medication history</h2>
+<ol style="list-style-type: decimal">
+<li>Reshape these fields to long format (see below)</li>
+<li>Filter for medications of interest (I cannot find a mapping file to convert these to Read codes)</li>
+</ol>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">ukbwranglr</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="../reference/field_id_pivot_longer.html">field_id_pivot_longer</a></span><span class="op">(</span>
+  <span class="va">dummy_ukb_data</span>,
+  field_id <span class="op">=</span> <span class="fl">20003</span>,
+  data_dict <span class="op">=</span> <span class="va">dummy_data_dict</span>,
+  ukb_codings <span class="op">=</span> <span class="va">ukb_codings</span>
+<span class="op">)</span> 
+<span class="co">#&gt; # A tibble: 14,100 x 4</span>
+<span class="co">#&gt;    eid   f20003                 f20003_value                      instance_array</span>
+<span class="co">#&gt;    &lt;chr&gt; &lt;chr&gt;                  &lt;ord&gt;                             &lt;chr&gt;         </span>
+<span class="co">#&gt;  1 1     treatment_medication_… sodium cromoglicate+isoprenaline… 0_0           </span>
+<span class="co">#&gt;  2 1     treatment_medication_… triamterene+furosemide 50mg/40mg… 0_1           </span>
+<span class="co">#&gt;  3 1     treatment_medication_… magnesium carbonate               0_2           </span>
+<span class="co">#&gt;  4 1     treatment_medication_… imtack 1.25mg spray               0_3           </span>
+<span class="co">#&gt;  5 1     treatment_medication_… dihydroergotamine mesylate        0_4           </span>
+<span class="co">#&gt;  6 1     treatment_medication_… simple ointment bp                0_5           </span>
+<span class="co">#&gt;  7 1     treatment_medication_… elidel 1% cream                   0_6           </span>
+<span class="co">#&gt;  8 1     treatment_medication_… bzt - bendrofluazide              0_7           </span>
+<span class="co">#&gt;  9 1     treatment_medication_… primaxin iv 250mg intravenous in… 0_8           </span>
+<span class="co">#&gt; 10 1     treatment_medication_… medinol over six 250mg/5ml s/f s… 0_9           </span>
+<span class="co">#&gt; # … with 14,090 more rows</span>
+
+<span class="co"># if you want to recode</span>
+<span class="co">#   recode_ukbcol( </span>
+<span class="co">#     col_to_recode = "f20003_value",</span>
+<span class="co">#     field_id = "20003",</span>
+<span class="co">#     ukb_data_dict = dummy_data_dict,</span>
+<span class="co">#     ukb_codings = ukb_codings %&gt;% filter(Value != "1195")</span>
+<span class="co">#   )</span></code></pre></div>
+</div>
+</div>
+<div id="primary-care-data" class="section level1">
+<h1 class="hasAnchor">
+<a href="#primary-care-data" class="anchor"></a>Primary care data</h1>
+<div id="introduction-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#introduction-1" class="anchor"></a>Introduction</h2>
+<p>The interim release primary care dataset covers ~50% of the full UK Biobank cohort and is provided in 3 tables:</p>
+<ol style="list-style-type: decimal">
+<li>Clinical events</li>
+<li>Prescriptions</li>
+<li>Registrations</li>
+</ol>
+<p>Only the prescriptions table will be considered here. This consists of 55 million rows rows with the following columns:</p>
+<ul>
+<li>
+<code>eid</code>: unique participant identifier</li>
+<li>
+<code>data_provider</code>: England (Vision or TPP), Scotland or Wales</li>
+<li>
+<code>issue_date</code>: date prescription was issued</li>
+<li>
+<code>read_2</code>: Read 2 code</li>
+<li><code>bnf_code</code></li>
+<li><code>dmd_code</code></li>
+<li><code>drug_name</code></li>
+<li>
+<code>quantity</code>: quantity prescribed</li>
+</ul>
+<p>Issues:</p>
+<ul>
+<li><p>Each of the 4 data providers uses different coding styles [TODO: INSERT FIGURE]</p></li>
+<li><p>Incorrect codes (do not match free text description)</p></li>
+<li><p>Missing drug codes, necessitating reliance on free text</p></li>
+<li>
+<p>Free text issues:</p>
+<ul>
+<li>Proprietary drug names</li>
+<li>Niche applications e.g. beta blocker eye drops</li>
+<li>Regular expressions searches e.g. searching for “Torem” (loop diuretic) also matches “Toremifene” (breast cancer drug)</li>
+</ul>
+</li>
+<li><p>Combination drugs only correspond to one BNF paragraph</p></li>
+</ul>
+<p>Approaches:</p>
+<ol style="list-style-type: decimal">
+<li>Use drug codes (Read2 fpr Wales) only:</li>
+</ol>
+<ul>
+<li>How many eids have free text but no drug code?</li>
+<li>Would miss combination drugs</li>
+</ul>
+<p><em>See resources 591 and 592 for fiurther information (available from <a href="https://biobank.ndph.ox.ac.uk/showcase/label.cgi?id=3000">here</a>).</em></p>
+</div>
+<div id="ascertaining-medication-history-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#ascertaining-medication-history-1" class="anchor"></a>Ascertaining medication history</h2>
+<ul>
+<li>DMD</li>
+</ul>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">bnf_chembl</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/fread.html">fread</a></span><span class="op">(</span><span class="va">BNF_CHEMBL</span><span class="op">)</span></code></pre></div>
+</div>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-      </div>
+        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
+    </nav>
+</div>
 
 </div>
 

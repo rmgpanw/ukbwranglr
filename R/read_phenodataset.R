@@ -562,7 +562,8 @@ ukb_rename_columns <- function(pheno_data_dict) {
   to_remove <- c("\\(",
                  "\\)",
                  "\\-",
-                 ",")
+                 ",",
+                 ":")
 
   for (string in to_remove) {
     column_names <- stringr::str_replace_all(column_names, string, "")

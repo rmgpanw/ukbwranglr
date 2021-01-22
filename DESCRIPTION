@@ -1,10 +1,10 @@
 Package: ukbwranglr
 Type: Package
 Title: Exploring UKB data
-Version: 0.1.0
+Version: 0.0.0.9000
 Authors@R: 
   person("Alasdair", "Warwick", email = "alasdair.warwick06@gmail.com", role = c("aut", "cre"))
-Description: Tools to load, process and summarise UKB data from a raw tab-delimited file.
+Description: Tools to load, pre-process and summarise raw UKB phenotype data.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -16,12 +16,15 @@ VignetteBuilder: knitr
 Imports:
     assertthat,
     data.table,
+    DBI,
     dplyr,
     lubridate,
     magrittr,
     progress,
     purrr,
+    readr,
     rlang,
+    RSQLite,
     skimr,
     stringr,
     tidyr,
