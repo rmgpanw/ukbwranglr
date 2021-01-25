@@ -16,32 +16,32 @@ selected columns) can be loaded into R with human-readable labels:
 *Raw data appearance:*
 
     #>      eid 31-0.0 34-0.0 21000-0.0 20002-0.0 21001-0.0
-    #> 1: fake1      0   1946      2002      1139   26.1735
-    #> 2: fake2      0   1946         3      1287   13.8933
-    #> 3: fake3      0   1946      4003      1663   25.8040
-    #> 4: fake4      1     NA      3003      1086   29.4059
-    #> 5: fake5      0   1956      3001        NA   24.8359
+    #> 1: fake1      0   1952        NA      1665   20.1115
+    #> 2: fake2      0   1946      4001      1383   30.1536
+    #> 3: fake3      1   1951         3      1197   22.8495
+    #> 4: fake4      0   1956        NA      1441   23.4904
+    #> 5: fake5     NA     NA        -3      1429   29.2752
 
 *Appearance when loaded using `ukbwranglr::read_pheno()`:*
 
     #>      eid sex_f31_0_0 year_of_birth_f34_0_0 ethnic_background_f21000_0_0
-    #> 1: fake1      Female                  1946      White and Black African
-    #> 2: fake2      Female                  1946       Asian or Asian British
-    #> 3: fake3      Female                  1946   Any other Black background
-    #> 4: fake4        Male                    NA                  Bangladeshi
-    #> 5: fake5      Female                  1956                       Indian
+    #> 1: fake1      Female                  1952                         <NA>
+    #> 2: fake2      Female                  1946                    Caribbean
+    #> 3: fake3        Male                  1951       Asian or Asian British
+    #> 4: fake4      Female                  1956                         <NA>
+    #> 5: fake5        <NA>                    NA         Prefer not to answer
     #>    noncancer_illness_code_selfreported_f20002_0_0
-    #> 1:               oesophagitis/barretts oesophagus
-    #> 2:                          anxiety/panic attacks
-    #> 3:                        abnormal smear (cervix)
-    #> 4:                       subarachnoid haemorrhage
-    #> 5:                                           <NA>
+    #> 1:                menopausal symptoms / menopause
+    #> 2:                            dermatopolymyositis
+    #> 3:        kidney stone/ureter stone/bladder stone
+    #> 4:                                        malaria
+    #> 5:                                     acromegaly
     #>    body_mass_index_bmi_f21001_0_0
-    #> 1:                        26.1735
-    #> 2:                        13.8933
-    #> 3:                        25.8040
-    #> 4:                        29.4059
-    #> 5:                        24.8359
+    #> 1:                        20.1115
+    #> 2:                        30.1536
+    #> 3:                        22.8495
+    #> 4:                        23.4904
+    #> 5:                        29.2752
 
 Also included are functions to help with pre-processing the data into an
 analysable format. For example:

@@ -663,7 +663,7 @@ get_cancer_register_icd10_diagnoses <- function(ukb_pheno,
 #'
 #' Extract diagnostic codes from multiple sources
 #'
-#' Loops through functions from the 'get all diagnostic codes' family and
+#' Loops through a list of functions (`function_list`) from the 'get all diagnostic codes' family and
 #' combines the results into a single dataframe.
 #'
 #' @param function_list A list of `get_XXXX_diagnoses` functions.
@@ -675,6 +675,7 @@ get_cancer_register_icd10_diagnoses <- function(ukb_pheno,
 get_all_diagnostic_codes_multi <- function(function_list = list(get_self_report_non_cancer_diagnoses_icd10,
                                                                 get_hes_icd9_diagnoses,
                                                                 get_hes_icd10_diagnoses,
+                                                                get_death_data_icd10_diagnoses,
                                                                 get_cancer_register_icd9_diagnoses,
                                                                 get_cancer_register_icd10_diagnoses),
                                            ukb_pheno,

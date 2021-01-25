@@ -1,7 +1,7 @@
 # NOTES -------------------------------------------------------------------
 
-#TODO
-#
+#TODO summarise_rowise_numerical_mean_min_max currently throws an error if data
+#dictionary contains columns that do not exist in dataset
 
 # EXPORTED FUNCTIONS ----------------------------------------------------
 

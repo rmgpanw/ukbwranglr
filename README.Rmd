@@ -79,7 +79,7 @@ Please see ['getting started'](https://rmgpanw.github.io/ukbwranglr/articles/ukb
 
 You can install the development version of ukbwranglr from [GitHub](https://github.com/rmgpanw/ukbwranglr/tree/dtable) with:
 
-``` r
+```{r eval=FALSE}
 # install.packages("devtools")
 devtools::install_github("rmgpanw/ukbwranglr")
 ```

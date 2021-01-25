@@ -103,6 +103,27 @@ extract_codings_for_fieldids <- function(field_ids,
     ))
 }
 
+#' Download UKB data dictionary
+#'
+#' Downloads the UK Biobank data dictionary from the
+#' \href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{UK
+#' Biobank website} and reads into R with all columns as character type.
+#'
+#' @export
+get_ukb_data_dict <- function() {
+  fread_tsv_as_character("https://biobank.ctsu.ox.ac.uk/~bbdatan/Data_Dictionary_Showcase.tsv")
+}
+
+#' Download UKB codings file
+#'
+#' Downloads the UK Biobank codings list from the
+#' \href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{UK
+#' Biobank website} and reads into R with all columns as character type.
+#'
+#' @export
+get_ukb_codings <- function() {
+  fread_tsv_as_character("https://biobank.ctsu.ox.ac.uk/~bbdatan/Codings.tsv")
+}
 
 # PRIVATE FUNCTIONS -------------------------------------------------------
 
@@ -371,3 +392,14 @@ check_required_cols_exist <- function(df,
     stop("Required columns not present in data")
   }
 }
+
+
+#' Read a tsv file with all columns as type character
+#'
+#' Wrapper around \code{\link[data.table]{fread}}
+#'
+fread_tsv_as_character <- purrr::partial(data.table::fread,
+                                         colClasses = c('character'),
+                                         sep = "\t",
+                                         quote = " ",
+                                         na.strings = c("", "NA"))

@@ -25,6 +25,7 @@ config <- read.config("../config.ini")
 DUMMY_DATA_PATH <- paste0("../", config$PATHS$DUMMY_DATA_PATH)
 BNF_CHEMBL <- config$PATHS$BNF_CHEMBL
 UKB_DB <- config$PATHS$UKB_DB
+GP_SCRIPTS_AK <- config$PATHS$GP_SCRIPTS_AK
 
 # Load data
 dummy_data_dict <- ukbwranglr::pheno_data_dict(DUMMY_DATA_PATH, delim = ",")

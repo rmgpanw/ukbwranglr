@@ -491,6 +491,6 @@ DBI::dbWriteTable(
 
 **Step 3:** Then use `get_first_diagnostic_code_record_db` to identify participants with specific codes of interest in their record. See the [dbplyr getting started vignette](https://dbplyr.tidyverse.org/articles/dbplyr.html) for a good overview of querying databases using `dplyr` syntax.
 
->**NOTE:** To improve search performance, set an index on the 'code' column (this will be filtered on most frequently) e.g. `dplyr::db_create_index(con, "clinical_events", "code").
+>**NOTE:** To improve search performance, set an index on the 'code' column (this will be filtered on most frequently) e.g. `dplyr::db_create_index(con, "clinical_events", "code")`.
 
 >**NOTE:** To remove a table, use `DBI::dbRemoveTable(conn, 'table_name')`.
