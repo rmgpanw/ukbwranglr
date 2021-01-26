@@ -365,6 +365,7 @@ Supply a list of functions from the 'get all diagnostic codes' family to `get_al
 # list of functions
 list_of_get_diagnostic_codes_functions <-
   list(
+    get_self_report_non_cancer_diagnoses,
     get_self_report_non_cancer_diagnoses_icd10,
     get_hes_icd10_diagnoses,
     get_cancer_register_icd10_diagnoses

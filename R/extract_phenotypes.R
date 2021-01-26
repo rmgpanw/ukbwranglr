@@ -244,7 +244,7 @@ get_death_data_icd10_diagnoses <- function(ukb_pheno,
                                                                date_col = "date")
 
   # combine into single df
-    death_data_diagnoses <- bind_rows(death_data_diagnoses)
+    death_data_diagnoses <- dplyr::bind_rows(death_data_diagnoses)
 
   # recode to ICD10
     death_data_diagnoses <- recode_ukbcol(df = death_data_diagnoses,
@@ -469,6 +469,10 @@ get_self_report_non_cancer_diagnoses_icd10 <- function(ukb_pheno,
   self_report_non_cancer_diagnoses_icd10 <- self_report_non_cancer_diagnoses_icd10 %>%
     dplyr::filter(!is.na(code))
 
+  # relabel 'source' col to indicate these are icd10 codes
+  self_report_non_cancer_diagnoses_icd10 <- self_report_non_cancer_diagnoses_icd10 %>%
+    dplyr::mutate(source = paste0(source, "_icd10"))
+
   return(self_report_non_cancer_diagnoses_icd10)
 }
 
@@ -663,11 +667,14 @@ get_cancer_register_icd10_diagnoses <- function(ukb_pheno,
 #'
 #' Extract diagnostic codes from multiple sources
 #'
-#' Loops through a list of functions (`function_list`) from the 'get all diagnostic codes' family and
-#' combines the results into a single dataframe.
+#' Loops through a list of functions (`function_list`) from the 'get all
+#' diagnostic codes' family and combines the results into a single dataframe.
 #'
 #' @param function_list A list of `get_XXXX_diagnoses` functions.
 #' @inheritParams get_self_report_non_cancer_diagnoses_icd10
+#' @param drop_source_col Remove `source_col` column, which records which column
+#'   in the main dataset the value in `code` column came from. Default is
+#'   `TRUE`.
 #'
 #' @return Dataframe
 #' @export
@@ -680,7 +687,8 @@ get_all_diagnostic_codes_multi <- function(function_list = list(get_self_report_
                                                                 get_cancer_register_icd10_diagnoses),
                                            ukb_pheno,
                                            data_dict,
-                                           ukb_codings) {
+                                           ukb_codings,
+                                           drop_source_col = TRUE) {
   # initialise empty results list
   result <- vector(mode = "list",
                    length = length(function_list))
@@ -702,7 +710,13 @@ get_all_diagnostic_codes_multi <- function(function_list = list(get_self_report_
   }
 
   # combine results into single df
-  result <- bind_rows(result)
+  result <- dplyr::bind_rows(result)
+
+  # remove source_col if requested (default is to remove)
+  if (drop_source_col == TRUE) {
+    result <- result %>%
+      dplyr::select(-source_col)
+  }
 
   # return result
   return(result)
@@ -727,12 +741,17 @@ get_diagnoses_set_index_code_date_cols <- function(get_diagnoses_df,
                                                    index_col,
                                                    code_col,
                                                    date_col) {
+
+  # create 'source' col indicating which FieldID the data (code) comes from
+  get_diagnoses_df$source <- index_col
+
   # select required columns and rename
   get_diagnoses_df <- get_diagnoses_df %>%
     select(eid,
-           source = .data[[index_col]],
+           source,
            code = .data[[code_col]],
-           date = .data[[date_col]])
+           date = .data[[date_col]],
+           source_col = .data[[index_col]])
 
   return(get_diagnoses_df)
 }
