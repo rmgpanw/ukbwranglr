@@ -689,20 +689,33 @@ get_all_diagnostic_codes_multi <- function(function_list = list(get_self_report_
                                            data_dict,
                                            ukb_codings,
                                            drop_source_col = TRUE) {
+  start_time <- proc.time()
+
   # initialise empty results list
   result <- vector(mode = "list",
                    length = length(function_list))
 
-  # initialist progress bar
-  pb <- progress::progress_bar$new(format = "[:bar] :current/:total (:percent)",
-                                                          total = length(function_list))
-  pb$tick(0)
+  # TODO - prob delete progress bar. messages are better i think
+  # # initialist progress bar
+  # pb <- progress::progress_bar$new(format = "[:bar] :current/:total (:percent)",
+  #                                                         total = length(function_list))
+  # pb$tick(0)
 
   # loop through 'get all diagnostic code' functions - populate results list
   for (func in seq_along(function_list)){
+    # TODO - delete probably
     # progress bar
-    pb$tick(1)
-    message("Processing get diagnosis function ", func, " of ", length(function_list))
+    # pb$tick(1)
+
+    # timet taken message
+    time_taken <- proc.time() - start_time
+    message("Processing get diagnosis function ", func, " of ", length(function_list),
+            ". Time taken: ",
+        (time_taken[3] %/% 60),
+        " minutes, ",
+        (round(time_taken[3] %% 60)),
+        " seconds.")
+
     # get diagnoses
     result[[func]] <- function_list[[func]](ukb_pheno = ukb_pheno,
                                                  data_dict = data_dict,
@@ -717,6 +730,14 @@ get_all_diagnostic_codes_multi <- function(function_list = list(get_self_report_
     result <- result %>%
       dplyr::select(-source_col)
   }
+
+  # completion message
+  time_taken <- proc.time() - start_time
+  message("Complete! Time taken: ",
+        (time_taken[3] %/% 60),
+        " minutes, ",
+        (round(time_taken[3] %% 60)),
+        " seconds.")
 
   # return result
   return(result)
