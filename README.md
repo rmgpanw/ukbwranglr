@@ -111,5 +111,5 @@ data_dict <- data_dict %>%
 
 ``` r
 ukb_pheno <- read_pheno(path = "MY_UKB_FILE.tab", 
-                        ukb_data_dict = data_dict)
+                        pheno_data_dict = data_dict)
 ```

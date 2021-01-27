@@ -155,7 +155,7 @@ filter_data_dict <- function(data_dict,
 
   # Error if produces an empty vector
   if (rlang::is_empty(data_dict)) {
-    stop("Error! Required values not present in data dictionary")
+    stop("Error! Required values not present in data dictionary: ", filter_value)
   } else {
     return(data_dict)
   }

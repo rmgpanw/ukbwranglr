@@ -702,7 +702,7 @@ get_all_diagnostic_codes_multi <- function(function_list = list(get_self_report_
   for (func in seq_along(function_list)){
     # progress bar
     pb$tick(1)
-
+    message("Processing get diagnosis function ", func, " of ", length(function_list))
     # get diagnoses
     result[[func]] <- function_list[[func]](ukb_pheno = ukb_pheno,
                                                  data_dict = data_dict,

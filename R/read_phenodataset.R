@@ -627,20 +627,20 @@ format_ukb_df_header <- function(colheaders) {
 colname_to_field_inst_array_df <- function(x) {
 
   # extract fieldid_instance_array (removing "f")
-  x <- str_extract(x, pattern = "_f[:digit:]+_[:digit:]+_[:digit:]+$") %>%
-    str_sub(3L, -1L)
+  x <- stringr::str_extract(x, pattern = "_f[:digit:]+_[:digit:]+_[:digit:]+$") %>%
+    stringr::str_sub(3L, -1L)
 
   # make into single column tibble
-  x <- tibble(fieldid_instance_array = x)
+  x <- tibble::tibble(fieldid_instance_array = x)
 
   # separate into field_id, instance and array. Also mutate cols with all
   # possible combinations
   x %>%
-    separate(col = "fieldid_instance_array",
+    tidyr::separate(col = "fieldid_instance_array",
              into = c("fieldid", "instance", "array"),
              sep = "_",
              remove = FALSE) %>%
-    mutate(
+    dplyr::mutate(
       fieldid_instance = paste(fieldid, instance, sep = "_"),
       instance_array = paste(instance, array, sep = "_"))
 }
