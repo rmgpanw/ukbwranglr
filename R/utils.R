@@ -403,3 +403,24 @@ fread_tsv_as_character <- purrr::partial(data.table::fread,
                                          sep = "\t",
                                          quote = " ",
                                          na.strings = c("", "NA"))
+
+#' Display time taken message
+#'
+#' Helper function for displaying time taken messages. Use
+#' \code{\link[base]{proc.time}} at start of function and supply this as the
+#' `start_time` parameter to this function.
+#'
+#' @param start_time The start time.
+#'
+#' @return A message stating time taken since start time
+time_taken_message <- function(start_time) {
+  # get time taken
+  time_taken <- proc.time() - start_time
+
+  # display message
+  message("Time taken: ",
+        (time_taken[3] %/% 60),
+        " minutes, ",
+        (round(time_taken[3] %% 60)),
+        " seconds.")
+}

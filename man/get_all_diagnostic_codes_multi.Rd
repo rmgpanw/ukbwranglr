@@ -10,7 +10,8 @@ get_all_diagnostic_codes_multi(
     get_cancer_register_icd9_diagnoses, get_cancer_register_icd10_diagnoses),
   ukb_pheno,
   data_dict,
-  ukb_codings
+  ukb_codings,
+  drop_source_col = TRUE
 )
 }
 \arguments{
@@ -24,6 +25,10 @@ get_all_diagnostic_codes_multi(
 default, this is downloaded directly from the
 \href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{UKB
  website}.}
+
+\item{drop_source_col}{Remove `source_col` column, which records which column
+in the main dataset the value in `code` column came from. Default is
+`TRUE`.}
 }
 \value{
 Dataframe
@@ -32,8 +37,8 @@ Dataframe
 Extract diagnostic codes from multiple sources
 }
 \details{
-Loops through a list of functions (`function_list`) from the 'get all diagnostic codes' family and
-combines the results into a single dataframe.
+Loops through a list of functions (`function_list`) from the 'get all
+diagnostic codes' family and combines the results into a single dataframe.
 }
 \seealso{
 Other get all diagnostic codes: 

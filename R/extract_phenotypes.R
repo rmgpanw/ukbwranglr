@@ -22,6 +22,10 @@
 # fieldids. Recode the remainder of the functions to use this so any changes
 # only need to be made at the start (maybe separate into 'code_fid' and 'date_fid' variables?)
 
+# Add check - UKB dataset should have all the required columns for these
+# functions i.e. all instances/arrays (as per the complete UKB data dictionary)
+# for all required FIDs. Raise error if not
+
 # EXPORTED FUNCTIONS ----------------------------------------------------
 
 # Get specific diagnostic codes, first recorded -------------------------------------------------------
@@ -555,7 +559,7 @@ get_cancer_register_icd9_diagnoses <- function(ukb_pheno,
                                              data_dict,
                                              ukb_codings) {
 
-  # required field_ids (see https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=2002)
+  # required field_ids (see https://biobank.ndph.ox.ac.uk/showcase/label.cgi?id=100092 )
   cancer_register_icd9_field_ids <- c("40013", "40005")
 
   # **TEMPFIX** - for fieldid 40013 (ICD9), there are only 14 instances, where as
@@ -564,9 +568,14 @@ get_cancer_register_icd9_diagnoses <- function(ukb_pheno,
   # instances are not equal
 
   # Therefore, remove the 'extra' instance columns for 40005 before proceeding
+  # check number of instances for FID 40013
+  f40013_instances <- data_dict %>%
+    dplyr::filter(FieldID == "40013") %>%
+    .$instance
+
   cols_to_remove <- data_dict %>%
     dplyr::filter(FieldID == "40005") %>%
-    dplyr::filter(instance %in% c("14", "15")) %>%
+    dplyr::filter(!(instance %in% f40013_instances)) %>%
     .$descriptive_colnames
 
   if (rlang::is_empty(cols_to_remove)) {
@@ -703,7 +712,7 @@ get_all_diagnostic_codes_multi <- function(function_list = list(get_self_report_
 
   # loop through 'get all diagnostic code' functions - populate results list
   for (func in seq_along(function_list)){
-    # TODO - delete probably
+    # TODO - delete probablygit
     # progress bar
     # pb$tick(1)
 

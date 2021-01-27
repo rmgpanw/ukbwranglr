@@ -332,11 +332,11 @@ cancer_register_icd10_diagnoses <- get_cancer_register_icd10_diagnoses(
 ```
 
 ```{r include=FALSE}
-# cancer_register_icd9_diagnoses <- get_cancer_register_icd9_diagnoses(
-#   ukb_pheno = dummy_ukb_data, 
-#   data_dict = dummy_data_dict, 
-#   ukb_codings = ukb_codings
-# )
+cancer_register_icd9_diagnoses <- get_cancer_register_icd9_diagnoses(
+  ukb_pheno = dummy_ukb_data,
+  data_dict = dummy_data_dict,
+  ukb_codings = ukb_codings
+)
 
 cancer_register_icd10_diagnoses <- get_cancer_register_icd10_diagnoses(
   ukb_pheno = dummy_ukb_data, 
