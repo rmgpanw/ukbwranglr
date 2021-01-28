@@ -170,6 +170,8 @@ pheno_data_dict <- function(path,
 #'   \code{NA}. TODO add detail
 #' @param clean_selected_continuous_and_integers If \code{TRUE}, certain special
 #'   continuous/integer codings are converted to \code{NA}. TODO add detail
+#' @param ... Additional parameters are passed on to
+#'   \code{\link[data.table]{fread}} when reading in UKB phenotype file
 #'
 #' @return A UK Biobank phenotype dataset as a data table with human-readable
 #'   variables labels and data values.
@@ -180,7 +182,8 @@ read_pheno <- function(path,
                        ukb_data_dict = "https://biobank.ctsu.ox.ac.uk/~bbdatan/Data_Dictionary_Showcase.tsv",
                        ukb_codings = "https://biobank.ctsu.ox.ac.uk/~bbdatan/Codings.tsv",
                        clean_dates = TRUE,
-                       clean_selected_continuous_and_integers = TRUE
+                       clean_selected_continuous_and_integers = TRUE,
+                       ...
                        ) {
 
   start_time <- proc.time()
@@ -219,7 +222,8 @@ read_pheno <- function(path,
     select = pheno_data_dict$field_id_full_raw, # selected cols
     colClasses = c('character'),
     na.strings = c("", "NA"),
-    sep = delim
+    sep = delim,
+    ...
   )
 
   # filter ukb data dictionary file for fields in dataset and nest by ValueType

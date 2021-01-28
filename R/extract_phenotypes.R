@@ -716,14 +716,16 @@ get_all_diagnostic_codes_multi <- function(function_list = list(get_self_report_
     # progress bar
     # pb$tick(1)
 
-    # timet taken message
-    time_taken <- proc.time() - start_time
+    # time taken message after first function has processed
+    if (func > 1) {
+      time_taken <- proc.time() - start_time
     message("Processing get diagnosis function ", func, " of ", length(function_list),
             ". Time taken: ",
         (time_taken[3] %/% 60),
         " minutes, ",
         (round(time_taken[3] %% 60)),
         " seconds.")
+    }
 
     # get diagnoses
     result[[func]] <- function_list[[func]](ukb_pheno = ukb_pheno,
