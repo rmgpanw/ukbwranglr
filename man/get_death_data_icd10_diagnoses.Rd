@@ -29,6 +29,13 @@ health-related outcomes - primary and secondary causes of death; see
 \href{https://biobank.ndph.ox.ac.uk/showcase/label.cgi?id=100093}{category
 100093}).
 }
+\section{Under the hood}{
+
+
+  Converts the data from FieldIDs 40001 and 40002 to long format separately
+  before combining into a single dataframe.
+}
+
 \seealso{
 Other get all diagnostic codes: 
 \code{\link{get_all_diagnostic_codes_multi}()},

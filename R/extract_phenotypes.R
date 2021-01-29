@@ -202,6 +202,11 @@ field_id_pivot_longer_multi <- function(field_ids,
 #' \href{https://biobank.ndph.ox.ac.uk/showcase/label.cgi?id=100093}{category
 #' 100093}).
 #'
+#' @section Under the hood:
+#'
+#'   Converts the data from FieldIDs 40001 and 40002 to long format separately
+#'   before combining into a single dataframe.
+#'
 #' @inheritParams summarise_rowise
 #' @inheritParams field_id_pivot_longer
 #'
@@ -219,7 +224,7 @@ get_death_data_icd10_diagnoses <- function(ukb_pheno,
   # initialise
   death_data_diagnoses <- vector(mode = "list", length = length(death_data_field_ids))
   names(death_data_diagnoses) <- paste0("f", death_data_field_ids)
-
+browser()
   # get all diagnostic codes and dates (and standardise) - fieldid 40001
   death_data_diagnoses[["f40001"]] <- field_id_pivot_longer(
     field_id = "40001",
@@ -228,6 +233,7 @@ get_death_data_icd10_diagnoses <- function(ukb_pheno,
     ukb_codings = ukb_codings
   ) %>%
     dplyr::mutate(date = NA) %>% # date is 'NA' (cannot ascertain dates of diagnoses from death certificates)
+    dplyr::mutate(date = as.Date(date)) %>% # make date type - allows combining with output from other get_XXX functions
     dplyr::filter(!is.na(f40001_value)) # remove rows with no codes
 
     death_data_diagnoses[["f40001"]] <- get_diagnoses_set_index_code_date_cols(get_diagnoses_df = death_data_diagnoses[["f40001"]],
@@ -257,7 +263,9 @@ get_death_data_icd10_diagnoses <- function(ukb_pheno,
   # combine into single df
     death_data_diagnoses <- dplyr::bind_rows(death_data_diagnoses)
 
-  # recode to ICD10
+  # recode to ICD10 (NB at this stage, this column is already contains ICD10
+  # codes but additionally includes descriptions e.g. "J95.1 Acute pulmonary
+  # insufficiency following thoracic surgery")
     death_data_diagnoses <- recode_ukbcol(df = death_data_diagnoses,
                                       col_to_recode = "code",
                                       field_id = "40002",

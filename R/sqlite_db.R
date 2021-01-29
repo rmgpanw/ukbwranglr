@@ -72,7 +72,7 @@ file_to_sqlite_db <- function(file,
   if (
     table %in% DBI::dbListTables(con) &
     append == FALSE) {
-    stop("Error! Table already exist in database. Specify `append = TRUE` to append data. To overwrite, first delete table with `DBI::dbRemoveTable(conn, 'table_name')`")
+    stop("Error! Table already exists in database. Specify `append = TRUE` to append data. To overwrite, first delete table with `DBI::dbRemoveTable(conn, 'table_name')`")
   }
 
   f <- function(x,
