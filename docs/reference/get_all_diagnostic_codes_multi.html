@@ -141,11 +141,12 @@
 
     <pre class="usage"><span class='fu'>get_all_diagnostic_codes_multi</span><span class='op'>(</span>
   function_list <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='va'>get_self_report_non_cancer_diagnoses_icd10</span>,
-    <span class='va'>get_hes_icd9_diagnoses</span>, <span class='va'>get_hes_icd10_diagnoses</span>, <span class='va'>get_cancer_register_icd9_diagnoses</span>,
-    <span class='va'>get_cancer_register_icd10_diagnoses</span><span class='op'>)</span>,
+    <span class='va'>get_hes_icd9_diagnoses</span>, <span class='va'>get_hes_icd10_diagnoses</span>, <span class='va'>get_death_data_icd10_diagnoses</span>,
+    <span class='va'>get_cancer_register_icd9_diagnoses</span>, <span class='va'>get_cancer_register_icd10_diagnoses</span><span class='op'>)</span>,
   <span class='va'>ukb_pheno</span>,
   <span class='va'>data_dict</span>,
-  <span class='va'>ukb_codings</span>
+  <span class='va'>ukb_codings</span>,
+  drop_source_col <span class='op'>=</span> <span class='cn'>TRUE</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -170,6 +171,12 @@ default, this is downloaded directly from the
 <a href='https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide'>UKB
  website</a>.</p></td>
     </tr>
+    <tr>
+      <th>drop_source_col</th>
+      <td><p>Remove `source_col` column, which records which column
+in the main dataset the value in `code` column came from. Default is
+`TRUE`.</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
@@ -177,8 +184,8 @@ default, this is downloaded directly from the
     <p>Dataframe</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Loops through functions from the 'get all diagnostic codes' family and
-combines the results into a single dataframe.</p>
+    <p>Loops through a list of functions (`function_list`) from the 'get all
+diagnostic codes' family and combines the results into a single dataframe.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other get all diagnostic codes: 
@@ -190,7 +197,8 @@ combines the results into a single dataframe.</p>
 <code><a href='get_hes_icd9_diagnoses.html'>get_hes_icd9_diagnoses</a>()</code>,
 <code><a href='get_self_report_cancer_diagnoses.html'>get_self_report_cancer_diagnoses</a>()</code>,
 <code><a href='get_self_report_non_cancer_diagnoses_icd10.html'>get_self_report_non_cancer_diagnoses_icd10</a>()</code>,
-<code><a href='get_self_report_non_cancer_diagnoses.html'>get_self_report_non_cancer_diagnoses</a>()</code></p></div>
+<code><a href='get_self_report_non_cancer_diagnoses.html'>get_self_report_non_cancer_diagnoses</a>()</code>,
+<code><a href='main_dataset_diagnoses_to_sqlite_db.html'>main_dataset_diagnoses_to_sqlite_db</a>()</code></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

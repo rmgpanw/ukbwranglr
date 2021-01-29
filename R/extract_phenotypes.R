@@ -224,7 +224,7 @@ get_death_data_icd10_diagnoses <- function(ukb_pheno,
   # initialise
   death_data_diagnoses <- vector(mode = "list", length = length(death_data_field_ids))
   names(death_data_diagnoses) <- paste0("f", death_data_field_ids)
-browser()
+
   # get all diagnostic codes and dates (and standardise) - fieldid 40001
   death_data_diagnoses[["f40001"]] <- field_id_pivot_longer(
     field_id = "40001",

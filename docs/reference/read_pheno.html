@@ -146,7 +146,8 @@
   ukb_data_dict <span class='op'>=</span> <span class='st'>"https://biobank.ctsu.ox.ac.uk/~bbdatan/Data_Dictionary_Showcase.tsv"</span>,
   ukb_codings <span class='op'>=</span> <span class='st'>"https://biobank.ctsu.ox.ac.uk/~bbdatan/Codings.tsv"</span>,
   clean_dates <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  clean_selected_continuous_and_integers <span class='op'>=</span> <span class='cn'>TRUE</span>
+  clean_selected_continuous_and_integers <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  <span class='va'>...</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -189,6 +190,11 @@ default, this is downloaded directly from the
       <th>clean_selected_continuous_and_integers</th>
       <td><p>If <code>TRUE</code>, certain special
 continuous/integer codings are converted to <code>NA</code>. TODO add detail</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Additional parameters are passed on to
+<code><a href='https://Rdatatable.gitlab.io/data.table/reference/fread.html'>fread</a></code> when reading in UKB phenotype file</p></td>
     </tr>
     </table>
 

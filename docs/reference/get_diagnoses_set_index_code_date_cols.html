@@ -143,7 +143,8 @@
   <span class='va'>get_diagnoses_df</span>,
   <span class='va'>index_col</span>,
   <span class='va'>code_col</span>,
-  <span class='va'>date_col</span>
+  <span class='va'>date_col</span>,
+  remove_special_dates <span class='op'>=</span> <span class='cn'>FALSE</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -165,6 +166,12 @@
       <th>date_col</th>
       <td><p>Column of dates when code was recorded</p></td>
     </tr>
+    <tr>
+      <th>remove_special_dates</th>
+      <td><p>Logical. Remove 'special' date values if
+requested. Default is <code>FALSE</code>, as only the self-report fields contain
+such values.</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
@@ -181,7 +188,8 @@
 <code><a href='get_hes_icd9_diagnoses.html'>get_hes_icd9_diagnoses</a>()</code>,
 <code><a href='get_self_report_cancer_diagnoses.html'>get_self_report_cancer_diagnoses</a>()</code>,
 <code><a href='get_self_report_non_cancer_diagnoses_icd10.html'>get_self_report_non_cancer_diagnoses_icd10</a>()</code>,
-<code><a href='get_self_report_non_cancer_diagnoses.html'>get_self_report_non_cancer_diagnoses</a>()</code></p></div>
+<code><a href='get_self_report_non_cancer_diagnoses.html'>get_self_report_non_cancer_diagnoses</a>()</code>,
+<code><a href='main_dataset_diagnoses_to_sqlite_db.html'>main_dataset_diagnoses_to_sqlite_db</a>()</code></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

@@ -12,7 +12,8 @@ knitr::opts_chunk$set(
 
 ```{r setup, include = FALSE}
 library(ukbwranglr)
-library(tidyverse)
+library(dplyr)
+library(purrr)
 library(readr)
 library(configr)
 

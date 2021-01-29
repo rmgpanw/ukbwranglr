@@ -6,3 +6,4 @@
 ^README\.Rmd$
 ^\.github$
 ^vignettes/articles$
+^R/tests.Rmd$

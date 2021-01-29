@@ -146,11 +146,17 @@ primary care clinical events dataset to match the output format for
 <code><a href='get_all_diagnostic_codes_multi.html'>get_all_diagnostic_codes_multi</a></code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>gp_clinical_to_sqlite_db</span><span class='op'>(</span><span class='va'>df</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>gp_clinical_to_sqlite_db</span><span class='op'>(</span><span class='va'>df</span>, remove_special_dates <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>remove_special_dates</th>
+      <td><p>Logical. Removes special date values if requested
+(see <a href='https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=591'>resource
+591</a> for details). Default is <code>TRUE</code>.</p></td>
+    </tr>
     <tr>
       <th>gp_clinical_df</th>
       <td><p>A dataframe</p></td>
@@ -170,7 +176,7 @@ primary care clinical events dataset to match the output format for
 <p>The UK Biobank primary care data lists read codes in separate columns, one
   for Read2 and one for Read3. This function reshapes the data to long format
   so that all codes are in a single column. Note that the 3 free-text 'value'
-  columns are dropped.</p>
+  columns are dropped. By default, special date values are set to <code>NA</code>.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other Generate a UKB database.: 

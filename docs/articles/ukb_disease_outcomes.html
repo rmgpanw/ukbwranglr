@@ -89,7 +89,7 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>UKB: Disease outcomes</h1>
             
-            <h4 class="date">22 January, 2021</h4>
+            <h4 class="date">29 January, 2021</h4>
       
       
       <div class="hidden name"><code>ukb_disease_outcomes.Rmd</code></div>
@@ -204,14 +204,14 @@
                                  <span class="va">selected_codes</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span> <span class="co"># display first few rows only</span>
 <span class="co">#&gt; # A tibble: 6 x 4</span>
-<span class="co">#&gt;   eid   source                                          code  date      </span>
-<span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;                                           &lt;chr&gt; &lt;chr&gt;     </span>
-<span class="co">#&gt; 1 4     noncancer_illness_code_selfreported_f20002_1_21 N12   1985-06-14</span>
-<span class="co">#&gt; 2 5     noncancer_illness_code_selfreported_f20002_1_17 N12   1983-09-06</span>
-<span class="co">#&gt; 3 7     noncancer_illness_code_selfreported_f20002_1_17 N12   1978-03-19</span>
-<span class="co">#&gt; 4 13    noncancer_illness_code_selfreported_f20002_0_11 N12   2007-09-30</span>
-<span class="co">#&gt; 5 15    noncancer_illness_code_selfreported_f20002_0_15 N12   1998-06-06</span>
-<span class="co">#&gt; 6 22    noncancer_illness_code_selfreported_f20002_1_1  N12   1989-12-12</span></code></pre></div>
+<span class="co">#&gt;   eid   source       code  date      </span>
+<span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;        &lt;chr&gt; &lt;chr&gt;     </span>
+<span class="co">#&gt; 1 4     f20002_icd10 N12   1985-06-14</span>
+<span class="co">#&gt; 2 5     f20002_icd10 N12   1983-09-06</span>
+<span class="co">#&gt; 3 7     f20002_icd10 N12   1978-03-19</span>
+<span class="co">#&gt; 4 13    f20002_icd10 N12   2007-09-30</span>
+<span class="co">#&gt; 5 15    f20002_icd10 N12   1998-06-06</span>
+<span class="co">#&gt; 6 22    f20002_icd10 N12   1989-12-12</span></code></pre></div>
 </div>
 <div id="cancer" class="section level3">
 <h3 class="hasAnchor">
@@ -273,14 +273,14 @@
                                  <span class="va">selected_codes</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span> <span class="co"># display first few rows only</span>
 <span class="co">#&gt; # A tibble: 6 x 4</span>
-<span class="co">#&gt;   eid   source                       code  date      </span>
-<span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;                        &lt;chr&gt; &lt;chr&gt;     </span>
-<span class="co">#&gt; 1 2     diagnoses_icd10_f41270_0_127 L86   1922-01-20</span>
-<span class="co">#&gt; 2 6     diagnoses_icd10_f41270_0_115 N12   1977-09-21</span>
-<span class="co">#&gt; 3 39    diagnoses_icd10_f41270_0_114 L86   1923-04-14</span>
-<span class="co">#&gt; 4 46    diagnoses_icd10_f41270_0_68  A014  1976-06-29</span>
-<span class="co">#&gt; 5 80    diagnoses_icd10_f41270_0_117 N12   1915-04-29</span>
-<span class="co">#&gt; 6 89    diagnoses_icd10_f41270_0_23  N12   1963-11-29</span></code></pre></div>
+<span class="co">#&gt;   eid   source code  date      </span>
+<span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;     </span>
+<span class="co">#&gt; 1 2     f41270 L86   1922-01-20</span>
+<span class="co">#&gt; 2 6     f41270 N12   1977-09-21</span>
+<span class="co">#&gt; 3 39    f41270 L86   1923-04-14</span>
+<span class="co">#&gt; 4 46    f41270 A014  1976-06-29</span>
+<span class="co">#&gt; 5 80    f41270 N12   1915-04-29</span>
+<span class="co">#&gt; 6 89    f41270 N12   1963-11-29</span></code></pre></div>
 </div>
 </div>
 <div id="death-register-records" class="section level1">
@@ -382,9 +382,29 @@
 <a href="#ascertaining-disease-outcomes-from-multiple-sources" class="anchor"></a>Ascertaining disease outcomes from multiple sources</h1>
 <p>Supply a list of functions from the ‘get all diagnostic codes’ family to <code><a href="../reference/get_all_diagnostic_codes_multi.html">get_all_diagnostic_codes_multi()</a></code> (see function documentation for defaults), then apply <code><a href="../reference/get_first_diagnostic_code_record.html">get_first_diagnostic_code_record()</a></code> to the result:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># TEMP</span>
+<span class="va">test</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
+    <span class="va">get_death_data_icd10_diagnoses</span>,
+    <span class="va">get_hes_icd9_diagnoses</span>,
+    <span class="va">get_hes_icd10_diagnoses</span>,
+    <span class="va">get_self_report_non_cancer_diagnoses</span>,
+    <span class="va">get_self_report_non_cancer_diagnoses_icd10</span>,
+    <span class="va">get_self_report_cancer_diagnoses</span>,
+    <span class="va">get_cancer_register_icd9_diagnoses</span>,
+    <span class="va">get_cancer_register_icd10_diagnoses</span>
+  <span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu">map</span><span class="op">(</span><span class="op">~</span> <span class="fu"><a href="../reference/get_all_diagnostic_codes_multi.html">get_all_diagnostic_codes_multi</a></span><span class="op">(</span>
+      ukb_pheno <span class="op">=</span> <span class="va">dummy_ukb_data</span>,
+      data_dict <span class="op">=</span> <span class="va">dummy_data_dict</span>,
+      ukb_codings <span class="op">=</span> <span class="va">ukb_codings</span>,
+      function_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="va">.x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
+
+<span class="va">test2</span> <span class="op">&lt;-</span> <span class="fu">bind_rows</span><span class="op">(</span><span class="va">test</span><span class="op">)</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># list of functions</span>
 <span class="va">list_of_get_diagnostic_codes_functions</span> <span class="op">&lt;-</span>
   <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
+    <span class="va">get_self_report_non_cancer_diagnoses</span>,
     <span class="va">get_self_report_non_cancer_diagnoses_icd10</span>,
     <span class="va">get_hes_icd10_diagnoses</span>,
     <span class="va">get_cancer_register_icd10_diagnoses</span>
@@ -399,6 +419,15 @@
                                  data_dict <span class="op">=</span> <span class="va">dummy_data_dict</span>,
                                  ukb_codings <span class="op">=</span> <span class="va">ukb_codings</span>,
                                  function_list <span class="op">=</span> <span class="va">list_of_get_diagnostic_codes_functions</span><span class="op">)</span>
+<span class="co">#&gt; Processing get diagnosis function 1 of 4</span>
+<span class="co">#&gt; Processing get diagnosis function 2 of 4</span>
+<span class="co">#&gt; Time taken: 0 minutes, 1 seconds.</span>
+<span class="co">#&gt; Processing get diagnosis function 3 of 4</span>
+<span class="co">#&gt; Time taken: 0 minutes, 1 seconds.</span>
+<span class="co">#&gt; Processing get diagnosis function 4 of 4</span>
+<span class="co">#&gt; Time taken: 0 minutes, 2 seconds.</span>
+<span class="co">#&gt; Complete!</span>
+<span class="co">#&gt; Time taken: 0 minutes, 2 seconds.</span>
 
 <span class="co"># extract eids with these codes, as well as the earliest recorded date (display</span>
 <span class="co"># first few rows only)</span>
@@ -406,12 +435,12 @@
                                  <span class="va">selected_codes</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 4 x 4</span>
-<span class="co">#&gt;   eid   source                       code  date      </span>
-<span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;                        &lt;chr&gt; &lt;chr&gt;     </span>
-<span class="co">#&gt; 1 1     diagnoses_icd10_f41270_0_64  E111  1969-09-03</span>
-<span class="co">#&gt; 2 2     diagnoses_icd10_f41270_0_140 A156  1988-08-17</span>
-<span class="co">#&gt; 3 64    diagnoses_icd10_f41270_0_145 A156  1983-11-20</span>
-<span class="co">#&gt; 4 77    diagnoses_icd10_f41270_0_46  E111  1965-11-01</span></code></pre></div>
+<span class="co">#&gt;   eid   source code  date      </span>
+<span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;     </span>
+<span class="co">#&gt; 1 1     f41270 E111  1969-09-03</span>
+<span class="co">#&gt; 2 2     f41270 A156  1988-08-17</span>
+<span class="co">#&gt; 3 64    f41270 A156  1983-11-20</span>
+<span class="co">#&gt; 4 77    f41270 E111  1965-11-01</span></code></pre></div>
 </div>
 <div id="primary-care-data" class="section level1">
 <h1 class="hasAnchor">
@@ -438,28 +467,29 @@
 <li>
 <code>value_1</code>, <code>value_2</code> and <code>value_3</code>: free text values (e.g. blood pressure measurements)</li>
 </ul>
-<p><em>See resources 591 and 592 for fiurther information (available from <a href="https://biobank.ndph.ox.ac.uk/showcase/label.cgi?id=3000">here</a>).</em></p>
+<p><em>See resources 591 and 592 for further information (available from <a href="https://biobank.ndph.ox.ac.uk/showcase/label.cgi?id=3000">here</a>).</em></p>
 </div>
 <div id="identifying-health-outcomes-using-diagnostic-codes-4" class="section level2">
 <h2 class="hasAnchor">
 <a href="#identifying-health-outcomes-using-diagnostic-codes-4" class="anchor"></a>Identifying health outcomes using diagnostic codes</h2>
-<p><strong>Step 1:</strong> Write the UKB primary care clinical events dataset to a table in a SQLite database (the database will be created if it does not already exist). The <code><a href="../reference/file_to_sqlite_db.html">file_to_sqlite_db()</a></code> function reads a file in chunks (chunk size as specified by the <code>chunk_size</code>), pre-processes the ‘chunk’ if the <code>data_processing_function</code> is not set to <code>NULL</code>, then writes to a SQLite database. The <code>gp_clinical_to_sqlite_db</code> function reshapes and formats the data to match output from <code>get_all_diagnostic_codes_multi</code>.</p>
+<p><strong>Step 1:</strong> Write the UKB primary care clinical events dataset to a table in a SQLite database (the database will be created if it does not already exist). The <code><a href="../reference/file_to_sqlite_db.html">file_to_sqlite_db()</a></code> function reads a file in chunks (chunk size as specified by the <code>chunk_size</code>), pre-processes the ‘chunk’ if the <code>data_processing_function</code> is not set to <code>NULL</code>, then writes to a SQLite database. The <code>gp_clinical_to_sqlite_db</code> function reshapes and formats the data to match output from <code>get_all_diagnostic_codes_multi</code>. By default, special date values are set to <code>NA</code> (see <a href="https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=591">resource 591</a> for further details).</p>
 <p>The interim release primary care clinical events file is ~4GB large with &gt;120 million rows. Writing to a database may take ~5 minutes.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># create a database connection (this will create a new database if it does not already exist)</span>
 <span class="va">con</span> <span class="op">=</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html">dbConnect</a></span><span class="op">(</span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="https://rsqlite.r-dbi.org/reference/SQLite.html">SQLite</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"ukb.db"</span><span class="op">)</span>
 
 <span class="co"># write to table</span>
 <span class="fu"><a href="../reference/file_to_sqlite_db.html">file_to_sqlite_db</a></span><span class="op">(</span>file <span class="op">=</span> <span class="st">"PATH_TO_GP_CLINICAL.TXT"</span>, 
              db_path <span class="op">=</span> <span class="st">"PATH_TO_DATABASE"</span>,
-             table <span class="op">=</span> <span class="st">"gp_clinical"</span>,
+             table <span class="op">=</span> <span class="st">"clinical_events"</span>,
              chunk_size <span class="op">=</span> <span class="fl">500000</span>,
              delim <span class="op">=</span> <span class="st">"\t"</span>,
              append <span class="op">=</span> <span class="cn">FALSE</span>,
              verbose <span class="op">=</span> <span class="cn">TRUE</span>,
-             data_processing_function <span class="op">=</span> <span class="va">gp_clinical_to_sqlite_db</span><span class="op">)</span></code></pre></div>
+             data_processing_function <span class="op">=</span> <span class="va">gp_clinical_to_sqlite_db</span>,
+             remove_special_dates <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> </code></pre></div>
 <p><strong>Step 2:</strong> Filter for selected codes - retrieve the table using <code><a href="https://dplyr.tidyverse.org/reference/tbl.html">dplyr::tbl()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/filter.html">dplyr::filter()</a></code> for selected codes, read the results into R with <code><a href="https://dplyr.tidyverse.org/reference/compute.html">dplyr::collect()</a></code> and convert the ‘date’ column to date format:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># retrieve table</span>
 <span class="va">clinical_events</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/tbl.html">tbl</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"clinical_events"</span><span class="op">)</span> 
 
@@ -477,7 +507,7 @@
 <a href="#combining-all-diagnostic-codes-into-a-sqlite-database" class="anchor"></a>Combining all diagnostic codes into a SQLite database</h1>
 <p><strong>Step 1:</strong> Follow ‘step 1’ in ‘Primary care data’, if not already done.</p>
 <p><strong>Step 2:</strong> Append to this the output from get_all_diagnostic_codes_multi (set the <code>append</code> argument in <code>dbWriteTable</code> to <code>TRUE</code>).</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># get diagnostic codes from ukb pheno data</span>
 <span class="va">diagnostic_codes_multiple_sources</span> <span class="op">&lt;-</span>
   <span class="fu"><a href="../reference/get_all_diagnostic_codes_multi.html">get_all_diagnostic_codes_multi</a></span><span class="op">(</span>ukb_pheno <span class="op">=</span> <span class="va">dummy_ukb_data</span>,
@@ -485,16 +515,20 @@
                                  ukb_codings <span class="op">=</span> <span class="va">ukb_codings</span><span class="op">)</span>
 
 <span class="co"># append to `clinical_events` table</span>
-<span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html">dbWriteTable</a></span><span class="op">(</span>
-      conn <span class="op">=</span> <span class="va">con</span>,
-      name <span class="op">=</span> <span class="st">"clinical_events"</span>,
-      value <span class="op">=</span> <span class="va">diagnostic_codes_multiple_sources</span>,
-      overwrite <span class="op">=</span> <span class="cn">FALSE</span>, <span class="co"># ensure table is not inadvertently overwritten</span>
-      append <span class="op">=</span> <span class="cn">TRUE</span>
-<span class="op">)</span></code></pre></div>
+<span class="fu"><a href="../reference/main_dataset_diagnoses_to_sqlite_db.html">main_dataset_diagnoses_to_sqlite_db</a></span><span class="op">(</span><span class="va">diagnostic_codes_multiple_sources</span>,
+                                                <span class="st">"clinical_events"</span>,
+                                                db_path <span class="op">=</span> <span class="st">"PATH_TO_DATABASE"</span>,
+                                                overwrite <span class="op">=</span> <span class="cn">FALSE</span>,
+                                                append <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+
+<span class="fu"><a href="../reference/main_dataset_diagnoses_to_sqlite_db.html">main_dataset_diagnoses_to_sqlite_db</a></span><span class="op">(</span><span class="va">diagnostic_codes_multiple_sources</span>,
+                                                <span class="st">"clinical_events"</span>,
+                                                db_path <span class="op">=</span> <span class="st">"ukb.db"</span>,
+                                                overwrite <span class="op">=</span> <span class="cn">FALSE</span>,
+                                                append <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p><strong>Step 3:</strong> Then use <code>get_first_diagnostic_code_record_db</code> to identify participants with specific codes of interest in their record. See the <a href="https://dbplyr.tidyverse.org/articles/dbplyr.html">dbplyr getting started vignette</a> for a good overview of querying databases using <code>dplyr</code> syntax.</p>
 <blockquote>
-<p><strong>NOTE:</strong> To improve search performance, set an index on the ‘code’ column (this will be filtered on most frequently) e.g. `dplyr::db_create_index(con, “clinical_events”, “code”).</p>
+<p><strong>NOTE:</strong> To improve search performance, set an index on the ‘code’ column (this will be filtered on most frequently) e.g. <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">dplyr::db_create_index(con, "clinical_events", "code")</a></code>.</p>
 </blockquote>
 <blockquote>
 <p><strong>NOTE:</strong> To remove a table, use <code><a href="https://dbi.r-dbi.org/reference/dbRemoveTable.html">DBI::dbRemoveTable(conn, 'table_name')</a></code>.</p>
