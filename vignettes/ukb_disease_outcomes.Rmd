@@ -361,6 +361,28 @@ get_first_diagnostic_code_record(cancer_register_icd10_diagnoses,
 
 Supply a list of functions from the 'get all diagnostic codes' family to `get_all_diagnostic_codes_multi()` (see function documentation for defaults), then apply `get_first_diagnostic_code_record()` to the result:
 
+```{r eval=FALSE}
+# TEMP
+test <- list(
+    get_death_data_icd10_diagnoses,
+    get_hes_icd9_diagnoses,
+    get_hes_icd10_diagnoses,
+    get_self_report_non_cancer_diagnoses,
+    get_self_report_non_cancer_diagnoses_icd10,
+    get_self_report_cancer_diagnoses,
+    get_cancer_register_icd9_diagnoses,
+    get_cancer_register_icd10_diagnoses
+  ) %>% 
+  map(~ get_all_diagnostic_codes_multi(
+      ukb_pheno = dummy_ukb_data,
+      data_dict = dummy_data_dict,
+      ukb_codings = ukb_codings,
+      function_list = list(.x)))
+
+test2 <- bind_rows(test)
+```
+
+
 ```{r}
 # list of functions
 list_of_get_diagnostic_codes_functions <-
@@ -406,11 +428,11 @@ Only the clinical events table will be considered here. This consists of >120 mi
 - `read_2`: Read 3 code
 - `value_1`, `value_2` and `value_3`: free text values (e.g. blood pressure measurements)
 
-*See resources 591 and 592 for fiurther information (available from [here](https://biobank.ndph.ox.ac.uk/showcase/label.cgi?id=3000)).*
+*See resources 591 and 592 for further information (available from [here](https://biobank.ndph.ox.ac.uk/showcase/label.cgi?id=3000)).*
 
 ## Identifying health outcomes using diagnostic codes
 
-**Step 1:** Write the UKB primary care clinical events dataset to a table in a SQLite database (the database will be created if it does not already exist). The `file_to_sqlite_db()` function reads a file in chunks (chunk size as specified by the `chunk_size`), pre-processes the 'chunk' if the `data_processing_function` is not set to `NULL`, then writes to a SQLite database. The `gp_clinical_to_sqlite_db` function reshapes and formats the data to match output from `get_all_diagnostic_codes_multi`. 
+**Step 1:** Write the UKB primary care clinical events dataset to a table in a SQLite database (the database will be created if it does not already exist). The `file_to_sqlite_db()` function reads a file in chunks (chunk size as specified by the `chunk_size`), pre-processes the 'chunk' if the `data_processing_function` is not set to `NULL`, then writes to a SQLite database. The `gp_clinical_to_sqlite_db` function reshapes and formats the data to match output from `get_all_diagnostic_codes_multi`. By default, special date values are set to `NA` (see [resource 591](https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=591) for further details).
 
 The interim release primary care clinical events file is ~4GB large with >120 million rows. Writing to a database may take ~5 minutes.
 
@@ -421,12 +443,13 @@ con = DBI::dbConnect(RSQLite::SQLite(), "ukb.db")
 # write to table
 file_to_sqlite_db(file = "PATH_TO_GP_CLINICAL.TXT", 
              db_path = "PATH_TO_DATABASE",
-             table = "gp_clinical",
+             table = "clinical_events",
              chunk_size = 500000,
              delim = "\t",
              append = FALSE,
              verbose = TRUE,
-             data_processing_function = gp_clinical_to_sqlite_db)
+             data_processing_function = gp_clinical_to_sqlite_db,
+             remove_special_dates = TRUE) 
 ```
 
 
@@ -443,7 +466,8 @@ file_to_sqlite_db(file = GP_CLINICAL_AK_TEMP,
              delim = "\t",
              append = FALSE, # set to TRUE if appending to an existing table
              verbose = TRUE,
-             data_processing_function = gp_clinical_to_sqlite_db)
+             data_processing_function = gp_clinical_to_sqlite_db,
+             remove_special_dates = TRUE)
 ```
 
 **Step 2:** Filter for selected codes - retrieve the table using `dplyr::tbl()`, `dplyr::filter()` for selected codes, read the results into R with `dplyr::collect()` and convert the 'date' column to date format:
@@ -481,13 +505,17 @@ diagnostic_codes_multiple_sources <-
                                  ukb_codings = ukb_codings)
 
 # append to `clinical_events` table
-DBI::dbWriteTable(
-      conn = con,
-      name = "clinical_events",
-      value = diagnostic_codes_multiple_sources,
-      overwrite = FALSE, # ensure table is not inadvertently overwritten
-      append = TRUE
-)
+main_dataset_diagnoses_to_sqlite_db(diagnostic_codes_multiple_sources,
+                                                "clinical_events",
+                                                db_path = "PATH_TO_DATABASE",
+                                                overwrite = FALSE,
+                                                append = TRUE)
+
+main_dataset_diagnoses_to_sqlite_db(diagnostic_codes_multiple_sources,
+                                                "clinical_events",
+                                                db_path = "ukb.db",
+                                                overwrite = FALSE,
+                                                append = TRUE)
 ```
 
 **Step 3:** Then use `get_first_diagnostic_code_record_db` to identify participants with specific codes of interest in their record. See the [dbplyr getting started vignette](https://dbplyr.tidyverse.org/articles/dbplyr.html) for a good overview of querying databases using `dplyr` syntax.

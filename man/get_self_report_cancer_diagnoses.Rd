@@ -4,7 +4,12 @@
 \alias{get_self_report_cancer_diagnoses}
 \title{Get self-reported cancer diagnoses}
 \usage{
-get_self_report_cancer_diagnoses(ukb_pheno, data_dict, ukb_codings)
+get_self_report_cancer_diagnoses(
+  ukb_pheno,
+  data_dict,
+  ukb_codings,
+  remove_special_dates = TRUE
+)
 }
 \arguments{
 \item{ukb_pheno}{a UK Biobank phenotype dataset}
@@ -15,18 +20,23 @@ get_self_report_cancer_diagnoses(ukb_pheno, data_dict, ukb_codings)
 default, this is downloaded directly from the
 \href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{UKB
  website}.}
+
+\item{remove_special_dates}{Logical. Remove 'special' date values if
+requested. Default is \code{TRUE}. See
+\href{https://biobank.ndph.ox.ac.uk/ukb/coding.cgi?id=13}{data coding 13}.}
 }
 \value{
 Dataframe
 }
 \description{
-Returns a long format dataframe with all self-reported cancer diagnoses
-with associated dates for each UK Biobank participant.
+Returns a long format dataframe with all self-reported cancer diagnoses with
+associated dates for each UK Biobank participant.
 }
 \details{
 Reformats the data for FieldIDs 20001 and 20006 (self-reported cancer
 diagnoses and dates, see
-\href{https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=100074}{category 100074}). Coded using
+\href{https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=100074}{category
+100074}). Coded using
 \href{https://biobank.ndph.ox.ac.uk/showcase/coding.cgi?id=3}{data coding 3}.
 }
 \seealso{
@@ -39,6 +49,7 @@ Other get all diagnostic codes:
 \code{\link{get_hes_icd10_diagnoses}()},
 \code{\link{get_hes_icd9_diagnoses}()},
 \code{\link{get_self_report_non_cancer_diagnoses_icd10}()},
-\code{\link{get_self_report_non_cancer_diagnoses}()}
+\code{\link{get_self_report_non_cancer_diagnoses}()},
+\code{\link{main_dataset_diagnoses_to_sqlite_db}()}
 }
 \concept{get all diagnostic codes}

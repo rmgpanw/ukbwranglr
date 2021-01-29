@@ -8,7 +8,8 @@ get_diagnoses_set_index_code_date_cols(
   get_diagnoses_df,
   index_col,
   code_col,
-  date_col
+  date_col,
+  remove_special_dates = FALSE
 )
 }
 \arguments{
@@ -19,6 +20,10 @@ get_diagnoses_set_index_code_date_cols(
 \item{code_col}{Column of codes}
 
 \item{date_col}{Column of dates when code was recorded}
+
+\item{remove_special_dates}{Logical. Remove 'special' date values if
+requested. Default is \code{FALSE}, as only the self-report fields contain
+such values.}
 }
 \description{
 Helper function
@@ -36,6 +41,7 @@ Other get all diagnostic codes:
 \code{\link{get_hes_icd9_diagnoses}()},
 \code{\link{get_self_report_cancer_diagnoses}()},
 \code{\link{get_self_report_non_cancer_diagnoses_icd10}()},
-\code{\link{get_self_report_non_cancer_diagnoses}()}
+\code{\link{get_self_report_non_cancer_diagnoses}()},
+\code{\link{main_dataset_diagnoses_to_sqlite_db}()}
 }
 \concept{get all diagnostic codes}

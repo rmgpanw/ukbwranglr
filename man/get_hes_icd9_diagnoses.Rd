@@ -15,18 +15,23 @@ get_hes_icd9_diagnoses(ukb_pheno, data_dict, ukb_codings)
 default, this is downloaded directly from the
 \href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{UKB
  website}.}
+
+\item{remove_special_dates}{Set special date values to \code{NA}. Default it
+\code{TRUE}.}
 }
 \value{
 Dataframe
 }
 \description{
-Returns a long format dataframe with all hospital inpatient ICD9 codes and associated dates for
-each UK Biobank participant.
+Returns a long format dataframe with all hospital inpatient ICD9 codes and
+associated dates for each UK Biobank participant.
 }
 \details{
 Reformats the data for FieldIDs 41271 and 41281 (hospital inpatient diagnoses
 and dates, see
 \href{https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=2002}{category 2002}).
+
+Also removes 'special' date values by default (see \href{}{coding })
 }
 \seealso{
 Other get all diagnostic codes: 
@@ -38,6 +43,7 @@ Other get all diagnostic codes:
 \code{\link{get_hes_icd10_diagnoses}()},
 \code{\link{get_self_report_cancer_diagnoses}()},
 \code{\link{get_self_report_non_cancer_diagnoses_icd10}()},
-\code{\link{get_self_report_non_cancer_diagnoses}()}
+\code{\link{get_self_report_non_cancer_diagnoses}()},
+\code{\link{main_dataset_diagnoses_to_sqlite_db}()}
 }
 \concept{get all diagnostic codes}

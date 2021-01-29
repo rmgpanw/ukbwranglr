@@ -150,15 +150,18 @@ file_to_sqlite_db <- function(file,
 #'   The UK Biobank primary care data lists read codes in separate columns, one
 #'   for Read2 and one for Read3. This function reshapes the data to long format
 #'   so that all codes are in a single column. Note that the 3 free-text 'value'
-#'   columns are dropped.
+#'   columns are dropped. By default, special date values are set to \code{NA}.
 #'
 #' @param gp_clinical_df A dataframe
+#' @param remove_special_dates Logical. Removes special date values if requested
+#'   (see \href{https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=591}{resource
+#'   591} for details). Default is \code{TRUE}.
 #'
 #' @return
 #' @export
 #' @family Generate a UKB database.
-gp_clinical_to_sqlite_db <- function(df) {
-  df %>%
+gp_clinical_to_sqlite_db <- function(df, remove_special_dates = TRUE) {
+  df <- df %>%
     dplyr::select(-value1,-value2,-value3) %>% # remove 3 'value' cols
     tidyr::pivot_longer(
       cols = c("read_2", "read_3"),
@@ -172,5 +175,69 @@ gp_clinical_to_sqlite_db <- function(df) {
                   date = event_dt) %>%
     dplyr::mutate(date = lubridate::dmy(date)) %>% # reformat date (needs to be character when writing to db)
     dplyr::mutate(date = as.character(date))
+
+  # remove special dates if requested (default is to remove)
+  if (remove_special_dates == TRUE) {
+
+    # primary care dates to remove
+    # see https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=591
+    primary_care_special_dates_to_remove <- c("01/01/1901",
+      "02/02/1902",
+      "03/03/1903",
+      "07/07/2037") %>%
+      lubridate::dmy() %>%
+      as.character()
+
+    df <- df %>%
+      dplyr::mutate(date = ifelse(
+        test = date %in% primary_care_special_dates_to_remove,
+        yes = NA,
+        no = date))
+  }
+
+  return(df)
+}
+
+#' Write diagnoses from the main UK Biobank dataset to a SQLite database
+#'
+#' If no database exists at \code{db_path}, then a new one will be created..
+#'
+#' @inheritParams file_to_sqlite_db
+#' @inheritParams get_first_diagnostic_code_record_basis
+#' @param overwrite Logical. If \code{TRUE}, will overwrite an existing table
+#'   with the same name. Default is \code{FALSE}
+#'
+#' @export
+#' @family get all diagnostic codes
+main_dataset_diagnoses_to_sqlite_db <- function(df,
+                                                table,
+                                                db_path = "ukb.db",
+                                                overwrite = FALSE,
+                                                append = FALSE
+) {
+  start_time <- proc.time()
+  # TODO - add checks that df is of the expected format
+
+  # convert date col to character
+  message("Converting dates to character type")
+  df <- df %>%
+    dplyr::mutate(date = as.character(date))
+
+  # create connection
+  # Create sqlite db connection
+  con <- DBI::dbConnect(RSQLite::SQLite(), db_path)
+
+  message("Writing to database")
+  # write to
+  DBI::dbWriteTable(
+    conn = con,
+    name = table,
+    value = df,
+    overwrite = overwrite,
+    append = append
+  )
+
+  message("Complete!")
+  time_taken_message(start_time)
 }
 # PRIVATE FUNCTIONS -------------------------------------------------------

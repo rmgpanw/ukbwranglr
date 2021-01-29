@@ -26,6 +26,9 @@
 # functions i.e. all instances/arrays (as per the complete UKB data dictionary)
 # for all required FIDs. Raise error if not
 
+# Remove special values e.g. -3 and -1 for self-reported years of diagnosis
+# (https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=20008); coding 13)
+
 # EXPORTED FUNCTIONS ----------------------------------------------------
 
 # Get specific diagnostic codes, first recorded -------------------------------------------------------
@@ -240,12 +243,16 @@ get_death_data_icd10_diagnoses <- function(ukb_pheno,
     ukb_codings = ukb_codings
   ) %>%
     dplyr::mutate(date = NA) %>% # date is 'NA' (cannot ascertain dates of diagnoses from death certificates)
+    dplyr::mutate(date = as.Date(date)) %>% # make date type - allows combining with output from other get_XXX functions
     dplyr::filter(!is.na(f40002_value)) # remove rows with no codes
 
-    death_data_diagnoses[["f40002"]] <- get_diagnoses_set_index_code_date_cols(get_diagnoses_df = death_data_diagnoses[["f40002"]],
-                                                               index_col = "f40002",
-                                                               code_col = "f40002_value",
-                                                               date_col = "date")
+    death_data_diagnoses[["f40002"]] <-
+      get_diagnoses_set_index_code_date_cols(
+        get_diagnoses_df = death_data_diagnoses[["f40002"]],
+        index_col = "f40002",
+        code_col = "f40002_value",
+        date_col = "date"
+      )
 
   # combine into single df
     death_data_diagnoses <- dplyr::bind_rows(death_data_diagnoses)
@@ -264,15 +271,19 @@ get_death_data_icd10_diagnoses <- function(ukb_pheno,
 
 #' Get hospital inpatient ICD9 diagnoses
 #'
-#' Returns a long format dataframe with all hospital inpatient ICD9 codes and associated dates for
-#' each UK Biobank participant.
+#' Returns a long format dataframe with all hospital inpatient ICD9 codes and
+#' associated dates for each UK Biobank participant.
 #'
 #' Reformats the data for FieldIDs 41271 and 41281 (hospital inpatient diagnoses
 #' and dates, see
 #' \href{https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=2002}{category 2002}).
 #'
+#' Also removes 'special' date values by default (see \href{}{coding })
+#'
 #' @inheritParams summarise_rowise
 #' @inheritParams field_id_pivot_longer
+#' @param remove_special_dates Set special date values to \code{NA}. Default it
+#'   \code{TRUE}.
 #'
 #' @return Dataframe
 #' @export
@@ -382,6 +393,9 @@ get_hes_icd10_diagnoses <- function(ukb_pheno,
 #'
 #' @inheritParams summarise_rowise
 #' @inheritParams field_id_pivot_longer
+#' @param remove_special_dates Logical. Remove 'special' date values if
+#'   requested. Default is \code{TRUE}. See
+#'   \href{https://biobank.ndph.ox.ac.uk/ukb/coding.cgi?id=13}{data coding 13}.
 #'
 #' @return Dataframe
 #' @export
@@ -389,7 +403,8 @@ get_hes_icd10_diagnoses <- function(ukb_pheno,
 #' @family get all diagnostic codes
 get_self_report_non_cancer_diagnoses <- function(ukb_pheno,
                                                        data_dict,
-                                                       ukb_codings) {
+                                                       ukb_codings,
+                                                 remove_special_dates = TRUE) {
 
   # required field_ids (see https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=2002)
   self_report_non_cancer_field_ids <- c("20002", "20008")
@@ -419,7 +434,8 @@ get_self_report_non_cancer_diagnoses <- function(ukb_pheno,
     get_diagnoses_df = self_report_non_cancer_diagnoses,
     index_col = "f20002",
     code_col = "f20002_value",
-    date_col = "f20008_value")
+    date_col = "f20008_value",
+    remove_special_dates = remove_special_dates)
 
   # convert date_col from decimal to date type
   self_report_non_cancer_diagnoses <- self_report_non_cancer_diagnoses %>%
@@ -444,6 +460,9 @@ get_self_report_non_cancer_diagnoses <- function(ukb_pheno,
 #'
 #' @inheritParams summarise_rowise
 #' @inheritParams field_id_pivot_longer
+#' @param remove_special_dates Logical. Remove 'special' date values if
+#'   requested. Default is \code{TRUE}. See
+#'   \href{https://biobank.ndph.ox.ac.uk/ukb/coding.cgi?id=13}{data coding 13}.
 #'
 #' @return Dataframe
 #' @export
@@ -451,12 +470,14 @@ get_self_report_non_cancer_diagnoses <- function(ukb_pheno,
 #' @family get all diagnostic codes
 get_self_report_non_cancer_diagnoses_icd10 <- function(ukb_pheno,
                                     data_dict,
-                                    ukb_codings) {
+                                    ukb_codings,
+                                    remove_special_dates = TRUE) {
 
   self_report_non_cancer_diagnoses_icd10 <-
     get_self_report_non_cancer_diagnoses(ukb_pheno = ukb_pheno,
                                          data_dict = data_dict,
-                                         ukb_codings = ukb_codings)
+                                         ukb_codings = ukb_codings,
+                                         remove_special_dates = remove_special_dates)
 
   # ...now recode to ICD10
   mapping_df <- ukb_codings %>%
@@ -483,16 +504,20 @@ get_self_report_non_cancer_diagnoses_icd10 <- function(ukb_pheno,
 
 #' Get self-reported cancer diagnoses
 #'
-#' Returns a long format dataframe with all self-reported cancer diagnoses
-#' with associated dates for each UK Biobank participant.
+#' Returns a long format dataframe with all self-reported cancer diagnoses with
+#' associated dates for each UK Biobank participant.
 #'
 #' Reformats the data for FieldIDs 20001 and 20006 (self-reported cancer
 #' diagnoses and dates, see
-#' \href{https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=100074}{category 100074}). Coded using
+#' \href{https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=100074}{category
+#' 100074}). Coded using
 #' \href{https://biobank.ndph.ox.ac.uk/showcase/coding.cgi?id=3}{data coding 3}.
 #'
 #' @inheritParams summarise_rowise
 #' @inheritParams field_id_pivot_longer
+#' @param remove_special_dates Logical. Remove 'special' date values if
+#'   requested. Default is \code{TRUE}. See
+#'   \href{https://biobank.ndph.ox.ac.uk/ukb/coding.cgi?id=13}{data coding 13}.
 #'
 #' @return Dataframe
 #' @export
@@ -500,7 +525,8 @@ get_self_report_non_cancer_diagnoses_icd10 <- function(ukb_pheno,
 #' @family get all diagnostic codes
 get_self_report_cancer_diagnoses <- function(ukb_pheno,
                                                  data_dict,
-                                                 ukb_codings) {
+                                                 ukb_codings,
+                                             remove_special_dates = TRUE) {
 
   # required field_ids (see https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=2002)
   self_report_cancer_field_ids <- c("20001", "20006")
@@ -530,7 +556,8 @@ get_self_report_cancer_diagnoses <- function(ukb_pheno,
     get_diagnoses_df = self_report_cancer_diagnoses,
     index_col = "f20001",
     code_col = "f20001_value",
-    date_col = "f20006_value")
+    date_col = "f20006_value",
+    remove_special_dates = remove_special_dates)
 
   # convert date_col from decimal to date type
   self_report_cancer_diagnoses <- self_report_cancer_diagnoses %>%
@@ -717,14 +744,9 @@ get_all_diagnostic_codes_multi <- function(function_list = list(get_self_report_
     # pb$tick(1)
 
     # time taken message after first function has processed
+    message("Processing get diagnosis function ", func, " of ", length(function_list))
     if (func > 1) {
-      time_taken <- proc.time() - start_time
-    message("Processing get diagnosis function ", func, " of ", length(function_list),
-            ". Time taken: ",
-        (time_taken[3] %/% 60),
-        " minutes, ",
-        (round(time_taken[3] %% 60)),
-        " seconds.")
+      time_taken_message(start_time)
     }
 
     # get diagnoses
@@ -743,12 +765,8 @@ get_all_diagnostic_codes_multi <- function(function_list = list(get_self_report_
   }
 
   # completion message
-  time_taken <- proc.time() - start_time
-  message("Complete! Time taken: ",
-        (time_taken[3] %/% 60),
-        " minutes, ",
-        (round(time_taken[3] %% 60)),
-        " seconds.")
+  message("Complete!")
+  time_taken_message(start_time)
 
   # return result
   return(result)
@@ -768,11 +786,15 @@ get_all_diagnostic_codes_multi <- function(function_list = list(get_self_report_
 #' @param index_col Column indicating diagnosis source (e.g. HES, self-report)
 #' @param code_col Column of codes
 #' @param date_col Column of dates when code was recorded
+#' @param remove_special_dates Logical. Remove 'special' date values if
+#'   requested. Default is \code{FALSE}, as only the self-report fields contain
+#'   such values.
 #' @family get all diagnostic codes
 get_diagnoses_set_index_code_date_cols <- function(get_diagnoses_df,
                                                    index_col,
                                                    code_col,
-                                                   date_col) {
+                                                   date_col,
+                                                   remove_special_dates = FALSE) {
 
   # create 'source' col indicating which FieldID the data (code) comes from
   get_diagnoses_df$source <- index_col
@@ -784,6 +806,27 @@ get_diagnoses_set_index_code_date_cols <- function(get_diagnoses_df,
            code = .data[[code_col]],
            date = .data[[date_col]],
            source_col = .data[[index_col]])
+
+  # remove self-report special date values if requested
+  if (remove_special_dates == TRUE) {
+
+    # special dates to remove
+    # FID 20006 and 20008; https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=20008
+    # https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=20006
+    self_report_cancer_and_non_cancer_diagnoses_special_dates <- c(
+      -3,
+      -1
+    ) %>%
+      lubridate::date_decimal() %>%
+      lubridate::as_date()
+
+    # remove special dates
+    get_diagnoses_df <- get_diagnoses_df %>%
+    dplyr::mutate(date = ifelse(
+      test = date %in% self_report_cancer_and_non_cancer_diagnoses_special_dates,
+      yes = NA,
+      no = date))
+  }
 
   return(get_diagnoses_df)
 }

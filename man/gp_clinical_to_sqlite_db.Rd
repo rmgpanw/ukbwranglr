@@ -5,9 +5,13 @@
 \title{Pre-processing function - reformat UK Biobank primary care clinical events
 data}
 \usage{
-gp_clinical_to_sqlite_db(df)
+gp_clinical_to_sqlite_db(df, remove_special_dates = TRUE)
 }
 \arguments{
+\item{remove_special_dates}{Logical. Removes special date values if requested
+(see \href{https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=591}{resource
+591} for details). Default is \code{TRUE}.}
+
 \item{gp_clinical_df}{A dataframe}
 }
 \value{
@@ -24,7 +28,7 @@ primary care clinical events dataset to match the output format for
   The UK Biobank primary care data lists read codes in separate columns, one
   for Read2 and one for Read3. This function reshapes the data to long format
   so that all codes are in a single column. Note that the 3 free-text 'value'
-  columns are dropped.
+  columns are dropped. By default, special date values are set to \code{NA}.
 }
 
 \seealso{

@@ -37,6 +37,7 @@ Other get all diagnostic codes:
 \code{\link{get_hes_icd9_diagnoses}()},
 \code{\link{get_self_report_cancer_diagnoses}()},
 \code{\link{get_self_report_non_cancer_diagnoses_icd10}()},
-\code{\link{get_self_report_non_cancer_diagnoses}()}
+\code{\link{get_self_report_non_cancer_diagnoses}()},
+\code{\link{main_dataset_diagnoses_to_sqlite_db}()}
 }
 \concept{get all diagnostic codes}

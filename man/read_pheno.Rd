@@ -11,7 +11,8 @@ read_pheno(
   ukb_data_dict = "https://biobank.ctsu.ox.ac.uk/~bbdatan/Data_Dictionary_Showcase.tsv",
   ukb_codings = "https://biobank.ctsu.ox.ac.uk/~bbdatan/Codings.tsv",
   clean_dates = TRUE,
-  clean_selected_continuous_and_integers = TRUE
+  clean_selected_continuous_and_integers = TRUE,
+  ...
 )
 }
 \arguments{
@@ -38,6 +39,9 @@ default, this is downloaded directly from the
 
 \item{clean_selected_continuous_and_integers}{If \code{TRUE}, certain special
 continuous/integer codings are converted to \code{NA}. TODO add detail}
+
+\item{...}{Additional parameters are passed on to
+\code{\link[data.table]{fread}} when reading in UKB phenotype file}
 }
 \value{
 A UK Biobank phenotype dataset as a data table with human-readable
