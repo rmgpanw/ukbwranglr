@@ -10,7 +10,7 @@
 #' \code{skimr::skim()} function to include proportion counts for factor
 #' variables
 #'
-#' @param data a dataframe
+#' @inheritParams skimr::skim
 #'
 #' @export
 my_skim <- skimr::skim_with(
@@ -406,7 +406,7 @@ fread_tsv_as_character <- purrr::partial(data.table::fread,
 
 #' Display time taken message
 #'
-#' Helper function for displaying time taken messages. Use
+#' Helper function for displaying time taken messages within other functions. Use
 #' \code{\link[base]{proc.time}} at start of function and supply this as the
 #' `start_time` parameter to this function.
 #'
