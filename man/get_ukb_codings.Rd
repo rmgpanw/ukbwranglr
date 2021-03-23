@@ -2,12 +2,12 @@
 % Please edit documentation in R/utils.R
 \name{get_ukb_codings}
 \alias{get_ukb_codings}
-\title{Download UKB codings file}
+\title{Get UKB codings file}
 \usage{
 get_ukb_codings()
 }
 \description{
-Downloads the UK Biobank codings list from the
-\href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{UK
-Biobank website} and reads into R with all columns as character type.
+Downloads the UK Biobank codings dictionary from
+\href{https://github.com/rmgpanw/ukbwranglr_resources}{\code{ukbwranglr_resources}}
+github repo.
 }

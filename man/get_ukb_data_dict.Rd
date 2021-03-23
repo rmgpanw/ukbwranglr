@@ -2,12 +2,12 @@
 % Please edit documentation in R/utils.R
 \name{get_ukb_data_dict}
 \alias{get_ukb_data_dict}
-\title{Download UKB data dictionary}
+\title{Get UKB data dictionary}
 \usage{
 get_ukb_data_dict()
 }
 \description{
-Downloads the UK Biobank data dictionary from the
-\href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{UK
-Biobank website} and reads into R with all columns as character type.
+Downloads the UK Biobank data dictionary from
+\href{https://github.com/rmgpanw/ukbwranglr_resources}{\code{ukbwranglr_resources}}
+github repo.
 }

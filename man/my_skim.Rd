@@ -7,7 +7,10 @@
 my_skim(data, ...)
 }
 \arguments{
-\item{data}{a dataframe}
+\item{data}{A tibble, or an object that can be coerced into a tibble.}
+
+\item{...}{Columns to select for skimming. When none are provided, the
+default is to skim all columns.}
 }
 \description{
 A tidyverse-friendly summary function that summarises a dataframe by column type

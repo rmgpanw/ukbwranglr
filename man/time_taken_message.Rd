@@ -13,7 +13,7 @@ time_taken_message(start_time)
 A message stating time taken since start time
 }
 \description{
-Helper function for displaying time taken messages. Use
+Helper function for displaying time taken messages within other functions. Use
 \code{\link[base]{proc.time}} at start of function and supply this as the
 `start_time` parameter to this function.
 }
