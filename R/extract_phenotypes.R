@@ -67,131 +67,6 @@ get_first_diagnostic_code_record <- function(df,
 
 # Get all diagnostic codes -------------------------------------------------------
 
-#' Convert column for a FieldID to long format
-#'
-#' Helper function. Selects the columns relating to a specified FieldID (plus the 'eid' column)
-#' and applies \code{\link[tidyr]{pivot_longer}}.
-#'
-#' @param field_id Character. A UK Biobank Field ID
-#' @inheritParams read_pheno
-#' @inheritParams summarise_rowise
-#'
-#' @return A dataframe with 3 columns: \itemize{ \item eid \item column names
-#'   (labelled as the specified `field_id`, prefixed by 'f') \item column values
-#'   (labelled as he specified `field_id`, prefixed by 'f' and suffixed by
-#'   '_value') }
-#'
-#' @export
-#'
-#' @family extract disease outcomes helpers
-field_id_pivot_longer <- function(ukb_pheno,
-                                  field_id,
-                                  data_dict,
-                                  ukb_codings) {
-
-  # check a single field_id has been supplied
-  assertthat::is.string(field_id)
-
-  # filter ukb_pheno for selected cols (eid + fieldid cols)
-  required_cols <- get_colnames_for_fieldids(field_id = field_id,
-                                             data_dict = data_dict)
-
-  check_required_cols_exist(df = ukb_pheno,
-                            required_cols)
-
-  ukb_pheno <- ukb_pheno %>%
-    dplyr::select(eid,
-                  tidyselect::all_of(required_cols))
-
-  # get codings for fieldid
-  field_id_codings <- ukb_codings %>%
-    dplyr::filter(Coding == (data_dict %>%
-                               dplyr::filter(FieldID == field_id) %>%
-                               .$Coding %>%
-                               head(n = 1)))
-
-  ukb_pheno <- ukb_pheno %>%
-    tidyr::pivot_longer(
-      cols = tidyselect::all_of(required_cols),
-      values_to = paste(paste0("f", field_id), "value", sep = "_")
-    ) %>%
-    dplyr::mutate(instance_array = colname_to_field_inst_array_df(name)$instance_array)
-
-  # rename
-  names(ukb_pheno)[which(names(ukb_pheno) == 'name')] <- paste0("f", field_id)
-
-  return(ukb_pheno)
-}
-
-
-#' Apply pivot_longer across multiple sets of columns
-#'
-#' Helper function.
-#'
-#' This should only be applied to related FieldIDs which are each associated
-#' with the same number of columns. For example, FieldIDs 20002, 20008, and
-#' 20009 all pertain to self-reported non-cancer illnesses.
-#'
-#' Raises and error if the supplied FieldIDs are associated with differing
-#' numbers of columns, or if the result has more rows than expected.
-#'
-#' @section Under the hood:
-#'
-#'   Maps \code{\link{field_id_pivot_longer}} to a set of FieldIDs, then
-#'   recombines the results into a single dataframe using
-#'   \code{\link[dplyr]{inner_join}}.
-#'
-#' @param field_ids Character vector of FieldIDs
-#' @inheritParams field_id_pivot_longer
-#'
-#' @return Dataframe.
-#' @export
-#'
-#' @family extract disease outcomes helpers
-field_id_pivot_longer_multi <- function(field_ids,
-                                        ukb_pheno,
-                                        data_dict,
-                                        ukb_codings) {
-
-  required_cols <- get_colnames_for_fieldids(field_ids = field_ids,
-                                             data_dict = data_dict)
-
-  check_required_cols_exist(df = ukb_pheno,
-                            required_cols)
-
-  # expected number of rows for each fieldid should be the same - this returns a
-  # numerical vector, each number is the number of columns selected for a
-  # fieldid
-  expected_row_numbers <- field_ids %>%
-    purrr::map(get_colnames_for_fieldids,
-               data_dict = data_dict) %>%
-    purrr::map_dbl(length) %>%
-    purrr::map_dbl(~ .x * nrow(ukb_pheno))
-
-  # check these are numeric and all the equal
-  assertthat::assert_that(is.numeric(expected_row_numbers))
-
-  if (length(unique(expected_row_numbers)) != 1) {
-    stop("Selected FieldIDs have differing numbers of associated columns")
-  }
-
-  # pivot_longer and join results into a single dataframe
-  result <- field_ids %>%
-    purrr::map(field_id_pivot_longer,
-               ukb_pheno = ukb_pheno,
-               data_dict = data_dict,
-               ukb_codings = ukb_codings) %>%
-    purrr::reduce(dplyr::inner_join, by = c("eid", "instance_array"))
-
-  # check that row number matches the expected value
-  if (nrow(result) != (expected_row_numbers[1])) {
-    stop("Result does not contain the expected number of rows. Aborting.")
-  }
-
-  return(result)
-}
-
-
 #' Get death data ICD10 diagnoses
 #'
 #' Returns a long format dataframe with all death data ICD10 codes for each UK
@@ -893,4 +768,125 @@ get_first_diagnostic_code_record_basis <- function(df,
              into = c("source", "code", "date"),
              sep = "_SEP_") %>%
     suppressWarnings() # separate() raises if there are rows with no dates - suppress these
+}
+
+#' Convert column for a FieldID to long format
+#'
+#' Helper function. Selects the columns relating to a specified FieldID (plus the 'eid' column)
+#' and applies \code{\link[tidyr]{pivot_longer}}.
+#'
+#' @param field_id Character. A UK Biobank Field ID
+#' @inheritParams read_pheno
+#' @inheritParams summarise_rowise
+#'
+#' @return A dataframe with 3 columns: \itemize{ \item eid \item column names
+#'   (labelled as the specified `field_id`, prefixed by 'f') \item column values
+#'   (labelled as he specified `field_id`, prefixed by 'f' and suffixed by
+#'   '_value') }
+#'
+#' @family extract disease outcomes helpers
+field_id_pivot_longer <- function(ukb_pheno,
+                                  field_id,
+                                  data_dict,
+                                  ukb_codings) {
+
+  # check a single field_id has been supplied
+  assertthat::is.string(field_id)
+
+  # filter ukb_pheno for selected cols (eid + fieldid cols)
+  required_cols <- get_colnames_for_fieldids(field_id = field_id,
+                                             data_dict = data_dict)
+
+  check_required_cols_exist(df = ukb_pheno,
+                            required_cols)
+
+  ukb_pheno <- ukb_pheno %>%
+    dplyr::select(eid,
+                  tidyselect::all_of(required_cols))
+
+  # get codings for fieldid
+  field_id_codings <- ukb_codings %>%
+    dplyr::filter(Coding == (data_dict %>%
+                               dplyr::filter(FieldID == field_id) %>%
+                               .$Coding %>%
+                               head(n = 1)))
+
+  ukb_pheno <- ukb_pheno %>%
+    tidyr::pivot_longer(
+      cols = tidyselect::all_of(required_cols),
+      values_to = paste(paste0("f", field_id), "value", sep = "_")
+    ) %>%
+    dplyr::mutate(instance_array = colname_to_field_inst_array_df(name)$instance_array)
+
+  # rename
+  names(ukb_pheno)[which(names(ukb_pheno) == 'name')] <- paste0("f", field_id)
+
+  return(ukb_pheno)
+}
+
+
+#' Apply pivot_longer across multiple sets of columns
+#'
+#' Helper function.
+#'
+#' This should only be applied to related FieldIDs which are each associated
+#' with the same number of columns. For example, FieldIDs 20002, 20008, and
+#' 20009 all pertain to self-reported non-cancer illnesses.
+#'
+#' Raises and error if the supplied FieldIDs are associated with differing
+#' numbers of columns, or if the result has more rows than expected.
+#'
+#' @section Under the hood:
+#'
+#'   Maps \code{\link{field_id_pivot_longer}} to a set of FieldIDs, then
+#'   recombines the results into a single dataframe using
+#'   \code{\link[dplyr]{inner_join}}.
+#'
+#' @param field_ids Character vector of FieldIDs
+#' @inheritParams field_id_pivot_longer
+#'
+#' @return Dataframe.
+#'
+#' @family extract disease outcomes helpers
+field_id_pivot_longer_multi <- function(field_ids,
+                                        ukb_pheno,
+                                        data_dict,
+                                        ukb_codings) {
+
+  required_cols <- get_colnames_for_fieldids(field_ids = field_ids,
+                                             data_dict = data_dict)
+
+  check_required_cols_exist(df = ukb_pheno,
+                            required_cols)
+
+  # expected number of rows for each fieldid should be the same - this returns a
+  # numerical vector, each number is the number of columns selected for a
+  # fieldid
+  expected_row_numbers <- field_ids %>%
+    purrr::map(get_colnames_for_fieldids,
+               data_dict = data_dict) %>%
+    purrr::map_dbl(length) %>%
+    purrr::map_dbl(~ .x * nrow(ukb_pheno))
+
+  # check these are numeric and all the equal
+  assertthat::assert_that(is.numeric(expected_row_numbers))
+
+  if (length(unique(expected_row_numbers)) != 1) {
+    stop("Selected FieldIDs have differing numbers of associated columns")
+  }
+
+  # pivot_longer and join results into a single dataframe
+  result <- field_ids %>%
+    purrr::map(field_id_pivot_longer,
+               ukb_pheno = ukb_pheno,
+               data_dict = data_dict,
+               ukb_codings = ukb_codings) %>%
+    purrr::reduce(dplyr::inner_join, by = c("eid", "instance_array"))
+
+  # check that row number matches the expected value
+  if (nrow(result) != (expected_row_numbers[1])) {
+    stop("Result does not contain the expected number of rows. Aborting.")
+  }
+
+  return(result)
 }
