@@ -103,25 +103,47 @@ extract_codings_for_fieldids <- function(field_ids,
     ))
 }
 
-#' Download UKB data dictionary
+#' Get UKB data dictionary
+#'
+#' Downloads the UK Biobank data dictionary from
+#' \href{https://github.com/rmgpanw/ukbwranglr_resources}{\code{ukbwranglr_resources}}
+#' github repo.
+#'
+#' @export
+get_ukb_data_dict <- function() {
+  fread_tsv_as_character("https://github.com/rmgpanw/ukbwranglr_resources/blob/main/ukb_data_dict_and_codings/Data_Dictionary_Showcase.tsv")
+}
+
+#' Get UKB codings file
+#'
+#' Downloads the UK Biobank codings dictionary from
+#' \href{https://github.com/rmgpanw/ukbwranglr_resources}{\code{ukbwranglr_resources}}
+#' github repo.
+#'
+#' @export
+get_ukb_codings <- function() {
+  fread_tsv_as_character("https://github.com/rmgpanw/ukbwranglr_resources/blob/main/ukb_data_dict_and_codings/Codings.tsv")
+}
+
+#' Download UKB data dictionary directly from UKB website
 #'
 #' Downloads the UK Biobank data dictionary from the
 #' \href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{UK
 #' Biobank website} and reads into R with all columns as character type.
 #'
 #' @export
-get_ukb_data_dict <- function() {
+get_ukb_data_dict_direct <- function() {
   fread_tsv_as_character("https://biobank.ctsu.ox.ac.uk/~bbdatan/Data_Dictionary_Showcase.tsv")
 }
 
-#' Download UKB codings file
+#' Download UKB codings file directly from UKB website
 #'
 #' Downloads the UK Biobank codings list from the
 #' \href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{UK
 #' Biobank website} and reads into R with all columns as character type.
 #'
 #' @export
-get_ukb_codings <- function() {
+get_ukb_codings_direct <- function() {
   fread_tsv_as_character("https://biobank.ctsu.ox.ac.uk/~bbdatan/Codings.tsv")
 }
 
