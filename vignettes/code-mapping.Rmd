@@ -1,0 +1,155 @@
+---
+title: "Clinical codes - lookups and mappings"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Clinical codes - lookups and mappings}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(ukbwranglr)
+```
+
+# Introduction
+
+This vignette describes how to work with clinical codes using `ukbwranglr`. Specifically:
+
+- Looking up codes and their descriptions
+- Getting 'children' codes
+- Mapping codes from one coding system to another
+
+The functions provided by `ukbwranglr` rely on [UK Biobank resource 592](https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592), which includes an Excel workbook containing lookup and mapping tables. This has been converted into a named list of data frames, where each item in the list corresponds to a sheet in the original Excel workbook. This can be retrieved with `get_ukb_code_mappings()`:
+
+```{r}
+# retrieve code mappings in .Rdata format
+ukb_code_mappings <- get_ukb_code_mappings()
+
+# each item in the list is a sheet in the UKB Excel workbook (resource 592)
+names(ukb_code_mappings)
+```
+
+# Code lookups
+
+To lookup details for a particular code, use `lookup_codes()`:
+
+```{r}
+# A Read2 code for T1DM
+t1dm_read2 <- c("C10E.", "C108.")
+
+# lookup details
+lookup_codes(codes = t1dm_read2,
+             code_type = "read2",
+             ukb_code_mappings = ukb_code_mappings)
+```
+
+# Children codes
+
+To get the children codes, use `get_child_codes()`. This will return all unique clinical codes that start with the codes of interest:
+
+```{r}
+get_child_codes(codes = t1dm_read2, 
+                code_type = "read2", 
+                ukb_code_mappings = ukb_code_mappings, 
+                codes_only = TRUE)
+```
+
+> **Note:** Some coding systems include a '.' (e.g. ICD-10) - this may return unexpected results with `get_child_codes()`, as this function searches using regexs and '.' is interpreted as a wildcard.
+
+By default, a character vector of codes is returned. To return a data frame including code descriptions, set the argument `codes_only` to `FALSE`:
+
+```{r}
+get_child_codes(codes = t1dm_read2, 
+                code_type = "read2", 
+                ukb_code_mappings = ukb_code_mappings, 
+                codes_only = FALSE) %>% 
+  head()
+```
+
+# Find codes that match a description
+
+Use `find_codes_by_description()`. For example, to find Read2 codes that match the description 'diabetic retinopathy':
+
+```{r}
+find_codes_by_description(reg_expr = "diabetic retinopathy", 
+                          code_type = "read2", 
+                          ukb_code_mappings = ukb_code_mappings, 
+                          ignore_case = TRUE, 
+                          codes_only = FALSE) %>% 
+  head()
+```
+
+# Code mapping
+
+Map codes for type 1 diabetes from Read2 to Read3:
+
+```{r}
+map_codes(codes = t1dm_read2, 
+          from = "read2", 
+          to = "read3", 
+          ukb_code_mappings = ukb_code_mappings, 
+          codes_only = TRUE)
+```
+
+Mapping to ICD is more problematic as some results are a range of ICD codes (note also that for ICD-10, the mapping sheets use an alternative code format which removes any "." characters):
+
+```{r}
+map_codes(codes = t1dm_read2, 
+          from = "read2", 
+          to = "icd10", 
+          ukb_code_mappings = ukb_code_mappings, 
+          codes_only = TRUE)
+```
+
+The available mappings do not cover all possible mapping directions. For example, while there are mappings for Read2 to ICD-10, there is no mapping for ICD-10 to Read2. For cases like this, `map_codes()` will attempt to map anyway:
+
+```{r}
+# find ICD-10 code matching "diabetic retinopathy"
+search_codes_by_description(
+  reg_expr = "diabetic retinopathy",
+  code_type = "icd10",
+  ukb_code_mappings = ukb_code_mappings,
+  ignore_case = TRUE,
+  codes_only = FALSE
+)
+```
+
+However, this returns a `NULL` result when attempting to map the following:
+
+```{r}
+# try mapping this ICD-10 code for diabetic retinopathy to Read codes
+icd10_diabetic_retinopathy <-
+  search_codes_by_description(
+    reg_expr = "diabetic retinopathy",
+    code_type = "icd10",
+    ukb_code_mappings = ukb_code_mappings,
+    ignore_case = TRUE,
+    codes_only = TRUE
+  )
+
+# this returns a `NULL` result however
+icd10_diabetic_retinopathy_as_read_code <- map_codes(
+  codes = icd10_diabetic_retinopathy,
+  from = "icd10",
+  to = "read2",
+  ukb_code_mappings = ukb_code_mappings,
+  codes_only = TRUE
+)
+```
+
+Inspecting the mapping sheet `read_v2_icd10` shows why:
+
+> **Note:** "H36.0" is converted to "H360" by `map_codes` internally, as this is the format used by the mapping sheets.
+
+```{r}
+ukb_code_mappings$read_v2_icd10 %>% 
+  filter(stringr::str_detect(icd10_code, pattern = "H360"))
+```
+

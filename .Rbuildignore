@@ -7,3 +7,4 @@
 ^\.github$
 ^vignettes/articles$
 ^R/tests.Rmd$
+^data-raw$

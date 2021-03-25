@@ -51,7 +51,7 @@ raw_data
 *Appearance when loaded using `ukbwranglr::read_pheno()`:*
 
 ```{r include=FALSE}
-data_dict <- ukbwranglr::pheno_data_dict(DUMMY_DATA_PATH, delim = ",")
+data_dict <- ukbwranglr::make_data_dict(DUMMY_DATA_PATH, delim = ",")
 ukbwranglr_data <- ukbwranglr::read_pheno(DUMMY_DATA_PATH, data_dict, delim = ",") 
 
 ukbwranglr_data <- ukbwranglr_data %>% 

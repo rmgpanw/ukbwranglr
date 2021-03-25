@@ -5,8 +5,6 @@
 
 # EXPORTED FUNCTIONS ----------------------------------------------------
 
-
-
 #' Ascertain diabetes type from first occurrence fields
 #'
 #' Mutates an indicator column for diabetes type based on UKB first occurrence

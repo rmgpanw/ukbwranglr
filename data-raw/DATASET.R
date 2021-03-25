@@ -1,0 +1,180 @@
+
+
+# SETUP -------------------------------------------------------------------
+
+ukb_code_mappings <- ukbwranglr::get_ukb_code_mappings()
+
+# UKB SPECIAL CODINGS -----------------------------------------------------------------
+
+# Used by read_phenodataset.R
+# codings that should, or should not, be converted to NA
+
+cont_and_int_codings_to_na <- c(
+  # Continuous
+  '13',
+  '909',
+  '1317',
+  # Integer
+  '100291',
+  '100586',
+  '37',
+  ## **NOTEre 37: also see notes under 'Other notes' in
+  ## `ukb_select_codings_to_na.Rmd` re 'polymorphic data fields'
+  '513',
+  '485',
+  '584',
+  '100696',
+  '170',
+  '42',
+  '525',
+  '100584',
+  '218'
+)
+
+cont_and_int_codings_NOT_to_na<- c(
+  # Continuous
+  '488',
+  # Integer
+  '100373', # -10 <- 'Less than one'
+  '100329', # -10 <- 'Less than an hour a day'
+  '528',
+  '100290',
+  '100306',
+  '100567',
+  '100569',
+  '100353', # number of cigarettes previously smoked daily
+  '487',
+  '100298',
+  '100300',
+  '100307',
+  '100355', # number of cigarettes currently smoked daily
+  '100504',
+  '100537',
+  '100582',
+  '100585',
+  '100595',
+  '100598',
+  '530',
+  '946',
+  '957',
+  '100698',
+  '17',
+  '1990',
+  '402',
+  '511',
+  '517',
+  '6361'
+)
+
+
+# UKB CODE MAPPINGS -------------------------------------------------------
+
+# used by functions in code_mappings.R
+
+# NOTES: if editing this, always refer to `ukb_code_mappings_sheet_names` and
+# `ukb_code_mappings_code_types` first - these should contain all possible code
+# types and sheets from the UKB excel file (resource 592). Tests in
+# test_data_raw_constants.R reply on the accuracy of these.
+
+# names of excel spreadsheets in ukb_code_mappings (UKB resource 592) -----
+
+# I generated this by manually copying `names(get_ukb_code_mappings())`
+ukb_code_mappings_sheet_names <- c(
+  "bnf_lkp",
+  "dmd_lkp",
+  "icd9_lkp",
+  "icd10_lkp",
+  "icd9_icd10",
+  "read_v2_lkp",
+  "read_v2_drugs_lkp",
+  "read_v2_drugs_bnf",
+  "read_v2_icd9",
+  "read_v2_icd10",
+  "read_v2_opcs4",
+  "read_v2_read_ctv3",
+  "read_ctv3_lkp",
+  "read_ctv3_icd9",
+  "read_ctv3_icd10",
+  "read_ctv3_opcs4",
+  "read_ctv3_read_v2"
+)
+
+assertthat::assert_that(
+  all(sort(ukb_code_mappings_sheet_names) == sort(names(ukb_code_mappings))),
+  msg = "`ukb_code_mappings_sheet_names` does not match the sheet names in resource 592 (fetched with `get_ukb_code_mappings`"
+)
+
+
+# colnames for each excel spreadsheet in resource 592 ---------------------
+colnames_for_ukb_code_mappings_sheet_names <- ukb_code_mappings_sheet_names %>%
+  purrr::set_names() %>%
+  purrr::map(~ names(ukb_code_mappings[[.x]]))
+
+
+# clinical codes types ----------------------------------------------------
+# my labels for clinical codes types, used in the constants below
+ukb_code_mappings_code_types <- c(
+  "bnf",
+  "dmd",
+  "icd9",
+  "icd10",
+  "read2",
+  "read2_drugs",
+  "read3",
+  "opcs4"
+)
+
+# clinical code system to lookup sheet map --------------------------------
+# mappings note, BNF - 'description_col' is for chemical substances only (TODO
+# amend this?)
+code_type_to_lkp_sheet_map_df <- tibble::tribble(
+  ~ code, ~ lkp_sheet, ~ code_col, ~ description_col,
+  "bnf", "bnf_lkp", "BNF_Presentation_Code", "BNF_Chemical_Substance",
+  "dmd", "dmd_lkp", "concept_id", "term",
+  "icd9", "icd9_lkp", "ICD9", "DESCRIPTION_ICD9",
+  "icd10", "icd10_lkp", "ICD10_CODE", "DESCRIPTION",
+  "read2", "read_v2_lkp", "read_code", "term_description",
+  "read2_drugs", "read_v2_drugs_lkp", "read_code", "term_description",
+  "read3", "read_ctv3_lkp", "read_code", "term_description"
+)
+
+# clinical code mappings map ----------------------------------------------
+
+# used by `map_codes()`
+# 'from' and 'to' cols: possible mapping combinations
+# 'mapping_sheet': the appropriate mapping sheet to use for a 'from'/'to' combination
+# 'from_col' and 'to_col': the columns to use when mapping
+clinical_code_mappings_map <- tibble::tribble(
+  ~ from, ~ to, ~ mapping_sheet, ~ from_col, ~ to_col,
+  "icd9", "icd10", "icd9_icd10", "ICD9", "ICD10",
+  "read2_drugs", "bnf", "read_v2_drugs_bnf", "read_code", "bnf_code",
+  "read2", "icd9", "read_v2_icd9", "read_code", "icd9_code",
+  "read2", "icd10", "read_v2_icd10", "read_code", "icd10_code",
+  "read2", "opcs4", "read_v2_opcs4", "read_code", "opcs_4.2_code",
+  "read2", "read3", "read_v2_read_ctv3", "READV2_CODE", "READV3_CODE",
+  "read3", "icd9", "read_ctv3_icd9", "read_code", "icd9_code",
+  "read3", "icd10", "read_ctv3_icd10", "read_code", "icd10_code",
+  "read3", "opcs4", "read_ctv3_opcs4", "read_code", "opcs4_code",
+  "read3", "read2", "read_ctv3_read_v2", "READV3_CODE", "READV2_CODE"
+)
+
+# see `test_data_raw_DATASET.R` for tests (check nothing misspelled etc)
+
+# SAVE AS R/sysdata.rda -------------------------------------------------------
+
+usethis::use_data(
+  # special ukb codings
+  cont_and_int_codings_to_na,
+  cont_and_int_codings_NOT_to_na,
+
+  # ukb_code_mappings
+  ukb_code_mappings_sheet_names,
+  ukb_code_mappings_code_types,
+  colnames_for_ukb_code_mappings_sheet_names,
+
+  code_type_to_lkp_sheet_map_df,
+  clinical_code_mappings_map,
+
+  internal = TRUE,
+  overwrite = TRUE
+)

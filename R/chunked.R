@@ -69,8 +69,9 @@ fread_chunked <- function(file,
   start_time <- proc.time()
 
   # stop if chunk_size is not an integer or less than 1
-  assert_integer_ge_1(x = chunk_size,
-                      arg_name = "chunk_size")
+  assert_integer_ge_n(x = chunk_size,
+                      arg_name = "chunk_size",
+                      n = 1)
 
   # initialise 'data' - will contain combined chunks if return_chunks == TRUE
   if (return_chunks) {
@@ -178,7 +179,7 @@ fread_chunked <- function(file,
       # time taken message
       if (progress) {
         message("\nProcessed ", i * chunk_size, " rows")
-        rawutil::time_taken_message(start_time)
+        time_taken_message(start_time)
       }
     } else if (is.null(chunk)) {
       # if
@@ -190,7 +191,7 @@ fread_chunked <- function(file,
 
   # completion message
   message("Complete!")
-  rawutil::time_taken_message(start_time)
+  time_taken_message(start_time)
 
   # return result, if return_chunks == TRUE
   if (return_chunks) {
@@ -218,8 +219,9 @@ process_df_chunked <- function(df,
   start_time <- proc.time()
 
   # stop if chunk_size is not an integer or less than 1
-  assert_integer_ge_1(chunk_size,
-                      "chunk_size")
+  assert_integer_ge_n(chunk_size,
+                      "chunk_size",
+                      n = 1)
 
   # initialise empty list to hold processed chunks
   total_n_rows <- nrow(df)
@@ -253,7 +255,7 @@ process_df_chunked <- function(df,
     # time taken message
     if (progress) {
       message("\nProcessed ", end_row, " rows")
-      rawutil::time_taken_message(start_time)
+      time_taken_message(start_time)
     }
   }
 
@@ -263,31 +265,11 @@ process_df_chunked <- function(df,
 
   # completion message
   message("Complete!")
-  rawutil::time_taken_message(start_time)
+  time_taken_message(start_time)
 
   return(result)
 }
 
 # PRIVATE FUNCTIONS -------------------------------------------------------
-
-#' Assert number is an integer that is greater than or equal to 1
-#'
-#' Helper function for \code{\link{fread_chunked}} and
-#' \code{\link{process_df_chunked}}.
-#'
-#' @param x An integer >= 1. Raises an error if this condition is not met
-#' @param arg_name character. The argument name for x. This is used to generate
-#'   an informative error message.
-#'
-#' @seealso \code{\link{fread_chunked}}, \code{\link{process_df_chunked}}
-assert_integer_ge_1 <- function(x, arg_name) {
-  # custom error message
-  error_message <- paste("Error!", arg_name, "must be an integer that is greater than 0")
-
-  # assertion
-  assertthat::assert_that(x >= 1,
-                          rlang::is_integerish(x),
-                          msg = error_message)
-}
 
 

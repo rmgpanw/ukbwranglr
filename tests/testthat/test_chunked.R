@@ -49,14 +49,4 @@ test_that("process_df_chunked() returns the input df unaltered if callback funct
 })
 
 
-# assert_integer_ge_1() -----------------------------------------------------------
 
-test_that("assert_integer_ge_1 (helper function) raises an error if chunk_size is not an integer or is < 1", {
-  expect_error(
-    assert_integer_ge_1(0, "chunk_size"),
-    regexp = "Error! chunk_size must be an integer that is greater than 0")
-
-  expect_error(
-    assert_integer_ge_1(1.3, "chunk_size"),
-    regexp = "Error! chunk_size must be an integer that is greater than 0")
-})

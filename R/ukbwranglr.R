@@ -1,3 +1,6 @@
+globalVariables(
+  c(".")
+)
 
 #' ukbwranglr: a package for exploring UK Biobank data
 #'
@@ -9,6 +12,7 @@
 #' \item Identifying participants taking certain medications
 #' }
 #'
+#' @importFrom magrittr "%>%"
 #' @docType package
 #' @name ukbwranglr
 NULL

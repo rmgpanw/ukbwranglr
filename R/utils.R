@@ -1,6 +1,9 @@
 
 # EXPORTED FUNCTIONS ------------------------------------------------------
 
+
+# Summarise ---------------------------------------------------------------
+
 #' Quickly summarise a dataframe
 #'
 #' A tidyverse-friendly summary function that summarises a dataframe by column type
@@ -42,6 +45,11 @@ my_skim <- skimr::skim_with(
   # logical - returns proportion = TRUE
   logical = skimr::sfl(pct_TRUE = function(x) {sum(x == TRUE, na.rm=TRUE) / length(x) * 100})
 )
+
+
+# Mappings - data dictionary/codings --------------------------------------
+
+
 
 #' Get descriptive colnames associated with one or more FieldIDs
 #'
@@ -103,6 +111,11 @@ extract_codings_for_fieldids <- function(field_ids,
     ))
 }
 
+
+# Download data dictionary/codings ----------------------------------------
+
+
+
 #' Get UKB data dictionary
 #'
 #' Downloads the UK Biobank data dictionary from
@@ -111,7 +124,7 @@ extract_codings_for_fieldids <- function(field_ids,
 #'
 #' @export
 get_ukb_data_dict <- function() {
-  fread_tsv_as_character("https://github.com/rmgpanw/ukbwranglr_resources/blob/main/ukb_data_dict_and_codings/Data_Dictionary_Showcase.tsv")
+  fread_tsv_as_character("https://github.com/rmgpanw/ukbwranglr_resources/raw/main/ukb_data_dict_and_codings/Data_Dictionary_Showcase.tsv")
 }
 
 #' Get UKB codings file
@@ -122,7 +135,7 @@ get_ukb_data_dict <- function() {
 #'
 #' @export
 get_ukb_codings <- function() {
-  fread_tsv_as_character("https://github.com/rmgpanw/ukbwranglr_resources/blob/main/ukb_data_dict_and_codings/Codings.tsv")
+  fread_tsv_as_character("https://github.com/rmgpanw/ukbwranglr_resources/raw/main/ukb_data_dict_and_codings/Codings.tsv")
 }
 
 #' Download UKB data dictionary directly from UKB website
@@ -147,7 +160,61 @@ get_ukb_codings_direct <- function() {
   fread_tsv_as_character("https://biobank.ctsu.ox.ac.uk/~bbdatan/Codings.tsv")
 }
 
+
+# Download ukb codings file -----------------------------------------------
+
+#' Get UK Biobank code mappings file
+#'
+#' Downloads the UK Biobank code mappings file
+#' (\href{https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592}{resource 592})
+#' from the
+#' \href{https://github.com/rmgpanw/ukbwranglr_resources}{ukbwranglr_resources}
+#' github repo. The raw file is a large excel spreadsheet. This has been saved
+#' in \code{.Rdata} format in
+#' \href{https://github.com/rmgpanw/ukbwranglr_resources}{ukbwranglr_resources}
+#' as a named list of data frames, one for each sheet in the original file.
+#'
+#' This function downloads the \code{ukb_code_mappings.Rdata} file from
+#' \href{https://github.com/rmgpanw/ukbwranglr_resources}{ukbwranglr_resources}
+#' to a temporary directory before loading and returning the result.
+#'
+#' \strong{Note:} This is a large object (>450 MB)
+#'
+#' @return A named list.
+#' @export
+get_ukb_code_mappings <- function() {
+  # file destination in tempdir
+  ukb_code_mappings_rdata <- tempfile(pattern = "ukb_code_mappings",
+           tmpdir = tempdir(),
+           fileext = ".Rdata")
+
+  # download from ukbwranglr_resources
+  download.file(url = "https://github.com/rmgpanw/ukbwranglr_resources/raw/main/Rdata/ukb_code_mappings.Rdata",
+                   destfile = ukb_code_mappings_rdata)
+
+  # load
+  load(ukb_code_mappings_rdata)
+
+  # return
+  return(all_lkps_maps_v2)
+}
+
 # PRIVATE FUNCTIONS -------------------------------------------------------
+
+# fread - tsv as character ------------------------------------------------
+
+#' Read a tsv file with all columns as type character
+#'
+#' Wrapper around \code{\link[data.table]{fread}}
+#'
+fread_tsv_as_character <- purrr::partial(data.table::fread,
+                                         colClasses = c('character'),
+                                         sep = "\t",
+                                         quote = " ",
+                                         na.strings = c("", "NA"))
+
+
+# Data dictionary/codings helpers -----------------------------------------
 
 #' Generic helper function values from a data dictionary
 #'
@@ -391,6 +458,79 @@ recode_column <- function(df, col_to_recode, mapping_df) {
 }
 
 
+# Testing/assertion helpers -----------------------------------------------
+
+#' Assert number is an integer that is greater than or equal to 1
+#'
+#' Helper function for \code{\link{fread_chunked}} and
+#' \code{\link{process_df_chunked}}.
+#'
+#' @param x An integer >= 1. Raises an error if this condition is not met
+#' @param arg_name character. The argument name for x. This is used to generate
+#'   an informative error message.
+#'
+#' @seealso \code{\link{fread_chunked}}, \code{\link{process_df_chunked}}
+#' @noRd
+assert_integer_ge_1 <- function(x, arg_name) {
+  # custom error message
+  error_message <- paste("Error!", arg_name, "must be an integer that is greater than 0")
+
+  # assertion
+  assertthat::assert_that(x >= 1,
+                          rlang::is_integerish(x),
+                          msg = error_message)
+}
+
+#' Assert number is an integer that is greater than or equal to n
+#'
+#' Helper function for \code{\link{fread_chunked}},
+#' \code{\link{process_df_chunked}}, and some other functions.
+#'
+#' @param x An integer >= n. Raises an error if this condition is not met
+#' @param arg_name character. The argument name for x. This is used to generate
+#'   an informative error message.
+#' @param n integer.
+#'
+#' @seealso \code{\link{fread_chunked}}, \code{\link{process_df_chunked}}
+#' @noRd
+assert_integer_ge_n <- function(x,
+                                arg_name,
+                                n) {
+  # custom error message
+  error_message <- paste("Error!",
+                         arg_name,
+                         "must be an integer that is greater than",
+                         n)
+
+  # assertion
+  assertthat::assert_that(x >= n,
+                          rlang::is_integerish(x),
+                          msg = error_message)
+}
+
+
+# Miscellaneous helpers ---------------------------------------------------
+
+#' Display time taken message
+#'
+#' Helper function for displaying time taken messages within other functions. Use
+#' \code{\link[base]{proc.time}} at start of function and supply this as the
+#' `start_time` parameter to this function.
+#'
+#' @param start_time The start time.
+#'
+#' @return A message stating time taken since start time
+time_taken_message <- function(start_time) {
+  # get time taken
+  time_taken <- proc.time() - start_time
+
+  # display message
+  message("Time taken: ",
+        (time_taken[3] %/% 60),
+        " minutes, ",
+        (round(time_taken[3] %% 60)),
+        " seconds.")
+}
 
 #' Check required columns are present
 #'
@@ -413,36 +553,4 @@ check_required_cols_exist <- function(df,
 
     stop("Required columns not present in data")
   }
-}
-
-
-#' Read a tsv file with all columns as type character
-#'
-#' Wrapper around \code{\link[data.table]{fread}}
-#'
-fread_tsv_as_character <- purrr::partial(data.table::fread,
-                                         colClasses = c('character'),
-                                         sep = "\t",
-                                         quote = " ",
-                                         na.strings = c("", "NA"))
-
-#' Display time taken message
-#'
-#' Helper function for displaying time taken messages within other functions. Use
-#' \code{\link[base]{proc.time}} at start of function and supply this as the
-#' `start_time` parameter to this function.
-#'
-#' @param start_time The start time.
-#'
-#' @return A message stating time taken since start time
-time_taken_message <- function(start_time) {
-  # get time taken
-  time_taken <- proc.time() - start_time
-
-  # display message
-  message("Time taken: ",
-        (time_taken[3] %/% 60),
-        " minutes, ",
-        (round(time_taken[3] %% 60)),
-        " seconds.")
 }
