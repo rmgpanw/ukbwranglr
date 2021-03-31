@@ -5,7 +5,7 @@
 # functions created for each data source (i.e. self-report, HES, primary care
 # etc)
 
-# Section 'Get specific diagnostic codes, first recorded' - for a set of
+# Section 'Extract specific diagnostic codes' - for a set of
 # specific diagnostic codes, extract a list of eid's with these codes and the
 # earliest recorded date. Depends on output from the 'get all diagnostic codes'
 # functions
@@ -31,7 +31,7 @@
 
 # EXPORTED FUNCTIONS ----------------------------------------------------
 
-# Get specific diagnostic codes, first recorded -------------------------------------------------------
+# Extract specific diagnostic codes -------------------------------------------------------
 
 #' Get the earliest record date for a set of diagnostic codes
 #'
@@ -47,17 +47,22 @@
 #'   date is then retrieved. If no dates are available, the first diagnostic
 #'   code as it appears in the data is retrieved instead.
 #'
-#' @inheritParams get_first_diagnostic_code_record_basis
+#' @inheritParams extract_single_diagnostic_code_record_basis
 #'
 #' @return Dataframe
 #' @export
-#' @family get specific diagnostic codes, first recorded
-get_first_diagnostic_code_record <- function(df,
-                                             codes) {
+#' @family extract specific diagnostic codes functions
+extract_first_or_last_clinical_event <- function(df,
+                                             codes,
+                                             min_max = "min") {
 
   # extract earliest date
-  df <- get_first_diagnostic_code_record_basis(df = df,
-                                         code = codes)
+  df <- extract_single_diagnostic_code_record_basis(
+    df = df,
+    code = codes,
+    mapping_function = purrr::partial(extract_first_or_last_record_mapper,
+                                      min_max = min_max)
+  )
 
   # drop nested column
   df %>%
@@ -106,30 +111,40 @@ get_death_data_icd10_diagnoses <- function(ukb_pheno,
     ukb_pheno = ukb_pheno,
     data_dict = data_dict,
     ukb_codings = ukb_codings
-  ) %>%
-    dplyr::mutate(date = NA) %>% # date is 'NA' (cannot ascertain dates of diagnoses from death certificates)
-    dplyr::mutate(date = as.Date(date)) %>% # make date type - allows combining with output from other get_XXX functions
-    dplyr::filter(!is.na(f40001_value)) # remove rows with no codes
+  )
 
-    death_data_diagnoses[["f40001"]] <- get_diagnoses_set_index_code_date_cols(get_diagnoses_df = death_data_diagnoses[["f40001"]],
+  # make date col: 'NA' (cannot ascertain dates of diagnoses from death certificates)
+  # make date type - allows combining with output from other get_XXX functions
+  death_data_diagnoses[["f40001"]]$date <- as.Date(NA)
+
+  # remove rows with no codes
+  death_data_diagnoses[["f40001"]] <- death_data_diagnoses[["f40001"]] %>%
+    dplyr::filter(!is.na(.data[["f40001_value"]])) # remove rows with no codes
+
+  death_data_diagnoses[["f40001"]] <- get_diagnoses_set_index_code_date_cols(get_clinical_events_df = death_data_diagnoses[["f40001"]],
                                                                index_col = "f40001",
                                                                code_col = "f40001_value",
                                                                date_col = "date")
 
   # get all diagnostic codes and dates (and standardise) - fieldid 40002
-    death_data_diagnoses[["f40002"]] <- field_id_pivot_longer(
+  death_data_diagnoses[["f40002"]] <- field_id_pivot_longer(
     field_id = "40002",
     ukb_pheno = ukb_pheno,
     data_dict = data_dict,
     ukb_codings = ukb_codings
-  ) %>%
-    dplyr::mutate(date = NA) %>% # date is 'NA' (cannot ascertain dates of diagnoses from death certificates)
-    dplyr::mutate(date = as.Date(date)) %>% # make date type - allows combining with output from other get_XXX functions
-    dplyr::filter(!is.na(f40002_value)) # remove rows with no codes
+  )
 
-    death_data_diagnoses[["f40002"]] <-
+  # make date col: 'NA' (cannot ascertain dates of diagnoses from death certificates)
+  # make date type - allows combining with output from other get_XXX functions
+  death_data_diagnoses[["f40002"]]$date <- as.Date(NA)
+
+  # remove rows with no codes
+  death_data_diagnoses[["f40002"]] <- death_data_diagnoses[["f40002"]] %>%
+    dplyr::filter(!is.na(.data[["f40002_value"]])) # remove rows with no codes
+
+  death_data_diagnoses[["f40002"]] <-
       get_diagnoses_set_index_code_date_cols(
-        get_diagnoses_df = death_data_diagnoses[["f40002"]],
+        get_clinical_events_df = death_data_diagnoses[["f40002"]],
         index_col = "f40002",
         code_col = "f40002_value",
         date_col = "date"
@@ -189,7 +204,7 @@ get_hes_icd9_diagnoses <- function(ukb_pheno,
 
   # remove empty code rows
   hes_icd9_diagnoses <- hes_icd9_diagnoses %>%
-    filter(!is.na(f41271_value))
+    dplyr::filter(!is.na(f41271_value))
 
   # recode to ICD10
   hes_icd9_diagnoses <- recode_ukbcol(df = hes_icd9_diagnoses,
@@ -201,7 +216,7 @@ get_hes_icd9_diagnoses <- function(ukb_pheno,
 
   # standardise
   hes_icd9_diagnoses <- get_diagnoses_set_index_code_date_cols(
-    get_diagnoses_df = hes_icd9_diagnoses,
+    get_clinical_events_df = hes_icd9_diagnoses,
     index_col = "f41271",
     code_col = "f41271_value",
     date_col = "f41281_value")
@@ -243,7 +258,7 @@ get_hes_icd10_diagnoses <- function(ukb_pheno,
 
   # remove empty code rows
   hes_icd10_diagnoses <- hes_icd10_diagnoses %>%
-    filter(!is.na(f41270_value))
+    dplyr::filter(!is.na(f41270_value))
 
   # recode to ICD10
   hes_icd10_diagnoses <- recode_ukbcol(df = hes_icd10_diagnoses,
@@ -255,7 +270,7 @@ get_hes_icd10_diagnoses <- function(ukb_pheno,
 
   # standardise
   hes_icd10_diagnoses <- get_diagnoses_set_index_code_date_cols(
-    get_diagnoses_df = hes_icd10_diagnoses,
+    get_clinical_events_df = hes_icd10_diagnoses,
     index_col = "f41270",
     code_col = "f41270_value",
     date_col = "f41280_value")
@@ -302,7 +317,7 @@ get_self_report_non_cancer_diagnoses <- function(ukb_pheno,
 
   # remove empty code rows
   self_report_non_cancer_diagnoses <- self_report_non_cancer_diagnoses %>%
-    filter(!is.na(f20002_value))
+    dplyr::filter(!is.na(.data[["f20002_value"]]))
 
   # recode to ukb codes
   self_report_non_cancer_diagnoses <- suppressWarnings(recode_ukbcol(df = self_report_non_cancer_diagnoses,
@@ -314,7 +329,7 @@ get_self_report_non_cancer_diagnoses <- function(ukb_pheno,
 
   # standardise
   self_report_non_cancer_diagnoses <- get_diagnoses_set_index_code_date_cols(
-    get_diagnoses_df = self_report_non_cancer_diagnoses,
+    get_clinical_events_df = self_report_non_cancer_diagnoses,
     index_col = "f20002",
     code_col = "f20002_value",
     date_col = "f20008_value",
@@ -424,7 +439,7 @@ get_self_report_cancer_diagnoses <- function(ukb_pheno,
 
   # remove empty code rows
   self_report_cancer_diagnoses <- self_report_cancer_diagnoses %>%
-    filter(!is.na(f20001_value))
+    dplyr::filter(!is.na(f20001_value))
 
   # recode to ukb codes
   self_report_cancer_diagnoses <- suppressWarnings(recode_ukbcol(df = self_report_cancer_diagnoses,
@@ -436,7 +451,7 @@ get_self_report_cancer_diagnoses <- function(ukb_pheno,
 
   # standardise
   self_report_cancer_diagnoses <- get_diagnoses_set_index_code_date_cols(
-    get_diagnoses_df = self_report_cancer_diagnoses,
+    get_clinical_events_df = self_report_cancer_diagnoses,
     index_col = "f20001",
     code_col = "f20001_value",
     date_col = "f20006_value",
@@ -508,7 +523,7 @@ get_cancer_register_icd9_diagnoses <- function(ukb_pheno,
 
   # remove empty code rows
   cancer_register_icd9_diagnoses <- cancer_register_icd9_diagnoses %>%
-    filter(!is.na(f40013_value))
+    dplyr::filter(!is.na(.data[["f40013_value"]]))
 
   # recode to ICD9
   cancer_register_icd9_diagnoses <- recode_ukbcol(df = cancer_register_icd9_diagnoses,
@@ -520,7 +535,7 @@ get_cancer_register_icd9_diagnoses <- function(ukb_pheno,
 
   # standardise
   cancer_register_icd9_diagnoses <- get_diagnoses_set_index_code_date_cols(
-    get_diagnoses_df = cancer_register_icd9_diagnoses,
+    get_clinical_events_df = cancer_register_icd9_diagnoses,
     index_col = "f40013",
     code_col = "f40013_value",
     date_col = "f40005_value")
@@ -561,7 +576,7 @@ get_cancer_register_icd10_diagnoses <- function(ukb_pheno,
 
   # remove empty code rows
   cancer_register_icd10_diagnoses <- cancer_register_icd10_diagnoses %>%
-    filter(!is.na(f40006_value))
+    dplyr::filter(!is.na(.data[["f40006_value"]]))
 
   # recode to ICD9
   cancer_register_icd10_diagnoses <- recode_ukbcol(df = cancer_register_icd10_diagnoses,
@@ -573,7 +588,7 @@ get_cancer_register_icd10_diagnoses <- function(ukb_pheno,
 
   # standardise
   cancer_register_icd10_diagnoses <- get_diagnoses_set_index_code_date_cols(
-    get_diagnoses_df = cancer_register_icd10_diagnoses,
+    get_clinical_events_df = cancer_register_icd10_diagnoses,
     index_col = "f40006",
     code_col = "f40006_value",
     date_col = "f40005_value")
@@ -665,7 +680,7 @@ get_all_diagnostic_codes_multi <- function(function_list = list(get_self_report_
 #'
 #' Selects essential columns: eid, field_id, code and date recorded.
 #'
-#' @param get_diagnoses_df a dataframe created by a 'get_X_diagnoses' function
+#' @param get_clinical_events_df a dataframe created by a 'get_X_diagnoses' function
 #' @param index_col Column indicating diagnosis source (e.g. HES, self-report)
 #' @param code_col Column of codes
 #' @param date_col Column of dates when code was recorded
@@ -673,19 +688,19 @@ get_all_diagnostic_codes_multi <- function(function_list = list(get_self_report_
 #'   requested. Default is \code{FALSE}, as only the self-report fields contain
 #'   such values.
 #' @family get all diagnostic codes
-get_diagnoses_set_index_code_date_cols <- function(get_diagnoses_df,
+get_diagnoses_set_index_code_date_cols <- function(get_clinical_events_df,
                                                    index_col,
                                                    code_col,
                                                    date_col,
                                                    remove_special_dates = FALSE) {
 
   # create 'source' col indicating which FieldID the data (code) comes from
-  get_diagnoses_df$source <- index_col
+  get_clinical_events_df$source <- index_col
 
   # select required columns and rename
-  get_diagnoses_df <- get_diagnoses_df %>%
-    select(eid,
-           source,
+  get_clinical_events_df <- get_clinical_events_df %>%
+    dplyr::select(.data[["eid"]],
+           .data[["source"]],
            code = .data[[code_col]],
            date = .data[[date_col]],
            source_col = .data[[index_col]])
@@ -699,76 +714,20 @@ get_diagnoses_set_index_code_date_cols <- function(get_diagnoses_df,
     self_report_cancer_and_non_cancer_diagnoses_special_dates <- c(
       -3,
       -1
-    ) %>%
-      lubridate::date_decimal() %>%
-      lubridate::as_date()
+    )
 
     # remove special dates
-    get_diagnoses_df <- get_diagnoses_df %>%
-    dplyr::mutate(date = ifelse(
-      test = date %in% self_report_cancer_and_non_cancer_diagnoses_special_dates,
+    get_clinical_events_df$date <- ifelse(
+      test = get_clinical_events_df$date %in% self_report_cancer_and_non_cancer_diagnoses_special_dates,
       yes = NA,
-      no = date))
+      no = get_clinical_events_df$date
+    )
+
   }
 
-  return(get_diagnoses_df)
+  return(get_clinical_events_df)
 }
 
-
-#' Get first record for a set of diagnostic codes (generic)
-#'
-#' Generic helper function. For a set of diagnostic codes, extract eids with at
-#' least one of these and the associated earliest recorded date.
-#'
-#' @param df A dataframe generated by one of the 'get all diagnostic codes'
-#'   functions
-#' @param codes Character vector of diagnostic codes
-#'
-#' @return A dataframe nested by eid, with columns for the earliest date one of
-#'   the specified codes was recorded
-#'
-#' @family get specific diagnostic codes, first recorded
-get_first_diagnostic_code_record_basis <- function(df,
-                                                   codes) {
-  # check there are no NA values for 'code' column
-  assertthat::assert_that(sum(is.na(df$code)) == 0,
-                          msg = "Error! Some rows have no diagnostic code (there should be no missing values)")
-
-  # check that date column is date type (not character)
-  assertthat::is.date(df$date)
-
-  # mapping function to extract earliest diagnostic code data for each eid -
-  # returns a single character.
-  get_earliest_record_mapper <- function(df) {
-    # get row index for earliest date
-    earliest_date <- which.min(df$date)
-
-    # if there are no dates, return the first row of codes
-    if (rlang::is_empty(earliest_date)) {
-      return(df[1, ] %>%
-               dplyr::select(-date) %>%
-               tidyr::unite("result", sep = "_SEP_", remove = TRUE) %>%
-               .$result)
-    }
-
-    # otherwise, return first date
-    df[earliest_date,] %>%
-      tidyr::unite("result", sep = "_SEP_", remove = TRUE) %>%
-      .$result
-  }
-
-  # filter for selected codes, nest by eid and extract earliest date + code (or
-  # just a code if no dates available)
-  df %>%
-    dplyr::filter(code %in% codes) %>%
-    dplyr::group_by(eid) %>%
-    tidyr::nest() %>%
-    dplyr::mutate(result = purrr::map_chr(data, get_earliest_record_mapper)) %>%
-    tidyr::separate(result,
-             into = c("source", "code", "date"),
-             sep = "_SEP_") %>%
-    suppressWarnings() # separate() raises if there are rows with no dates - suppress these
-}
 
 #' Convert column for a FieldID to long format
 #'
@@ -809,7 +768,7 @@ field_id_pivot_longer <- function(ukb_pheno,
     dplyr::filter(Coding == (data_dict %>%
                                dplyr::filter(FieldID == field_id) %>%
                                .$Coding %>%
-                               head(n = 1)))
+                               utils::head(n = 1)))
 
   ukb_pheno <- ukb_pheno %>%
     tidyr::pivot_longer(
@@ -889,4 +848,282 @@ field_id_pivot_longer_multi <- function(field_ids,
   }
 
   return(result)
+}
+
+
+
+# Extract specific diagnostic code helpers --------------------------------
+
+#' Extract a single record from a dataframe generated by one of the
+#' \code{get_XXX_diagnoses} functions (generic)
+#'
+#' Generic helper function. For a set of diagnostic codes, filter for eids with
+#' at least one of these and extract a single row per eid (e.g. the earliest
+#' date that one of the diagnostic codes appears).
+#'
+#' @param df A dataframe generated by one of the \code{get_XXX_diagnoses}
+#'   functions functions
+#' @param codes Character vector of diagnostic codes
+#' @param mapping_function a function that will be applied to \code{df} nested
+#'   by eid, extracting a single row per eid (e.g. the earliest date that one of
+#'   the \code{codes} appears). This will be applied using \code{\link[purrr]{map_chr}} and should return the \code{source}, \code{code} and
+#'   \code{date} columns as a single character, separated by "_SEP_".
+#' @param ... additional args are passed on to \code{mapping_function}.
+#'
+#' @return A dataframe nested by eid, with \code{source}, \code{code} and
+#'   \code{date} columns for row extracted by the \code{mapping_function}.
+#'
+#' @family extract specific diagnostic codes functions
+extract_single_diagnostic_code_record_basis <- function(df,
+                                                        codes,
+                                                        mapping_function,
+                                                        ...) {
+  # validate args
+  expected_colnames <-  c("eid", "source", "code", "date")
+  assertthat::assert_that(all(colnames(df) == expected_colnames),
+                          msg = "`df` does not contain the expected columns: eid, source, code, date")
+  assertthat::assert_that(class(codes) %in% c("character", "list"),
+                          msg = "`codes` must be either a character vector or list")
+  assertthat::assert_that(class(mapping_function) == "function",
+                          msg = "`mapping_function` must be a function")
+
+  if (class(codes) == "list") {
+    # check names are valid and unique
+    assertthat::assert_that(all(names(codes) %in% ukbwranglr:::clinical_events_sources$data_coding) &
+                              length(unique(names(codes))) == length(names(codes)),
+                            msg = paste("If `codes` is a list, `names(codes)` must be unique and be one of the following:",
+                                        stringr::str_c(ukbwranglr:::clinical_events_sources$data_coding,
+                                                       sep = "",
+                                                       collapse = ", ")))
+  }
+
+  # filter for selected codes. Depends on:
+
+  # 1: Whether `df` is a dataframe or tbl_sql object
+  # 2: Whether `codes` is a character vector or list
+
+  # TODO replace nested ifelse statements with S3
+  # methods?
+
+  # if `df` is a "tbl_sql" object
+  if (all(class(df) %in% c("tbl_SQLiteConnection",
+                         "tbl_dbi",
+                         "tbl_sql",
+                         "tbl_lazy",
+                         "tbl"))) {
+    if (class(codes) == "character") {
+      df <- df %>%
+        dplyr::filter(code %in% codes) %>%
+        dplyr::collect() %>%
+        # need to convert this from character to a date
+        dplyr::mutate(date = as.Date(date))
+    } else if (class(codes) == "list") {
+      # filter for codes only within sources that use that code_type
+
+      df <- filter_clinical_events_for_list_of_codes(df,
+                                                     df_class = "tbl_sql",
+                                                     codes = codes)
+    }
+
+  } else if (all(class(df) %in% c("data.table", "data.frame", "tbl_df", "tbl"))) {
+    # if `df` is a data frame (or data table/tibble)
+    if (class(codes) == "character") {
+      df <- df %>%
+        dplyr::filter(code %in% codes)
+    } else if (class(codes) == "list") {
+      # filter for codes only within sources that use that code_type
+
+      df <- filter_clinical_events_for_list_of_codes(df,
+                                                     df_class = "df",
+                                                     codes = codes)
+    }
+
+  } else {
+    stop(paste("Error! `class(df)` is not valid. Check `class(df)` matches one of: ",
+               c("tbl_SQLiteConnection",
+                 "tbl_dbi",
+                 "tbl_sql",
+                 "tbl_lazy",
+                 "tbl",
+                 "data.table",
+                 "data.frame",
+                 "tbl_df",
+                 "tbl")))
+  }
+
+  # check that date column is date type (not character)
+  assertthat::assert_that(class(df$date) == "Date",
+                          msg = "`date` column is not of class 'Date' after collecting `df` from database")
+
+  #nest by eid and extract earliest date + code (or just a code if no dates
+  #available)
+  df %>%
+    dplyr::group_by(eid) %>%
+    tidyr::nest() %>%
+    dplyr::mutate(result = purrr::map_chr(data, mapping_function)) %>%
+    tidyr::separate(result,
+                    into = c("source", "code", "date"),
+                    sep = "_SEP_") %>%
+    suppressWarnings() # separate() raises if there are rows with no dates - suppress these
+}
+
+#' Helper function for \code{\link{extract_single_diagnostic_code_record_basis}}
+#'
+#' Performs the code filtering step in
+#' \code{\link{extract_single_diagnostic_code_record_basis}} when \code{codes}
+#' is of class \code{list}.
+#'
+#' @param df_class character. Either "df", or "tbl_sql".
+#' @inheritParams  extract_single_diagnostic_code_record_basis
+#'
+#' @return a data frame
+#' @noRd
+filter_clinical_events_for_list_of_codes <- function(df,
+                                                     df_class,
+                                                     codes) {
+  # validate args
+  match.arg(arg = df_class,
+            choices = c("df", "tbl_sql"))
+
+  if (df_class == "df") {
+    assertthat::assert_that(
+      all(class(df) %in% c("data.table", "data.frame", "tbl_df", "tbl")),
+      msg = paste("Error! arg `df_class` == 'df' but `class(df)` is: ", stringr::str_c(class(df),
+                                                                                       sep = "",
+                                                                                       collapse = ", "))
+    )
+  } else if (df_class == "tbl_sql") {
+    assertthat::assert_that(
+      all(class(df) %in% c("tbl_SQLiteConnection",
+                           "tbl_dbi",
+                           "tbl_sql",
+                           "tbl_lazy",
+                           "tbl")),
+      msg = paste("Error! arg `df_class` == 'tbl_sql' but `class(df)` is: ", stringr::str_c(class(df),
+                                                                                            sep = "",
+                                                                                            collapse = ", "))
+    )
+  }
+
+  # ***A reminder to amend this section if new types of
+  # data_coding are added to
+  # ukbwranglr:::clinical_events_sources$data_coding***
+  assertthat::assert_that(all(
+    unique(sort(ukbwranglr:::clinical_events_sources$data_coding)) == sort(c(
+      'icd10',
+      'data_coding_6',
+      'data_coding_3',
+      'icd9',
+      'read2',
+      'read3'
+    ))),
+    msg = "Error! check code for `ukbwranglr:::clinical_events_sources$data_coding` and amend the filter statement in this function to address all possible code types")
+
+  # filter Note: for dbplyr (tbl_sql objects), cannot use
+  # `get_sources_for_code_type("icd9")` or `codes$icd9` in the filter statement
+  # below. It will silently return an error result
+
+  icd9_sources <- get_sources_for_code_type("icd9")
+  icd10_sources <- get_sources_for_code_type("icd10")
+  read2_sources <- get_sources_for_code_type("read2")
+  read3_sources <- get_sources_for_code_type("read3")
+  data_coding_6_sources <- get_sources_for_code_type("data_coding_6")
+  data_coding_3_sources <- get_sources_for_code_type("data_coding_3")
+
+  icd9_codes <- codes$icd9
+  icd10_codes <- codes$icd10
+  read2_codes <- codes$read2
+  read3_codes <- codes$read3
+  data_coding_6_codes <- codes$data_coding_6
+  data_coding_3_codes <- codes$data_coding_3
+
+  df <- df %>%
+    dplyr::filter(
+      (
+        .data[["source"]] %in% icd9_sources &
+          .data[["code"]] %in% icd9_codes
+      ) |
+        (
+          .data[["source"]] %in% icd10_sources &
+            .data[["code"]] %in% icd10_codes
+        ) |
+        (
+          .data[["source"]] %in% read2_sources &
+            .data[["code"]] %in% read2_codes
+        ) |
+        (
+          .data[["source"]] %in% read3_sources &
+            .data[["code"]] %in% read3_codes
+        ) |
+        (
+          .data[["source"]] %in% data_coding_6_sources &
+            .data[["code"]] %in% data_coding_6_codes
+        ) |
+        (
+          .data[["source"]] %in% data_coding_3_sources &
+            .data[["code"]] %in% data_coding_3_codes
+        )
+    )
+
+  if (df_class == "tbl_sql") {
+    df <- df %>%
+      dplyr::collect() %>%
+      # need to convert this from character to a date
+      dplyr::mutate(date = as.Date(date))
+  }
+
+  return(df)
+}
+
+# (mappers) ---------------------------------------------------------------
+
+# Helper for `extract_single_diagnostic_code_record_basis()`. A mapping function
+# to extract earliest diagnostic code data for each eid - returns a single
+# character. If no dates available, will return the first row of the data frame
+extract_first_or_last_record_mapper <- function(df,
+                                                min_max = "min") {
+  # validate args
+  match.arg(arg = min_max,
+            choices = c("min", "max"))
+
+  # get row index for earliest/latest date
+  if (min_max == "min") {
+    selected_date <- which.min(df$date)
+  } else if (min_max == "max") {
+    selected_date <- which.max(df$date)
+  }
+
+  # if there are no dates, return the first row of codes
+  if (rlang::is_empty(selected_date)) {
+    return(df[1, ] %>%
+             dplyr::select(-date) %>%
+             tidyr::unite("result", sep = "_SEP_", remove = TRUE) %>%
+             .$result)
+  }
+
+  # otherwise, return first date
+  df[selected_date,] %>%
+    tidyr::unite("result", sep = "_SEP_", remove = TRUE) %>%
+    .$result
+}
+
+# Mappings - data dictionary/codings/clinical events schema --------------------------------------
+
+#' Helper function for \code{link{extract_single_diagnostic_code_record_basis}}
+#'
+#' For a given clinical code type, returns the data sources that use this.
+#'
+#' @param code_type character vector of length 1.
+#'
+#' @return Character vector of data sources which use the clinical coding system
+#'   specified by \code{code_type}.
+#' @noRd
+#' @family extract specific diagnostic codes functions
+get_sources_for_code_type <- function(code_type) {
+  match.arg(code_type,
+            ukbwranglr:::clinical_events_sources$data_coding)
+
+  ukbwranglr:::clinical_events_sources %>%
+    dplyr::filter(data_coding == code_type) %>%
+    .$source
 }

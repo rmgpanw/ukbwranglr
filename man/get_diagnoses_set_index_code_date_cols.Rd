@@ -5,7 +5,7 @@
 \title{Standardise a long format diagnoses dataframe}
 \usage{
 get_diagnoses_set_index_code_date_cols(
-  get_diagnoses_df,
+  get_clinical_events_df,
   index_col,
   code_col,
   date_col,
@@ -13,7 +13,7 @@ get_diagnoses_set_index_code_date_cols(
 )
 }
 \arguments{
-\item{get_diagnoses_df}{a dataframe created by a 'get_X_diagnoses' function}
+\item{get_clinical_events_df}{a dataframe created by a 'get_X_diagnoses' function}
 
 \item{index_col}{Column indicating diagnosis source (e.g. HES, self-report)}
 

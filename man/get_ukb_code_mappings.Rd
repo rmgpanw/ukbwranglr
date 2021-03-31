@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{get_ukb_code_mappings}
 \alias{get_ukb_code_mappings}
-\title{Get UK Biobank code mappings file}
+\title{Get UK Biobank clinical code mappings file}
 \usage{
 get_ukb_code_mappings()
 }

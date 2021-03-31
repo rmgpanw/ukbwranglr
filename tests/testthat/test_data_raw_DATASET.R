@@ -7,6 +7,40 @@ library(rawutil)
 # TESTS -------------------------------------------------------------------
 
 
+# Diagnoses FieldIDs -------------------------------------------------------
+
+DIAGNOSES_FIELD_IDS <- c(
+
+  # Death data ICD10
+  "40001",
+  "40002",
+
+  # NOT IN AK DATASET
+  # # HES ICD9
+  "41271",
+  "41281",
+
+  # # HES ICD10
+  "41270",
+  "41280",
+
+  # self-report non-cancer
+  "20002",
+  "20008",
+
+  # self-report cancer
+  "20001",
+  "20006",
+
+  # cancer ICD9
+  "40013",
+  "40005",
+
+  # cancer ICD10
+  "40006",
+  "40005"
+)
+
 # UKB code mappings constants ---------------------------------------------
 
 # `ukb_code_mappings_sheet_names` and `ukb_code_mappings_code_type --------
@@ -76,20 +110,42 @@ test_that(
   }
 )
 
-# `code_type_to_lkp_sheet_map` --------------------------------------------
+# `code_type_to_lkp_sheet_map_df` --------------------------------------------
 
-test_that("`code_type_to_lkp_sheet_map` has only unique values", {
-  expect_true(length(names(ukbwranglr:::code_type_to_lkp_sheet_map)) == length(unique(names(ukbwranglr:::code_type_to_lkp_sheet_map))))
+test_that("`code_type_to_lkp_sheet_map_df` has only unique values", {
+  expect_true(length(ukbwranglr:::code_type_to_lkp_sheet_map_df$code) == length(unique(ukbwranglr:::code_type_to_lkp_sheet_map_df$code)))
 
-  expect_true(length(ukbwranglr:::code_type_to_lkp_sheet_map) == length(unique(ukbwranglr:::code_type_to_lkp_sheet_map)))
+  expect_true(length(ukbwranglr:::code_type_to_lkp_sheet_map_df$lkp_sheet) == length(unique(ukbwranglr:::code_type_to_lkp_sheet_map_df$lkp_sheet)))
 })
 
-test_that("`code_type_to_lkp_sheet_map` only contains values in `ukb_code_mappings_sheet_names` and `ukb_code_mappings_code_types`", {
+test_that("`code_type_to_lkp_sheet_map_df` only contains values in `ukb_code_mappings_sheet_names` and `ukb_code_mappings_code_types`", {
   expect_true(
-    all(names(ukbwranglr:::code_type_to_lkp_sheet_map) %in% ukbwranglr:::ukb_code_mappings_code_types)
+    all(ukbwranglr:::code_type_to_lkp_sheet_map_df$code %in% ukbwranglr:::ukb_code_mappings_code_types)
   )
 
   expect_true(
-    all(ukbwranglr:::code_type_to_lkp_sheet_map %in% ukbwranglr:::ukb_code_mappings_sheet_names)
+    all(ukbwranglr:::code_type_to_lkp_sheet_map_df$lkp_sheet %in% ukbwranglr:::ukb_code_mappings_sheet_names)
   )
+})
+
+# `clinical_events_sources` -----------------------------------------------
+
+test_that("`clinical_events_sources$data_coding` contains the following:
+          'icd10',
+          'data_coding_6',
+          'data_coding_3',
+          'icd9',
+          'read2',
+          'read3'.
+          IF NOT: AMEND `extract_single_diagnostic_code_record_basis()` FILTER STATEMENT and tests for `filter_clinical_events_for_list_of_codes()`", {
+  expect_equal(unique(sort(ukbwranglr:::clinical_events_sources$data_coding)),
+               sort(c(
+                 'icd10',
+                 'data_coding_6',
+                 'data_coding_3',
+                 'icd9',
+                 'read2',
+                 'read3'
+               )))
+
 })

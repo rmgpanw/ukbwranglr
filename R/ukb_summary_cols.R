@@ -29,7 +29,7 @@ ukb_mutate_dob <- function(ukb_df, ukb_mapping_df) {
   # MAIN BODY
   ## Find year/month of birth columns
   selected_cols <- ukb_mapping_df %>%
-    dplyr::filter(FieldID %in% c('34', '52')) %>%
+    dplyr::filter(.data[["FieldID"]] %in% c('34', '52')) %>%
     .$descriptive_colnames
 
   ## make ukb_df_temp with only these 2 fields and mutate dob
@@ -74,13 +74,13 @@ ukb_mutate_numerical_means <- function(ukb_df,
   nest_mapping_df_by_field <- function(.ukb_mapping_df) {
     .ukb_mapping_df %>%
     dplyr::filter(
-      (ValueType %in% c('Continuous', 'Integer')) &
+      (.data[["ValueType"]] %in% c('Continuous', 'Integer')) &
         (
       #***IMPORTANT*** filters for either:
       ## 1. Cols without special coding values
-      (is.na(Coding)) |
+      (is.na(.data[["Coding"]])) |
       ## 2. Cols with special coding values that have been 'cleaned' to 'NA' y `ukb_parse()`
-          (!is.na(Coding) & cont_int_to_na == TRUE)
+          (!is.na(.data[["Coding"]]) & cont_int_to_na == TRUE)
       ## ...i.e. filters out any continuous/integer cols with remaining 'uncleaned' special values
       )) %>%
     dplyr::group_by(Field_FieldID) %>%

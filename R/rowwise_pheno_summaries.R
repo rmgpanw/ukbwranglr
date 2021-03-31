@@ -331,7 +331,7 @@ rowise_min_max_date <- function(ukb_pheno,
 
   # get subset of date cols + eid
   subset_cols <- c("eid", selected_date_cols)
-  ukb_pheno_subset <- ukb_pheno[, ..subset_cols]
+  ukb_pheno_subset <- ukb_pheno[, subset_cols]
 
   # remove nonsense dates (set these to NA) - get a data.table warning message
   # when using this... ukb_pheno_subset <- ukb_pheno_subset %>%

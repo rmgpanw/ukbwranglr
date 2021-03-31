@@ -21,10 +21,8 @@ get_all_diagnostic_codes_multi(
 
 \item{data_dict}{a data dictionary for \code{ukb_pheno}}
 
-\item{ukb_codings}{The path to a tab-delimited UKB codings dictionary. By
-default, this is downloaded directly from the
-\href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{UKB
- website}.}
+\item{ukb_codings}{The UKB codings dictionary. This should be a data frame where all columns are of type \code{character}. By
+default, this is downloaded from the \href{https://github.com/rmgpanw/ukbwranglr_resources}{\code{ukbwranglr_resources}} github repo.}
 
 \item{drop_source_col}{Remove `source_col` column, which records which column
 in the main dataset the value in `code` column came from. Default is

@@ -20,15 +20,14 @@ recode_ukbcol(
 
 \item{field_id}{Character. A UK Biobank FieldID}
 
-\item{ukb_data_dict}{The path to a tab-delimited UKB data dictionary. By
-default, this is downloaded directly from the
-\href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{UKB
- website}.}
+\item{ukb_data_dict}{The UKB data dictionary. This should be a data frame
+where all columns are of type \code{character}. By default, this is
+downloaded from the
+\href{https://github.com/rmgpanw/ukbwranglr_resources}{\code{ukbwranglr_resources}}
+github repo.}
 
-\item{ukb_codings}{The path to a tab-delimited UKB codings dictionary. By
-default, this is downloaded directly from the
-\href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{UKB
- website}.}
+\item{ukb_codings}{The UKB codings dictionary. This should be a data frame where all columns are of type \code{character}. By
+default, this is downloaded from the \href{https://github.com/rmgpanw/ukbwranglr_resources}{\code{ukbwranglr_resources}} github repo.}
 
 \item{mapping_direction}{Character. Either "meaning_code" (default) or
 "code_meaning"}

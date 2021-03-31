@@ -1,5 +1,5 @@
 globalVariables(
-  c(".")
+  c(".", ".data", ".SD")
 )
 
 #' ukbwranglr: a package for exploring UK Biobank data

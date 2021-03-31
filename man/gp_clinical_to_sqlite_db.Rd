@@ -15,7 +15,7 @@ gp_clinical_to_sqlite_db(df, remove_special_dates = TRUE)
 \item{gp_clinical_df}{A dataframe}
 }
 \value{
-
+data frame
 }
 \description{
 To be used with \code{\link{file_to_sqlite_db}}. Reformats the UK Biobank

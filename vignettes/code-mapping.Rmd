@@ -16,6 +16,7 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(ukbwranglr)
+library(magrittr)
 ```
 
 # Introduction
@@ -75,10 +76,10 @@ get_child_codes(codes = t1dm_read2,
 
 # Find codes that match a description
 
-Use `find_codes_by_description()`. For example, to find Read2 codes that match the description 'diabetic retinopathy':
+Use `search_codes_by_description()`. For example, to find Read2 codes that match the description 'diabetic retinopathy':
 
 ```{r}
-find_codes_by_description(reg_expr = "diabetic retinopathy", 
+search_codes_by_description(reg_expr = "diabetic retinopathy", 
                           code_type = "read2", 
                           ukb_code_mappings = ukb_code_mappings, 
                           ignore_case = TRUE, 
@@ -150,6 +151,6 @@ Inspecting the mapping sheet `read_v2_icd10` shows why:
 
 ```{r}
 ukb_code_mappings$read_v2_icd10 %>% 
-  filter(stringr::str_detect(icd10_code, pattern = "H360"))
+  dplyr::filter(stringr::str_detect(icd10_code, pattern = "H360"))
 ```
 

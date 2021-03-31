@@ -240,12 +240,6 @@ test5 <- rowise_summary(ukb_pheno = test4, function_name = "n_not_na", selected_
 
 TODO  - how many unspecified first occurrence dm have self-reported T1 vs T2 DM?
 
-# TODO
-
-- Add globalvariables() to remove notes when runnning `check()` (see https://www.r-bloggers.com/2019/08/no-visible-binding-for-global-variable/)
-- Redo `read_pheno()` to use data.table syntax
-- Labelling categorical values: fieldID 20002 has multiple labels for 
-
 
 # TESTS
 
