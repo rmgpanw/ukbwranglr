@@ -8,3 +8,5 @@
 ^vignettes/articles$
 ^R/tests.Rmd$
 ^data-raw$
+^config.ini$
+^docs$

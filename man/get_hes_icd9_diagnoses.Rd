@@ -13,12 +13,9 @@ get_hes_icd9_diagnoses(ukb_pheno, data_dict, ukb_codings)
 
 \item{ukb_codings}{The UKB codings dictionary. This should be a data frame where all columns are of type \code{character}. By
 default, this is downloaded from the \href{https://github.com/rmgpanw/ukbwranglr_resources}{\code{ukbwranglr_resources}} github repo.}
-
-\item{remove_special_dates}{Set special date values to \code{NA}. Default it
-\code{TRUE}.}
 }
 \value{
-Dataframe
+Data frame
 }
 \description{
 Returns a long format dataframe with all hospital inpatient ICD9 codes and
@@ -28,8 +25,6 @@ associated dates for each UK Biobank participant.
 Reformats the data for FieldIDs 41271 and 41281 (hospital inpatient diagnoses
 and dates, see
 \href{https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=2002}{category 2002}).
-
-Also removes 'special' date values by default (see \href{}{coding })
 }
 \seealso{
 Other get all diagnostic codes: 

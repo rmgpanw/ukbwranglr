@@ -28,6 +28,7 @@ Imports:
     RSQLite,
     skimr,
     stringr,
+    tibble,
     tidyr,
     tidyselect
 Depends: 

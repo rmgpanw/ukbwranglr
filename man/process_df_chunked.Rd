@@ -22,6 +22,6 @@ each chunk is processed.}
 a dataframe
 }
 \description{
-May be helpful if applying \code{\link[dplyr]{pivot_longer}} to a large
+May be helpful if applying \code{\link[tidyr]{pivot_longer}} to a large
 dataframe where many of the values are \code{NA} and these are to be removed.
 }

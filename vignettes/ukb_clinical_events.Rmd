@@ -14,42 +14,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup, include = FALSE}
-library(ukbwranglr)
-library(dplyr)
-library(purrr)
-library(readr)
-```
-
-```{r}
-# Load data
-dummy_data_dict <- ukbwranglr::make_data_dict(DUMMY_DATA_PATH, delim = ",")
-dummy_ukb_data <- ukbwranglr::read_pheno(DUMMY_DATA_PATH, dummy_data_dict, delim = ",") 
-dummy_ukb_data$eid <- as.character(seq(1:nrow(dummy_ukb_data)))
-ukb_codings <- data.table::fread(
-    "https://biobank.ctsu.ox.ac.uk/~bbdatan/Codings.tsv",
-    colClasses = c('character'),
-    sep = "\t",
-    quote = " ",
-    na.strings = c("", "NA")
-  )
-
-dummy_ukb_data_raw <- data.table::fread(
-    DUMMY_DATA_PATH,
-    colClasses = c('character'),
-    sep = ",",
-    quote = " ",
-    na.strings = c("", "NA")
-  )
-
-# ukb_data_dict <- data.table::fread(
-#     "https://biobank.ctsu.ox.ac.uk/~bbdatan/Data_Dictionary_Showcase.tsv",
-#     colClasses = c('character'),
-#     na.strings = c("", "NA"),
-#     sep = "\t",
-#   )
-```
-
 # Overview
 
 Disease outcomes in UKB may be primarily ascertained from the following sources:
@@ -72,6 +36,36 @@ Other sources to consider include:
 
 The rest of this article details how disease outcomes may be extracted from each of the data sources outlined above using `ukbwranglr`.
 
+# Setup
+
+```{r setup, include = FALSE}
+library(ukbwranglr)
+library(dplyr)
+library(purrr)
+library(readr)
+library(magrittr)
+```
+
+```{r}
+# download dummy data, full UKB data dictionary and codings files
+dummy_data_filepath <- download_dummy_ukb_data_to_tempdir()
+ukb_data_dict <- get_ukb_data_dict()
+ukb_codings <- get_ukb_codings()
+
+# make data dictionary
+dummy_data_dict <- make_data_dict(ukb_pheno = dummy_data_filepath, 
+                                  ukb_data_dict = ukb_data_dict,
+                                  delim = ",")
+
+# read dummy data into R
+dummy_ukb_data <- read_pheno(dummy_data_filepath, 
+                             data_dict = dummy_data_dict,
+                             ukb_data_dict = ukb_data_dict,
+                             ukb_codings = ukb_codings,
+                             delim = ",") 
+```
+
+
 # Self-report data ([verbal interview](https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=100074))
 
 ## Introduction
@@ -84,48 +78,43 @@ FieldID's for self-reported (verbal interview) disease outcomes are categorised 
 | Interpolated year when first diagnosed | [20008](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=20008) | [20006](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=20006) |
 | Interpolated age when first diagnosed | [20009](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=20009) | [20007](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=20007) |
 
+> **NOTE:** Field IDs 20006 and 20008 (interpolated year when cancer/non-cancer illness, respectively, first diagnosed) include ['special' dates](https://biobank.ndph.ox.ac.uk/ukb/coding.cgi?id=13). These are set to `NA` by the functions described below.
+
 UK Biobank also provides mappings from self-reported non-cancer illness codes to 3-character ICD-10 codes ([data-coding 609](https://biobank.ndph.ox.ac.uk/showcase/coding.cgi?id=609)). 
 
->**NOTE:** Not all the self-report codes are mapped to ICD-10 (111 out of 447). For example, the non-cancer illness code `1065` refers to 'hypertension', which cannot be mapped to ICD-10 as it is too non-specific Code `1072`, which refers to 'essential hypertension' however *is* mappable (maps to ICD-10 code `I10`). 
+> **NOTE:** Not all the self-report codes are mapped to ICD-10 (111 out of 447). For example, the non-cancer illness code `1065` refers to 'hypertension', which cannot be mapped to ICD-10 as it is too non-specific Code `1072`, which refers to 'essential hypertension' however *is* mappable (maps to ICD-10 code `I10`). Run the code below to explore this further.
 
-```{r eval=FALSE, include = FALSE}
+```{r eval=FALSE}
 # Self-report codes that do not map to ICD-10 may be identified as follows:
-
-# get UKB codings dictionary
-# (https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide),
-# filtered for coding 609
-ukb_codings_609 <-
-  readr::read_tsv(
-    "https://biobank.ctsu.ox.ac.uk/~bbdatan/Codings.tsv",
-    col_types = cols(.default = "c"),
-    quote = ""
-  ) %>%
+# filter UKB codings file for coding 609
+ukb_codings_609 <- ukb_codings %>%
   filter(Coding == "609")
 
 # get the full set of UKB self-report non-cancer illness codes form website
 # https://biobank.ndph.ox.ac.uk/ukb/coding.cgi?id=6
 html_page <-
   xml2::read_html("https://biobank.ndph.ox.ac.uk/ukb/coding.cgi?id=6")
+
 table_nodes <- xml2::xml_find_all(html_page, "//table")
+
 ukb_selfreport_non_cancer_codings_readable <-
   rvest::html_table(table_nodes[[2]])
 
 # filter for those that were selectable (i.e. no 'special' values like -1)
 ukb_selfreport_non_cancer_codings_readable <-
   ukb_selfreport_non_cancer_codings_readable %>%
-  filter(Selectable == "Yes")
+  dplyr::filter(Selectable == "Yes")
 
-# filter for those NOT mapped to ICD-10
+# filter for those NOT mapped to ICD-10 and view
 ukb_selfreport_non_cancer_codings_readable <-
   ukb_selfreport_non_cancer_codings_readable %>%
-  filter(!(Coding %in% ukb_codings_609$Value))
+  dplyr::filter(!(Coding %in% ukb_codings_609$Value))
 
-View(ukb_selfreport_codings_readable_no_special_values_not_in_ukb_codings_609)
+utils::View(ukb_selfreport_codings_readable_no_special_values_not_in_ukb_codings_609)
 ```
 
 ```{r eval=FALSE, include=FALSE}
 # ***EXPLORE***
-
 # Note: the ukb codings-file contains all the codes on the webpage for data-coding 609 https://biobank.ndph.ox.ac.uk/showcase/coding.cgi?id=609
 # get ukbdata-coding 609 (map self-report codes to icd-10 codes)
 html_page <- xml2::read_html("https://biobank.ndph.ox.ac.uk/showcase/coding.cgi?id=609")
@@ -144,38 +133,23 @@ all(ukb_codings_609$Value %in% ukb_selfreport_icd_map$Coding)
 
 **Step 1:** A long format table summarising all self-reported non-cancer medical conditions (coded as per [data coding 6](https://biobank.ndph.ox.ac.uk/showcase/coding.cgi?id=6)) for each UK Biobank participant can be created as follows:
 
-```{r eval = FALSE}
-# get UKB codings file
-ukb_codings <- data.table::fread(
-    "https://biobank.ctsu.ox.ac.uk/~bbdatan/Codings.tsv",
-    colClasses = c('character'),
-    sep = "\t",
-    quote = " ",
-    na.strings = c("", "NA")
-  )
-
+```{r eval=FALSE}
 self_report_non_cancer_diagnoses <- get_self_report_non_cancer_diagnoses(
-  ukb_pheno, # dataset read into R using read_pheno()
-  data_dict, # data dictionary created with pheno_data_dict()
-  ukb_codings # the UKB codings file
+  ukb_pheno = dummy_ukb_data, # dataset read into R using read_pheno()
+  data_dict = dummy_data_dict, # data dictionary created with pheno_data_dict()
+  ukb_codings = ukb_codings, # the UKB codings file
+  remove_special_dates = TRUE # set special values to `NA` (see data coding 13: https://biobank.ndph.ox.ac.uk/ukb/coding.cgi?id=13)
 )
 ```
 
 Alternatively, this can be created using [ICD10 code mappings](https://biobank.ndph.ox.ac.uk/showcase/coding.cgi?id=609) (see note above):
 
-```{r eval = FALSE}
-self_report_non_cancer_diagnoses_icd10 <- get_self_report_non_cancer_diagnoses_icd10(
-  ukb_pheno, # dataset read into R using read_pheno()
-  data_dict, # data dictionary created with pheno_data_dict()
-  ukb_codings # the UKB codings file
-)
-```
-
-```{r include = FALSE}
+```{r}
 self_report_non_cancer_diagnoses_icd10 <- get_self_report_non_cancer_diagnoses_icd10(
   ukb_pheno = dummy_ukb_data, 
-  data_dict = dummy_data_dict, 
-  ukb_codings = ukb_codings
+  data_dict = dummy_data_dict,
+  ukb_codings = ukb_codings,
+  remove_special_dates = TRUE
 )
 ```
 
@@ -186,8 +160,9 @@ self_report_non_cancer_diagnoses_icd10 <- get_self_report_non_cancer_diagnoses_i
 selected_codes <- c("A014", "N12", "L86")
 
 # extract eids with these codes, as well as the earliest recorded date
-get_first_diagnostic_code_record(self_report_non_cancer_diagnoses_icd10,
-                                 selected_codes) %>% 
+extract_first_or_last_clinical_event(self_report_non_cancer_diagnoses_icd10,
+                                 selected_codes,
+                                 min_max = "min") %>% 
   head() # display first few rows only
 ```
 
@@ -205,7 +180,7 @@ self_report_cancer_diagnoses <- get_self_report_cancer_diagnoses(
 )
 
 # extract eids with these codes, as well as the earliest recorded date
-get_first_diagnostic_code_record(self_report_cancer_diagnoses,
+extract_first_or_last_clinical_event(self_report_cancer_diagnoses,
                                  self_report_cancer_codes) %>% 
   head() # display first few rows only
 ```
@@ -245,15 +220,16 @@ hes_icd10_diagnoses <- get_hes_icd10_diagnoses(
 )
 ```
 
-Then use `get_first_diagnostic_code_record()`:
+Then use `extract_first_or_last_clinical_event()`:
 
-```{r}
+```{r eval = FALSE}
 # select ICD10 codes
 selected_codes <- c("A014", "N12", "L86")
 
 # extract eids with these codes, as well as the earliest recorded date
-get_first_diagnostic_code_record(hes_icd10_diagnoses,
-                                 selected_codes) %>%
+extract_first_or_last_clinical_event(hes_icd10_diagnoses,
+                                 selected_codes,
+                                 min_max = "min") %>%
   head() # display first few rows only
 ```
 
@@ -271,8 +247,8 @@ Use the same work flow as described for self-report data. To generate a long for
 
 ```{r eval = FALSE}
 death_data_icd10_diagnoses <- get_death_data_icd10_diagnoses(
-  ukb_pheno, # dataset read into R using read_pheno()
-  data_dict, # data dictionary created with pheno_data_dict()
+  dummy_ukb_data, # dataset read into R using read_pheno()
+  dummy_data_dict, # data dictionary created with pheno_data_dict()
   ukb_codings # the UKB codings file
 )
 ```
@@ -285,15 +261,16 @@ death_data_icd10_diagnoses <- get_death_data_icd10_diagnoses(
 )
 ```
 
-Then use `get_first_diagnostic_code_record()`:
+Then use `extract_first_or_last_clinical_event()`:
 
-```{r}
+```{r eval=FALSE}
 # select ICD10 codes
 selected_codes <- c("A014", "N12", "L86", "M7704")
 
 # extract eids with these codes, as well as the earliest recorded date
-get_first_diagnostic_code_record(death_data_icd10_diagnoses,
-                                 selected_codes) %>%
+extract_first_or_last_clinical_event(death_data_icd10_diagnoses,
+                                 selected_codes,
+                                 min_max = "min") %>%
   head() # display first few rows only
 ```
 
@@ -316,21 +293,8 @@ Coded data on cancer diagnoses ([category 100092](https://biobank.ndph.ox.ac.uk/
 
 Use the same work flow as described for self-report data. To generate a long format tables (ICD-9 and ICD-10) summarising all cancer conditions recorded for each UK Biobank participant, use `get_cancer_register_icd9_diagnoses()` and `get_cancer_register_icd10_diagnoses()`:
 
-```{r eval=FALSE}
-cancer_register_icd9_diagnoses <- get_cancer_register_icd9_diagnoses(
-  ukb_pheno, # dataset read into R using read_pheno()
-  data_dict, # data dictionary created with pheno_data_dict()
-  ukb_codings # the UKB codings file
-)
 
-cancer_register_icd10_diagnoses <- get_cancer_register_icd10_diagnoses(
-  ukb_pheno, # dataset read into R using read_pheno()
-  data_dict, # data dictionary created with pheno_data_dict()
-  ukb_codings # the UKB codings file
-)
-```
-
-```{r include=FALSE}
+```{r eval = FALSE}
 cancer_register_icd9_diagnoses <- get_cancer_register_icd9_diagnoses(
   ukb_pheno = dummy_ukb_data,
   data_dict = dummy_data_dict,
@@ -344,43 +308,21 @@ cancer_register_icd10_diagnoses <- get_cancer_register_icd10_diagnoses(
 )
 ```
 
-Then use `get_first_diagnostic_code_record()`:
+Then use `extract_first_or_last_clinical_event()`:
 
-```{r}
+```{r eval = FALSE}
 # select ICD10 codes
 selected_codes <- c("A001", "A156", "E111")
 
 # extract eids with these codes, as well as the earliest recorded date
-get_first_diagnostic_code_record(cancer_register_icd10_diagnoses,
+extract_first_or_last_clinical_event(cancer_register_icd10_diagnoses,
                                  selected_codes) %>%
   head() # display first few rows only
 ```
 
 # Ascertaining disease outcomes from multiple sources
 
-Supply a list of functions from the 'get all diagnostic codes' family to `get_all_diagnostic_codes_multi()` (see function documentation for defaults), then apply `get_first_diagnostic_code_record()` to the result:
-
-```{r eval=FALSE}
-# TEMP
-test <- list(
-    get_death_data_icd10_diagnoses,
-    get_hes_icd9_diagnoses,
-    get_hes_icd10_diagnoses,
-    get_self_report_non_cancer_diagnoses,
-    get_self_report_non_cancer_diagnoses_icd10,
-    get_self_report_cancer_diagnoses,
-    get_cancer_register_icd9_diagnoses,
-    get_cancer_register_icd10_diagnoses
-  ) %>% 
-  map(~ get_all_diagnostic_codes_multi(
-      ukb_pheno = dummy_ukb_data,
-      data_dict = dummy_data_dict,
-      ukb_codings = ukb_codings,
-      function_list = list(.x)))
-
-test2 <- bind_rows(test)
-```
-
+Supply a list of functions from the 'get all diagnostic codes' family to `get_all_diagnostic_codes_multi()` (see function documentation for defaults), then apply `extract_first_or_last_clinical_event()` to the result:
 
 ```{r}
 # list of functions
@@ -404,8 +346,9 @@ diagnostic_codes_multiple_sources <-
 
 # extract eids with these codes, as well as the earliest recorded date (display
 # first few rows only)
-get_first_diagnostic_code_record(diagnostic_codes_multiple_sources,
-                                 selected_codes) %>%
+extract_first_or_last_clinical_event(diagnostic_codes_multiple_sources,
+                                 selected_codes,
+                                 min_max = "min") %>%
   head()
 ```
 
@@ -451,24 +394,6 @@ file_to_sqlite_db(file = "PATH_TO_GP_CLINICAL.TXT",
              remove_special_dates = TRUE) 
 ```
 
-
-```{r eval=FALSE, include=FALSE}
-# connect to db
-con = DBI::dbConnect(RSQLite::SQLite(), UKB_DB)
-
-# write file to table named 'gp_clinical' in database
-file_to_sqlite_db(file = GP_CLINICAL_AK_TEMP, 
-             col_types = readr::cols(.default = "c"),
-             db_path = UKB_DB,
-             table = "clinical_events",
-             chunk_size = 500000,
-             delim = "\t",
-             append = FALSE, # set to TRUE if appending to an existing table
-             verbose = TRUE,
-             data_processing_function = gp_clinical_to_sqlite_db,
-             remove_special_dates = TRUE)
-```
-
 **Step 2:** Filter for selected codes - retrieve the table using `dplyr::tbl()`, `dplyr::filter()` for selected codes, read the results into R with `dplyr::collect()` and convert the 'date' column to date format:
 
 ```{r eval=FALSE}
@@ -483,11 +408,12 @@ eids_with_selected_codes <- clinical_events %>%
   mutate(date = as.Date(date))
 ```
 
-**Step 3:** Then use `get_first_diagnostic_code_record` to identify participants with specific codes of interest in their record. See the [dbplyr getting started vignette](https://dbplyr.tidyverse.org/articles/dbplyr.html) for a good overview of querying databases using `dplyr` syntax.
+**Step 3:** Then use `extract_first_or_last_clinical_event` to identify participants with specific codes of interest in their record. See the [dbplyr getting started vignette](https://dbplyr.tidyverse.org/articles/dbplyr.html) for a good overview of querying databases using `dplyr` syntax.
 
 ```{r eval=FALSE, include=FALSE}
-get_first_diagnostic_code_record(eids_with_selected_codes, 
-                                 selected_codes)
+extract_first_or_last_clinical_event(eids_with_selected_codes,
+                                     selected_codes,
+                                     min_max = "min")
 ```
 
 # Combining all diagnostic codes into a SQLite database
@@ -509,16 +435,17 @@ main_dataset_diagnoses_to_sqlite_db(diagnostic_codes_multiple_sources,
                                                 db_path = "PATH_TO_DATABASE",
                                                 overwrite = FALSE,
                                                 append = TRUE)
-
-main_dataset_diagnoses_to_sqlite_db(diagnostic_codes_multiple_sources,
-                                                "clinical_events",
-                                                db_path = "ukb.db",
-                                                overwrite = FALSE,
-                                                append = TRUE)
 ```
 
-**Step 3:** Then use `get_first_diagnostic_code_record_db` to identify participants with specific codes of interest in their record. See the [dbplyr getting started vignette](https://dbplyr.tidyverse.org/articles/dbplyr.html) for a good overview of querying databases using `dplyr` syntax.
+**Step 3:** Then use `extract_first_or_last_clinical_event` to identify participants with specific codes of interest in their record. See the [dbplyr getting started vignette](https://dbplyr.tidyverse.org/articles/dbplyr.html) for a good overview of querying databases using `dplyr` syntax.
 
->**NOTE:** To improve search performance, set an index on the 'code' column (this will be filtered on most frequently) e.g. `dplyr::db_create_index(con, "clinical_events", "code")`.
+> **NOTE:** To improve search performance, set an index on the 'code' column (this will be filtered on most frequently) for example:
 
->**NOTE:** To remove a table, use `DBI::dbRemoveTable(conn, 'table_name')`.
+```{r eval = FALSE}
+sql_index_source <- "CREATE INDEX idx_clinical_events_source ON clinical_events (source);"
+sql_index_code <- "CREATE INDEX idx_clinical_events_code ON clinical_events (code);"
+DBI::dbSendQuery(con, statement = sql_index_source)
+DBI::dbSendQuery(con, statement = sql_index_code)
+```
+
+> **NOTE:** To remove a table, use `DBI::dbRemoveTable(conn, 'table_name')`.

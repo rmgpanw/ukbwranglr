@@ -1,9 +1,11 @@
 # GENERATE RAW DUMMY UKB DATA FOR PACKAGE
 
-# read selected columns from dummy_ukb_data.csv, downloaded manually from ukbwranglr_resources repo
+# read selected columns from dummy_ukb_data.csv, downloaded from ukbwranglr_resources repo
 # (https://github.com/rmgpanw/ukbwranglr_resources)
+full_dummy_data_path <- download_dummy_ukb_data_to_tempdir()
+
 dummy_data <- data.table::fread(
-  file = "data-raw/dummy_ukb_data.csv",
+  file = full_dummy_data_path,
   colClasses = c('character'),
   sep = ",",
   quote = " ",

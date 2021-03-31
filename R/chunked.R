@@ -202,7 +202,7 @@ fread_chunked <- function(file,
 
 #' Apply a function to a data frame in chunks
 #'
-#' May be helpful if applying \code{\link[dplyr]{pivot_longer}} to a large
+#' May be helpful if applying \code{\link[tidyr]{pivot_longer}} to a large
 #' dataframe where many of the values are \code{NA} and these are to be removed.
 #'
 #' @param df data frame

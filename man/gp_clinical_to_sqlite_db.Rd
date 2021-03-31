@@ -8,11 +8,11 @@ data}
 gp_clinical_to_sqlite_db(df, remove_special_dates = TRUE)
 }
 \arguments{
+\item{df}{A dataframe}
+
 \item{remove_special_dates}{Logical. Removes special date values if requested
 (see \href{https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=591}{resource
 591} for details). Default is \code{TRUE}.}
-
-\item{gp_clinical_df}{A dataframe}
 }
 \value{
 data frame

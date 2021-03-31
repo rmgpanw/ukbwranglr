@@ -6,6 +6,9 @@
 \usage{
 fread_tsv_as_character(...)
 }
+\arguments{
+\item{...}{additional arguments are passed on to \code{\link[data.table]{fread}}}
+}
 \description{
 Wrapper around \code{\link[data.table]{fread}}
 }

@@ -170,14 +170,14 @@ read_pheno <- function(path,
 
   # filter ukb data dictionary file for fields in dataset and nest by ValueType
   ukb_data_dict_filt_nested <- ukb_data_dict %>%
-    dplyr::filter(FieldID %in% data_dict$FieldID) %>%
-    dplyr::group_by(ValueType) %>%
+    dplyr::filter(.data[["FieldID"]] %in% data_dict$FieldID) %>%
+    dplyr::group_by(.data[["ValueType"]]) %>%
     tidyr::nest()
 
   # filter ukb codings file for codings in dataset and nest by Coding
   ukb_codings_filt_nested <- ukb_codings %>%
-    dplyr::filter(Coding %in% unique(data_dict$Coding)) %>%
-    dplyr::group_by(Coding) %>%
+    dplyr::filter(.data[["Coding"]] %in% unique(data_dict$Coding)) %>%
+    dplyr::group_by(.data[["Coding"]]) %>%
     tidyr::nest()
 
   # IMPORTANT: now reorder ukb_codings_filt_nested by Value ...otherwise, Fields
@@ -193,12 +193,19 @@ read_pheno <- function(path,
   # (some cannot be converted to integer, in which case it's ok, they just do
   # not get/need to be reordered), before assigning levels
 
-  ukb_codings_filt_nested <- ukb_codings_filt_nested %>%
-    dplyr::mutate(data = purrr::map(
-      .x = data,
-      .f = ~ suppressWarnings(.x %>%
-                                dplyr::arrange(as.integer(Value)))
-    ))
+  ukb_codings_filt_nested$data <- purrr::map(
+    .x = ukb_codings_filt_nested$data,
+    .f = ~ suppressWarnings(.x %>%
+                              dplyr::arrange(as.integer(.data[["Value"]])))
+  )
+
+  # TO DELETE - as long as above works
+  # ukb_codings_filt_nested <- ukb_codings_filt_nested %>%
+  #   dplyr::mutate(data = purrr::map(
+  #     .x = data,
+  #     .f = ~ suppressWarnings(.x %>%
+  #                               dplyr::arrange(as.integer(Value)))
+  #   ))
 
 
 # LOOP BY CODING ----------------------------------------------------------
@@ -249,7 +256,7 @@ read_pheno <- function(path,
 
       ### identify Fields that use this coding
       selected_cols <- data_dict %>%
-        dplyr::filter(Coding == coding) %>%
+        dplyr::filter(.data[["Coding"]] == coding) %>%
         .$colheaders_raw
 
       ### now convert selected columns to labelled factors
@@ -268,7 +275,7 @@ read_pheno <- function(path,
 
       ### identify Fields that use this coding
       selected_cols <- data_dict %>%
-        dplyr::filter(Coding == coding) %>%
+        dplyr::filter(.data[["Coding"]] == coding) %>%
         .$colheaders_raw
 
       #### vector of 'nonsense dates'
@@ -306,7 +313,7 @@ read_pheno <- function(path,
       #   .valuetype = 'Continuous')
       # ) &
       (data_dict %>%
-       dplyr::filter(ValueType == 'Continuous' & Coding == coding) %>%
+       dplyr::filter(.data[["ValueType"]] == 'Continuous' & .data[["Coding"]] == coding) %>%
        dplyr::slice(1L) %>%
        .$cont_int_to_na %>% # 'isTRUE' will return 'FALSE' if this statement returns 'logical(0)' i.e. no rows returned, whereas '== TRUE' throws an error
        isTRUE)) {
@@ -326,7 +333,7 @@ read_pheno <- function(path,
 
       ### identify Fields that use this coding
       selected_cols <- data_dict %>%
-        dplyr::filter(Coding == coding) %>%
+        dplyr::filter(.data[["Coding"]] == coding) %>%
         .$colheaders_raw
 
       ### replace special coding values with 'NA' for selected columns
@@ -345,7 +352,7 @@ read_pheno <- function(path,
       #   .valuetype = 'Integer')
       # ) &
       (data_dict %>%
-       dplyr::filter(ValueType == 'Integer' & Coding == coding) %>%
+       dplyr::filter(.data[["ValueType"]] == 'Integer' & .data[["Coding"]] == coding) %>%
        dplyr::slice(1L) %>%
        .$cont_int_to_na %>% # 'isTRUE' will return 'FALSE' if this statement returns 'logical(0)' i.e. no rows returned, whereas '== TRUE' throws an error
        isTRUE)) {
@@ -365,7 +372,7 @@ read_pheno <- function(path,
 
       ### identify Fields that use this coding
       selected_cols <- data_dict %>%
-        dplyr::filter(Coding == coding) %>%
+        dplyr::filter(.data[["Coding"]] == coding) %>%
         .$colheaders_raw
 
       ### replace special coding values with 'NA' for selected columns
@@ -380,7 +387,7 @@ read_pheno <- function(path,
   message('Converting dates...')
   # extract column names
   selected_cols <- data_dict %>%
-    dplyr::filter(ValueType == 'Date') %>%
+    dplyr::filter(.data[["ValueType"]] == 'Date') %>%
     .$colheaders_raw
 
   ### convert selected columns to date
@@ -393,7 +400,7 @@ read_pheno <- function(path,
   message('Converting continuous variables...')
   # extract column names
   selected_cols <- data_dict %>%
-    dplyr::filter(ValueType == 'Continuous') %>%
+    dplyr::filter(.data[["ValueType"]] == 'Continuous') %>%
     .$colheaders_raw
 
   ### convert selected columns to numeric
@@ -407,7 +414,7 @@ read_pheno <- function(path,
   message('Converting integer variables...')
   # extract column names
   selected_cols <- data_dict %>%
-    dplyr::filter(ValueType == 'Integer') %>%
+    dplyr::filter(.data[["ValueType"]] == 'Integer') %>%
     .$colheaders_raw
 
   ### convert selected columns to integer
@@ -588,12 +595,13 @@ colname_to_field_inst_array_df <- function(x) {
 
   # separate into field_id, instance and array. Also mutate cols with all
   # possible combinations
-  x %>%
+  x <- x %>%
     tidyr::separate(col = "fieldid_instance_array",
              into = c("fieldid", "instance", "array"),
              sep = "_",
-             remove = FALSE) %>%
-    dplyr::mutate(
-      fieldid_instance = paste(fieldid, instance, sep = "_"),
-      instance_array = paste(instance, array, sep = "_"))
+             remove = FALSE)
+  x$fieldid_instance <- paste(x$fieldid, x$instance, sep = "_")
+  x$instance_array <- paste(x$instance, x$array, sep = "_")
+
+  return(x)
 }
