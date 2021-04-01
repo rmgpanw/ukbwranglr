@@ -629,47 +629,19 @@ drop_source_col = TRUE) {
 
   start_time <- proc.time()
 
-  # test - can potentially replace the loop with this (but not sure how to incorporate time taken message):
-  # test <- function_list %>%
-  #   purrr::imap(~ {
-  #     .x(ukb_pheno = dummy_ukb_data,
-  #                   data_dict = dummy_ukb_data_dict,
-  #                   ukb_codings = ukb_codings)
-  #     message("\nProcessed get diagnosis function ", .y, " of ", length(function_list))
-  #     time_taken_message(start_time)
-  #     }) %>%
-  #   dplyr::bind_rows()
-  #
-  # # initialise empty results list
-  # result <- vector(mode = "list",
-  #                  length = length(function_list))
-
-  # TODO - prob delete progress bar. messages are better i think
-  # # initialist progress bar
-  # pb <- progress::progress_bar$new(format = "[:bar] :current/:total (:percent)",
-  #                                                         total = length(function_list))
-  # pb$tick(0)
-
-  # loop through 'get all diagnostic code' functions - populate results list
-  for (func in seq_along(function_list)){
-    # TODO - delete probablygit
-    # progress bar
-    # pb$tick(1)
-
-    # time taken message after first function has processed
-    message("Processing get diagnosis function ", func, " of ", length(function_list))
-    if (func > 1) {
+  # loop through functions, then concatenate results
+  result <- function_list %>%
+    purrr::imap(~ {
+      single_result <- .x(ukb_pheno = ukb_pheno,
+                          data_dict = data_dict,
+                          ukb_codings = ukb_codings)
+      message("\nProcessed get diagnosis function ", .y, " of ", length(function_list))
       time_taken_message(start_time)
-    }
+      return(single_result)
+      })
 
-    # get diagnoses
-    result[[func]] <- function_list[[func]](ukb_pheno = ukb_pheno,
-                                                 data_dict = data_dict,
-                                                 ukb_codings = ukb_codings)
-  }
-
-  # combine results into single df
-  result <- dplyr::bind_rows(result)
+  result <- result %>%
+    dplyr::bind_rows()
 
   # remove source_col if requested (default is to remove)
   if (drop_source_col == TRUE) {
