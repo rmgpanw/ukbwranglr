@@ -12,3 +12,4 @@
 ^docs$
 ^codecov\.yml$
 ^_pkgdown\.yml$
+^\.travis\.yml$

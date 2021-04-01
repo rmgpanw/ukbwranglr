@@ -7,6 +7,8 @@
 
 [![Codecov test
 coverage](https://codecov.io/gh/rmgpanw/ukbwranglr/branch/master/graph/badge.svg)](https://codecov.io/gh/rmgpanw/ukbwranglr?branch=master)
+[![Travis build
+status](https://travis-ci.com/rmgpanw/ukbwranglr.svg?branch=master)](https://travis-ci.com/rmgpanw/ukbwranglr)
 <!-- badges: end -->
 
 # Overview
