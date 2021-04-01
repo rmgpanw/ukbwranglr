@@ -231,10 +231,10 @@ get_ukb_code_mappings <- function() {
 #'
 #' \dontrun{
 #' # download dummy data to tempdir() and get filepath
-#' dummy_ukb_data_path <- download_dummy_ukb_data_to_tempdir()
+#' # dummy_ukb_data_path <- download_dummy_ukb_data_to_tempdir()
 #'
 #' # make data dictionary make_data_dict(dummy_ukb_data_path, delim = ",",
-#' ukb_data_dict = get_ukb_data_dict())
+#' # ukb_data_dict = get_ukb_data_dict())
 #' }
 download_dummy_ukb_data_to_tempdir <- function() {
   # file path in tempdir
@@ -279,7 +279,7 @@ make_empty_clinical_codes_list <- function() {
 #' `start_time` parameter to this function.
 #'
 #' @param start_time The start time.
-#' @noRd
+#' @export
 #' @return A message stating time taken since start time
 time_taken_message <- function(start_time) {
   # get time taken

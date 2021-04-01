@@ -77,7 +77,6 @@ reference:
   - field_id_pivot_longer_multi
   - get_diagnoses_set_index_code_date_cols
   - gp_clinical_to_sqlite_db
-  - recode_ukbcol
 
 - title: Package overview
   desc: General summary of package contents

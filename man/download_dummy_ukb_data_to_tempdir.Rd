@@ -18,9 +18,9 @@ returned as a string.
 
 \dontrun{
 # download dummy data to tempdir() and get filepath
-dummy_ukb_data_path <- download_dummy_ukb_data_to_tempdir()
+# dummy_ukb_data_path <- download_dummy_ukb_data_to_tempdir()
 
 # make data dictionary make_data_dict(dummy_ukb_data_path, delim = ",",
-ukb_data_dict = get_ukb_data_dict())
+# ukb_data_dict = get_ukb_data_dict())
 }
 }

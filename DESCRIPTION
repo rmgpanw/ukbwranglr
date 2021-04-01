@@ -19,6 +19,7 @@ Imports:
     assertthat,
     data.table,
     DBI,
+    dbplyr,
     dplyr,
     lubridate,
     magrittr,
