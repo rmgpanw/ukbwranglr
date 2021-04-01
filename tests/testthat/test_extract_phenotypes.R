@@ -22,18 +22,21 @@ dummy_ukb_data_path <- download_dummy_ukb_data_to_tempdir()
 dummy_ukb_data_dict <- make_data_dict(ukb_pheno = dummy_ukb_data_path,
                                       delim = ",",
                                       ukb_data_dict = ukb_data_dict)
-dummy_ukb_data <- read_pheno(path = dummy_ukb_data_path,
+dummy_ukb_data_3eid <- read_pheno(path = dummy_ukb_data_path,
                              delim = ",",
                              data_dict = dummy_ukb_data_dict,
                              ukb_data_dict = ukb_data_dict,
                              ukb_codings = ukb_codings,
                              clean_dates = FALSE,
                              clean_selected_continuous_and_integers = FALSE,
-                             nrows = 1)
+                             nrows = 3)
+
+dummy_ukb_data_1eid <- dummy_ukb_data_3eid[1, ]
+dummy_ukb_data_2eid <- dummy_ukb_data_3eid[c(1, 2), ]
 
 # test all `get_XXX_diagnoses()` functions at once (by default, should include all of these)
 dummy_ukb_data_all_diagnoses <-
-  get_all_diagnostic_codes_multi(ukb_pheno = dummy_ukb_data,
+  get_all_diagnostic_codes_multi(ukb_pheno = dummy_ukb_data_1eid,
                                  data_dict = dummy_ukb_data_dict,
                                  ukb_codings = ukb_codings)
 
@@ -248,3 +251,27 @@ test_that(
                  sort(expected_sources))
   }
 )
+
+# `field_id_pivot_longer_multi()` -----------------------------------------
+
+test_that("`field_id_pivot_longer_multi()` correctly matches diagnoses with dates by instance", {
+  result <- field_id_pivot_longer_multi(
+    # field_ids for HES data (icd9)
+    field_ids = c("41271", "41281"),
+    ukb_pheno = dummy_ukb_data_2eid,
+    data_dict = dummy_ukb_data_dict,
+    ukb_codings = ukb_codings)
+
+  expect_true(is.data.frame(result))
+})
+
+# TODO make a better test - use mockr package:
+# test_that("`field_id_pivot_longer_multi()` correctly raises an error if instance/array do not match between field ids", {
+#   result <- field_id_pivot_longer_multi(
+#     # field_ids for HES data (icd9)
+#     field_ids = c("41271", "41281"),
+#     ukb_pheno = dummy_ukb_data_2eid,
+#     data_dict = dummy_ukb_data_dict,
+#     ukb_codings = ukb_codings)
+#
+# })

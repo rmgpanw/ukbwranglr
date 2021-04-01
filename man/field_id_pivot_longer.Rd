@@ -19,14 +19,14 @@ of the full dictionary if only a subset of columns need to be loaded.}
 default, this is downloaded from the \href{https://github.com/rmgpanw/ukbwranglr_resources}{\code{ukbwranglr_resources}} github repo.}
 }
 \value{
-A dataframe with 3 columns: \itemize{ \item eid \item column names
-  (labelled as the specified `field_id`, prefixed by 'f') \item column values
-  (labelled as he specified `field_id`, prefixed by 'f' and suffixed by
-  '_value') }
+A long format data frame with 3 columns: \itemize{ \item eid \item
+  column names (labelled as the specified \code{field_id}, prefixed by 'f')
+  \item column values (labelled as he specified \code{field_id}, prefixed by
+  'f' and suffixed by '_value') }
 }
 \description{
-Helper function. Selects the columns relating to a specified FieldID (plus the 'eid' column)
-and applies \code{\link[tidyr]{pivot_longer}}.
+Helper function. Selects the columns relating to a specified FieldID (plus
+the \code{eid} column) and applies \code{\link[tidyr]{pivot_longer}}.
 }
 \seealso{
 Other extract disease outcomes helpers: 

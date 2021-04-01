@@ -5,6 +5,8 @@
 
 <!-- badges: start -->
 
+[![Codecov test
+coverage](https://codecov.io/gh/rmgpanw/ukbwranglr/branch/master/graph/badge.svg)](https://codecov.io/gh/rmgpanw/ukbwranglr?branch=master)
 <!-- badges: end -->
 
 # Overview

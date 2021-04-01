@@ -31,7 +31,7 @@ file_to_sqlite_db(
 )
 }
 \arguments{
-\item{file}{Character. The path to the file to be written to `db_path`.}
+\item{file}{Character. The path to the file to be written to \code{db_path}.}
 
 \item{table}{Character. Name of table to write to.}
 
@@ -48,7 +48,7 @@ created if this does not already exist. Default is "ukb.db".}
 \item{verbose}{Print time taken after each chunk has been written to
 database.}
 
-\item{append}{Append to table if already exists. Default is `FALSE`.}
+\item{append}{Append to table if already exists. Default is \code{FALSE}.}
 
 \item{data_processing_function}{A function to be applied to each chunk before
 writing to database. Default is `NULL`.}
@@ -111,7 +111,10 @@ setting option \code{readr.show_progress} to \code{FALSE}.}
 option is \code{TRUE} then blank rows will not be represented at all.  If it is
 \code{FALSE} then they will be represented by \code{NA} values in all the columns.}
 
-\item{...}{additional parameters passed on to `data_processing_function`.}
+\item{...}{additional parameters passed on to \code{data_processing_function}.}
+}
+\value{
+Returns a database connection object invisibly.
 }
 \description{
 Writes a file in chunks to a SQLite database, with or without pre-processing.

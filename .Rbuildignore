@@ -8,5 +8,7 @@
 ^vignettes/articles$
 ^R/tests.Rmd$
 ^data-raw$
-^config.ini$
+^config\.ini$
 ^docs$
+^codecov\.yml$
+^_pkgdown\.yml$

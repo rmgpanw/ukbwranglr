@@ -15,8 +15,9 @@ be removed at the end of the current R session. The path to this file is
 returned as a string.
 }
 \examples{
+
 \dontrun{
-# download dummy data to `tempdir()` and get filepath
+# download dummy data to tempdir() and get filepath
 dummy_ukb_data_path <- download_dummy_ukb_data_to_tempdir()
 
 # make data dictionary make_data_dict(dummy_ukb_data_path, delim = ",",

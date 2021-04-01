@@ -23,6 +23,7 @@ DUMMY_DATA_PATH <- config$PATHS$DUMMY_DATA_PATH
 # ukbwranglr <img src="man/figures/test.png" align="right" width="100" />
 
 <!-- badges: start -->
+[![Codecov test coverage](https://codecov.io/gh/rmgpanw/ukbwranglr/branch/master/graph/badge.svg)](https://codecov.io/gh/rmgpanw/ukbwranglr?branch=master)
 <!-- badges: end -->
 
 # Overview

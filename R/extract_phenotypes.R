@@ -718,17 +718,17 @@ get_diagnoses_set_index_code_date_cols <- function(get_clinical_events_df,
 
 #' Convert column for a FieldID to long format
 #'
-#' Helper function. Selects the columns relating to a specified FieldID (plus the 'eid' column)
-#' and applies \code{\link[tidyr]{pivot_longer}}.
+#' Helper function. Selects the columns relating to a specified FieldID (plus
+#' the \code{eid} column) and applies \code{\link[tidyr]{pivot_longer}}.
 #'
 #' @param field_id Character. A UK Biobank Field ID
 #' @inheritParams read_pheno
 #' @inheritParams summarise_rowise
 #'
-#' @return A dataframe with 3 columns: \itemize{ \item eid \item column names
-#'   (labelled as the specified `field_id`, prefixed by 'f') \item column values
-#'   (labelled as he specified `field_id`, prefixed by 'f' and suffixed by
-#'   '_value') }
+#' @return A long format data frame with 3 columns: \itemize{ \item eid \item
+#'   column names (labelled as the specified \code{field_id}, prefixed by 'f')
+#'   \item column values (labelled as he specified \code{field_id}, prefixed by
+#'   'f' and suffixed by '_value') }
 #'
 #' @family extract disease outcomes helpers
 field_id_pivot_longer <- function(ukb_pheno,
@@ -799,11 +799,27 @@ field_id_pivot_longer_multi <- function(field_ids,
                                         data_dict,
                                         ukb_codings) {
 
-  required_cols <- get_colnames_for_fieldids(field_ids = field_ids,
-                                             data_dict = data_dict)
+  # get required cols and check they exist
+  required_cols <- field_ids %>%
+    purrr::set_names(nm = paste0("f", .)) %>%
+    purrr::map(get_colnames_for_fieldids,
+              data_dict = data_dict)
 
   check_required_cols_exist(df = ukb_pheno,
-                            required_cols)
+                            purrr::flatten_chr(required_cols))
+
+  # check field ids have matching instances/arrays (intersect should equal union)
+  required_cols_inst_arrays <- required_cols %>%
+    purrr::map(colname_to_field_inst_array_df) %>%
+    purrr::map("instance_array")
+
+  # TODO - write formal test for this (I've checked manually)
+  assertthat::assert_that(
+    length(purrr::reduce(required_cols_inst_arrays, union)) == length(purrr::reduce(required_cols_inst_arrays, intersect)),
+    msg = paste0("Error! The supplied field IDs (",
+                 stringr::str_c(field_ids, sep = "", collapse = ", "),
+                 ") have differing instances/arrays. Try checking these manually in `data_dict`.")
+  )
 
   # expected number of rows for each fieldid should be the same - this returns a
   # numerical vector, each number is the number of columns selected for a
@@ -826,7 +842,9 @@ field_id_pivot_longer_multi <- function(field_ids,
     purrr::map(field_id_pivot_longer,
                ukb_pheno = ukb_pheno,
                data_dict = data_dict,
-               ukb_codings = ukb_codings) %>%
+               ukb_codings = ukb_codings)
+
+  result <- result %>%
     purrr::reduce(dplyr::inner_join, by = c("eid", "instance_array"))
 
   # check that row number matches the expected value

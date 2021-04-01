@@ -5,7 +5,8 @@
 \title{Get all diagnostic codes from multiple data sources}
 \usage{
 get_all_diagnostic_codes_multi(
-  function_list = list(get_self_report_non_cancer_diagnoses_icd10,
+  function_list = list(get_self_report_non_cancer_diagnoses,
+    get_self_report_non_cancer_diagnoses_icd10, get_self_report_cancer_diagnoses,
     get_hes_icd9_diagnoses, get_hes_icd10_diagnoses, get_death_data_icd10_diagnoses,
     get_cancer_register_icd9_diagnoses, get_cancer_register_icd10_diagnoses),
   ukb_pheno,
@@ -15,7 +16,7 @@ get_all_diagnostic_codes_multi(
 )
 }
 \arguments{
-\item{function_list}{A list of `get_XXXX_diagnoses` functions.}
+\item{function_list}{A list of \code{get_XXXX_diagnoses} functions.}
 
 \item{ukb_pheno}{a UK Biobank phenotype dataset}
 
@@ -24,9 +25,10 @@ get_all_diagnostic_codes_multi(
 \item{ukb_codings}{The UKB codings dictionary. This should be a data frame where all columns are of type \code{character}. By
 default, this is downloaded from the \href{https://github.com/rmgpanw/ukbwranglr_resources}{\code{ukbwranglr_resources}} github repo.}
 
-\item{drop_source_col}{Remove `source_col` column, which records which column
-in the main dataset the value in `code` column came from. Default is
-`TRUE`.}
+\item{drop_source_col}{If \code{TRUE}, removes \code{source_col} column. This
+records which column in the main dataset the value in \code{code} column
+came from (retaining this column may be helpful for debugging). Default is
+\code{TRUE}.}
 }
 \value{
 Dataframe
@@ -35,8 +37,8 @@ Dataframe
 Extract diagnostic codes from multiple sources
 }
 \details{
-Loops through a list of functions (`function_list`) from the 'get all
-diagnostic codes' family and combines the results into a single dataframe.
+Loops through a list of functions (\code{function_list}) from the 'get all
+diagnostic codes' family and combines the results into a single data frame.
 }
 \seealso{
 Other get all diagnostic codes: 

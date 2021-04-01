@@ -10,8 +10,8 @@ read_pheno(
   data_dict,
   ukb_data_dict = get_ukb_data_dict(),
   ukb_codings = get_ukb_codings(),
-  clean_dates = TRUE,
-  clean_selected_continuous_and_integers = TRUE,
+  clean_dates = FALSE,
+  clean_selected_continuous_and_integers = FALSE,
   na.strings = c("", "NA"),
   ...
 )

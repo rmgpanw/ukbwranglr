@@ -24,7 +24,7 @@ created if this does not already exist. Default is "ukb.db".}
 \item{overwrite}{Logical. If \code{TRUE}, will overwrite an existing table
 with the same name. Default is \code{FALSE}}
 
-\item{append}{Append to table if already exists. Default is `FALSE`.}
+\item{append}{Append to table if already exists. Default is \code{FALSE}.}
 }
 \value{
 Returns a database connection object invisibly.
