@@ -2,11 +2,7 @@ pandoc: 2.7.3
 pkgdown: 1.6.1
 pkgdown_sha: ~
 articles:
-  diabetes_type: diabetes_type.html
-  misc_ukb_codings: misc_ukb_codings.html
-  ukb_disease_outcomes: ukb_disease_outcomes.html
-  ukb_load_pheno_subset: ukb_load_pheno_subset.html
-  ukb_medications: ukb_medications.html
-  ukbwranglr: ukbwranglr.html
-last_built: 2021-01-29T14:10Z
+  code-mapping: code-mapping.html
+  ukb_clinical_events: ukb_clinical_events.html
+last_built: 2021-04-01T01:06Z
 

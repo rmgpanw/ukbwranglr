@@ -89,9 +89,6 @@ get_all_diagnostic_codes_multi." />
   </a>
 </li>
 <li>
-  <a href="../articles/ukbwranglr.html">Get started</a>
-</li>
-<li>
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
@@ -102,19 +99,10 @@ get_all_diagnostic_codes_multi." />
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/diabetes_type.html">Ascertaining and subclassifying diabetes in the UKB</a>
+      <a href="../articles/code-mapping.html">Clinical codes - lookups and mappings</a>
     </li>
     <li>
-      <a href="../articles/misc_ukb_codings.html">Misc: UKB codings</a>
-    </li>
-    <li>
-      <a href="../articles/ukb_disease_outcomes.html">UKB: Disease outcomes</a>
-    </li>
-    <li>
-      <a href="../articles/ukb_load_pheno_subset.html">UKB: Load selected columns</a>
-    </li>
-    <li>
-      <a href="../articles/ukb_medications.html">UKB medication history</a>
+      <a href="../articles/ukb_clinical_events.html">Clinical events</a>
     </li>
   </ul>
 </li>
@@ -152,22 +140,20 @@ primary care clinical events dataset to match the output format for
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
+      <th>df</th>
+      <td><p>A dataframe</p></td>
+    </tr>
+    <tr>
       <th>remove_special_dates</th>
       <td><p>Logical. Removes special date values if requested
 (see <a href='https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=591'>resource
 591</a> for details). Default is <code>TRUE</code>.</p></td>
     </tr>
-    <tr>
-      <th>gp_clinical_df</th>
-      <td><p>A dataframe</p></td>
-    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    
-
-
+    <p>data frame</p>
     <h2 class="hasAnchor" id="under-the-hood"><a class="anchor" href="#under-the-hood"></a>Under the hood</h2>
 
     

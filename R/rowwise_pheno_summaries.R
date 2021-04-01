@@ -70,21 +70,23 @@ summarise_rowise <- function(ukb_pheno,
   col_groups_to_summarise <- data_dict %>%
     dplyr::filter(.data[[grouping_col]] %in% selected_col_groups) %>%
     dplyr::group_by(.data[[grouping_col]]) %>%
-    tidyr::nest() %>%
+    tidyr::nest()
     # rename grouping_col to facilitate join in code chunk below
-    dplyr::rename(group = .data[[grouping_col]],
-                  cols_to_summarise = .data[["data"]])
+  col_groups_to_summarise <- rename_cols(df = col_groups_to_summarise,
+                                         old_colnames = c(grouping_col, "data"),
+                                         new_colnames = c("group", "cols_to_summarise"))
 
   # new summary colnames: paste function names with grouping_col (e.g.
   # mean_blood_pressure...)
-  new_colnames <- expand.grid(functions,
+  new_colnames <- base::expand.grid(functions,
                               col_groups_to_summarise$group,
-                              stringsAsFactors = FALSE) %>%
+                              stringsAsFactors = FALSE)
     # expand.grid makes all possible combinations of functions/col_group_names,
     # now paste these together to create new colnames
-    dplyr::mutate(new_colnames = paste(Var1,
-                                       Var2,
-                                       sep = "_")) %>%
+  new_colnames$new_colnames <- paste(new_colnames$Var1,
+                                     new_colnames$Var2,
+                                     sep = "_")
+  new_colnames <- new_colnames %>%
     # remove 'functions' column ('Var1')
     dplyr::select(-.data[["Var1"]]) %>%
     # group_by grouping_col and nest (and rename "data" as newcolnames for clarity)
@@ -185,9 +187,8 @@ summarise_rowise_numerical_mean_min_max <- function(ukb_pheno,
   ## ukb_pheno: a **cleaned** and **renamed** ukb phenotypes_file
   ## ukb_mapping_df: a ukb mapping file generated with ukb_mapping_generator()
 
-  if (!(mean_min_max %in% c("rowMeans", "pmin", "pmax"))) {
-    stop("Argument 'mean_min_max', must be one of 'rowMeans', 'pmin', or 'pmax'")
-  }
+  match.arg(mean_min_max,
+            choices = c("rowMeans", "pmin", "pmax"))
 
   start_time <- proc.time()
 
@@ -195,20 +196,24 @@ summarise_rowise_numerical_mean_min_max <- function(ukb_pheno,
 
   # nest ukb_mapping_df by Field and mutate names for mean_cols
   nest_mapping_df_by_field <- function(.ukb_mapping_df) {
-    .ukb_mapping_df %>%
+    .ukb_mapping_df <- .ukb_mapping_df %>%
       dplyr::filter(
-        (ValueType %in% c('Continuous', 'Integer')) &
+        (.data[["ValueType"]] %in% c('Continuous', 'Integer')) &
           (
             #***IMPORTANT*** filters for either:
             ## 1. Cols without special coding values
-            (is.na(Coding)) |
+            (is.na(.data[["Coding"]])) |
               ## 2. Cols with special coding values that have been 'cleaned' to 'NA' y `ukb_parse()`
-              (!is.na(Coding) & cont_int_to_na == TRUE)
+              (!is.na(.data[["Coding"]]) & .data[["cont_int_to_na"]] == TRUE)
             ## ...i.e. filters out any continuous/integer cols with remaining 'uncleaned' special values
           )) %>%
-      dplyr::group_by(Field_FieldID) %>%
-      tidyr::nest() %>%
-      dplyr::mutate(new_colname = paste(mean_min_max, Field_FieldID, sep = '_'))
+      dplyr::group_by(.data[["Field_FieldID"]]) %>%
+      tidyr::nest()
+    .ukb_mapping_df$new_colname = paste(.ukb_mapping_df$mean_min_max,
+                                        .ukb_mapping_df$Field_FieldID,
+                                        sep = '_')
+
+    return(.ukb_mapping_df)
   }
 
   # extract vector of descriptive_colnames matching a Field
@@ -221,7 +226,7 @@ summarise_rowise_numerical_mean_min_max <- function(ukb_pheno,
   mutate_mean_col <- function(.ukb_pheno, .mean_col_name, .selected_cols) {
     # assign temp name to new col
     .ukb_pheno <- .ukb_pheno %>%
-      dplyr::mutate(new_col = rowMeans(dplyr::across(tidyselect::all_of(.selected_cols)),
+      dplyr::mutate("new_col" = rowMeans(dplyr::across(tidyselect::all_of(.selected_cols)),
                                        na.rm = TRUE))
 
     # rename (messy, but works...)
@@ -308,9 +313,8 @@ rowise_min_max_date <- function(ukb_pheno,
                                 min_max = "pmin") {
 
   # check min_max arg is either pmin or pmax
-  if (!(min_max %in% c('pmin', 'pmax'))) {
-    stop("Error! Argument 'min_max' must be either 'pmin' or 'pmax'.")
-  }
+  match.arg(min_max,
+            choices = c('pmin', 'pmax'))
 
   # nonsense dates, as integer
   nonsense_dates <- lubridate::as_date(
@@ -417,6 +421,7 @@ rowise_summary <- function(ukb_pheno,
 #'   fn
 #' @param ... allows additional arguments such as na.rm to passed on to
 #'   functions listed in fn
+#' @noRd
 dt_rowwise_fn <- function(fn, cols, ...) {
   # Row-wise summary helper function:
   # applies a set of summary functions ('fn' =

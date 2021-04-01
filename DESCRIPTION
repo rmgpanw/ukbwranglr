@@ -27,6 +27,7 @@ Imports:
     rlang,
     RSQLite,
     skimr,
+    stats,
     stringr,
     tibble,
     tidyr,

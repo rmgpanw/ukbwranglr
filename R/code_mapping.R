@@ -133,7 +133,7 @@ lookup_codes <- function(codes,
     # TODO - warning if duplicates found in `codes`
     if (quiet == FALSE) {
       warning_if_codes_not_found(codes = codes,
-                                 code_type = from,
+                                 code_type = code_type,
                                  search_col = ukb_code_mappings[[lkp_sheet]][[code_col]])
     }
 

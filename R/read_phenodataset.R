@@ -444,9 +444,9 @@ read_pheno <- function(path,
       '\n\nNumber of continuous/integer fields in this dataset that still have "uncleaned" special values: ',
       data_dict %>%
         dplyr::filter(
-          ValueType %in% c('Continuous', 'Integer') &
+          .data[["ValueType"]] %in% c('Continuous', 'Integer') &
             !is.na(.data[["Coding"]]) &
-            cont_int_to_na == FALSE
+            .data[["cont_int_to_na"]] == FALSE
         ) %>%
         nrow()
     )

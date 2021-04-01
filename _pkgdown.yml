@@ -1,0 +1,83 @@
+reference:
+- title: Loading UK Biobank data
+  desc: Make a data dictionary and optionally select columns to read into R
+- contents:
+  - make_data_dict
+  - read_pheno
+
+- title: Extract clinical events data
+  desc:  Reformat diagnoses/operations data fields to aid phenotyping
+- contents:
+  - get_death_data_icd10_diagnoses
+  - get_self_report_cancer_diagnoses
+  - get_self_report_non_cancer_diagnoses
+  - get_self_report_non_cancer_diagnoses_icd10
+  - get_hes_icd9_diagnoses
+  - get_hes_icd10_diagnoses
+  - get_cancer_register_icd9_diagnoses
+  - get_cancer_register_icd10_diagnoses
+  - get_all_diagnostic_codes_multi
+  - extract_first_or_last_clinical_event
+
+- title: Create local data base
+  desc: Store processed data as a local database
+- contents:
+  - main_dataset_diagnoses_to_sqlite_db
+  - file_to_sqlite_db
+
+- title: Clinical codes
+  desc: Explore and map between clinical coding systems
+- contents:
+  - lookup_codes
+  - search_codes_by_description
+  - get_child_codes
+  - map_codes
+
+- title: Phenotype algorithms
+  desc: Identify phenotypes as per definitions in this package
+- contents:
+  - diabetes_type_first_occurrence
+  - diabetes_diagnosis_date_first_occurrence
+
+- title: Summarise row wise
+  desc: Mainly for summarising continuous variables
+- contents:
+  - ukb_mutate_numerical_means
+  - summarise_rowise
+  - summarise_rowise_numerical_mean_min_max
+  - rowise_min_max_date
+  - rowise_summary
+
+- title: Utilites
+  desc: Miscellaneous general utility functions
+- contents:
+  - my_skim
+  - ukb_mutate_dob
+  - get_colnames_for_fieldids
+  - extract_codings_for_fieldids
+  - get_ukb_data_dict
+  - get_ukb_codings
+  - get_ukb_data_dict_direct
+  - get_ukb_codings_direct
+  - get_ukb_code_mappings
+  - make_empty_clinical_codes_list
+
+- title: Dummy data
+  desc: Functions to generate dummy UKB data
+- contents:
+  - download_dummy_ukb_data_to_tempdir
+
+- title: Private functions
+  desc: Helpers
+- contents:
+  - extract_single_diagnostic_code_record_basis
+  - field_id_pivot_longer
+  - field_id_pivot_longer_multi
+  - get_diagnoses_set_index_code_date_cols
+  - gp_clinical_to_sqlite_db
+  - recode_ukbcol
+
+- title: Package overview
+  desc: General summary of package contents
+- contents:
+  - ukbwranglr

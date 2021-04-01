@@ -228,8 +228,9 @@ get_ukb_code_mappings <- function() {
 #' @export
 #'
 #' @examples
+#'
 #' \dontrun{
-#' # download dummy data to `tempdir()` and get filepath
+#' # download dummy data to tempdir() and get filepath
 #' dummy_ukb_data_path <- download_dummy_ukb_data_to_tempdir()
 #'
 #' # make data dictionary make_data_dict(dummy_ukb_data_path, delim = ",",
@@ -280,7 +281,7 @@ make_empty_clinical_codes_list <- function() {
 #' Wrapper around \code{\link[data.table]{fread}}
 #'
 #' @param ... additional arguments are passed on to \code{\link[data.table]{fread}}
-#'
+#' @noRd
 fread_tsv_as_character <- purrr::partial(data.table::fread,
                                          colClasses = c('character'),
                                          sep = "\t",
@@ -306,7 +307,7 @@ fread_tsv_as_character <- purrr::partial(data.table::fread,
 #'   filtering.
 #'
 #' @return A vector.
-#'
+#' @noRd
 #' @family data dictionary helper functions
 filter_data_dict <- function(data_dict,
                              filter_col,
@@ -331,7 +332,7 @@ filter_data_dict <- function(data_dict,
 #' Generates a `mapping_df` for \code{\link{recode_ukbcol}}
 #'
 #' @inheritParams recode_ukbcol
-#'
+#' @noRd
 #' @family recode UKB values
 recode_column_coding_meaning_value_mapping_df <- function(field_id,
                                                            ukb_data_dict,
@@ -375,22 +376,24 @@ recode_column_coding_meaning_value_mapping_df <- function(field_id,
 #'
 #' @section Under the hood:
 #'
-#' The UK Biobank codings for a given FieldID (`field_id`) are extracted into
-#'   a `mapping_df`, which is formatted for use with
+#' The UK Biobank codings for a given FieldID (\code{field_id}) are extracted into
+#'   a \code{mapping_df}, which is formatted for use with
 #'   \code{\link{recode_column}}. This then recodes the specified column
-#'   (`col_to_recode`) in `df` from either meaning to raw UK Biobank codings
+#'   (\code{col_to_recode}) in \code{df} from either meaning to raw UK Biobank codings
 #'   (default) or vice versa.
 #'
-#' @seealso columns "Value" and "Meaning" in the
+#' @seealso Columns "Value" and "Meaning" in the
 #'   \href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{UKB
 #'    codings dictionary}
 #'
 #' @param df A dataframe
-#' @param col_to_recode Name of column in `df` to be recoded
+#' @param col_to_recode Name of column in \code{df} to be recoded
 #' @param field_id Character. A UK Biobank FieldID
 #' @inheritParams read_pheno
 #' @param mapping_direction Character. Either "meaning_code" (default) or
 #'   "code_meaning"
+#'
+#' @noRd
 #' @family recode UKB values
 recode_ukbcol <- function(df,
                           col_to_recode,
@@ -438,26 +441,26 @@ recode_ukbcol <- function(df,
 #' Recode values in a dataframe column
 #'
 #' Returns the input dataframe with recoded values in the specified
-#' `col_to_recode`
+#' \code{col_to_recode}
 #'
-#' Uses a `mapping_df` to recode the values for a selected column
-#' (`col_to_recode`) in a dataframe (`df`). The `mapping_df` should only contain
-#' 2 columns named "old_vals" (containing values in `df[[col_to_recode]]` to be
+#' Uses a \code{mapping_df} to recode the values for a selected column
+#' (\code{col_to_recode}) in a dataframe (\code{df}). The \code{mapping_df} should only contain
+#' 2 columns named "old_vals" (containing values in \code{df$col_to_recode} to be
 #' recoded) and "new_vals" (replacement values). There should also be no duplicated values in either column.
 #'
-#' A warning is generated if `mapping_df$old_vals` does not contain all values
-#' in `df`, or if the return value has more rows than the original `df` (i.e. a
+#' A warning is generated if \code{mapping_df$old_vals} does not contain all values
+#' in \code{df}, or if the return value has more rows than the original \code{df} (i.e. a
 #' mutating join has been performed)
 #'
 #' @section Under the hood:
 #'
-#'   Uses \code{\link[dplyr]{left_join}} to merge `df` and `mapping_df`,
-#'   retaining the "new_vals" in `mapping_df`.
+#'   Uses \code{\link[dplyr]{left_join}} to merge \code{df} and \code{mapping_df},
+#'   retaining the "new_vals" in \code{mapping_df}.
 #'
 #' @param df a dataframe
-#' @param col_to_recode Character - name of column in `df` to be recoded
+#' @param col_to_recode Character - name of column in \code{df} to be recoded
 #' @param mapping_df a dataframe with 2 columns named "old_vals" and "new_vals"
-#'
+#' @noRd
 #' @family recode UKB values
 recode_column <- function(df, col_to_recode, mapping_df) {
 
@@ -481,7 +484,7 @@ recode_column <- function(df, col_to_recode, mapping_df) {
  }
 
   # Warning if "old_vals" does not contain all values in df
-  if (length(setdiff(unique(na.omit(df[[col_to_recode]])), mapping_df$old_vals)) > 0) {
+  if (length(setdiff(unique(stats::na.omit(df[[col_to_recode]])), mapping_df$old_vals)) > 0) {
     warning("WARNING! `mapping_df` does not contain all unique values in `df[[col_to_Recode]]`.
             Some values will not have been recoded - is this intentional?")
   }
@@ -612,7 +615,7 @@ assert_all_df_cols_are_type_character <- function(df, arg_name) {
 #' `start_time` parameter to this function.
 #'
 #' @param start_time The start time.
-#'
+#' @noRd
 #' @return A message stating time taken since start time
 time_taken_message <- function(start_time) {
   # get time taken
@@ -633,6 +636,7 @@ time_taken_message <- function(start_time) {
 #'
 #' @param df Dataframe
 #' @param ... Character vector(s)
+#' @noRd
 check_required_cols_exist <- function(df,
                                       ...) {
   # combine input colnames into single character vector

@@ -30,7 +30,8 @@ github repo.}
 default, this is downloaded from the \href{https://github.com/rmgpanw/ukbwranglr_resources}{\code{ukbwranglr_resources}} github repo.}
 
 \item{mapping_direction}{Character. Either "meaning_code" (default) or
-"code_meaning"}
+"code_meaning"
+@noRd}
 }
 \description{
 Recodes values in a specified column from descriptive label to UK Biobank
@@ -50,9 +51,5 @@ The UK Biobank codings for a given FieldID (`field_id`) are extracted into
 columns "Value" and "Meaning" in the
   \href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{UKB
    codings dictionary}
-
-Other recode UKB values: 
-\code{\link{recode_column_coding_meaning_value_mapping_df}()},
-\code{\link{recode_column}()}
 }
 \concept{recode UKB values}

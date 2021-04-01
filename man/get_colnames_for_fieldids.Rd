@@ -26,8 +26,4 @@ Use this in functions which manipulate a UKB phenotype dataset processed by
 change then so will these functions, however changes would only need to be
 updated at the start of each function.
 }
-\seealso{
-Other data dictionary helper functions: 
-\code{\link{filter_data_dict}()}
-}
 \concept{data dictionary helper functions}

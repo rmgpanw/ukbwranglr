@@ -62,7 +62,7 @@ extract_first_or_last_clinical_event <- function(df,
   # extract earliest date
   df <- extract_single_diagnostic_code_record_basis(
     df = df,
-    code = codes,
+    codes = codes,
     mapping_function = purrr::partial(extract_first_or_last_record_mapper,
                                       min_max = min_max)
   )
@@ -1129,6 +1129,6 @@ get_sources_for_code_type <- function(code_type) {
             ukbwranglr:::clinical_events_sources$data_coding)
 
   ukbwranglr:::clinical_events_sources %>%
-    dplyr::filter(data_coding == code_type) %>%
+    dplyr::filter(.data[["data_coding"]] == code_type) %>%
     .$source
 }

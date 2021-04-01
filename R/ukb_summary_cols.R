@@ -39,8 +39,8 @@ ukb_mutate_dob <- function(ukb_df, ukb_mapping_df) {
   names(ukb_df_temp) <- c('yob', 'mob') # rename
 
   ukb_df_temp <- ukb_df_temp %>%
-    dplyr::mutate(dob = paste(yob,
-                       as.integer(mob), # need to extract integer value e.g. 'January' == 1
+    dplyr::mutate("dob" = paste(.data[["yob"]],
+                       as.integer(.data[["mob"]]), # need to extract integer value e.g. 'January' == 1
                        01, # first day of month
                        sep = '-'))
 
@@ -80,12 +80,12 @@ ukb_mutate_numerical_means <- function(ukb_df,
       ## 1. Cols without special coding values
       (is.na(.data[["Coding"]])) |
       ## 2. Cols with special coding values that have been 'cleaned' to 'NA' y `ukb_parse()`
-          (!is.na(.data[["Coding"]]) & cont_int_to_na == TRUE)
+          (!is.na(.data[["Coding"]]) & .data[["cont_int_to_na"]] == TRUE)
       ## ...i.e. filters out any continuous/integer cols with remaining 'uncleaned' special values
       )) %>%
-    dplyr::group_by(Field_FieldID) %>%
+    dplyr::group_by(.data[["Field_FieldID"]]) %>%
     tidyr::nest() %>%
-    dplyr::mutate(new_colname = paste('mean', Field_FieldID, sep = '_'))
+    dplyr::mutate("new_colname" = paste('mean', .data[["Field_FieldID"]], sep = '_'))
   }
 
   ## extract vector of descriptive_colnames matching a Field
@@ -98,7 +98,7 @@ ukb_mutate_numerical_means <- function(ukb_df,
   mutate_mean_col <- function(.ukb_df, .mean_col_name, .selected_cols) {
     # assign temp name to new col
     .ukb_df <- .ukb_df %>%
-    dplyr::mutate(new_col = rowMeans(dplyr::across(tidyselect::all_of(.selected_cols)),
+    dplyr::mutate("new_col" = rowMeans(dplyr::across(tidyselect::all_of(.selected_cols)),
                                      na.rm = TRUE))
 
     # rename (messy, but works...)
@@ -128,6 +128,9 @@ ukb_mutate_numerical_means <- function(ukb_df,
   ## return result
   return(ukb_df)
 }
+
+
+# TODO --------------------------------------------------------------------
 
 ukb_mutate_numerical_summaries <- function(.ukb_df) {
   # idea is to use rowwise() and pass a list of functions e.g. n(), min(), max():
