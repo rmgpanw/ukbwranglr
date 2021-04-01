@@ -272,6 +272,27 @@ make_empty_clinical_codes_list <- function() {
     purrr::map( ~ NULL)
 }
 
+#' Display time taken message
+#'
+#' Helper function for displaying time taken messages within other functions. Use
+#' \code{\link[base]{proc.time}} at start of function and supply this as the
+#' `start_time` parameter to this function.
+#'
+#' @param start_time The start time.
+#' @noRd
+#' @return A message stating time taken since start time
+time_taken_message <- function(start_time) {
+  # get time taken
+  time_taken <- proc.time() - start_time
+
+  # display message
+  message("Time taken: ",
+          (time_taken[3] %/% 60),
+          " minutes, ",
+          (round(time_taken[3] %% 60)),
+          " seconds.")
+}
+
 # PRIVATE FUNCTIONS -------------------------------------------------------
 
 # fread - tsv as character ------------------------------------------------
@@ -607,27 +628,6 @@ assert_all_df_cols_are_type_character <- function(df, arg_name) {
 
 
 # Miscellaneous helpers ---------------------------------------------------
-
-#' Display time taken message
-#'
-#' Helper function for displaying time taken messages within other functions. Use
-#' \code{\link[base]{proc.time}} at start of function and supply this as the
-#' `start_time` parameter to this function.
-#'
-#' @param start_time The start time.
-#' @noRd
-#' @return A message stating time taken since start time
-time_taken_message <- function(start_time) {
-  # get time taken
-  time_taken <- proc.time() - start_time
-
-  # display message
-  message("Time taken: ",
-        (time_taken[3] %/% 60),
-        " minutes, ",
-        (round(time_taken[3] %% 60)),
-        " seconds.")
-}
 
 #' Check required columns are present
 #'

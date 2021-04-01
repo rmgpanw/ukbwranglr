@@ -24,6 +24,7 @@ reference:
 - contents:
   - main_dataset_diagnoses_to_sqlite_db
   - file_to_sqlite_db
+  - gp_clinical_to_sqlite_db
 
 - title: Clinical codes
   desc: Explore and map between clinical coding systems
@@ -61,6 +62,7 @@ reference:
   - get_ukb_codings_direct
   - get_ukb_code_mappings
   - make_empty_clinical_codes_list
+  - time_taken_message
 
 - title: Dummy data
   desc: Functions to generate dummy UKB data

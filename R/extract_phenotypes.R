@@ -599,33 +599,50 @@ get_cancer_register_icd10_diagnoses <- function(ukb_pheno,
 #'
 #' Extract diagnostic codes from multiple sources
 #'
-#' Loops through a list of functions (`function_list`) from the 'get all
-#' diagnostic codes' family and combines the results into a single dataframe.
+#' Loops through a list of functions (\code{function_list}) from the 'get all
+#' diagnostic codes' family and combines the results into a single data frame.
 #'
-#' @param function_list A list of `get_XXXX_diagnoses` functions.
+#' @param function_list A list of \code{get_XXXX_diagnoses} functions.
 #' @inheritParams get_self_report_non_cancer_diagnoses_icd10
-#' @param drop_source_col Remove `source_col` column, which records which column
-#'   in the main dataset the value in `code` column came from. Default is
-#'   `TRUE`.
+#' @param drop_source_col If \code{TRUE}, removes \code{source_col} column. This
+#'   records which column in the main dataset the value in \code{code} column
+#'   came from (retaining this column may be helpful for debugging). Default is
+#'   \code{TRUE}.
 #'
 #' @return Dataframe
 #' @export
 #' @family get all diagnostic codes
-get_all_diagnostic_codes_multi <- function(function_list = list(get_self_report_non_cancer_diagnoses_icd10,
-                                                                get_hes_icd9_diagnoses,
-                                                                get_hes_icd10_diagnoses,
-                                                                get_death_data_icd10_diagnoses,
-                                                                get_cancer_register_icd9_diagnoses,
-                                                                get_cancer_register_icd10_diagnoses),
-                                           ukb_pheno,
-                                           data_dict,
-                                           ukb_codings,
-                                           drop_source_col = TRUE) {
+get_all_diagnostic_codes_multi <- function(function_list = list(
+  get_self_report_non_cancer_diagnoses,
+  get_self_report_non_cancer_diagnoses_icd10,
+  get_self_report_cancer_diagnoses,
+  get_hes_icd9_diagnoses,
+  get_hes_icd10_diagnoses,
+  get_death_data_icd10_diagnoses,
+  get_cancer_register_icd9_diagnoses,
+  get_cancer_register_icd10_diagnoses
+),
+ukb_pheno,
+data_dict,
+ukb_codings,
+drop_source_col = TRUE) {
+
   start_time <- proc.time()
 
-  # initialise empty results list
-  result <- vector(mode = "list",
-                   length = length(function_list))
+  # test - can potentially replace the loop with this (but not sure how to incorporate time taken message):
+  # test <- function_list %>%
+  #   purrr::imap(~ {
+  #     .x(ukb_pheno = dummy_ukb_data,
+  #                   data_dict = dummy_ukb_data_dict,
+  #                   ukb_codings = ukb_codings)
+  #     message("\nProcessed get diagnosis function ", .y, " of ", length(function_list))
+  #     time_taken_message(start_time)
+  #     }) %>%
+  #   dplyr::bind_rows()
+  #
+  # # initialise empty results list
+  # result <- vector(mode = "list",
+  #                  length = length(function_list))
 
   # TODO - prob delete progress bar. messages are better i think
   # # initialist progress bar

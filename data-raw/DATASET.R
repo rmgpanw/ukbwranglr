@@ -217,6 +217,8 @@ clinical_events_sources <- tibble::tribble(
   "f20001", "data_coding_3", "Cancer code, self-reported", "Medical conditions",
   "f40013", "icd9", "Type of cancer: ICD9", "Cancer register",
   "f40006", "icd10", "Type of cancer: ICD10", "Cancer register",
+  "f41270", "icd10", "Diagnoses - ICD10", "Summary Diagnoses - Hospital inpatient - Health-related outcomes",
+  "f41271", "icd9", "Diagnoses - ICD9", "Summary Diagnoses - Hospital inpatient - Health-related outcomes",
   "gpc_r2", "read2", "gp_clinical table - `read_2` column", "Primary care",
   "gpc_r3", "read3", "gp_clinical table - `read_3` column", "Primary care"
 )

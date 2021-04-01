@@ -20,7 +20,7 @@
 #'   and write to a SQLite database, and \code{\link[readr]{read_delim_chunked}}
 #'   to read the input file in chunks.
 #'
-#' @param file Character. The path to the file to be written to `db_path`.
+#' @param file Character. The path to the file to be written to \code{db_path}.
 #' @param db_path Character. Path to a SQLite database. A new database will be
 #'   created if this does not already exist. Default is "ukb.db".
 #' @param table Character. Name of table to write to.
@@ -29,11 +29,13 @@
 #' @param col_types Default is for all columns to be type character.
 #' @param verbose Print time taken after each chunk has been written to
 #'   database.
-#' @param append Append to table if already exists. Default is `FALSE`.
+#' @param append Append to table if already exists. Default is \code{FALSE}.
 #' @param data_processing_function A function to be applied to each chunk before
 #'   writing to database. Default is `NULL`.
 #' @inheritParams readr::read_delim_chunked
-#' @param ... additional parameters passed on to `data_processing_function`.
+#' @param ... additional parameters passed on to \code{data_processing_function}.
+#'
+#' @return Returns a database connection object invisibly.
 #'
 #' @export
 #'
@@ -135,6 +137,9 @@ file_to_sqlite_db <- function(file,
           " minutes, ",
           (round(time_taken[3] %% 60)),
           " seconds")
+
+  # return db connection object invisibly
+  invisible(con)
 }
 
 
@@ -185,8 +190,6 @@ main_dataset_diagnoses_to_sqlite_db <- function(df,
   invisible(con)
 }
 
-# PRIVATE FUNCTIONS -------------------------------------------------------
-
 #' Pre-processing function - reformat UK Biobank primary care clinical events
 #' data
 #'
@@ -206,6 +209,7 @@ main_dataset_diagnoses_to_sqlite_db <- function(df,
 #'   (see \href{https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=591}{resource
 #'   591} for details). Default is \code{TRUE}.
 #'
+#' @export
 #' @return data frame
 #' @family Generate a UKB database.
 gp_clinical_to_sqlite_db <- function(df, remove_special_dates = TRUE) {
@@ -265,3 +269,6 @@ gp_clinical_to_sqlite_db <- function(df, remove_special_dates = TRUE) {
 
   return(df)
 }
+
+# PRIVATE FUNCTIONS -------------------------------------------------------
+

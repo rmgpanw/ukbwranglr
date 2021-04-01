@@ -13,6 +13,30 @@
 
 # Make dummy data ---------------------------------------------------------
 
+# get ukb data dict and codings
+ukb_data_dict <- get_ukb_data_dict()
+ukb_codings <- get_ukb_codings()
+
+# get dummy ukb data (contains all diagnoses columns) and load single eid for testing
+dummy_ukb_data_path <- download_dummy_ukb_data_to_tempdir()
+dummy_ukb_data_dict <- make_data_dict(ukb_pheno = dummy_ukb_data_path,
+                                      delim = ",",
+                                      ukb_data_dict = ukb_data_dict)
+dummy_ukb_data <- read_pheno(path = dummy_ukb_data_path,
+                             delim = ",",
+                             data_dict = dummy_ukb_data_dict,
+                             ukb_data_dict = ukb_data_dict,
+                             ukb_codings = ukb_codings,
+                             clean_dates = FALSE,
+                             clean_selected_continuous_and_integers = FALSE,
+                             nrows = 1)
+
+# test all `get_XXX_diagnoses()` functions at once (by default, should include all of these)
+dummy_ukb_data_all_diagnoses <-
+  get_all_diagnostic_codes_multi(ukb_pheno = dummy_ukb_data,
+                                 data_dict = dummy_ukb_data_dict,
+                                 ukb_codings = ukb_codings)
+
 # dummy clinical_events_df
 dummy_clinical_events <- make_dummy_clinical_events_df(eids = c(1, 2, 3),
                                                        n_rows = c(200, 200, 200))
@@ -49,9 +73,9 @@ min_dates_db <- extract_single_diagnostic_code_record_basis(df = dummy_clinical_
 # min_dates: expected result (- nested `data` col)
 expected <- tibble::tribble(
   ~ eid, ~ source, ~ code, ~ date,
-  1, "f20002", "A", "2000-01-01",
-  2, "gpc_r2", "B", "2000-01-02",
-  3, "f20001", "A", "2000-01-10",
+  1, "f20001", "A", "2000-01-03",
+  2, "f20001", "B", "2000-01-02",
+  3, "gpc_r2", "B", "2000-01-02",
 )
 
 # TESTS -------------------------------------------------------------------
@@ -148,7 +172,7 @@ test_that(
     expected_result <- dummy_clinical_events %>%
       dplyr::filter(
         (.data[["source"]] %in% c("gpc_r2") & .data[["code"]] %in% "A") |
-        (.data[["source"]] %in% c("f40001", "f40002", "f20002_icd10", "f40006") & .data[["code"]] %in% "B")
+        (.data[["source"]] %in% c("f40001", "f40002", "f20002_icd10", "f40006", "f41270") & .data[["code"]] %in% "B")
         )
 
     # eid 1
@@ -211,4 +235,16 @@ test_that("`get_diagnoses_set_index_code_date_cols()` removes special dates (dat
 })
 
 
-# TODO dates in get_XXX_diagnoses to sql function. recreate database
+# `get_all_diagnostic_codes_multi()` --------------------------------------
+
+test_that(
+  "output from `get_all_diagnostic_codes_multi()` contains all expected source types", {
+    # output from `get_all_diagnostic_codes_multi()` won't include primary care data
+    expected_sources <- subset(ukbwranglr:::clinical_events_sources$source,
+                               !ukbwranglr:::clinical_events_sources$source %in% c("gpc_r2",
+                                                                                   "gpc_r3"))
+
+    expect_equal(sort(unique(dummy_ukb_data_all_diagnoses$source)),
+                 sort(expected_sources))
+  }
+)
