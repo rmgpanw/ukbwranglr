@@ -3,14 +3,6 @@
 # SETUP -------------------------------------------------------------------
 
 ukb_code_mappings <- ukbwranglr::get_ukb_code_mappings()
-ukb_data_dict <- ukbwranglr::get_ukb_data_dict()
-
-
-
-# DUMMY_DATA_INCLUDED WITH PACKAGE ----------------------------------------
-
-
-
 
 # FIELD_ID_GROUPS ---------------------------------------------------------
 

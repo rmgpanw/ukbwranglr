@@ -1,9 +1,11 @@
 
 # CONSTANTS ---------------------------------------------------------------
 
+ukb_data_dict <- get_ukb_data_dict()
+ukb_codings <- get_ukb_codings()
 dummy_ukb_data_path <- system.file("extdata", "dummy_ukb_data.csv", package = "ukbwranglr")
-dummy_ukb_data_dict <-
-dummy_ukb_data <-
+dummy_ukb_data_dict <- make_data_dict(dummy_ukb_data_path, delim = ",", ukb_data_dict = ukb_data_dict)
+dummy_ukb_data <- read_pheno(dummy_ukb_data_path, delim =  ",", data_dict = dummy_ukb_data_dict, ukb_data_dict = ukb_data_dict, ukb_codings = ukb_codings)
 
 # TESTS -------------------------------------------------------------------
 
@@ -75,7 +77,12 @@ test_that("`assert_all_df_cols_are_type_character()` raises error appropriately"
 
 # `mutate_dob` ------------------------------------------------------------
 
-# test_that("`mutate_dob()` returns the expected dates", {
-#   mutate_dob()
-# })
+test_that("`mutate_dob()` returns the expected dates", {
+  # warnings generated for any missing yob/mob values - can suppress these
+  result <- head(
+    suppressWarnings(mutate_dob(ukb_pheno = dummy_ukb_data, data_dict = dummy_ukb_data_dict))
+    )
+  expect_equal(result,
+               as.Date(c("1952-08-01", "1946-03-01", "1951-04-01", "1956-09-01", NA, "1948-02-01")))
+})
 
