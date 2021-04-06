@@ -171,11 +171,11 @@ get_ukb_codings_direct <- function() {
 #' from the
 #' \href{https://github.com/rmgpanw/ukbwranglr_resources}{ukbwranglr_resources}
 #' github repo. The raw file is a large excel spreadsheet. This has been saved
-#' in \code{.Rdata} format in
+#' in \code{.rds} format in
 #' \href{https://github.com/rmgpanw/ukbwranglr_resources}{ukbwranglr_resources}
 #' as a named list of data frames, one for each sheet in the original file.
 #'
-#' This function downloads the \code{ukb_code_mappings.Rdata} file from
+#' This function downloads the \code{ukb_code_mappings.rds} file from
 #' \href{https://github.com/rmgpanw/ukbwranglr_resources}{ukbwranglr_resources}
 #' to a temporary directory before loading and returning the result.
 #'
@@ -185,26 +185,18 @@ get_ukb_codings_direct <- function() {
 #' @export
 get_ukb_code_mappings <- function() {
   # file destination in tempdir
-  # ukb_code_mappings_rdata <- tempfile(pattern = "ukb_code_mappings",
-  #          tmpdir = tempdir(),
-  #          fileext = ".Rdata")
-
-  # file destination in tempdir
-  ukb_code_mappings_rdata <- file.path(tmpdir = tempdir(),
-                                       "ukb_code_mappings.Rdata")
+  ukb_code_mappings_rds <- file.path(tmpdir = tempdir(),
+                                       "ukb_code_mappings.rds")
 
 
   # download from ukbwranglr_resources if not already downloaded
-  if(!file.exists(ukb_code_mappings_rdata)) {
-    utils::download.file(url = "https://github.com/rmgpanw/ukbwranglr_resources/raw/main/Rdata/ukb_code_mappings.Rdata",
-                  destfile = ukb_code_mappings_rdata)
+  if(!file.exists(ukb_code_mappings_rds)) {
+    utils::download.file(url = "https://github.com/rmgpanw/ukbwranglr_resources/raw/main/Rdata/ukb_code_mappings.rds",
+                  destfile = ukb_code_mappings_rds)
   }
 
   # load
-  load(ukb_code_mappings_rdata)
-
-  # return
-  return(all_lkps_maps_v2)
+  readRDS(ukb_code_mappings_rds)
 }
 
 
