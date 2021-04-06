@@ -15,12 +15,12 @@ Downloads the UK Biobank code mappings file
 from the
 \href{https://github.com/rmgpanw/ukbwranglr_resources}{ukbwranglr_resources}
 github repo. The raw file is a large excel spreadsheet. This has been saved
-in \code{.Rdata} format in
+in \code{.rds} format in
 \href{https://github.com/rmgpanw/ukbwranglr_resources}{ukbwranglr_resources}
 as a named list of data frames, one for each sheet in the original file.
 }
 \details{
-This function downloads the \code{ukb_code_mappings.Rdata} file from
+This function downloads the \code{ukb_code_mappings.rds} file from
 \href{https://github.com/rmgpanw/ukbwranglr_resources}{ukbwranglr_resources}
 to a temporary directory before loading and returning the result.
 

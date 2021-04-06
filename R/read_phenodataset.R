@@ -13,12 +13,13 @@
 #'
 #' @param ukb_pheno Either the path to a UKB phenotype file or the file already
 #'   loaded into R as a data frame.
-#' @param delim Delimiter for the UKB phenotype file. Default is "\\t"
+#' @param delim Delimiter for the UKB phenotype file. Default is "\\t". Ignored
+#'   if the file name ends with \code{.dta} (i.e. is a \code{STATA} file).
 #' @param ukb_data_dict The UKB data dictionary. This should be a data frame
 #'   where all columns are of type \code{character}. By default, this is
 #'   downloaded from the
 #'   \href{https://github.com/rmgpanw/ukbwranglr_resources}{\code{ukbwranglr_resources}}
-#'   github repo.
+#'    github repo.
 #'
 #' @return A data dictionary (data table) specific to the specified UKB
 #'   phenotype. This includes a column of descriptive names. TODO: flesh this
@@ -31,19 +32,28 @@ make_data_dict <- function(ukb_pheno,
   # extract column names - ukb_pheno can be a file path or a dataframe already
   # loaded into R
   if (class(ukb_pheno)[1] == "character") {
-  # read column names only
-  colheaders_raw <- data.table::fread(
-    ukb_pheno,
-    colClasses = c('character'),
-    na.strings = c("", "NA"),
-    sep = delim,
-    header = TRUE,
-    data.table = TRUE,
-    showProgress = TRUE,
-    nrows=0
-  )
+    # read column names only
+    # stata file
+    if (stringr::str_detect(ukb_pheno, "\\.dta$")) {
+      message("`ukb_pheno` appears to be a STATA file. Ignoring `delim` argument")
+      colheaders_raw <-
+        haven::read_dta(file = ukb_pheno, n_max = 1) %>%
+        names()
+    } else {
+      # flat file
+      colheaders_raw <- data.table::fread(
+        ukb_pheno,
+        colClasses = c('character'),
+        na.strings = c("", "NA"),
+        sep = delim,
+        header = TRUE,
+        data.table = TRUE,
+        showProgress = TRUE,
+        nrows = 0 %>%
+          names()
+      )
+    }
 
-  colheaders_raw <- names(colheaders_raw)
   } else if (all(class(ukb_pheno) %in% c("data.table", "data.frame", "tbl_df", "tbl"))) {
        colheaders_raw <- names(ukb_pheno)
   } else {

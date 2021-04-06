@@ -29,7 +29,7 @@ of the full dictionary if only a subset of columns need to be loaded.}
 where all columns are of type \code{character}. By default, this is
 downloaded from the
 \href{https://github.com/rmgpanw/ukbwranglr_resources}{\code{ukbwranglr_resources}}
-github repo.}
+ github repo.}
 
 \item{ukb_codings}{The UKB codings dictionary. This should be a data frame where all columns are of type \code{character}. By
 default, this is downloaded from the \href{https://github.com/rmgpanw/ukbwranglr_resources}{\code{ukbwranglr_resources}} github repo.}
