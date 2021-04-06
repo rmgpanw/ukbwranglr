@@ -22,8 +22,11 @@ get_all_diagnostic_codes_multi(
 
 \item{data_dict}{a data dictionary for \code{ukb_pheno}}
 
-\item{ukb_codings}{The UKB codings dictionary. This should be a data frame where all columns are of type \code{character}. By
-default, this is downloaded from the \href{https://github.com/rmgpanw/ukbwranglr_resources}{\code{ukbwranglr_resources}} github repo.}
+\item{ukb_codings}{The UKB codings dictionary. This should be a data frame
+where all columns are of type \code{character}. By default, this is
+downloaded from the
+\href{https://github.com/rmgpanw/ukbwranglr_resources}{\code{ukbwranglr_resources}}
+github repo.}
 
 \item{drop_source_col}{If \code{TRUE}, removes \code{source_col} column. This
 records which column in the main dataset the value in \code{code} column

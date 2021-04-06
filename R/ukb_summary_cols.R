@@ -12,46 +12,6 @@
 # library(lubridate)
 
 # Functions ---------------------------------------------------------------
-#' Mutate DOB column from a processed UKB df
-#'
-#' @param ukb_df a **cleaned** and **renamed** ukb phenotypes_file
-#' @param ukb_mapping_df a ukb mapping file generated with ukb_mapping_generator()
-#'
-#' @return the ukb df with a new (DOB) column
-#' @export
-ukb_mutate_dob <- function(ukb_df, ukb_mapping_df) {
-  # Mutates approximate DOB column from FieldID's 34 and 52 (year and month of birth)
-
-  # PARAMETERS:
-  ## ukb_df: a **cleaned** and **renamed** ukb phenotypes_file
-  ## ukb_mapping_df: a ukb mapping file generated with ukb_mapping_generator()
-
-  # MAIN BODY
-  ## Find year/month of birth columns
-  selected_cols <- ukb_mapping_df %>%
-    dplyr::filter(.data[["FieldID"]] %in% c('34', '52')) %>%
-    .$descriptive_colnames
-
-  ## make ukb_df_temp with only these 2 fields and mutate dob
-  ukb_df_temp <- ukb_df %>%
-    dplyr::select(tidyr::contains(selected_cols)) # select fields
-
-  names(ukb_df_temp) <- c('yob', 'mob') # rename
-
-  ukb_df_temp <- ukb_df_temp %>%
-    dplyr::mutate("dob" = paste(.data[["yob"]],
-                       as.integer(.data[["mob"]]), # need to extract integer value e.g. 'January' == 1
-                       01, # first day of month
-                       sep = '-'))
-
-  ukb_df_temp$dob <- lubridate::ymd(ukb_df_temp$dob) # convert to date format
-
-  ## join dob back to ukb_df
-  ukb_df$dob <- ukb_df_temp$dob
-
-  ## return ukb_df
-  return(ukb_df)
-}
 
 #' Mutate mean values across instances for numerical UKB fields
 #'

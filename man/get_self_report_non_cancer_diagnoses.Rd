@@ -16,8 +16,11 @@ get_self_report_non_cancer_diagnoses(
 
 \item{data_dict}{a data dictionary for \code{ukb_pheno}}
 
-\item{ukb_codings}{The UKB codings dictionary. This should be a data frame where all columns are of type \code{character}. By
-default, this is downloaded from the \href{https://github.com/rmgpanw/ukbwranglr_resources}{\code{ukbwranglr_resources}} github repo.}
+\item{ukb_codings}{The UKB codings dictionary. This should be a data frame
+where all columns are of type \code{character}. By default, this is
+downloaded from the
+\href{https://github.com/rmgpanw/ukbwranglr_resources}{\code{ukbwranglr_resources}}
+github repo.}
 
 \item{remove_special_dates}{Logical. Remove 'special' date values if
 requested. Default is \code{TRUE}. See

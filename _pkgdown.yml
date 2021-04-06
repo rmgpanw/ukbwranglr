@@ -53,7 +53,7 @@ reference:
   desc: Miscellaneous general utility functions
 - contents:
   - my_skim
-  - ukb_mutate_dob
+  - mutate_dob
   - get_colnames_for_fieldids
   - extract_codings_for_fieldids
   - get_ukb_data_dict

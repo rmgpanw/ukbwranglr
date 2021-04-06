@@ -18,6 +18,6 @@ Dataframe.
 }
 \description{
 General helper function - filters
-\href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{`ubk_codings`}
+\href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{`ukb_codings`}
 for the codings associated with one or more FieldIDs.
 }

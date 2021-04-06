@@ -1,8 +1,9 @@
 
-
 # CONSTANTS ---------------------------------------------------------------
 
-
+dummy_ukb_data_path <- system.file("extdata", "dummy_ukb_data.csv", package = "ukbwranglr")
+dummy_ukb_data_dict <-
+dummy_ukb_data <-
 
 # TESTS -------------------------------------------------------------------
 
@@ -62,7 +63,7 @@ test_that("`rename_cols()` raises appropriate errors for invalid arguments", {
 
 # `assert_all_df_cols_are_type_character()` -------------------------------
 
-test_that("`assert_all_df_cols_are_type_character`() raises error appropriately", {
+test_that("`assert_all_df_cols_are_type_character()` raises error appropriately", {
   acceptable_df <- data.frame(x = "a", y = "b")
   not_acceptable_df <- data.frame(x = "a", y = 1)
 
@@ -71,3 +72,10 @@ test_that("`assert_all_df_cols_are_type_character`() raises error appropriately"
 
   expect_true(assert_all_df_cols_are_type_character(acceptable_df, "acceptable_df"))
 })
+
+# `mutate_dob` ------------------------------------------------------------
+
+# test_that("`mutate_dob()` returns the expected dates", {
+#   mutate_dob()
+# })
+
