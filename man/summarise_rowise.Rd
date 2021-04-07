@@ -16,7 +16,7 @@ summarise_rowise(
 \arguments{
 \item{ukb_pheno}{a UK Biobank phenotype dataset}
 
-\item{functions}{a character vector of function names (e.g. c("sd"))}
+\item{functions}{a character vector of function names (e.g. \code{c("sd")})}
 
 \item{data_dict}{a data dictionary for \code{ukb_pheno}}
 

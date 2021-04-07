@@ -13,6 +13,7 @@ globalVariables(
 #' }
 #'
 #' @importFrom magrittr "%>%"
+#' @importFrom data.table ":="
 #' @docType package
 #' @name ukbwranglr
 NULL

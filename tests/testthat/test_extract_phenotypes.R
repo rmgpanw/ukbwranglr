@@ -76,9 +76,9 @@ min_dates_db <- extract_single_diagnostic_code_record_basis(df = dummy_clinical_
 # min_dates: expected result (- nested `data` col)
 expected <- tibble::tribble(
   ~ eid, ~ source, ~ code, ~ date,
-  1, "f20001", "A", "2000-01-03",
-  2, "f20001", "B", "2000-01-02",
-  3, "gpc_r2", "B", "2000-01-02",
+  1, "f20001", "A", as.Date("2000-01-03"),
+  2, "f20001", "B", as.Date("2000-01-02"),
+  3, "gpc_r2", "B", as.Date("2000-01-02"),
 )
 
 # TESTS -------------------------------------------------------------------

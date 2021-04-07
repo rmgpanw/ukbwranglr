@@ -7,8 +7,7 @@
 rowise_summary(ukb_pheno, function_name, selected_cols, new_colname)
 }
 \arguments{
-\item{ukb_pheno}{a **cleaned** and **renamed** ukb phenotype dataset. Must be a
-data.table::datatable}
+\item{ukb_pheno}{a UK Biobank phenotype dataset}
 
 \item{function_name}{A function name as a character}
 

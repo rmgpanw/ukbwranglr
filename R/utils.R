@@ -304,6 +304,7 @@ mutate_dob <- function(ukb_pheno, data_dict) {
 #' make_empty_clinical_codes_list()
 make_empty_clinical_codes_list <- function() {
   ukbwranglr:::clinical_events_sources$data_coding %>%
+    unique() %>%
     purrr::set_names() %>%
     purrr::map( ~ NULL)
 }
