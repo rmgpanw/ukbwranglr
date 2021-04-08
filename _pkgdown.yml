@@ -18,6 +18,8 @@ reference:
   - get_cancer_register_icd10_diagnoses
   - get_all_diagnostic_codes_multi
   - extract_first_or_last_clinical_event
+  - extract_first_or_last_clinical_event_multi
+  - mutate_age_at_event_cols
 
 - title: Create local data base
   desc: Store processed data as a local database
@@ -33,6 +35,11 @@ reference:
   - search_codes_by_description
   - get_child_codes
   - map_codes
+
+- title: Phenotype clinical code lists
+  desc: Code lists for use identifying phenotypes
+- contents:
+  - generate_self_reported_diabetes_codes_df
 
 - title: Phenotype algorithms
   desc: Identify phenotypes as per definitions in this package

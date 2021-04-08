@@ -95,7 +95,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/code-mapping.html">Clinical codes - lookups and mappings</a>
+      <a href="../articles/clinical_codes.html">Clinical codes - lookups and mappings</a>
     </li>
     <li>
       <a href="../articles/ukb_clinical_events.html">Clinical events</a>
@@ -139,7 +139,8 @@ loaded into R as a data frame.</p></td>
     </tr>
     <tr>
       <th>delim</th>
-      <td><p>Delimiter for the UKB phenotype file. Default is "\t"</p></td>
+      <td><p>Delimiter for the UKB phenotype file. Default is "\t". Ignored
+if the file name ends with <code>.dta</code> (i.e. is a <code>STATA</code> file).</p></td>
     </tr>
     <tr>
       <th>ukb_data_dict</th>
@@ -147,7 +148,7 @@ loaded into R as a data frame.</p></td>
 where all columns are of type <code>character</code>. By default, this is
 downloaded from the
 <a href='https://github.com/rmgpanw/ukbwranglr_resources'><code>ukbwranglr_resources</code></a>
-github repo.</p></td>
+ github repo.</p></td>
     </tr>
     </table>
 

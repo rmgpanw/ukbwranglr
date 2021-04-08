@@ -95,7 +95,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/code-mapping.html">Clinical codes - lookups and mappings</a>
+      <a href="../articles/clinical_codes.html">Clinical codes - lookups and mappings</a>
     </li>
     <li>
       <a href="../articles/ukb_clinical_events.html">Clinical events</a>
@@ -127,14 +127,19 @@
     <p>Returns all descriptive column names matching one or more FieldIDs.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_colnames_for_fieldids</span><span class='op'>(</span><span class='va'>field_ids</span>, <span class='va'>data_dict</span>, scalar_output <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>get_colnames_for_fieldids</span><span class='op'>(</span>
+  <span class='va'>field_ids</span>,
+  <span class='va'>data_dict</span>,
+  scalar_output <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  error_if_missing <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>field_ids</th>
-      <td><p>Character. A UK Biobank Field ID</p></td>
+      <td><p>character vector of UK Biobank Field IDs.</p></td>
     </tr>
     <tr>
       <th>data_dict</th>
@@ -144,6 +149,11 @@
       <th>scalar_output</th>
       <td><p>bool. If <code>TRUE</code>, error raised if more than one
 colname is returned. Default value is <code>FALSE</code>.</p></td>
+    </tr>
+    <tr>
+      <th>error_if_missing</th>
+      <td><p>bool. Raise error if any values in
+<code>filter_value</code> are missing. Default is <code>TRUE</code>.</p></td>
     </tr>
     </table>
 
