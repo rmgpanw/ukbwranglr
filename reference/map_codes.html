@@ -96,7 +96,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/code-mapping.html">Clinical codes - lookups and mappings</a>
+      <a href="../articles/clinical_codes.html">Clinical codes - lookups and mappings</a>
     </li>
     <li>
       <a href="../articles/ukb_clinical_events.html">Clinical events</a>
@@ -135,6 +135,7 @@
   <span class='va'>to</span>,
   ukb_code_mappings <span class='op'>=</span> <span class='fu'><a href='get_ukb_code_mappings.html'>get_ukb_code_mappings</a></span><span class='op'>(</span><span class='op'>)</span>,
   codes_only <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  preferred_description_only <span class='op'>=</span> <span class='cn'>TRUE</span>,
   quiet <span class='op'>=</span> <span class='cn'>FALSE</span>
 <span class='op'>)</span></pre>
 
@@ -163,6 +164,11 @@
       <td><p>bool. If <code>TRUE</code> (default), return a character vector
 of <em>unique</em> codes. If <code>FALSE</code>, return a data frame of all results
 including code descriptions (useful for manual validation).</p></td>
+    </tr>
+    <tr>
+      <th>preferred_description_only</th>
+      <td><p>bool. Return only preferred descriptions
+for clinical codes with synonyms. Default value is <code>TRUE</code>.</p></td>
     </tr>
     <tr>
       <th>quiet</th>

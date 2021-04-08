@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Summarise a UK Biobank phenotype dataset row-wise — summarise_rowise • ukbwranglr</title>
+<title>Mutate age at event columns — mutate_age_at_event_cols • ukbwranglr</title>
 
 
 <!-- jquery -->
@@ -39,12 +39,9 @@
 
 
 
-<meta property="og:title" content="Summarise a UK Biobank phenotype dataset row-wise — summarise_rowise" />
-<meta property="og:description" content="Allows the user to summarise row-wise across a set of column &quot;groups&quot;. e.g.
-calculate standard deviation values for all systolic and diastolic blood
-pressure readings per eid. Can also accept custom functions (e.g. a function
-to count the number of non-NA values). Custom functions should include a
-'...' parameter." />
+<meta property="og:title" content="Mutate age at event columns — mutate_age_at_event_cols" />
+<meta property="og:description" content="Mutates numeric columns with the age at event for all columns that
+match the regex supplied to date_col_regex." />
 
 
 
@@ -122,26 +119,21 @@ to count the number of non-NA values). Custom functions should include a
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Summarise a UK Biobank phenotype dataset row-wise</h1>
+    <h1>Mutate age at event columns</h1>
     
-    <div class="hidden name"><code>summarise_rowise.Rd</code></div>
+    <div class="hidden name"><code>mutate_age_at_event_cols.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Allows the user to summarise row-wise across a set of column "groups". e.g.
-calculate standard deviation values for all systolic and diastolic blood
-pressure readings per eid. Can also accept custom functions (e.g. a function
-to count the number of non-NA values). Custom functions should include a
-'...' parameter.</p>
+    <p>Mutates numeric columns with the age at event for all columns that
+match the regex supplied to <code>date_col_regex</code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>summarise_rowise</span><span class='op'>(</span>
+    <pre class="usage"><span class='fu'>mutate_age_at_event_cols</span><span class='op'>(</span>
   <span class='va'>ukb_pheno</span>,
-  <span class='va'>functions</span>,
-  <span class='va'>data_dict</span>,
-  grouping_col <span class='op'>=</span> <span class='st'>"Field_FieldID"</span>,
-  <span class='va'>selected_col_groups</span>,
-  <span class='va'>...</span>
+  dob_col <span class='op'>=</span> <span class='st'>"dob"</span>,
+  date_col_regex <span class='op'>=</span> <span class='st'>"_date$"</span>,
+  date_col_regex_replacement <span class='op'>=</span> <span class='st'>"_age"</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -149,61 +141,50 @@ to count the number of non-NA values). Custom functions should include a
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>ukb_pheno</th>
-      <td><p>a UK Biobank phenotype dataset</p></td>
+      <td><p>a UK Biobank phenotype data frame containing "eid" and date
+of birth columns, as well as date columns matching the regex supplied to
+the <code>date_col_regex</code> argument.</p></td>
     </tr>
     <tr>
-      <th>functions</th>
-      <td><p>a character vector of function names (e.g. <code><a href='https://rdrr.io/r/base/c.html'>c("sd")</a></code>)</p></td>
+      <th>dob_col</th>
+      <td><p>character. The name of the date of birth column in
+<code>ukb_pheno</code>.</p></td>
     </tr>
     <tr>
-      <th>data_dict</th>
-      <td><p>a data dictionary for <code>ukb_pheno</code></p></td>
+      <th>date_col_regex</th>
+      <td><p>character. A regular expression that matches the date
+columns to be processed in <code>ukb_pheno</code>.</p></td>
     </tr>
     <tr>
-      <th>grouping_col</th>
-      <td><p>the name of a column in <code>data_dict</code> that indicates
-column groups to summarise</p></td>
-    </tr>
-    <tr>
-      <th>selected_col_groups</th>
-      <td><p>a character vector of column groups to summarise
-(i.e. can be a subset of the unique values in
-<code>data_dict$grouping_col</code>)</p></td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td><p>arguments to passed on to summary functions listed in
-<code>functions</code></p></td>
+      <th>date_col_regex_replacement</th>
+      <td><p>character. New "age-at-event" columns will
+have names matching those of the input date columns, replacing the regex
+supplied to <code>date_col_regex</code> with this string.</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>A dataframe with additional "age-at-event" columns</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
-
-<span class='co'># make a custom function that counts the number of non-NA values.</span>
-<span class='co'># Note: include '...', otherwise an error is thrown by including na.rm = TRUE below</span>
-
-<span class='va'>n_not_na</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span> <span class='op'>{</span>
-<span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span><span class='op'>(</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span><span class='op'>)</span>
-<span class='op'>}</span>
-
-<span class='co'># summarise all numerical columns in UKB dataset by calculating mean/sd/n_not_na,</span>
-<span class='co'># including argument na.rm = TRUE</span>
-
-<span class='va'>summarise_test_read_pheno</span> <span class='op'>&lt;-</span> <span class='fu'>summarise_rowise</span><span class='op'>(</span>
-ukb_pheno <span class='op'>=</span> <span class='va'>ukb_pheno</span>, <span class='co'># UKB phenotype dataset as a datatable</span>
-functions <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"mean"</span>, <span class='st'>"sd"</span>, <span class='st'>"n_not_na"</span><span class='op'>)</span>,
-data_dict <span class='op'>=</span> <span class='va'>data_dict</span>, <span class='co'># data dictionary generated by make_data_dict()</span>
-grouping_col <span class='op'>=</span> <span class='st'>"Field_FieldID"</span>, <span class='co'># to summarise by FieldID</span>
-selected_col_groups <span class='op'>=</span> <span class='va'>data_dict</span> <span class='op'>%&gt;%</span> <span class='co'># ...and only summarise numerical data</span>
-  <span class='fu'>dplyr</span><span class='fu'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span><span class='op'>(</span><span class='va'>ValueType</span> <span class='op'>%in%</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Continuous"</span>, <span class='st'>"Integer"</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
-  <span class='va'>.</span><span class='op'>$</span><span class='va'>Field_FieldID</span> <span class='op'>%&gt;%</span>
-  <span class='fu'><a href='https://rdrr.io/r/base/unique.html'>unique</a></span><span class='op'>(</span><span class='op'>)</span>,
-na.rm <span class='op'>=</span> <span class='cn'>TRUE</span>
+    <pre class="examples"><div class='input'><span class='co'># dummy data</span>
+<span class='va'>dummy_ukb_pheno</span> <span class='op'>&lt;-</span> <span class='fu'>tibble</span><span class='fu'>::</span><span class='fu'><a href='https://tibble.tidyverse.org/reference/tribble.html'>tribble</a></span><span class='op'>(</span>
+<span class='op'>~</span> <span class='va'>eid</span>, <span class='op'>~</span> <span class='va'>dob</span>, <span class='op'>~</span> <span class='va'>event_date</span>,
+<span class='fl'>1</span>, <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span><span class='op'>(</span><span class='st'>"2000-01-01"</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span><span class='op'>(</span><span class='st'>"2010-01-01"</span><span class='op'>)</span>
 <span class='op'>)</span>
-<span class='op'>}</span>
-</div></pre>
+
+<span class='co'># mutate age at event col</span>
+<span class='fu'>mutate_age_at_event_cols</span><span class='op'>(</span>
+  <span class='va'>dummy_ukb_pheno</span>,
+  dob_col <span class='op'>=</span> <span class='st'>"dob"</span>,
+  date_col_regex <span class='op'>=</span> <span class='st'>"_date$"</span>,
+  date_col_regex_replacement <span class='op'>=</span> <span class='st'>"_age"</span>
+<span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='message'>Calculating age at event for event_date. New colname: event_age</span></div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 1 x 4</span><span>
+#&gt;     eid dob        event_date event_age
+#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;date&gt;</span><span>     </span><span style='color: #949494;font-style: italic;'>&lt;date&gt;</span><span>         </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span>     1 2000-01-01 2010-01-01      10.0</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

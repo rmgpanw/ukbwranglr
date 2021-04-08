@@ -95,7 +95,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/code-mapping.html">Clinical codes - lookups and mappings</a>
+      <a href="../articles/clinical_codes.html">Clinical codes - lookups and mappings</a>
     </li>
     <li>
       <a href="../articles/ukb_clinical_events.html">Clinical events</a>
@@ -131,6 +131,7 @@
   <span class='va'>codes</span>,
   <span class='va'>code_type</span>,
   ukb_code_mappings <span class='op'>=</span> <span class='fu'><a href='get_ukb_code_mappings.html'>get_ukb_code_mappings</a></span><span class='op'>(</span><span class='op'>)</span>,
+  preferred_description_only <span class='op'>=</span> <span class='cn'>TRUE</span>,
   quiet <span class='op'>=</span> <span class='cn'>FALSE</span>
 <span class='op'>)</span></pre>
 
@@ -151,6 +152,11 @@ Must be one of <code>read2</code>, <code>read3</code>, <code>icd9</code>, <code>
       <th>ukb_code_mappings</th>
       <td><p>the <code>ukb_code_mappings</code> list returned by
 <code><a href='get_ukb_code_mappings.html'>get_ukb_code_mappings</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>preferred_description_only</th>
+      <td><p>bool. Return only preferred descriptions
+for clinical codes with synonyms. Default value is <code>TRUE</code>.</p></td>
     </tr>
     <tr>
       <th>quiet</th>
