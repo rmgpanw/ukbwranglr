@@ -41,7 +41,7 @@
 
 <meta property="og:title" content="Get the earliest record date for a set of diagnostic codes — extract_first_or_last_clinical_event" />
 <meta property="og:description" content="For a set of diagnostic codes, extract individuals with at least one of these
-and retrieve the earliest recorded date (if available)." />
+and retrieve, if available, the earliest or latest recorded date." />
 
 
 
@@ -126,7 +126,7 @@ and retrieve the earliest recorded date (if available)." />
 
     <div class="ref-description">
     <p>For a set of diagnostic codes, extract individuals with at least one of these
-and retrieve the earliest recorded date (if available).</p>
+and retrieve, if available, the earliest or latest recorded date.</p>
     </div>
 
     <pre class="usage"><span class='fu'>extract_first_or_last_clinical_event</span><span class='op'>(</span>
@@ -163,8 +163,9 @@ latest date that on of the specified <code>codes</code> appears.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Data frame with columns "eid", "event_indicator" and "event_date". "Event" is
-  replaced with the string supplied to the <code>phenotype_name</code> argument.</p>
+    <p>Data frame with columns "eid", "event_min/max_indicator" and
+  "event_min/max_date". "Event" is replaced with the string supplied to the
+  <code>phenotype_name</code> argument.</p>
     <h2 class="hasAnchor" id="under-the-hood"><a class="anchor" href="#under-the-hood"></a>Under the hood</h2>
 
     
@@ -178,6 +179,7 @@ latest date that on of the specified <code>codes</code> appears.</p></td>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other extract specific diagnostic codes functions: 
+<code><a href='extract_first_or_last_clinical_event_multi.html'>extract_first_or_last_clinical_event_multi</a>()</code>,
 <code><a href='extract_single_diagnostic_code_record_basis.html'>extract_single_diagnostic_code_record_basis</a>()</code></p></div>
 
   </div>
