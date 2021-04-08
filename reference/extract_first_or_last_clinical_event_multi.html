@@ -132,7 +132,8 @@ either the first or last recorded clinical event for multiple phenotypes.</p>
     <pre class="usage"><span class='fu'>extract_first_or_last_clinical_event_multi</span><span class='op'>(</span>
   <span class='va'>df</span>,
   <span class='va'>clinical_codes_df</span>,
-  min_max <span class='op'>=</span> <span class='st'>"min"</span>
+  min_max <span class='op'>=</span> <span class='st'>"min"</span>,
+  prefix <span class='op'>=</span> <span class='cn'>NULL</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -146,7 +147,16 @@ by one of the <code>get_XXX_diagnoses</code> functions</p></td>
     <tr>
       <th>clinical_codes_df</th>
       <td><p>data frame. Must match the format as per
-<code>get_self_reported_diabetes_codes_df</code>.</p></td>
+<code><a href='generate_self_reported_diabetes_codes_df.html'>generate_self_reported_diabetes_codes_df</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>min_max</th>
+      <td><p>can be either "min" or "max". Extracts either the earliest or
+latest date that on of the specified <code>codes</code> appears.</p></td>
+    </tr>
+    <tr>
+      <th>prefix</th>
+      <td><p>character. Optionally add a prefix to column names.</p></td>
     </tr>
     </table>
 
