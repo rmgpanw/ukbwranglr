@@ -83,6 +83,33 @@ expected <- tibble::tribble(
 
 # TESTS -------------------------------------------------------------------
 
+
+# `mutate_age_at_event_cols()` --------------------------------------------
+
+test_that(
+  "`mutate_age_at_event_cols()` creates the expected age-at-event columns", {
+    dummy_ukb_pheno <- tibble::tribble(
+      ~ eid, ~ dob, ~ event_date,
+      1, as.Date("2000-01-01"), as.Date("2010-01-01")
+    )
+
+    result <- mutate_age_at_event_cols(dummy_ukb_pheno,
+                                       dob_col = "dob",
+                                       date_col_regex = "_date$",
+                                       date_col_regex_replacement = "_age")
+
+    expect_equal(
+      names(result[4]),
+      "event_age"
+    )
+
+    expect_equal(
+      as.integer(result$event_age),
+      10
+    )
+  }
+)
+
 # `extract_single_diagnostic_code_record_basis()` -------------------------
 
 test_that(
@@ -104,6 +131,26 @@ test_that(
     expect_equal(min_dates_db$source, expected$source)
     expect_equal(min_dates_db$code, expected$code)
     expect_equal(min_dates_db$date, expected$date)
+  }
+)
+
+
+# `filter_clinical_events_for_codes()` ------------------------------------
+
+test_that(
+  "`filter_clinical_events_for_codes()` (helper function for `extract_single_diagnostic_code_record_basis()`) returns the expected number of rows",
+  {
+    expect_equal(
+      nrow(filter_clinical_events_for_codes(df = dummy_clinical_events,
+                                       codes = list("read2" = "A"))),
+      4
+    )
+
+    expect_equal(
+      nrow(filter_clinical_events_for_codes(df = dummy_clinical_events_db,
+                                            codes = list("read2" = "A"))),
+      4
+    )
   }
 )
 

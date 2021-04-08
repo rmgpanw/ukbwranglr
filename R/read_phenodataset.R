@@ -501,33 +501,37 @@ mutate_descriptive_columns <- function(data_dict) {
   column_names[1] <- 'eid'
   Field_FieldID_names[1] <- 'eid'
 
-  # Replace special characters
-  ## characters to be replaced with "_"
-  to_underscore <- c(" - ",
-                     " ",
-                     "/",
-                     "\\.")
+  # replace special characters and convert to lower case
+  column_names <- remove_special_characters_and_make_lower_case(column_names)
+  Field_FieldID_names <- remove_special_characters_and_make_lower_case(Field_FieldID_names)
 
-  for (string in to_underscore) {
-    column_names <- stringr::str_replace_all(column_names, string, "_")
-    Field_FieldID_names <- stringr::str_replace_all(Field_FieldID_names, string, "_")
-  }
-
-  ## characters to replace with "" (i.e. to remove)
-  to_remove <- c("\\(",
-                 "\\)",
-                 "\\-",
-                 ",",
-                 ":")
-
-  for (string in to_remove) {
-    column_names <- stringr::str_replace_all(column_names, string, "")
-    Field_FieldID_names <- stringr::str_replace_all(Field_FieldID_names, string, "")
-  }
-
-  # make lowercase
-  column_names <- tolower(column_names)
-  Field_FieldID_names <- tolower(Field_FieldID_names)
+  # # Replace special characters
+  # ## characters to be replaced with "_"
+  # to_underscore <- c(" - ",
+  #                    " ",
+  #                    "/",
+  #                    "\\.")
+  #
+  # for (string in to_underscore) {
+  #   column_names <- stringr::str_replace_all(column_names, string, "_")
+  #   Field_FieldID_names <- stringr::str_replace_all(Field_FieldID_names, string, "_")
+  # }
+  #
+  # ## characters to replace with "" (i.e. to remove)
+  # to_remove <- c("\\(",
+  #                "\\)",
+  #                "\\-",
+  #                ",",
+  #                ":")
+  #
+  # for (string in to_remove) {
+  #   column_names <- stringr::str_replace_all(column_names, string, "")
+  #   Field_FieldID_names <- stringr::str_replace_all(Field_FieldID_names, string, "")
+  # }
+  #
+  # # make lowercase
+  # column_names <- tolower(column_names)
+  # Field_FieldID_names <- tolower(Field_FieldID_names)
 
   # mutate column with new, 'descriptive' column names and Field_FieldID_names
   data_dict[['descriptive_colnames']] <- column_names

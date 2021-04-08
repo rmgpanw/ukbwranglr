@@ -25,6 +25,8 @@
 #'   including code descriptions (useful for manual validation).
 #' @param quiet bool. Warning message if any of \code{codes} are not found for
 #'   the supplied \code{code_type}.
+#' @param preferred_description_only bool. Return only preferred descriptions
+#'   for clinical codes with synonyms. Default value is \code{TRUE}.
 #'
 #' @export
 #' @family Clinical code lookups and mappings
@@ -32,6 +34,7 @@ get_child_codes <- function(codes,
                             code_type,
                             ukb_code_mappings = get_ukb_code_mappings(),
                             codes_only = TRUE,
+                            preferred_description_only = TRUE,
                             quiet = FALSE) {
   # validate args
   match.arg(arg = code_type,
@@ -47,16 +50,15 @@ get_child_codes <- function(codes,
   code_col <- get_col_for_lookup_sheet(lookup_sheet = lkp_sheet,
                                        column = "code_col")
 
-  # amend `codes`
+  # determine relevant column indicating whether code description is preferred
+  # (for code types with synonymous code descriptions like read 2 and read 3)
+  preferred_description_col <- get_col_for_lookup_sheet(lookup_sheet = lkp_sheet,
+                                       column = "preferred_synonym_col")
 
-  # ***TO DELETE*** #
-  #  problem with this is no children are returned if
-  # searching for children of e.g. "C10E."
-
-  # escape any '.' characters (e.g.
-  # ICD-10) codes <- stringr::str_replace_all(codes, pattern = fixed("."),
-  # replacement = "\\.")
-  # ***TO DELETE*** #
+  # get preferred code, if appropriate
+  if (!is.na(preferred_description_col)) {
+    preferred_description_code <- get_preferred_description_code_for_lookup_sheet(lookup_sheet = lkp_sheet)
+  }
 
   # add "^" at start and ".*" at end
   codes <- paste0("^", codes, ".*")
@@ -69,6 +71,12 @@ get_child_codes <- function(codes,
     dplyr::filter(stringr::str_detect(.data[[code_col]],
                                       pattern = stringr::regex(codes,
                                                                ignore_case = FALSE)))
+
+  # filter for preferred code descriptions only if requested
+  if (preferred_description_only & !is.na(preferred_description_col)) {
+    result <- result %>%
+      dplyr::filter(.data[[preferred_description_col]] == preferred_description_code)
+  }
 
   # return result
   if (rlang::is_empty(result)) {
@@ -108,6 +116,7 @@ get_child_codes <- function(codes,
 lookup_codes <- function(codes,
                          code_type,
                          ukb_code_mappings = get_ukb_code_mappings(),
+                         preferred_description_only = TRUE,
                          quiet = FALSE) {
   # validate args
   match.arg(arg = code_type,
@@ -120,9 +129,25 @@ lookup_codes <- function(codes,
   code_col <- get_col_for_lookup_sheet(lookup_sheet = lkp_sheet,
                                        column = "code_col")
 
+  # determine relevant column indicating whether code description is preferred
+  # (for code types with synonymous code descriptions like read 2 and read 3)
+  preferred_description_col <- get_col_for_lookup_sheet(lookup_sheet = lkp_sheet,
+                                                        column = "preferred_synonym_col")
+
+  # get preferred code, if appropriate
+  if (!is.na(preferred_description_col)) {
+    preferred_description_code <- get_preferred_description_code_for_lookup_sheet(lookup_sheet = lkp_sheet)
+  }
+
   # lookup - filter lookup sheet for codes
   result <- ukb_code_mappings[[lkp_sheet]] %>%
     dplyr::filter(.data[[code_col]] %in% codes)
+
+  # filter for preferred code descriptions only if requested
+  if (preferred_description_only & !is.na(preferred_description_col)) {
+    result <- result %>%
+      dplyr::filter(.data[[preferred_description_col]] == preferred_description_code)
+  }
 
   # return result
   if (rlang::is_empty(result)) {
@@ -159,7 +184,8 @@ search_codes_by_description <- function(reg_expr,
                                       code_type,
                                       ukb_code_mappings = get_ukb_code_mappings(),
                                       ignore_case = TRUE,
-                                      codes_only = FALSE) {
+                                      codes_only = FALSE,
+                                      preferred_description_only = TRUE) {
   # validate args
   match.arg(arg = code_type,
             choices = ukbwranglr:::code_type_to_lkp_sheet_map_df$code)
@@ -174,6 +200,16 @@ search_codes_by_description <- function(reg_expr,
   description_col <- get_col_for_lookup_sheet(lookup_sheet = lkp_sheet,
                                        column = "description_col")
 
+  # determine relevant column indicating whether code description is preferred
+  # (for code types with synonymous code descriptions like read 2 and read 3)
+  preferred_description_col <- get_col_for_lookup_sheet(lookup_sheet = lkp_sheet,
+                                                        column = "preferred_synonym_col")
+
+  # get preferred code, if appropriate
+  if (!is.na(preferred_description_col)) {
+    preferred_description_code <- get_preferred_description_code_for_lookup_sheet(lookup_sheet = lkp_sheet)
+  }
+
   # search for codes
   result <- ukb_code_mappings[[lkp_sheet]] %>%
     dplyr::filter(stringr::str_detect(
@@ -181,6 +217,12 @@ search_codes_by_description <- function(reg_expr,
       pattern = stringr::regex(pattern = reg_expr,
                                ignore_case = ignore_case)
     ))
+
+  # filter for preferred code descriptions only if requested
+  if (preferred_description_only & !is.na(preferred_description_col)) {
+    result <- result %>%
+      dplyr::filter(.data[[preferred_description_col]] == preferred_description_code)
+  }
 
   # return result
   if (rlang::is_empty(result)) {
@@ -221,6 +263,7 @@ map_codes <- function(codes,
                       to,
                       ukb_code_mappings = get_ukb_code_mappings(),
                       codes_only = TRUE,
+                      preferred_description_only = TRUE,
                       quiet = FALSE) {
   # validate args
   match.arg(arg = from,
@@ -272,6 +315,17 @@ map_codes <- function(codes,
                                   value = "to_col")
   }
 
+  # determine relevant column indicating whether code description is preferred
+  # (for code types with synonymous code descriptions like read 2 and read 3)
+  preferred_description_col <- get_value_for_mapping_sheet(mapping_sheet = mapping_sheet,
+                                                        value = "preferred_synonym_col")
+
+  # get preferred code, if appropriate
+  if (!is.na(preferred_description_col)) {
+    preferred_description_code <- get_value_for_mapping_sheet(mapping_sheet = mapping_sheet,
+                                                              value = "preferred_code")
+  }
+
   # do mapping
   # reformat codes if mapping from icd10
   if (from == "icd10") {
@@ -281,6 +335,14 @@ map_codes <- function(codes,
 
   result <- ukb_code_mappings[[mapping_sheet]] %>%
     dplyr::filter(.data[[from_col]] %in% codes)
+
+  # filter for preferred code descriptions only if requested
+  if (preferred_description_only & !is.na(preferred_description_col)) {
+    result <- result %>%
+      dplyr::filter(.data[[preferred_description_col]] == preferred_description_code) %>%
+      # Note, will get duplicate codes without this step
+      dplyr::distinct(.data[[to_col]], .keep_all = TRUE)
+  }
 
   # return result
   if (rlang::is_empty(result)) {
@@ -397,7 +459,7 @@ get_lookup_sheet <- function(code_type) {
     .$lkp_sheet
 }
 
-#' Get name of code or decription column for a lookup sheet
+#' Get name of code, description or preferred synonym column for a lookup sheet
 #'
 #' Helper function for \code{\link{lookup_codes}} and \code{\link{get_child_codes}}
 #'
@@ -416,7 +478,7 @@ get_col_for_lookup_sheet <- function(lookup_sheet,
             choices = ukbwranglr:::code_type_to_lkp_sheet_map_df$lkp_sheet)
 
   match.arg(arg = column,
-            choices = c("code_col", "description_col"))
+            choices = c("code_col", "description_col", "preferred_synonym_col"))
 
   # get column name for lookup sheet
   ukbwranglr:::code_type_to_lkp_sheet_map_df %>%
@@ -424,6 +486,26 @@ get_col_for_lookup_sheet <- function(lookup_sheet,
     .[[column]]
 }
 
+#' Get preferred description code for a lookup sheet
+#'
+#' Helper function for \code{\link{lookup_codes}} and \code{\link{get_child_codes}}
+#'
+#' @param lookup_sheet character
+#'
+#' @return character (scalar)
+#'
+#' @family Clinical code lookups and mappings
+#' @noRd
+get_preferred_description_code_for_lookup_sheet <- function(lookup_sheet) {
+  # validate args
+  match.arg(arg = lookup_sheet,
+            choices = ukbwranglr:::code_type_to_lkp_sheet_map_df$lkp_sheet)
+
+  # get preferred description code for lookup sheet
+  ukbwranglr:::code_type_to_lkp_sheet_map_df %>%
+    dplyr::filter(.data[["lkp_sheet"]] == lookup_sheet) %>%
+    .[["preferred_code"]]
+}
 
 #' Helper function - generate warning message
 #'

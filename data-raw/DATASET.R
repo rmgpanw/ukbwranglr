@@ -1,4 +1,4 @@
-
+library(magrittr)
 
 # SETUP -------------------------------------------------------------------
 
@@ -163,14 +163,14 @@ ukb_code_mappings_code_types <- c(
 # mappings note, BNF - 'description_col' is for chemical substances only (TODO
 # amend this?)
 code_type_to_lkp_sheet_map_df <- tibble::tribble(
-  ~ code, ~ lkp_sheet, ~ code_col, ~ description_col,
-  "bnf", "bnf_lkp", "BNF_Presentation_Code", "BNF_Chemical_Substance",
-  "dmd", "dmd_lkp", "concept_id", "term",
-  "icd9", "icd9_lkp", "ICD9", "DESCRIPTION_ICD9",
-  "icd10", "icd10_lkp", "ICD10_CODE", "DESCRIPTION",
-  "read2", "read_v2_lkp", "read_code", "term_description",
-  "read2_drugs", "read_v2_drugs_lkp", "read_code", "term_description",
-  "read3", "read_ctv3_lkp", "read_code", "term_description"
+  ~ code, ~ lkp_sheet, ~ code_col, ~ description_col, ~ preferred_synonym_col, ~ preferred_code,
+  "bnf", "bnf_lkp", "BNF_Presentation_Code", "BNF_Chemical_Substance", NA, NA,
+  "dmd", "dmd_lkp", "concept_id", "term", NA, NA,
+  "icd9", "icd9_lkp", "ICD9", "DESCRIPTION_ICD9", NA, NA,
+  "icd10", "icd10_lkp", "ICD10_CODE", "DESCRIPTION", NA, NA,
+  "read2", "read_v2_lkp", "read_code", "term_description", "term_code", "00",
+  "read2_drugs", "read_v2_drugs_lkp", "read_code", "term_description", NA, NA,
+  "read3", "read_ctv3_lkp", "read_code", "term_description", "description_type", "P"
 )
 
 # clinical code mappings map ----------------------------------------------
@@ -180,17 +180,17 @@ code_type_to_lkp_sheet_map_df <- tibble::tribble(
 # 'mapping_sheet': the appropriate mapping sheet to use for a 'from'/'to' combination
 # 'from_col' and 'to_col': the columns to use when mapping
 clinical_code_mappings_map <- tibble::tribble(
-  ~ from, ~ to, ~ mapping_sheet, ~ from_col, ~ to_col,
-  "icd9", "icd10", "icd9_icd10", "ICD9", "ICD10",
-  "read2_drugs", "bnf", "read_v2_drugs_bnf", "read_code", "bnf_code",
-  "read2", "icd9", "read_v2_icd9", "read_code", "icd9_code",
-  "read2", "icd10", "read_v2_icd10", "read_code", "icd10_code",
-  "read2", "opcs4", "read_v2_opcs4", "read_code", "opcs_4.2_code",
-  "read2", "read3", "read_v2_read_ctv3", "READV2_CODE", "READV3_CODE",
-  "read3", "icd9", "read_ctv3_icd9", "read_code", "icd9_code",
-  "read3", "icd10", "read_ctv3_icd10", "read_code", "icd10_code",
-  "read3", "opcs4", "read_ctv3_opcs4", "read_code", "opcs4_code",
-  "read3", "read2", "read_ctv3_read_v2", "READV3_CODE", "READV2_CODE"
+  ~ from, ~ to, ~ mapping_sheet, ~ from_col, ~ to_col, ~ preferred_synonym_col, ~ preferred_code,
+  "icd9", "icd10", "icd9_icd10", "ICD9", "ICD10", NA, NA,
+  "read2_drugs", "bnf", "read_v2_drugs_bnf", "read_code", "bnf_code", NA, NA,
+  "read2", "icd9", "read_v2_icd9", "read_code", "icd9_code", NA, NA,
+  "read2", "icd10", "read_v2_icd10", "read_code", "icd10_code", NA, NA,
+  "read2", "opcs4", "read_v2_opcs4", "read_code", "opcs_4.2_code", NA, NA,
+  "read2", "read3", "read_v2_read_ctv3", "READV2_CODE", "READV3_CODE", "TERMV3_TYPE", "P",
+  "read3", "icd9", "read_ctv3_icd9", "read_code", "icd9_code", NA, NA,
+  "read3", "icd10", "read_ctv3_icd10", "read_code", "icd10_code", NA, NA,
+  "read3", "opcs4", "read_ctv3_opcs4", "read_code", "opcs4_code", NA, NA,
+  "read3", "read2", "read_ctv3_read_v2", "READV3_CODE", "READV2_CODE", "TERMV2_TYPE", "P"
 )
 
 # see `test_data_raw_DATASET.R` for tests (check nothing misspelled etc)

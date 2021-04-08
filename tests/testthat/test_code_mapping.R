@@ -14,7 +14,7 @@ test_that("`get_child_codes()` returns the expected nuber of results", {
       codes = c("C10E."),
       code_type = "read2",
       ukb_code_mappings = ukb_code_mappings,
-      codes_only = TRUE
+      codes_only = TRUE,
     )
   ),
   expected = 27)
@@ -25,10 +25,22 @@ test_that("`get_child_codes()` returns the expected nuber of results", {
       codes = c("C10E."),
       code_type = "read2",
       ukb_code_mappings = ukb_code_mappings,
-      codes_only = FALSE
+      codes_only = FALSE,
+      preferred_description_only = FALSE
     )
   ),
   expected = 73)
+
+  expect_equal(nrow(
+    get_child_codes(
+      codes = c("C10E."),
+      code_type = "read2",
+      ukb_code_mappings = ukb_code_mappings,
+      codes_only = FALSE,
+      preferred_description_only = TRUE
+    )
+  ),
+  expected = 27)
 })
 
 # `lookup_codes()` --------------------------------------------------------
@@ -38,10 +50,21 @@ test_that("`lookup_codes()` returns the expected number of results", {
     lookup_codes(
       codes = c("C10E.", "C108."),
       code_type = "read2",
-      ukb_code_mappings = ukb_code_mappings
+      ukb_code_mappings = ukb_code_mappings,
+      preferred_description_only = FALSE
     )
   ),
   expected = 7)
+
+  expect_equal(nrow(
+    lookup_codes(
+      codes = c("C10E.", "C108."),
+      code_type = "read2",
+      ukb_code_mappings = ukb_code_mappings,
+      preferred_description_only = TRUE
+    )
+  ),
+  expected = 2)
 })
 
 # `map_codes()` -----------------------------------------------------------
@@ -56,6 +79,45 @@ test_that(
                 quiet = FALSE),
       regexp = "Warning! The following codes were not found for read2 (the coding system being mapped from): 'foo', 'bar'",
       fixed = TRUE
+    )
+  }
+)
+
+test_that(
+  "`map_codes()` returns the expected codes", {
+    # codes only
+    expect_equal(
+      map_codes(codes = c("C10E."),
+                from = "read2",
+                to = "read3",
+                ukb_code_mappings = ukb_code_mappings,
+                quiet = FALSE,
+                codes_only = TRUE),
+      "X40J4"
+    )
+
+    # codes and ALL descriptions
+    expect_equal(
+      nrow(map_codes(codes = c("C10E."),
+                     from = "read2",
+                     to = "read3",
+                     ukb_code_mappings = ukb_code_mappings,
+                     quiet = FALSE,
+                     codes_only = FALSE,
+                     preferred_description_only = FALSE)),
+      4
+    )
+
+    # codes and preferred descriptions only (this additionally filters for only unique codes)
+    expect_equal(
+      map_codes(codes = c("C10E.", "C108."),
+                     from = "read2",
+                     to = "read3",
+                     ukb_code_mappings = ukb_code_mappings,
+                     quiet = FALSE,
+                     codes_only = FALSE,
+                     preferred_description_only = TRUE)$READV3_CODE,
+      "X40J4"
     )
   }
 )

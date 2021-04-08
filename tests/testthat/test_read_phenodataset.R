@@ -48,6 +48,26 @@ test_that("`read_pheno()` correctly reads a file", {
                c(NA, "Caribbean", "Asian or Asian British", NA, "Prefer not to answer", "Asian or Asian British"))
 })
 
+
+# `mutate_descriptive_columns()` ------------------------------------------
+
+test_that(
+  "`mutate_descriptive_columns()` works", {
+    expect_equal(
+      data_dict$descriptive_colnames,
+      c(
+        "eid",
+        "sex_f31_0_0",
+        "year_of_birth_f34_0_0",
+        "month_of_birth_f52_0_0",
+        "ethnic_background_f21000_0_0",
+        "noncancer_illness_code_selfreported_f20002_0_0",
+        "body_mass_index_bmi_f21001_0_0"
+      )
+    )
+  }
+)
+
 # `format_ukb_df_header()` ------------------------------------------------
 
 test_that(

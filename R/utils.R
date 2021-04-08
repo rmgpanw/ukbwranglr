@@ -747,3 +747,41 @@ rename_cols <- function(df, old_colnames, new_colnames) {
   # return result
   return(df)
 }
+
+#' Helper function - format string to a valid format for data frame colnames
+#'
+#' Removes special characters and converts all letters to lower case in
+#' character vector.
+#'
+#' @param string character vector
+#'
+#' @noRd
+remove_special_characters_and_make_lower_case <- function(string) {
+  # Replace special characters
+  # characters to be replaced with "_"
+  to_underscore <- c(" - ",
+                     " ",
+                     "/",
+                     "\\.")
+
+  for (char in to_underscore) {
+    string <- stringr::str_replace_all(string, char, "_")
+  }
+
+  # characters to replace with "" (i.e. to remove)
+  to_remove <- c("\\(",
+                 "\\)",
+                 "\\-",
+                 ",",
+                 ":")
+
+  for (char in to_remove) {
+    string <- stringr::str_replace_all(string, char, "")
+  }
+
+  # Make lower case
+  string <- tolower(string)
+
+  # Return result
+  return(string)
+}
