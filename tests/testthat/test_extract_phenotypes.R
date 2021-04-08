@@ -58,6 +58,16 @@ dplyr::copy_to(con,
 # get tbl_sql object
 dummy_clinical_events_db <- dplyr::tbl(con, "dummy_clinical_events")
 
+# should match output from `generate_self_reported_diabetes_codes_df()`
+dummy_clinical_codes_df <- tibble::tribble(
+  ~ disease, ~ description, ~ category, ~ code_type, ~ code, ~ phenotype_source,
+  "Diabetes", "diabetes", "Diabetes unspecified", "icd10", "D", "test",
+  "Diabetes", "gestational diabetes", "Gestational diabetes", "icd10", "E", "test",
+  "Diabetes", "type 1 diabetes", "Type 1 diabetes", "read3", "H", "test",
+  "Diabetes", "type 1 diabetes", "Type 1 diabetes", "read3", "G", "test",
+  "Diabetes", "type 2 diabetes", "Type 2 diabetes", "data_coding_6", "D", "test",
+)
+
 # Process dummy data (and record expected results) ------------------------
 
 # ***`extract_single_diagnostic_code_record_basis()` -------------------------
@@ -83,6 +93,32 @@ expected <- tibble::tribble(
 
 # TESTS -------------------------------------------------------------------
 
+
+# `extract_first_or_last_clinical_event_multi()` --------------------------
+
+test_that(
+  "`extract_first_or_last_clinical_event_multi()` returns the expected column names", {
+    result <- extract_first_or_last_clinical_event_multi(df = dummy_clinical_events,
+                                               clinical_codes_df = dummy_clinical_codes_df,
+                                               min_max = "min",
+                                               prefix = "testy_")
+
+    expect_equal(
+      names(result),
+      c(
+        "eid",
+        "testy_diabetes_unspecified_test_min_date",
+        "testy_diabetes_unspecified_test_indicator",
+        "testy_gestational_diabetes_test_min_date",
+        "testy_gestational_diabetes_test_indicator",
+        "testy_type_1_diabetes_test_min_date",
+        "testy_type_1_diabetes_test_indicator",
+        "testy_type_2_diabetes_test_min_date",
+        "testy_type_2_diabetes_test_indicator"
+        )
+    )
+  }
+)
 
 # `mutate_age_at_event_cols()` --------------------------------------------
 

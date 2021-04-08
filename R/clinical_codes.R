@@ -7,6 +7,8 @@
 
 # EXPORTED FUNCTIONS ------------------------------------------------------
 
+# Exploring and mapping clinical codes ------------------------------------
+
 #' Get child codes for a clinical code type
 #'
 #' Uses the code mapping file provided by UK Biobank (resource 592:
@@ -377,6 +379,31 @@ map_codes <- function(codes,
       return(result)
     }
   }
+}
+
+
+# Clinical code lists -----------------------------------------------------
+
+#' Generate a data frame of clinical codes for self-reported diabetes in the UK
+#' Biobank
+#'
+#' Data frames of this format may be used with
+#' \code{\link{extract_first_or_last_clinical_event_multi}} to facilitate
+#' identification of clinical events (e.g. date of diabetes diagnosis).
+#'
+#' @return Data frame
+#' @export
+#'
+#' @examples
+#' generate_self_reported_diabetes_codes_df()
+generate_self_reported_diabetes_codes_df <- function() {
+  tribble(
+    ~ disease, ~ description, ~ category, ~ code_type, ~ code, ~ phenotype_source,
+    "Diabetes", "diabetes", "Diabetes unspecified", "data_coding_6", "1220", "ukbwr",
+    "Diabetes", "gestational diabetes", "Gestational diabetes", "data_coding_6", "1221", "ukbwr",
+    "Diabetes", "type 1 diabetes", "Type 1 diabetes", "data_coding_6", "1222", "ukbwr",
+    "Diabetes", "type 2 diabetes", "Type 2 diabetes", "data_coding_6", "1223", "ukbwr",
+  )
 }
 
 # PRIVATE FUNCTIONS -------------------------------------------------------

@@ -25,12 +25,13 @@ latest date that on of the specified \code{codes} appears.}
 \item{phenotype_name}{character. Name}
 }
 \value{
-Data frame with columns "eid", "event_indicator" and "event_date". "Event" is
-  replaced with the string supplied to the \code{phenotype_name} argument.
+Data frame with columns "eid", "event_min/max_indicator" and
+  "event_min/max_date". "Event" is replaced with the string supplied to the
+  \code{phenotype_name} argument.
 }
 \description{
 For a set of diagnostic codes, extract individuals with at least one of these
-and retrieve the earliest recorded date (if available).
+and retrieve, if available, the earliest or latest recorded date.
 }
 \section{Under the hood}{
 
@@ -44,6 +45,7 @@ and retrieve the earliest recorded date (if available).
 
 \seealso{
 Other extract specific diagnostic codes functions: 
+\code{\link{extract_first_or_last_clinical_event_multi}()},
 \code{\link{extract_single_diagnostic_code_record_basis}()}
 }
 \concept{extract specific diagnostic codes functions}

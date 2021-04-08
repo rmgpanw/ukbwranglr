@@ -35,6 +35,7 @@ date that one of the diagnostic codes appears).
 }
 \seealso{
 Other extract specific diagnostic codes functions: 
+\code{\link{extract_first_or_last_clinical_event_multi}()},
 \code{\link{extract_first_or_last_clinical_event}()}
 }
 \concept{extract specific diagnostic codes functions}
