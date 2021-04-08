@@ -7,7 +7,8 @@
 extract_first_or_last_clinical_event_multi(
   df,
   clinical_codes_df,
-  min_max = "min"
+  min_max = "min",
+  prefix = NULL
 )
 }
 \arguments{
@@ -15,7 +16,12 @@ extract_first_or_last_clinical_event_multi(
 by one of the \code{get_XXX_diagnoses} functions}
 
 \item{clinical_codes_df}{data frame. Must match the format as per
-\code{\link{get_self_reported_diabetes_codes_df}}.}
+\code{\link{generate_self_reported_diabetes_codes_df}}.}
+
+\item{min_max}{can be either "min" or "max". Extracts either the earliest or
+latest date that on of the specified \code{codes} appears.}
+
+\item{prefix}{character. Optionally add a prefix to column names.}
 }
 \value{
 Data frame with an "eid" column, and "event_min/max_indicator" and

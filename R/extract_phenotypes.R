@@ -123,9 +123,10 @@ mutate_age_at_event_cols <- function(ukb_pheno,
 #' either the first or last recorded clinical event for multiple phenotypes.
 #'
 #' @param clinical_codes_df data frame. Must match the format as per
-#'   \code{\link{get_self_reported_diabetes_codes_df}}.
+#'   \code{\link{generate_self_reported_diabetes_codes_df}}.
 #' @param prefix character. Optionally add a prefix to column names.
 #' @inheritParams extract_single_diagnostic_code_record_basis
+#' @inheritParams extract_first_or_last_clinical_event
 #'
 #' @return Data frame with an "eid" column, and "event_min/max_indicator" and
 #'   "event_min/max_date" columns for each phenotype in the 'category' column of

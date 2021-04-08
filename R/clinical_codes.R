@@ -397,7 +397,7 @@ map_codes <- function(codes,
 #' @examples
 #' generate_self_reported_diabetes_codes_df()
 generate_self_reported_diabetes_codes_df <- function() {
-  tribble(
+  tibble::tribble(
     ~ disease, ~ description, ~ category, ~ code_type, ~ code, ~ phenotype_source,
     "Diabetes", "diabetes", "Diabetes unspecified", "data_coding_6", "1220", "ukbwr",
     "Diabetes", "gestational diabetes", "Gestational diabetes", "data_coding_6", "1221", "ukbwr",
