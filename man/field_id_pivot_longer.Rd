@@ -7,7 +7,7 @@
 field_id_pivot_longer(ukb_pheno, field_id, data_dict, ukb_codings)
 }
 \arguments{
-\item{ukb_pheno}{a UK Biobank phenotype dataset}
+\item{ukb_pheno}{a UK Biobank phenotype dataset. Must be a data table}
 
 \item{field_id}{Character. A UK Biobank Field ID}
 

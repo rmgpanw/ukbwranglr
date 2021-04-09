@@ -7,9 +7,10 @@
 diabetes_type_first_occurrence(ukb_pheno, data_dict)
 }
 \arguments{
-\item{ukb_pheno}{a UK Biobank phenotype dataset}
+\item{ukb_pheno}{a UK Biobank phenotype dataset. Must be a data table}
 
-\item{data_dict}{a data dictionary for \code{ukb_pheno}}
+\item{data_dict}{a data dictionary for \code{ukb_pheno}. Can be a "filtered"
+version including only the columns to be summarised.}
 }
 \value{
 The UK Biobank dataset (supplied to arg \code{ukb_pheno}) with an additional indicator column

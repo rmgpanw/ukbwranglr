@@ -16,6 +16,8 @@
 #'   version including only the columns to be summarised.
 #' @param grouping_col the name of a column in \code{data_dict} that indicates
 #'   column groups to summarise
+#' @param prefix character. An optional prefix to add to the names of all newly
+#'   created columns. Default is \code{NULL}.
 #' @param ... arguments to passed on to summary functions listed in
 #'   \code{functions}
 #'
@@ -47,18 +49,27 @@
 #'
 #'   # to summarise by FieldID
 #'   grouping_col = "Field_FieldID"
+#'
+#'   # additional args passed on to `functions`
+#'   na.rm = TRUE
 #' )
 #' }
 summarise_rowise <- function(ukb_pheno,
                              functions,
                              data_dict,
                              grouping_col = "Field_FieldID",
+                             prefix = NULL,
                              ...) {
 
   start_time <- proc.time()
 
   # validate args
   assertthat::is.string(grouping_col)
+
+  assertthat::assert_that(
+    all(data_dict$descriptive_colnames %in% names(ukb_pheno)),
+    msg = "Error! `data_dict$descriptive_colnames` includes values not present in `names(ukb_pheno)`. Please filter `data_dict` for only the columns in `ukb_pheno` to be summarised"
+  )
 
   # ***STEP 1***
   # Create list of column groups with columns to summarise and new
@@ -90,6 +101,13 @@ summarise_rowise <- function(ukb_pheno,
   new_colnames$new_colnames <- paste(new_colnames$Var1,
                                      new_colnames$Var2,
                                      sep = "_")
+
+  # add optional prefix to new column names
+  if (!is.null(prefix)) {
+    new_colnames$new_colnames <- paste0(prefix,
+                                        new_colnames$new_colnames)
+  }
+
   new_colnames <- new_colnames %>%
     # remove 'functions' column ('Var1')
     dplyr::select(-.data[["Var1"]]) %>%
@@ -165,8 +183,11 @@ summarise_rowise <- function(ukb_pheno,
     " seconds"
   )
 
+  # message - number of new columns created and their names
+  new_colnames_vector <- tidyr::unnest(new_colnames,
+                                       c(.data[["new_colnames"]]))$new_colnames
   message(paste0(
-    "Appended the following new columns: ", stringr::str_c(tidyr::unnest(new_colnames, c(.data[["new_colnames"]]))$new_colnames,
+    "Appended, ", length(new_colnames_vector), " new columns: ", stringr::str_c(new_colnames_vector,
                                                            sep = "",
                                                            collapse = ", ")
     ))

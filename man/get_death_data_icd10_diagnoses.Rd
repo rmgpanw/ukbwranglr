@@ -7,9 +7,10 @@
 get_death_data_icd10_diagnoses(ukb_pheno, data_dict, ukb_codings)
 }
 \arguments{
-\item{ukb_pheno}{a UK Biobank phenotype dataset}
+\item{ukb_pheno}{a UK Biobank phenotype dataset. Must be a data table}
 
-\item{data_dict}{a data dictionary for \code{ukb_pheno}}
+\item{data_dict}{a data dictionary for \code{ukb_pheno}. Can be a "filtered"
+version including only the columns to be summarised.}
 
 \item{ukb_codings}{The UKB codings dictionary. This should be a data frame
 where all columns are of type \code{character}. By default, this is
