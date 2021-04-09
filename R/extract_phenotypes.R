@@ -182,27 +182,28 @@ extract_first_or_last_clinical_event_multi <- function(
     }
   }
 
-  # now filter `df` for all codes in this `clinical_codes_df`. This is to speed up the next step. TODO may be problematic if returns too large a result though
+  # now filter `df` for all codes in this `clinical_codes_df`. This is to speed
+  # up the next step.
+
+  # TODO ...may be problematic if returns too large a result though
   message("Filtering df for all codes in clinical_codes_df")
-  df_filtered <- filter_clinical_events_for_codes(df,
-                                                  clinical_codes_df$code)
+  df <- filter_clinical_events_for_codes(df,
+                                         clinical_codes_df$code)
 
   # get results: loop through phenotypes
-  message("Extracting event dates for phenotypes")
-  # for (i in seq_along(sort(unique(clinical_codes_df$phenotype_name)))) {
-  #   list_of_phenotype_results[[i]] <-
-  #     extract_first_or_last_clinical_event(df = df_filtered,
-  #                                          codes = list_of_phenotype_codelists[[i]],
-  #                                          phenotype_name = clinical_codes_df$phenotype_name[i],
-  #                                          min_max = min_max)
-  # }
-
+  message("EXTRACTING EVENT DATES FOR PHENOTYPES\n")
+  n_phenotypes <- length(names(list_of_phenotype_results))
+  i <- 1
   for (phenotype in names(list_of_phenotype_results)) {
+    message(paste0("Extracting event dates for ", phenotype,
+                   " (Phenotype ", i, " of ", n_phenotypes, ")"))
     list_of_phenotype_results[[phenotype]] <-
-      extract_first_or_last_clinical_event(df = df_filtered,
+      extract_first_or_last_clinical_event(df = df,
                                            codes = list_of_phenotype_codelists[[phenotype]],
                                            phenotype_name = phenotype,
                                            min_max = min_max)
+    i <- i + 1
+    time_taken_message(start_time)
   }
 
   # combine
@@ -210,6 +211,7 @@ extract_first_or_last_clinical_event_multi <- function(
     purrr::reduce(dplyr::full_join, by = "eid")
 
   # return result
+  message("COMPLETE!")
   time_taken_message(start_time)
   return(result)
 }
