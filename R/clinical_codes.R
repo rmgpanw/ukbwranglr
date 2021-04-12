@@ -478,6 +478,59 @@ generate_self_reported_diabetes_codes_df <- function() {
   )
 }
 
+
+# Utilities ---------------------------------------------------------------
+
+#' Reformat ICD-10 codes
+#'
+#' The lookup sheet in
+#' \href{https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592}{UKB resource 592}
+#' for ICD-10 ("icd10_lkp") has a column called "ALT_CODE", which is an
+#' alternative format for ICD-10 codes. This is the format used in the mapping
+#' sheets for this resource, as well as in
+#' \href{https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=41270}{Field ID 41270}.
+#' This function converts from one format to the other.
+#'
+#' @param icd10_codes character vector of ICD-10 codes
+#' @param input_icd10_format character. Must be either "ICD10_CODE" or
+#'   "ALT_CODE".
+#' @param output_icd10_format character. Must be either "ICD10_CODE" or
+#'   "ALT_CODE".
+#' @inheritParams get_child_codes
+#'
+#' @return character vector of ICD-10 codes, reformatted as specified by
+#'   \code{output_icd10_format}.
+#' @export
+#' @family Clinical code lookups and mappings
+reformat_icd10_codes <- function(icd10_codes,
+                                 ukb_code_mappings,
+                                 input_icd10_format = "ICD10_CODE",
+                                 output_icd10_format = "ALT_CODE") {
+  # validate args
+  match.arg(arg = input_icd10_format,
+            choices = c("ICD10_CODE", "ALT_CODE"))
+
+  match.arg(arg = output_icd10_format,
+            choices = c("ICD10_CODE", "ALT_CODE"))
+
+
+  assertthat::assert_that(input_icd10_format != output_icd10_format,
+                          msg = "Error for `reformat_icd10_codes()`! Input and output icd10 formats cannot be the same")
+
+  # reformat icd10 codes
+  result <- ukb_code_mappings$icd10_lkp %>%
+    dplyr::filter(.data[[input_icd10_format]] %in% icd10_codes) %>%
+    .[[output_icd10_format]] %>%
+    unique()
+
+  if (rlang::is_empty(result)) {
+    warning("Warning! `reformat_icd10_codes()` found no icd10 code matches. Returning NULL")
+    return(NULL)
+  } else(
+    return(result)
+  )
+}
+
 # PRIVATE FUNCTIONS -------------------------------------------------------
 
 
@@ -632,49 +685,3 @@ warning_if_codes_not_found <-
       )
     }
   }
-
-
-#' Helper function for \code{\link{map_codes}} - reformat ICD-10 codes
-#'
-#' The lookup sheet for ICD-10 ("icd10_lkp") has a column called "ALT_CODE",
-#' which is an alternative format for ICD-10 codes. This is the format used in
-#' the mapping sheets. This function converts from one format to the other.
-#'
-#' @param icd10_codes character vector of ICD-10 codes
-#' @param input_icd10_format character. Must be either "ICD10_CODE" or "ALT_CODE".
-#' @inheritParams get_child_codes
-#'
-#' @return character vector of ICD-10 codes, reformatted as per the "ALT_CODE"
-#'   column in the "icd10_lkp" sheet in
-#'   \href{https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592}{UKB resource
-#'   592}.
-#' @noRd
-#' @family Clinical code lookups and mappings
-reformat_icd10_codes <- function(icd10_codes,
-                                 ukb_code_mappings,
-                                 input_icd10_format = "ICD10_CODE",
-                                 output_icd10_format = "ALT_CODE") {
-  # validate args
-  match.arg(arg = input_icd10_format,
-            choices = c("ICD10_CODE", "ALT_CODE"))
-
-  match.arg(arg = output_icd10_format,
-            choices = c("ICD10_CODE", "ALT_CODE"))
-
-
-  assertthat::assert_that(input_icd10_format != output_icd10_format,
-                          msg = "Error for `reformat_icd10_codes()`! Input and output icd10 formats cannot be the same")
-
-  # reformat icd10 codes
-  result <- ukb_code_mappings$icd10_lkp %>%
-    dplyr::filter(.data[[input_icd10_format]] %in% icd10_codes) %>%
-    .[[output_icd10_format]] %>%
-    unique()
-
-  if (rlang::is_empty(result)) {
-    warning("Warning! `reformat_icd10_codes()` found no icd10 code matches. Returning NULL")
-    return(NULL)
-  } else(
-    return(result)
-  )
-}

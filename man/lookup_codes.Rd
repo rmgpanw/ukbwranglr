@@ -44,6 +44,7 @@ Returns a data frame including descriptions for the codes of interest
 \seealso{
 Other Clinical code lookups and mappings: 
 \code{\link{get_child_codes}()},
-\code{\link{map_codes}()}
+\code{\link{map_codes}()},
+\code{\link{reformat_icd10_codes}()}
 }
 \concept{Clinical code lookups and mappings}

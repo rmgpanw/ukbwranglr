@@ -43,6 +43,7 @@ This is case \emph{sensitive} (important for read codes especially).
 \seealso{
 Other Clinical code lookups and mappings: 
 \code{\link{lookup_codes}()},
-\code{\link{map_codes}()}
+\code{\link{map_codes}()},
+\code{\link{reformat_icd10_codes}()}
 }
 \concept{Clinical code lookups and mappings}

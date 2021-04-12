@@ -53,6 +53,7 @@ The values for arguments \code{from} and \code{to} must be one of
 \seealso{
 Other Clinical code lookups and mappings: 
 \code{\link{get_child_codes}()},
-\code{\link{lookup_codes}()}
+\code{\link{lookup_codes}()},
+\code{\link{reformat_icd10_codes}()}
 }
 \concept{Clinical code lookups and mappings}

@@ -39,7 +39,6 @@ to count the number of non-NA values). Custom functions should include a
 }
 \examples{
 \dontrun{
-
 # make a custom function that counts the number of non-NA values.
 # Note: include '...', otherwise an error is thrown by including na.rm = TRUE below
 
