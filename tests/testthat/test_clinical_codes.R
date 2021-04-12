@@ -6,6 +6,21 @@ ukb_code_mappings <- get_ukb_code_mappings()
 
 # TESTS -------------------------------------------------------------------
 
+
+# `ukb_code_mappings` -----------------------------------------------------
+
+test_that("`ukb_code_mappings` sheet 'icd10_lkp' has no rows with values in both the 'MODIFER-4' and 'MODIFER-5' columns", {
+  # relevant to `lookup_codes()` when `standardise_output` is `TRUE`. Some
+  # ICD-10 codes have a description modifier in one of these 2 columns (e.g.
+  # `E10` for T1DM (MODIFER-4) and `S27` for traumatic pneumothorax
+  # (MODIFER-5)). `lookup_codes()` creates a description column by pasting
+  # together the 'DESCRIPTION' column with *only* one of these. Therefore only
+  # one of these columns should contain a description.
+  expect_true(
+    sum(!is.na(ukb_code_mappings$icd10_lkp$MODIFIER_4) & !is.na(ukb_code_mappings$icd10_lkp$MODIFIER_5)) == 0
+  )
+})
+
 # `get_child_codes()` -----------------------------------------------------
 
 test_that("`get_child_codes()` returns the expected nuber of results", {
@@ -68,6 +83,25 @@ test_that("`lookup_codes()` returns the expected number of results", {
   expected = 2)
 })
 
+test_that(
+  "`lookup_codes()` returns the expected columns when `standardise_output` is `TRUE`",
+  {
+    result <- lookup_codes(
+      codes = c("E10", "E10.0"),
+      code_type = "icd10",
+      ukb_code_mappings = ukb_code_mappings,
+      preferred_description_only = TRUE,
+      standardise_output = TRUE
+    )
+
+    expect_equal(names(result), c("code", "description", "code_type"))
+
+    expect_equal(result$description,
+                 c("Type 1 diabetes mellitus",
+                   "Type 1 diabetes mellitus With coma"))
+  }
+  )
+
 # `map_codes()` -----------------------------------------------------------
 
 test_that(
@@ -78,7 +112,7 @@ test_that(
                 to = "read3",
                 ukb_code_mappings = ukb_code_mappings,
                 quiet = FALSE),
-      regexp = "Warning! The following codes were not found for read2 (the coding system being mapped from): 'foo', 'bar'",
+      regexp = "Warning! The following codes were not found for read2: 'foo', 'bar'",
       fixed = TRUE
     )
   }
@@ -93,7 +127,8 @@ test_that(
                 to = "read3",
                 ukb_code_mappings = ukb_code_mappings,
                 quiet = FALSE,
-                codes_only = TRUE),
+                codes_only = TRUE,
+                standardise_output = FALSE),
       "X40J4"
     )
 
@@ -105,19 +140,42 @@ test_that(
                      ukb_code_mappings = ukb_code_mappings,
                      quiet = FALSE,
                      codes_only = FALSE,
-                     preferred_description_only = FALSE)),
+                     preferred_description_only = FALSE,
+                     standardise_output = FALSE)),
       4
     )
 
     # codes and preferred descriptions only (this additionally filters for only unique codes)
     expect_equal(
-      map_codes(codes = c("C10E.", "C108."),
-                     from = "read2",
-                     to = "read3",
-                     ukb_code_mappings = ukb_code_mappings,
-                     quiet = FALSE,
-                     codes_only = FALSE,
-                     preferred_description_only = TRUE)$READV3_CODE,
+      map_codes(
+        codes = c("C10E.", "C108."),
+        from = "read2",
+        to = "read3",
+        ukb_code_mappings = ukb_code_mappings,
+        quiet = FALSE,
+        codes_only = FALSE,
+        preferred_description_only = TRUE,
+        standardise_output = FALSE
+      )$READV3_CODE,
+      "X40J4"
+    )
+  }
+)
+
+test_that(
+  "`map_codes` returns the expected output when `standardise_output` is `TRUE`",
+  {
+    expect_equal(
+      map_codes(
+        codes = c("C10E.", "C108."),
+        from = "read2",
+        to = "read3",
+        ukb_code_mappings = ukb_code_mappings,
+        quiet = FALSE,
+        codes_only = FALSE,
+        preferred_description_only = TRUE,
+        standardise_output = TRUE
+      )$code,
       "X40J4"
     )
   }

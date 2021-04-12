@@ -9,6 +9,7 @@ lookup_codes(
   code_type,
   ukb_code_mappings = get_ukb_code_mappings(),
   preferred_description_only = TRUE,
+  standardise_output = TRUE,
   quiet = FALSE
 )
 }
@@ -24,6 +25,12 @@ Must be one of \code{read2}, \code{read3}, \code{icd9}, \code{icd10},
 
 \item{preferred_description_only}{bool. Return only preferred descriptions
 for clinical codes with synonyms. Default value is \code{TRUE}.}
+
+\item{standardise_output}{bool. If \code{TRUE} (default), outputs a data
+frame with columns named 'code', 'description' and 'code_type'. Otherwise
+returns a data frame with all columns for the relevant lookup sheet from
+(\href{https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592}{UK Biobank
+resource 592}).}
 
 \item{quiet}{bool. Warning message if any of \code{codes} are not found for
 the supplied \code{code_type}.}

@@ -132,6 +132,7 @@
   <span class='va'>code_type</span>,
   ukb_code_mappings <span class='op'>=</span> <span class='fu'><a href='get_ukb_code_mappings.html'>get_ukb_code_mappings</a></span><span class='op'>(</span><span class='op'>)</span>,
   preferred_description_only <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  standardise_output <span class='op'>=</span> <span class='cn'>TRUE</span>,
   quiet <span class='op'>=</span> <span class='cn'>FALSE</span>
 <span class='op'>)</span></pre>
 
@@ -157,6 +158,14 @@ Must be one of <code>read2</code>, <code>read3</code>, <code>icd9</code>, <code>
       <th>preferred_description_only</th>
       <td><p>bool. Return only preferred descriptions
 for clinical codes with synonyms. Default value is <code>TRUE</code>.</p></td>
+    </tr>
+    <tr>
+      <th>standardise_output</th>
+      <td><p>bool. If <code>TRUE</code> (default), outputs a data
+frame with columns named 'code', 'description' and 'code_type'. Otherwise
+returns a data frame with all columns for the relevant lookup sheet from
+(<a href='https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592'>UK Biobank
+resource 592</a>).</p></td>
     </tr>
     <tr>
       <th>quiet</th>

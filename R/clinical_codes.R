@@ -5,6 +5,11 @@
 # Read3, or Read3 and ICD-10. These rely on the code mapping file provided by
 # UK Biobank (resource 592: https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592)
 
+# TODO - make these work when `ukb_code_mappings` is supplied as a SQLite db
+# file containing resource 592(?)
+
+# TODO - validate `ukb_code_mappings` arg
+
 # EXPORTED FUNCTIONS ------------------------------------------------------
 
 # Exploring and mapping clinical codes ------------------------------------
@@ -41,6 +46,11 @@ get_child_codes <- function(codes,
   # validate args
   match.arg(arg = code_type,
             choices = ukbwranglr:::code_type_to_lkp_sheet_map_df$code)
+
+  assertthat::assert_that(
+    is.character(codes),
+    msg = "Error! `codes` must be a character vector"
+  )
 
   assertthat::assert_that(is.logical(codes_only),
                           msg = "`code_only` must be either 'TRUE' or 'FALSE'")
@@ -110,6 +120,11 @@ get_child_codes <- function(codes,
 #' Returns a data frame including descriptions for the codes of interest
 #'
 #' @param codes character. Vector of codes to lookup
+#' @param standardise_output bool. If \code{TRUE} (default), outputs a data
+#'   frame with columns named 'code', 'description' and 'code_type'. Otherwise
+#'   returns a data frame with all columns for the relevant lookup sheet from
+#'   (\href{https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592}{UK Biobank
+#'   resource 592}).
 #' @inheritParams get_child_codes
 #'
 #' @return data frame
@@ -119,8 +134,14 @@ lookup_codes <- function(codes,
                          code_type,
                          ukb_code_mappings = get_ukb_code_mappings(),
                          preferred_description_only = TRUE,
+                         standardise_output = TRUE,
                          quiet = FALSE) {
   # validate args
+  assertthat::assert_that(
+    is.character(codes),
+    msg = "Error! `codes` must be a character vector"
+  )
+
   match.arg(arg = code_type,
             choices = ukbwranglr:::code_type_to_lkp_sheet_map_df$code)
 
@@ -130,6 +151,10 @@ lookup_codes <- function(codes,
   # determine code column for lookup sheet
   code_col <- get_col_for_lookup_sheet(lookup_sheet = lkp_sheet,
                                        column = "code_col")
+
+  # determine description column for lookup sheet
+  description_col <- get_col_for_lookup_sheet(lookup_sheet = lkp_sheet,
+                                             column = "description_col")
 
   # determine relevant column indicating whether code description is preferred
   # (for code types with synonymous code descriptions like read 2 and read 3)
@@ -149,6 +174,31 @@ lookup_codes <- function(codes,
   if (preferred_description_only & !is.na(preferred_description_col)) {
     result <- result %>%
       dplyr::filter(.data[[preferred_description_col]] == preferred_description_code)
+  }
+
+  # standardise output if requested
+  if (standardise_output) {
+    names(result)[which(names(result) == code_col)] <- "code"
+    names(result)[which(names(result) == description_col)] <- "description"
+
+    # ICD-10 has a modifier column e.g. "E10" = "Type 1 diabetes mellitus",
+    # whereas "E10.0" = "Type 1 diabetes mellitus with coma". "With coma" is
+    # contained in the modifier columns "MODIFIER-4". See 'S27' for an example
+    # code where additional description is contained in the "MODIFER-5" column.
+    # The returned "description" column from `standardise_output == TRUE`
+    # therefore combines the 'DESCRIPTION' column with one of these 2 columns
+    # (whichever is not NA).
+    if (lkp_sheet == "icd10_lkp") {
+      result$description <- dplyr::case_when(
+        !is.na(result$MODIFIER_4) ~ paste(result$description, result$MODIFIER_4),
+        !is.na(result$MODIFIER_5) ~ paste(result$description, result$MODIFIER_4),
+        TRUE ~ result$description
+      )
+    }
+
+    # return code, description and code_type cols only
+    result <- result[c("code", "description")]
+    result[["code_type"]] <- code_type
   }
 
   # return result
@@ -257,6 +307,7 @@ search_codes_by_description <- function(reg_expr,
 #' @param quiet bool. Warning message if any of `codes` are not found for the
 #'   code type being mapped from.
 #' @inheritParams get_child_codes
+#' @inheritParams lookup_codes
 #'
 #' @export
 #' @family Clinical code lookups and mappings
@@ -264,8 +315,9 @@ map_codes <- function(codes,
                       from,
                       to,
                       ukb_code_mappings = get_ukb_code_mappings(),
-                      codes_only = TRUE,
+                      codes_only = FALSE,
                       preferred_description_only = TRUE,
+                      standardise_output = TRUE,
                       quiet = FALSE) {
   # validate args
   match.arg(arg = from,
@@ -276,11 +328,19 @@ map_codes <- function(codes,
             choices = ukbwranglr:::code_type_to_lkp_sheet_map_df$code)
             # choices = ukbwranglr:::clinical_code_mappings_map$to)
 
+  assertthat::assert_that(
+    is.character(codes),
+    msg = "Error! `codes` must be a character vector"
+  )
+
   assertthat::assert_that(!from == to,
                           msg = "Error! `from` and `to` args cannot be the same")
 
   assertthat::assert_that(is.logical(codes_only),
                           msg = "`code_only` must be either 'TRUE' or 'FALSE'")
+
+  assertthat::assert_that(!(codes_only & standardise_output),
+                          msg = "Error! `codes_only` and `standardise_output` cannot both be `TRUE`")
 
   # get appropriate mapping sheet
   swap_mapping_cols <- FALSE
@@ -347,8 +407,8 @@ map_codes <- function(codes,
   }
 
   # return result
-  if (rlang::is_empty(result)) {
-    message("No codes found after mapping. Returning `NULL`")
+  if (nrow(result) == 0) {
+    message("\nNo codes found after mapping. Returning `NULL`")
     return(NULL)
   } else {
     # warning if any `codes` not present in `from_col`
@@ -375,12 +435,24 @@ map_codes <- function(codes,
       # }
 
       return(result)
-    } else {
+    } else if (standardise_output) {
+      # Note, not all mapping sheets in UKB resource 592 contain descriptions
+      # (e.g. 'read_v2_icd9'). Therefore need to use `lookup_codes` if
+      # `standardise_output` is `TRUE`
+      return(
+        lookup_codes(
+          codes = unique(result[[to_col]]),
+          code_type = to,
+          ukb_code_mappings = ukb_code_mappings,
+          preferred_description_only = preferred_description_only,
+          quiet = quiet
+        )
+      )
+      } else {
       return(result)
     }
   }
 }
-
 
 # Clinical code lists -----------------------------------------------------
 
@@ -554,7 +626,7 @@ warning_if_codes_not_found <-
       warning(
         "Warning! The following codes were not found for ",
         code_type,
-        " (the coding system being mapped from): '",
+        ": '",
         stringr::str_c(missing_codes, sep = "", collapse = "', '"),
         "'"
       )

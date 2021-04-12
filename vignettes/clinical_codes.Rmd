@@ -37,6 +37,8 @@ ukb_code_mappings <- get_ukb_code_mappings()
 names(ukb_code_mappings)
 ```
 
+> **Note:** `get_ukb_code_mappings()` returns a large object (~460MB)
+
 # Code lookups
 
 To lookup details for a particular code, use `lookup_codes()`. Setting `preferred_description_only` to `TRUE` will return only the preferred code descriptions if synonyms are present (`read2` and `read3` may include multiple descriptions for the same code):
@@ -50,6 +52,105 @@ lookup_codes(codes = t1dm_read2,
              code_type = "read2",
              ukb_code_mappings = ukb_code_mappings,
              preferred_description_only = TRUE)
+```
+By default, the output is standardised to produce the columns shown above. To output the original formatting from [UK Biobank resource 592](https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592), set `standardise_output` to `FALSE`:
+
+```{r}
+# lookup details
+lookup_codes(codes = t1dm_read2,
+             code_type = "read2",
+             ukb_code_mappings = ukb_code_mappings,
+             preferred_description_only = TRUE,
+             standardise_output = FALSE)
+```
+
+# Code mapping
+
+An example: map codes for type 1 diabetes from Read2 to Read3. Note that both of the Read 2 codes `C10E.` and `C108.` map to a single read3 code, `X40J4`:
+
+```{r}
+# Some Read2 codes for T1DM
+t1dm_read2 <- c("C10E.", "C108.")
+
+# lookup details
+map_codes(codes = t1dm_read2, 
+          from = "read2", 
+          to = "read3", 
+          ukb_code_mappings = ukb_code_mappings)
+```
+
+If re-running the above search with `standardise_output` as `FALSE` and `preferred_description_only` as `TRUE`, note that some of the input code values may not appear in the result if multiple codes map to a single code:
+
+```{r}
+# Some Read2 codes for T1DM
+t1dm_read2 <- c("C10E.", "C108.")
+
+# lookup details - the input Read 2 code 'C10E.' does not appear in the result
+map_codes(codes = t1dm_read2, 
+          from = "read2", 
+          to = "read3", 
+          ukb_code_mappings = ukb_code_mappings, 
+          codes_only = FALSE,
+          preferred_description_only = TRUE,
+          standardise_output = FALSE)
+```
+
+Mapping to ICD is more problematic as some results are a range of ICD codes (note also that for ICD-10, the mapping sheets use an alternative code format which removes any "." characters):
+
+```{r}
+map_codes(codes = t1dm_read2, 
+          from = "read2", 
+          to = "icd10", 
+          ukb_code_mappings = ukb_code_mappings, 
+          codes_only = TRUE,
+          standardise_output = FALSE)
+```
+
+The available mappings do not cover all possible mapping directions. For example, while there are mappings for Read2 to ICD-10, there is no mapping for ICD-10 to Read2. For cases like this, `map_codes()` will attempt to map anyway by using the same mapping sheet in reverse (e.g. for mapping ICD-10 to Read2, `map_codes` uses the `read_v2_icd10` mapping sheet). However, this returns no results when attempting to map the ICD-10 code, `H36.0` for diabetic retinopathy:
+
+```{r}
+# find ICD-10 code matching "diabetic retinopathy"
+icd10_diabetic_retinopathy <-
+  search_codes_by_description(
+    reg_expr = "diabetic retinopathy",
+    code_type = "icd10",
+    ukb_code_mappings = ukb_code_mappings,
+    ignore_case = TRUE,
+    codes_only = TRUE
+  )
+
+# attempting to map this to Read 2 returns an result however
+map_codes(
+  codes = icd10_diabetic_retinopathy,
+  from = "icd10",
+  to = "read2",
+  ukb_code_mappings = ukb_code_mappings,
+  standardise_output = FALSE,
+  codes_only = TRUE
+)
+```
+
+Inspecting the mapping sheet `read_v2_icd10` shows why. The `icd10_code` column contains 2 ICD-10 codes which both describe diabetic retinopathy:
+
+```{r}
+ukb_code_mappings$read_v2_icd10 %>% 
+  dplyr::filter(stringr::str_detect(icd10_code, pattern = "H360"))
+```
+
+> **Note:** "H36.0" is converted to "H360" by `map_codes` internally, as this is the format used by the mapping sheets.
+
+# Find codes that match a description
+
+Use `search_codes_by_description()`. For example, to find Read2 codes that match the description 'diabetic retinopathy':
+
+```{r}
+search_codes_by_description(reg_expr = "diabetic retinopathy", 
+                          code_type = "read2", 
+                          ukb_code_mappings = ukb_code_mappings, 
+                          ignore_case = TRUE, 
+                          codes_only = FALSE,
+                          preferred_description_only = TRUE) %>% 
+  head()
 ```
 
 # Children codes
@@ -82,105 +183,3 @@ get_child_codes(codes = t1dm_read2,
                 codes_only = FALSE) %>% 
   head()
 ```
-
-# Find codes that match a description
-
-Use `search_codes_by_description()`. For example, to find Read2 codes that match the description 'diabetic retinopathy':
-
-```{r}
-search_codes_by_description(reg_expr = "diabetic retinopathy", 
-                          code_type = "read2", 
-                          ukb_code_mappings = ukb_code_mappings, 
-                          ignore_case = TRUE, 
-                          codes_only = FALSE,
-                          preferred_description_only = TRUE) %>% 
-  head()
-```
-
-# Code mapping
-
-An example: map codes for type 1 diabetes from Read2 to Read3.
-
-```{r}
-# Some Read2 codes for T1DM
-t1dm_read2 <- c("C10E.", "C108.")
-
-# lookup details
-map_codes(codes = t1dm_read2, 
-          from = "read2", 
-          to = "read3", 
-          ukb_code_mappings = ukb_code_mappings, 
-          codes_only = FALSE,
-          preferred_description_only = FALSE)
-```
-
-Note that by setting `preferred_description_only` to `TRUE`, some of the code values being mapped may not appear in the result if multiple codes map to a single code. In this example, both of the read2 codes `C10E.` and `C108.` map to a single read3 code, `X40J4`.
-
-```{r}
-# Some Read2 codes for T1DM
-t1dm_read2 <- c("C10E.", "C108.")
-
-# lookup details
-map_codes(codes = t1dm_read2, 
-          from = "read2", 
-          to = "read3", 
-          ukb_code_mappings = ukb_code_mappings, 
-          codes_only = FALSE,
-          preferred_description_only = TRUE)
-```
-
-Mapping to ICD is more problematic as some results are a range of ICD codes (note also that for ICD-10, the mapping sheets use an alternative code format which removes any "." characters):
-
-```{r}
-map_codes(codes = t1dm_read2, 
-          from = "read2", 
-          to = "icd10", 
-          ukb_code_mappings = ukb_code_mappings, 
-          codes_only = TRUE)
-```
-
-The available mappings do not cover all possible mapping directions. For example, while there are mappings for Read2 to ICD-10, there is no mapping for ICD-10 to Read2. For cases like this, `map_codes()` will attempt to map anyway:
-
-```{r}
-# find ICD-10 code matching "diabetic retinopathy"
-search_codes_by_description(
-  reg_expr = "diabetic retinopathy",
-  code_type = "icd10",
-  ukb_code_mappings = ukb_code_mappings,
-  ignore_case = TRUE,
-  codes_only = FALSE
-)
-```
-
-However, this returns a `NULL` result when attempting to map the following:
-
-```{r}
-# try mapping this ICD-10 code for diabetic retinopathy to Read codes
-icd10_diabetic_retinopathy <-
-  search_codes_by_description(
-    reg_expr = "diabetic retinopathy",
-    code_type = "icd10",
-    ukb_code_mappings = ukb_code_mappings,
-    ignore_case = TRUE,
-    codes_only = TRUE
-  )
-
-# this returns a `NULL` result however
-icd10_diabetic_retinopathy_as_read_code <- map_codes(
-  codes = icd10_diabetic_retinopathy,
-  from = "icd10",
-  to = "read2",
-  ukb_code_mappings = ukb_code_mappings,
-  codes_only = TRUE
-)
-```
-
-Inspecting the mapping sheet `read_v2_icd10` shows why:
-
-> **Note:** "H36.0" is converted to "H360" by `map_codes` internally, as this is the format used by the mapping sheets.
-
-```{r}
-ukb_code_mappings$read_v2_icd10 %>% 
-  dplyr::filter(stringr::str_detect(icd10_code, pattern = "H360"))
-```
-

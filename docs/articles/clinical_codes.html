@@ -110,6 +110,9 @@
 <span class="co">#&gt; [10] "read_v2_icd10"     "read_v2_opcs4"     "read_v2_read_ctv3"</span>
 <span class="co">#&gt; [13] "read_ctv3_lkp"     "read_ctv3_icd9"    "read_ctv3_icd10"  </span>
 <span class="co">#&gt; [16] "read_ctv3_opcs4"   "read_ctv3_read_v2"</span></code></pre></div>
+<blockquote>
+<p><strong>Note:</strong> <code><a href="../reference/get_ukb_code_mappings.html">get_ukb_code_mappings()</a></code> returns a large object (~460MB)</p>
+</blockquote>
 </div>
 <div id="code-lookups" class="section level1">
 <h1 class="hasAnchor">
@@ -125,118 +128,54 @@
              ukb_code_mappings <span class="op">=</span> <span class="va">ukb_code_mappings</span>,
              preferred_description_only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 2 x 3</span>
+<span class="co">#&gt;   code  description                         code_type</span>
+<span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;                               &lt;chr&gt;    </span>
+<span class="co">#&gt; 1 C108. Insulin dependent diabetes mellitus read2    </span>
+<span class="co">#&gt; 2 C10E. Type 1 diabetes mellitus            read2</span></code></pre></div>
+<p>By default, the output is standardised to produce the columns shown above. To output the original formatting from <a href="https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592">UK Biobank resource 592</a>, set <code>standardise_output</code> to <code>FALSE</code>:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># lookup details</span>
+<span class="fu"><a href="../reference/lookup_codes.html">lookup_codes</a></span><span class="op">(</span>codes <span class="op">=</span> <span class="va">t1dm_read2</span>,
+             code_type <span class="op">=</span> <span class="st">"read2"</span>,
+             ukb_code_mappings <span class="op">=</span> <span class="va">ukb_code_mappings</span>,
+             preferred_description_only <span class="op">=</span> <span class="cn">TRUE</span>,
+             standardise_output <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 2 x 3</span>
 <span class="co">#&gt;   read_code term_code term_description                   </span>
 <span class="co">#&gt;   &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt;                              </span>
 <span class="co">#&gt; 1 C108.     00        Insulin dependent diabetes mellitus</span>
 <span class="co">#&gt; 2 C10E.     00        Type 1 diabetes mellitus</span></code></pre></div>
 </div>
-<div id="children-codes" class="section level1">
+<div id="code-mapping" class="section level1">
 <h1 class="hasAnchor">
-<a href="#children-codes" class="anchor"></a>Children codes</h1>
-<p>To get the children codes, use <code><a href="../reference/get_child_codes.html">get_child_codes()</a></code>. This will return all unique clinical codes that start with the codes of interest:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Some Read2 codes for T1DM</span>
-<span class="va">t1dm_read2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"C10E."</span>, <span class="st">"C108."</span><span class="op">)</span>
-
-<span class="co"># lookup details</span>
-<span class="fu"><a href="../reference/get_child_codes.html">get_child_codes</a></span><span class="op">(</span>codes <span class="op">=</span> <span class="va">t1dm_read2</span>, 
-                code_type <span class="op">=</span> <span class="st">"read2"</span>, 
-                ukb_code_mappings <span class="op">=</span> <span class="va">ukb_code_mappings</span>, 
-                codes_only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="co">#&gt;  [1] "C108." "C1080" "C1081" "C1082" "C1083" "C1084" "C1085" "C1086" "C1087"</span>
-<span class="co">#&gt; [10] "C1088" "C1089" "C108A" "C108B" "C108C" "C108D" "C108E" "C108F" "C108G"</span>
-<span class="co">#&gt; [19] "C108H" "C108J" "C108y" "C108z" "C10E." "C10E0" "C10E1" "C10E2" "C10E3"</span>
-<span class="co">#&gt; [28] "C10E4" "C10E5" "C10E6" "C10E7" "C10E8" "C10E9" "C10EA" "C10EB" "C10EC"</span>
-<span class="co">#&gt; [37] "C10ED" "C10EE" "C10EF" "C10EG" "C10EH" "C10EJ" "C10EK" "C10EL" "C10EM"</span>
-<span class="co">#&gt; [46] "C10EN" "C10EP" "C10EQ" "C10ER"</span></code></pre></div>
-<blockquote>
-<p><strong>Note:</strong> Some coding systems include a ‘.’ (e.g. ICD-10) - this may return unexpected results with <code><a href="../reference/get_child_codes.html">get_child_codes()</a></code>, as this function searches using regexs and ‘.’ is interpreted as a wildcard.</p>
-</blockquote>
-<p>By default, a character vector of codes is returned. To return a data frame including code descriptions, set the argument <code>codes_only</code> to <code>FALSE</code>:</p>
+<a href="#code-mapping" class="anchor"></a>Code mapping</h1>
+<p>An example: map codes for type 1 diabetes from Read2 to Read3. Note that both of the Read 2 codes <code>C10E.</code> and <code>C108.</code> map to a single read3 code, <code>X40J4</code>:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Some Read2 codes for T1DM</span>
 <span class="va">t1dm_read2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"C10E."</span>, <span class="st">"C108."</span><span class="op">)</span>
 
 <span class="co"># lookup details</span>
-<span class="fu"><a href="../reference/get_child_codes.html">get_child_codes</a></span><span class="op">(</span>codes <span class="op">=</span> <span class="va">t1dm_read2</span>, 
-                code_type <span class="op">=</span> <span class="st">"read2"</span>, 
-                ukb_code_mappings <span class="op">=</span> <span class="va">ukb_code_mappings</span>, 
-                codes_only <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 6 x 3</span>
-<span class="co">#&gt;   read_code term_code term_description                                          </span>
-<span class="co">#&gt;   &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt;                                                     </span>
-<span class="co">#&gt; 1 C108.     00        Insulin dependent diabetes mellitus                       </span>
-<span class="co">#&gt; 2 C1080     00        Insulin-dependent diabetes mellitus with renal complicati…</span>
-<span class="co">#&gt; 3 C1081     00        Insulin-dependent diabetes mellitus with ophthalmic compl…</span>
-<span class="co">#&gt; 4 C1082     00        Insulin-dependent diabetes mellitus with neurological com…</span>
-<span class="co">#&gt; 5 C1083     00        Insulin dependent diabetes mellitus with multiple complic…</span>
-<span class="co">#&gt; 6 C1084     00        Unstable insulin dependent diabetes mellitus</span></code></pre></div>
-</div>
-<div id="find-codes-that-match-a-description" class="section level1">
-<h1 class="hasAnchor">
-<a href="#find-codes-that-match-a-description" class="anchor"></a>Find codes that match a description</h1>
-<p>Use <code><a href="../reference/search_codes_by_description.html">search_codes_by_description()</a></code>. For example, to find Read2 codes that match the description ‘diabetic retinopathy’:</p>
+<span class="fu"><a href="../reference/map_codes.html">map_codes</a></span><span class="op">(</span>codes <span class="op">=</span> <span class="va">t1dm_read2</span>, 
+          from <span class="op">=</span> <span class="st">"read2"</span>, 
+          to <span class="op">=</span> <span class="st">"read3"</span>, 
+          ukb_code_mappings <span class="op">=</span> <span class="va">ukb_code_mappings</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 1 x 3</span>
+<span class="co">#&gt;   code  description              code_type</span>
+<span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;                    &lt;chr&gt;    </span>
+<span class="co">#&gt; 1 X40J4 Type I diabetes mellitus read3</span></code></pre></div>
+<p>If re-running the above search with <code>standardise_output</code> as <code>FALSE</code> and <code>preferred_description_only</code> as <code>TRUE</code>, note that some of the input code values may not appear in the result if multiple codes map to a single code:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/search_codes_by_description.html">search_codes_by_description</a></span><span class="op">(</span>reg_expr <span class="op">=</span> <span class="st">"diabetic retinopathy"</span>, 
-                          code_type <span class="op">=</span> <span class="st">"read2"</span>, 
-                          ukb_code_mappings <span class="op">=</span> <span class="va">ukb_code_mappings</span>, 
-                          ignore_case <span class="op">=</span> <span class="cn">TRUE</span>, 
-                          codes_only <span class="op">=</span> <span class="cn">FALSE</span>,
-                          preferred_description_only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 6 x 3</span>
-<span class="co">#&gt;   read_code term_code term_description                                          </span>
-<span class="co">#&gt;   &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt;                                                     </span>
-<span class="co">#&gt; 1 2BBJ.     00        O/E - no right diabetic retinopathy                       </span>
-<span class="co">#&gt; 2 2BBk.     00        O/E - right eye stable treated proliferative diabetic ret…</span>
-<span class="co">#&gt; 3 2BBK.     00        O/E - no left diabetic retinopathy                        </span>
-<span class="co">#&gt; 4 2BBl.     00        O/E - left eye stable treated proliferative diabetic reti…</span>
-<span class="co">#&gt; 5 2BBo.     00        O/E - sight threatening diabetic retinopathy              </span>
-<span class="co">#&gt; 6 2BBP.     00        O/E - right eye background diabetic retinopathy</span></code></pre></div>
-</div>
-<div id="code-mapping" class="section level1">
-<h1 class="hasAnchor">
-<a href="#code-mapping" class="anchor"></a>Code mapping</h1>
-<p>An example: map codes for type 1 diabetes from Read2 to Read3.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Some Read2 codes for T1DM</span>
 <span class="va">t1dm_read2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"C10E."</span>, <span class="st">"C108."</span><span class="op">)</span>
 
-<span class="co"># lookup details</span>
+<span class="co"># lookup details - the input Read 2 code 'C10E.' does not appear in the result</span>
 <span class="fu"><a href="../reference/map_codes.html">map_codes</a></span><span class="op">(</span>codes <span class="op">=</span> <span class="va">t1dm_read2</span>, 
           from <span class="op">=</span> <span class="st">"read2"</span>, 
           to <span class="op">=</span> <span class="st">"read3"</span>, 
           ukb_code_mappings <span class="op">=</span> <span class="va">ukb_code_mappings</span>, 
           codes_only <span class="op">=</span> <span class="cn">FALSE</span>,
-          preferred_description_only <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 10 x 11</span>
-<span class="co">#&gt;    CHAPTER READV2_CODE READV2_DESC TERMV2_DESC TERMV2_ORDER TERMV2_TYPE</span>
-<span class="co">#&gt;    &lt;chr&gt;   &lt;chr&gt;       &lt;chr&gt;       &lt;chr&gt;       &lt;chr&gt;        &lt;chr&gt;      </span>
-<span class="co">#&gt;  1 C       C108.       Insulin de… Insulin de… 00           P          </span>
-<span class="co">#&gt;  2 C       C108.       Insulin de… Insulin de… 00           P          </span>
-<span class="co">#&gt;  3 C       C108.       Insulin de… IDDM-Insul… 11           S          </span>
-<span class="co">#&gt;  4 C       C108.       Insulin de… IDDM-Insul… 11           S          </span>
-<span class="co">#&gt;  5 C       C108.       Insulin de… Type 1 dia… 12           S          </span>
-<span class="co">#&gt;  6 C       C108.       Insulin de… Type I dia… 13           S          </span>
-<span class="co">#&gt;  7 C       C10E.       Type 1 dia… Type 1 dia… 00           P          </span>
-<span class="co">#&gt;  8 C       C10E.       Type 1 dia… Insulin de… 12           S          </span>
-<span class="co">#&gt;  9 C       C10E.       Type 1 dia… Insulin de… 12           S          </span>
-<span class="co">#&gt; 10 C       C10E.       Type 1 dia… Type I dia… 11           S          </span>
-<span class="co">#&gt; # … with 5 more variables: READV3_CODE &lt;chr&gt;, TERMV3_CODE &lt;chr&gt;,</span>
-<span class="co">#&gt; #   TERMV3_TYPE &lt;chr&gt;, TERMV3_DESC &lt;chr&gt;, IS_ASSURED &lt;chr&gt;</span></code></pre></div>
-<p>Note that by setting <code>preferred_description_only</code> to <code>TRUE</code>, some of the code values being mapped may not appear in the result if multiple codes map to a single code. In this example, both of the read2 codes <code>C10E.</code> and <code>C108.</code> map to a single read3 code, <code>X40J4</code>.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Some Read2 codes for T1DM</span>
-<span class="va">t1dm_read2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"C10E."</span>, <span class="st">"C108."</span><span class="op">)</span>
-
-<span class="co"># lookup details</span>
-<span class="fu"><a href="../reference/map_codes.html">map_codes</a></span><span class="op">(</span>codes <span class="op">=</span> <span class="va">t1dm_read2</span>, 
-          from <span class="op">=</span> <span class="st">"read2"</span>, 
-          to <span class="op">=</span> <span class="st">"read3"</span>, 
-          ukb_code_mappings <span class="op">=</span> <span class="va">ukb_code_mappings</span>, 
-          codes_only <span class="op">=</span> <span class="cn">FALSE</span>,
-          preferred_description_only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+          preferred_description_only <span class="op">=</span> <span class="cn">TRUE</span>,
+          standardise_output <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 1 x 11</span>
 <span class="co">#&gt;   CHAPTER READV2_CODE READV2_DESC TERMV2_DESC TERMV2_ORDER TERMV2_TYPE</span>
 <span class="co">#&gt;   &lt;chr&gt;   &lt;chr&gt;       &lt;chr&gt;       &lt;chr&gt;       &lt;chr&gt;        &lt;chr&gt;      </span>
@@ -244,32 +183,17 @@
 <span class="co">#&gt; # … with 5 more variables: READV3_CODE &lt;chr&gt;, TERMV3_CODE &lt;chr&gt;,</span>
 <span class="co">#&gt; #   TERMV3_TYPE &lt;chr&gt;, TERMV3_DESC &lt;chr&gt;, IS_ASSURED &lt;chr&gt;</span></code></pre></div>
 <p>Mapping to ICD is more problematic as some results are a range of ICD codes (note also that for ICD-10, the mapping sheets use an alternative code format which removes any “.” characters):</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/map_codes.html">map_codes</a></span><span class="op">(</span>codes <span class="op">=</span> <span class="va">t1dm_read2</span>, 
           from <span class="op">=</span> <span class="st">"read2"</span>, 
           to <span class="op">=</span> <span class="st">"icd10"</span>, 
           ukb_code_mappings <span class="op">=</span> <span class="va">ukb_code_mappings</span>, 
-          codes_only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+          codes_only <span class="op">=</span> <span class="cn">TRUE</span>,
+          standardise_output <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 <span class="co">#&gt; [1] "E100-E109"</span></code></pre></div>
-<p>The available mappings do not cover all possible mapping directions. For example, while there are mappings for Read2 to ICD-10, there is no mapping for ICD-10 to Read2. For cases like this, <code><a href="../reference/map_codes.html">map_codes()</a></code> will attempt to map anyway:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<p>The available mappings do not cover all possible mapping directions. For example, while there are mappings for Read2 to ICD-10, there is no mapping for ICD-10 to Read2. For cases like this, <code><a href="../reference/map_codes.html">map_codes()</a></code> will attempt to map anyway by using the same mapping sheet in reverse (e.g. for mapping ICD-10 to Read2, <code>map_codes</code> uses the <code>read_v2_icd10</code> mapping sheet). However, this returns no results when attempting to map the ICD-10 code, <code>H36.0</code> for diabetic retinopathy:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># find ICD-10 code matching "diabetic retinopathy"</span>
-<span class="fu"><a href="../reference/search_codes_by_description.html">search_codes_by_description</a></span><span class="op">(</span>
-  reg_expr <span class="op">=</span> <span class="st">"diabetic retinopathy"</span>,
-  code_type <span class="op">=</span> <span class="st">"icd10"</span>,
-  ukb_code_mappings <span class="op">=</span> <span class="va">ukb_code_mappings</span>,
-  ignore_case <span class="op">=</span> <span class="cn">TRUE</span>,
-  codes_only <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span>
-<span class="co">#&gt; # A tibble: 1 x 12</span>
-<span class="co">#&gt;   ICD10_CODE ALT_CODE USAGE USAGE_UK DESCRIPTION MODIFIER_4 MODIFIER_5</span>
-<span class="co">#&gt;   &lt;chr&gt;      &lt;chr&gt;    &lt;chr&gt; &lt;chr&gt;    &lt;chr&gt;       &lt;chr&gt;      &lt;chr&gt;     </span>
-<span class="co">#&gt; 1 H36.0      H360     ASTE… 2        Diabetic r… &lt;NA&gt;       &lt;NA&gt;      </span>
-<span class="co">#&gt; # … with 5 more variables: QUALIFIERS &lt;chr&gt;, GENDER_MASK &lt;chr&gt;, MIN_AGE &lt;chr&gt;,</span>
-<span class="co">#&gt; #   MAX_AGE &lt;chr&gt;, TREE_DESCRIPTION &lt;chr&gt;</span></code></pre></div>
-<p>However, this returns a <code>NULL</code> result when attempting to map the following:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># try mapping this ICD-10 code for diabetic retinopathy to Read codes</span>
 <span class="va">icd10_diabetic_retinopathy</span> <span class="op">&lt;-</span>
   <span class="fu"><a href="../reference/search_codes_by_description.html">search_codes_by_description</a></span><span class="op">(</span>
     reg_expr <span class="op">=</span> <span class="st">"diabetic retinopathy"</span>,
@@ -279,26 +203,23 @@
     codes_only <span class="op">=</span> <span class="cn">TRUE</span>
   <span class="op">)</span>
 
-<span class="co"># this returns a `NULL` result however</span>
-<span class="va">icd10_diabetic_retinopathy_as_read_code</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/map_codes.html">map_codes</a></span><span class="op">(</span>
+<span class="co"># attempting to map this to Read 2 returns an result however</span>
+<span class="fu"><a href="../reference/map_codes.html">map_codes</a></span><span class="op">(</span>
   codes <span class="op">=</span> <span class="va">icd10_diabetic_retinopathy</span>,
   from <span class="op">=</span> <span class="st">"icd10"</span>,
   to <span class="op">=</span> <span class="st">"read2"</span>,
   ukb_code_mappings <span class="op">=</span> <span class="va">ukb_code_mappings</span>,
+  standardise_output <span class="op">=</span> <span class="cn">FALSE</span>,
   codes_only <span class="op">=</span> <span class="cn">TRUE</span>
 <span class="op">)</span>
 <span class="co">#&gt; Warning in map_codes(codes = icd10_diabetic_retinopathy, from = "icd10", :</span>
 <span class="co">#&gt; Warning! No mapping sheet available for this request. Attempting to map anyway</span>
 <span class="co">#&gt; using: read_v2_icd10</span>
-<span class="co">#&gt; Warning in warning_if_codes_not_found(codes = codes, code_type = from,</span>
-<span class="co">#&gt; search_col = ukb_code_mappings[[mapping_sheet]][[from_col]]): Warning! The</span>
-<span class="co">#&gt; following codes were not found for icd10 (the coding system being mapped from):</span>
-<span class="co">#&gt; 'H360'</span></code></pre></div>
-<p>Inspecting the mapping sheet <code>read_v2_icd10</code> shows why:</p>
-<blockquote>
-<p><strong>Note:</strong> “H36.0” is converted to “H360” by <code>map_codes</code> internally, as this is the format used by the mapping sheets.</p>
-</blockquote>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<span class="co">#&gt; </span>
+<span class="co">#&gt; No codes found after mapping. Returning `NULL`</span>
+<span class="co">#&gt; NULL</span></code></pre></div>
+<p>Inspecting the mapping sheet <code>read_v2_icd10</code> shows why. The <code>icd10_code</code> column contains 2 ICD-10 codes which both describe diabetic retinopathy:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ukb_code_mappings</span><span class="op">$</span><span class="va">read_v2_icd10</span> <span class="op">%&gt;%</span> 
   <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_detect.html">str_detect</a></span><span class="op">(</span><span class="va">icd10_code</span>, pattern <span class="op">=</span> <span class="st">"H360"</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 17 x 3</span>
@@ -321,6 +242,74 @@
 <span class="co">#&gt; 15 F4207     E143D H360A 7             </span>
 <span class="co">#&gt; 16 F4208     E143D H360A 7             </span>
 <span class="co">#&gt; 17 F420z     E143D H360A 7</span></code></pre></div>
+<blockquote>
+<p><strong>Note:</strong> “H36.0” is converted to “H360” by <code>map_codes</code> internally, as this is the format used by the mapping sheets.</p>
+</blockquote>
+</div>
+<div id="find-codes-that-match-a-description" class="section level1">
+<h1 class="hasAnchor">
+<a href="#find-codes-that-match-a-description" class="anchor"></a>Find codes that match a description</h1>
+<p>Use <code><a href="../reference/search_codes_by_description.html">search_codes_by_description()</a></code>. For example, to find Read2 codes that match the description ‘diabetic retinopathy’:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/search_codes_by_description.html">search_codes_by_description</a></span><span class="op">(</span>reg_expr <span class="op">=</span> <span class="st">"diabetic retinopathy"</span>, 
+                          code_type <span class="op">=</span> <span class="st">"read2"</span>, 
+                          ukb_code_mappings <span class="op">=</span> <span class="va">ukb_code_mappings</span>, 
+                          ignore_case <span class="op">=</span> <span class="cn">TRUE</span>, 
+                          codes_only <span class="op">=</span> <span class="cn">FALSE</span>,
+                          preferred_description_only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 6 x 3</span>
+<span class="co">#&gt;   read_code term_code term_description                                          </span>
+<span class="co">#&gt;   &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt;                                                     </span>
+<span class="co">#&gt; 1 2BBJ.     00        O/E - no right diabetic retinopathy                       </span>
+<span class="co">#&gt; 2 2BBk.     00        O/E - right eye stable treated proliferative diabetic ret…</span>
+<span class="co">#&gt; 3 2BBK.     00        O/E - no left diabetic retinopathy                        </span>
+<span class="co">#&gt; 4 2BBl.     00        O/E - left eye stable treated proliferative diabetic reti…</span>
+<span class="co">#&gt; 5 2BBo.     00        O/E - sight threatening diabetic retinopathy              </span>
+<span class="co">#&gt; 6 2BBP.     00        O/E - right eye background diabetic retinopathy</span></code></pre></div>
+</div>
+<div id="children-codes" class="section level1">
+<h1 class="hasAnchor">
+<a href="#children-codes" class="anchor"></a>Children codes</h1>
+<p>To get the children codes, use <code><a href="../reference/get_child_codes.html">get_child_codes()</a></code>. This will return all unique clinical codes that start with the codes of interest:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Some Read2 codes for T1DM</span>
+<span class="va">t1dm_read2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"C10E."</span>, <span class="st">"C108."</span><span class="op">)</span>
+
+<span class="co"># lookup details</span>
+<span class="fu"><a href="../reference/get_child_codes.html">get_child_codes</a></span><span class="op">(</span>codes <span class="op">=</span> <span class="va">t1dm_read2</span>, 
+                code_type <span class="op">=</span> <span class="st">"read2"</span>, 
+                ukb_code_mappings <span class="op">=</span> <span class="va">ukb_code_mappings</span>, 
+                codes_only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="co">#&gt;  [1] "C108." "C1080" "C1081" "C1082" "C1083" "C1084" "C1085" "C1086" "C1087"</span>
+<span class="co">#&gt; [10] "C1088" "C1089" "C108A" "C108B" "C108C" "C108D" "C108E" "C108F" "C108G"</span>
+<span class="co">#&gt; [19] "C108H" "C108J" "C108y" "C108z" "C10E." "C10E0" "C10E1" "C10E2" "C10E3"</span>
+<span class="co">#&gt; [28] "C10E4" "C10E5" "C10E6" "C10E7" "C10E8" "C10E9" "C10EA" "C10EB" "C10EC"</span>
+<span class="co">#&gt; [37] "C10ED" "C10EE" "C10EF" "C10EG" "C10EH" "C10EJ" "C10EK" "C10EL" "C10EM"</span>
+<span class="co">#&gt; [46] "C10EN" "C10EP" "C10EQ" "C10ER"</span></code></pre></div>
+<blockquote>
+<p><strong>Note:</strong> Some coding systems include a ‘.’ (e.g. ICD-10) - this may return unexpected results with <code><a href="../reference/get_child_codes.html">get_child_codes()</a></code>, as this function searches using regexs and ‘.’ is interpreted as a wildcard.</p>
+</blockquote>
+<p>By default, a character vector of codes is returned. To return a data frame including code descriptions, set the argument <code>codes_only</code> to <code>FALSE</code>:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Some Read2 codes for T1DM</span>
+<span class="va">t1dm_read2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"C10E."</span>, <span class="st">"C108."</span><span class="op">)</span>
+
+<span class="co"># lookup details</span>
+<span class="fu"><a href="../reference/get_child_codes.html">get_child_codes</a></span><span class="op">(</span>codes <span class="op">=</span> <span class="va">t1dm_read2</span>, 
+                code_type <span class="op">=</span> <span class="st">"read2"</span>, 
+                ukb_code_mappings <span class="op">=</span> <span class="va">ukb_code_mappings</span>, 
+                codes_only <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 6 x 3</span>
+<span class="co">#&gt;   read_code term_code term_description                                          </span>
+<span class="co">#&gt;   &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt;                                                     </span>
+<span class="co">#&gt; 1 C108.     00        Insulin dependent diabetes mellitus                       </span>
+<span class="co">#&gt; 2 C1080     00        Insulin-dependent diabetes mellitus with renal complicati…</span>
+<span class="co">#&gt; 3 C1081     00        Insulin-dependent diabetes mellitus with ophthalmic compl…</span>
+<span class="co">#&gt; 4 C1082     00        Insulin-dependent diabetes mellitus with neurological com…</span>
+<span class="co">#&gt; 5 C1083     00        Insulin dependent diabetes mellitus with multiple complic…</span>
+<span class="co">#&gt; 6 C1084     00        Unstable insulin dependent diabetes mellitus</span></code></pre></div>
 </div>
   </div>
 

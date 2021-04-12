@@ -179,6 +179,7 @@ code_type_to_lkp_sheet_map_df <- tibble::tribble(
 # 'from' and 'to' cols: possible mapping combinations
 # 'mapping_sheet': the appropriate mapping sheet to use for a 'from'/'to' combination
 # 'from_col' and 'to_col': the columns to use when mapping
+# Note, `preferred_synonym_col` and `preferred_code` refer to `to_col`
 clinical_code_mappings_map <- tibble::tribble(
   ~ from, ~ to, ~ mapping_sheet, ~ from_col, ~ to_col, ~ preferred_synonym_col, ~ preferred_code,
   "icd9", "icd10", "icd9_icd10", "ICD9", "ICD10", NA, NA,
