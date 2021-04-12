@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get child codes for a clinical code type — get_child_codes • ukbwranglr</title>
+<title>Reformat ICD-10 codes — reformat_icd10_codes • ukbwranglr</title>
 
 
 <!-- jquery -->
@@ -39,9 +39,14 @@
 
 
 
-<meta property="og:title" content="Get child codes for a clinical code type — get_child_codes" />
-<meta property="og:description" content="Uses the code mapping file provided by UK Biobank (resource 592:
-https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592)" />
+<meta property="og:title" content="Reformat ICD-10 codes — reformat_icd10_codes" />
+<meta property="og:description" content="The lookup sheet in
+UKB resource 592
+for ICD-10 (&quot;icd10_lkp&quot;) has a column called &quot;ALT_CODE&quot;, which is an
+alternative format for ICD-10 codes. This is the format used in the mapping
+sheets for this resource, as well as in
+Field ID 41270.
+This function converts from one format to the other." />
 
 
 
@@ -119,37 +124,34 @@ https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592)" />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get child codes for a clinical code type</h1>
+    <h1>Reformat ICD-10 codes</h1>
     
-    <div class="hidden name"><code>get_child_codes.Rd</code></div>
+    <div class="hidden name"><code>reformat_icd10_codes.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Uses the code mapping file provided by UK Biobank (resource 592:
-https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592)</p>
+    <p>The lookup sheet in
+<a href='https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592'>UKB resource 592</a>
+for ICD-10 ("icd10_lkp") has a column called "ALT_CODE", which is an
+alternative format for ICD-10 codes. This is the format used in the mapping
+sheets for this resource, as well as in
+<a href='https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=41270'>Field ID 41270</a>.
+This function converts from one format to the other.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_child_codes</span><span class='op'>(</span>
-  <span class='va'>codes</span>,
-  <span class='va'>code_type</span>,
-  ukb_code_mappings <span class='op'>=</span> <span class='fu'><a href='get_ukb_code_mappings.html'>get_ukb_code_mappings</a></span><span class='op'>(</span><span class='op'>)</span>,
-  codes_only <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  preferred_description_only <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  quiet <span class='op'>=</span> <span class='cn'>FALSE</span>
+    <pre class="usage"><span class='fu'>reformat_icd10_codes</span><span class='op'>(</span>
+  <span class='va'>icd10_codes</span>,
+  <span class='va'>ukb_code_mappings</span>,
+  input_icd10_format <span class='op'>=</span> <span class='st'>"ICD10_CODE"</span>,
+  output_icd10_format <span class='op'>=</span> <span class='st'>"ALT_CODE"</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>codes</th>
-      <td><p>character. A vector of codes to get the child codes for</p></td>
-    </tr>
-    <tr>
-      <th>code_type</th>
-      <td><p>character. The type of clinical code system to be searched.
-Must be one of <code>read2</code>, <code>read3</code>, <code>icd9</code>, <code>icd10</code>,
-<code>bnf</code>, <code>dmd</code>, <code>read2_drugs</code> or <code>opcs4</code>.</p></td>
+      <th>icd10_codes</th>
+      <td><p>character vector of ICD-10 codes</p></td>
     </tr>
     <tr>
       <th>ukb_code_mappings</th>
@@ -157,32 +159,27 @@ Must be one of <code>read2</code>, <code>read3</code>, <code>icd9</code>, <code>
 <code><a href='get_ukb_code_mappings.html'>get_ukb_code_mappings</a></code>.</p></td>
     </tr>
     <tr>
-      <th>codes_only</th>
-      <td><p>bool. If <code>TRUE</code> (default), return a character vector
-of <em>unique</em> codes. If <code>FALSE</code>, return a data frame of all results
-including code descriptions (useful for manual validation).</p></td>
+      <th>input_icd10_format</th>
+      <td><p>character. Must be either "ICD10_CODE" or
+"ALT_CODE".</p></td>
     </tr>
     <tr>
-      <th>preferred_description_only</th>
-      <td><p>bool. Return only preferred descriptions
-for clinical codes with synonyms. Default value is <code>TRUE</code>.</p></td>
-    </tr>
-    <tr>
-      <th>quiet</th>
-      <td><p>bool. Warning message if any of <code>codes</code> are not found for
-the supplied <code>code_type</code>.</p></td>
+      <th>output_icd10_format</th>
+      <td><p>character. Must be either "ICD10_CODE" or
+"ALT_CODE".</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>This is case <em>sensitive</em> (important for read codes especially).</p>
+    <p>character vector of ICD-10 codes, reformatted as specified by
+  <code>output_icd10_format</code>.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other Clinical code lookups and mappings: 
+<code><a href='get_child_codes.html'>get_child_codes</a>()</code>,
 <code><a href='lookup_codes.html'>lookup_codes</a>()</code>,
-<code><a href='map_codes.html'>map_codes</a>()</code>,
-<code><a href='reformat_icd10_codes.html'>reformat_icd10_codes</a>()</code></p></div>
+<code><a href='map_codes.html'>map_codes</a>()</code></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
