@@ -190,6 +190,12 @@ extract_first_or_last_clinical_event_multi <- function(
   df <- filter_clinical_events_for_codes(df,
                                          clinical_codes_df$code)
 
+  # exit early with warning if no rows in `df`
+  if(nrow(df) == 0) {
+    warning("Warning! `df` does not contain any of the codes in `clinical_codes_df$code`. Returning `NULL`")
+    return(NULL)
+  }
+
   # get results: loop through phenotypes
   message("EXTRACTING EVENT DATES FOR PHENOTYPES\n")
   n_phenotypes <- length(names(list_of_phenotype_results))

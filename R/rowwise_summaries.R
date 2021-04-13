@@ -324,7 +324,7 @@ summarise_rowise_numerical_mean_min_max <- function(ukb_pheno,
 #' @param min_max Character. Must be either "pmin" or "pmax"
 #'
 #' @return The UKB dataset supplied to argument \code{ukb_pheno} with an
-#'   additional column containning the earliest/latest date across the
+#'   additional column containing the earliest/latest date across the
 #'   \code{selected_date_cols}.
 #' @export
 rowise_min_max_date <- function(ukb_pheno,

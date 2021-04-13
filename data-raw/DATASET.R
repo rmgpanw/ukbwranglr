@@ -102,6 +102,23 @@ cont_and_int_codings_NOT_to_na<- c(
 )
 
 
+
+# NONSENSE DATES ----------------------------------------------------------
+
+# make list containing nonsense dates
+nonsense_dates_categories <- c(
+  "PRIMARY_CARE"
+)
+
+NONSENSE_DATES <- vector(mode = "list", length = length(nonsense_dates_categories))
+names(NONSENSE_DATES) <- nonsense_dates_categories
+
+# populate list
+NONSENSE_DATES$PRIMARY_CARE <- c("01/01/1901",
+                                 "02/02/1902",
+                                 "03/03/1903",
+                                 "07/07/2037")
+
 # UKB CODE MAPPINGS -------------------------------------------------------
 
 # used by functions in code_mappings.R
@@ -232,6 +249,9 @@ usethis::use_data(
   # special ukb codings
   cont_and_int_codings_to_na,
   cont_and_int_codings_NOT_to_na,
+
+  # nonsense dates
+  NONSENSE_DATES,
 
   # ukb_code_mappings
   ukb_code_mappings_sheet_names,
