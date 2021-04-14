@@ -22,7 +22,7 @@ rowise_min_max_date(
 }
 \value{
 The UKB dataset supplied to argument \code{ukb_pheno} with an
-  additional column containning the earliest/latest date across the
+  additional column containing the earliest/latest date across the
   \code{selected_date_cols}.
 }
 \description{

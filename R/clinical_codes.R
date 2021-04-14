@@ -55,6 +55,11 @@ get_child_codes <- function(codes,
   assertthat::assert_that(is.logical(codes_only),
                           msg = "`code_only` must be either 'TRUE' or 'FALSE'")
 
+  # check all sheets are present
+  assertthat::assert_that(
+    all(ukbwranglr:::ukb_code_mappings_sheet_names %in% names(ukb_code_mappings))
+  )
+
   # determine relevant lookup sheet
   lkp_sheet <- get_lookup_sheet(code_type = code_type)
 
@@ -80,6 +85,7 @@ get_child_codes <- function(codes,
 
   # get children (filter for codes which match ANY of those in `codes` arg)
   result <- ukb_code_mappings[[lkp_sheet]] %>%
+    dplyr::collect() %>%
     dplyr::filter(stringr::str_detect(.data[[code_col]],
                                       pattern = stringr::regex(codes,
                                                                ignore_case = FALSE)))
@@ -145,6 +151,11 @@ lookup_codes <- function(codes,
   match.arg(arg = code_type,
             choices = ukbwranglr:::code_type_to_lkp_sheet_map_df$code)
 
+  # check all sheets are present
+  assertthat::assert_that(
+    all(ukbwranglr:::ukb_code_mappings_sheet_names %in% names(ukb_code_mappings))
+  )
+
   # determine relevant lookup sheet
   lkp_sheet <- get_lookup_sheet(code_type = code_type)
 
@@ -168,7 +179,8 @@ lookup_codes <- function(codes,
 
   # lookup - filter lookup sheet for codes
   result <- ukb_code_mappings[[lkp_sheet]] %>%
-    dplyr::filter(.data[[code_col]] %in% codes)
+    dplyr::filter(.data[[code_col]] %in% codes) %>%
+    dplyr::collect()
 
   # filter for preferred code descriptions only if requested
   if (preferred_description_only & !is.na(preferred_description_col)) {
@@ -211,7 +223,9 @@ lookup_codes <- function(codes,
     if (quiet == FALSE) {
       warning_if_codes_not_found(codes = codes,
                                  code_type = code_type,
-                                 search_col = ukb_code_mappings[[lkp_sheet]][[code_col]])
+                                 search_col = ukb_code_mappings[[lkp_sheet]] %>%
+                                   dplyr::collect() %>%
+                                   .[[code_col]])
     }
 
     # return either unique codes only, or df including code descriptions
@@ -242,6 +256,11 @@ search_codes_by_description <- function(reg_expr,
   match.arg(arg = code_type,
             choices = ukbwranglr:::code_type_to_lkp_sheet_map_df$code)
 
+  # check all sheets are present
+  assertthat::assert_that(
+    all(ukbwranglr:::ukb_code_mappings_sheet_names %in% names(ukb_code_mappings))
+  )
+
   # determine relevant lookup sheet
   lkp_sheet <- get_lookup_sheet(code_type = code_type)
 
@@ -264,6 +283,7 @@ search_codes_by_description <- function(reg_expr,
 
   # search for codes
   result <- ukb_code_mappings[[lkp_sheet]] %>%
+    dplyr::collect() %>%
     dplyr::filter(stringr::str_detect(
       string = .data[[description_col]],
       pattern = stringr::regex(pattern = reg_expr,
@@ -320,6 +340,11 @@ map_codes <- function(codes,
                       standardise_output = TRUE,
                       quiet = FALSE) {
   # validate args
+  # check all sheets are present
+  assertthat::assert_that(
+    all(ukbwranglr:::ukb_code_mappings_sheet_names %in% names(ukb_code_mappings))
+  )
+
   match.arg(arg = from,
             choices = ukbwranglr:::code_type_to_lkp_sheet_map_df$code)
             # choices = ukbwranglr:::clinical_code_mappings_map$from)
@@ -396,7 +421,8 @@ map_codes <- function(codes,
   }
 
   result <- ukb_code_mappings[[mapping_sheet]] %>%
-    dplyr::filter(.data[[from_col]] %in% codes)
+    dplyr::filter(.data[[from_col]] %in% codes) %>%
+    dplyr::collect()
 
   # filter for preferred code descriptions only if requested
   if (preferred_description_only & !is.na(preferred_description_col)) {
@@ -416,7 +442,9 @@ map_codes <- function(codes,
     if (quiet == FALSE) {
       warning_if_codes_not_found(codes = codes,
                                  code_type = from,
-                                 search_col = ukb_code_mappings[[mapping_sheet]][[from_col]])
+                                 search_col = ukb_code_mappings[[mapping_sheet]] %>%
+                                   dplyr::collect() %>%
+                                   .[[from_col]])
     }
 
     # return either unique codes only, or df including descriptions
@@ -520,6 +548,7 @@ reformat_icd10_codes <- function(icd10_codes,
   # reformat icd10 codes
   result <- ukb_code_mappings$icd10_lkp %>%
     dplyr::filter(.data[[input_icd10_format]] %in% icd10_codes) %>%
+    dplyr::collect() %>%
     .[[output_icd10_format]] %>%
     unique()
 
