@@ -183,9 +183,12 @@ lookup_codes <- function(codes,
     dplyr::collect()
 
   # filter for preferred code descriptions only if requested
-  if (preferred_description_only & !is.na(preferred_description_col)) {
-    result <- result %>%
-      dplyr::filter(.data[[preferred_description_col]] == preferred_description_code)
+  if (!is.null(preferred_description_only)) {
+    if (preferred_description_only &
+        !is.na(preferred_description_col)) {
+      result <- result %>%
+        dplyr::filter(.data[[preferred_description_col]] == preferred_description_code)
+    }
   }
 
   # standardise output if requested
@@ -291,9 +294,12 @@ search_codes_by_description <- function(reg_expr,
     ))
 
   # filter for preferred code descriptions only if requested
-  if (preferred_description_only & !is.na(preferred_description_col)) {
-    result <- result %>%
-      dplyr::filter(.data[[preferred_description_col]] == preferred_description_code)
+  if (!is.null(preferred_description_only)) {
+    if (preferred_description_only &
+        !is.na(preferred_description_col)) {
+      result <- result %>%
+        dplyr::filter(.data[[preferred_description_col]] == preferred_description_code)
+    }
   }
 
   # return result
@@ -324,8 +330,12 @@ search_codes_by_description <- function(reg_expr,
 #' @param codes character. A character vector of codes to be mapped.
 #' @param from character (scalar). Coding system that \code{codes} belong to.
 #' @param to character (scalar). Coding system to map \code{codes} to.
-#' @param quiet bool. Warning message if any of `codes` are not found for the
-#'   code type being mapped from.
+#' @param quiet bool. Warning message if any of \code{codes} are not found for
+#'   the code type being mapped from.
+#' @param preferred_description_only bool. Return only preferred descriptions
+#'   for clinical codes with synonyms. Can only be \code{TRUE} if
+#'   \code{standardise_output} is also \code{TRUE}. Default value is
+#'   \code{NULL}.
 #' @inheritParams get_child_codes
 #' @inheritParams lookup_codes
 #'
@@ -336,9 +346,9 @@ map_codes <- function(codes,
                       to,
                       ukb_code_mappings = get_ukb_code_mappings(),
                       codes_only = FALSE,
-                      preferred_description_only = TRUE,
                       standardise_output = TRUE,
-                      quiet = FALSE) {
+                      quiet = FALSE,
+                      preferred_description_only = NULL) {
   # validate args
   # check all sheets are present
   assertthat::assert_that(
@@ -366,6 +376,13 @@ map_codes <- function(codes,
 
   assertthat::assert_that(!(codes_only & standardise_output),
                           msg = "Error! `codes_only` and `standardise_output` cannot both be `TRUE`")
+
+  if (!is.null(preferred_description_only)) {
+    assertthat::assert_that(!(
+      preferred_description_only == TRUE & standardise_output == FALSE
+    ),
+    msg = "Error! `preferred_description_only` cannot be `TRUE` unless `standardise_output` is also `TRUE`")
+  }
 
   # get appropriate mapping sheet
   swap_mapping_cols <- FALSE
@@ -423,14 +440,6 @@ map_codes <- function(codes,
   result <- ukb_code_mappings[[mapping_sheet]] %>%
     dplyr::filter(.data[[from_col]] %in% codes) %>%
     dplyr::collect()
-
-  # filter for preferred code descriptions only if requested
-  if (preferred_description_only & !is.na(preferred_description_col)) {
-    result <- result %>%
-      dplyr::filter(.data[[preferred_description_col]] == preferred_description_code) %>%
-      # Note, will get duplicate codes without this step
-      dplyr::distinct(.data[[to_col]], .keep_all = TRUE)
-  }
 
   # return result
   if (nrow(result) == 0) {

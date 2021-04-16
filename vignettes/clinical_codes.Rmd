@@ -79,20 +79,31 @@ map_codes(codes = t1dm_read2,
           ukb_code_mappings = ukb_code_mappings)
 ```
 
-If re-running the above search with `standardise_output` as `FALSE` and `preferred_description_only` as `TRUE`, note that some of the input code values may not appear in the result if multiple codes map to a single code:
+Note that `preferred_description_only` cannot be `TRUE` if `standardise_output` is `FALSE` with `map_codes` (will raise an error). This is because some codes may otherwise be 'lost' in the mapping process. When `standardise_output` is `TRUE`, the mapped codes from `map_codes` are passed on to `lookup_codes`, at which point one can request to return only preferred code descriptions:
 
 ```{r}
-# Some Read2 codes for T1DM
-t1dm_read2 <- c("C10E.", "C108.")
+# mapping the Read 2 code "D4104" to Read 3 only returns the secondary Read 3
+# description (`TERMV3_TYPE` == "S"), unlike for "D4103". 
+map_codes(codes = c("D4103", "D4104"), 
+          from = "read2", 
+          to = "read3", 
+          ukb_code_mappings = ukb_code_mappings, 
+          codes_only = FALSE,
+          preferred_description_only = FALSE,
+          standardise_output = FALSE) %>% 
+  dplyr::select(tidyselect::contains("V3"))
+```
 
-# lookup details - the input Read 2 code 'C10E.' does not appear in the result
-map_codes(codes = t1dm_read2, 
+```{r}
+# if `standardise_output` is `TRUE`, then `preferred_description_only` may also
+# be set to `TRUE`
+map_codes(codes = c("D4103", "D4104"), 
           from = "read2", 
           to = "read3", 
           ukb_code_mappings = ukb_code_mappings, 
           codes_only = FALSE,
           preferred_description_only = TRUE,
-          standardise_output = FALSE)
+          standardise_output = TRUE)
 ```
 
 Mapping to ICD is more problematic as some results are a range of ICD codes (note also that for ICD-10, the mapping sheets use an alternative code format which removes any "." characters):
@@ -119,7 +130,7 @@ icd10_diabetic_retinopathy <-
     codes_only = TRUE
   )
 
-# attempting to map this to Read 2 returns an result however
+# attempting to map this to Read 2 returns a NULL result however
 map_codes(
   codes = icd10_diabetic_retinopathy,
   from = "icd10",

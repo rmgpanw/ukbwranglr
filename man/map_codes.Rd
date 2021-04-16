@@ -10,9 +10,9 @@ map_codes(
   to,
   ukb_code_mappings = get_ukb_code_mappings(),
   codes_only = FALSE,
-  preferred_description_only = TRUE,
   standardise_output = TRUE,
-  quiet = FALSE
+  quiet = FALSE,
+  preferred_description_only = NULL
 )
 }
 \arguments{
@@ -29,17 +29,19 @@ map_codes(
 of \emph{unique} codes. If \code{FALSE}, return a data frame of all results
 including code descriptions (useful for manual validation).}
 
-\item{preferred_description_only}{bool. Return only preferred descriptions
-for clinical codes with synonyms. Default value is \code{TRUE}.}
-
 \item{standardise_output}{bool. If \code{TRUE} (default), outputs a data
 frame with columns named 'code', 'description' and 'code_type'. Otherwise
 returns a data frame with all columns for the relevant lookup sheet from
 (\href{https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592}{UK Biobank
 resource 592}).}
 
-\item{quiet}{bool. Warning message if any of `codes` are not found for the
-code type being mapped from.}
+\item{quiet}{bool. Warning message if any of \code{codes} are not found for
+the code type being mapped from.}
+
+\item{preferred_description_only}{bool. Return only preferred descriptions
+for clinical codes with synonyms. Can only be \code{TRUE} if
+\code{standardise_output} is also \code{TRUE}. Default value is
+\code{NULL}.}
 }
 \description{
 Uses the code mapping file provided by UK Biobank

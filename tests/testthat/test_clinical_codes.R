@@ -145,8 +145,10 @@ test_that(
       4
     )
 
-    # codes and preferred descriptions only (this additionally filters for only unique codes)
-    expect_equal(
+    # codes and preferred descriptions only - should raise an error as can miss
+    # codes e.g. try searching for "D4104", will only return the secondary
+    # description for its Read3 equivalent (which is also "D4104")
+    expect_error(
       map_codes(
         codes = c("C10E.", "C108."),
         from = "read2",
@@ -156,8 +158,8 @@ test_that(
         codes_only = FALSE,
         preferred_description_only = TRUE,
         standardise_output = FALSE
-      )$READV3_CODE,
-      "X40J4"
+      ),
+      regexp = "Error! `preferred_description_only` cannot be `TRUE` unless `standardise_output` is also `TRUE`"
     )
   }
 )
