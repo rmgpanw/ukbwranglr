@@ -6,7 +6,8 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Summarise a UK Biobank phenotype dataset row-wise — summarise_rowise • ukbwranglr</title>
+<title>Reformat a dataframe of clinical codes to work with
+extract_first_or_last_clinical_event_multi — reformat_standardised_codelist • ukbwranglr</title>
 
 
 <!-- jquery -->
@@ -39,12 +40,13 @@
 
 
 
-<meta property="og:title" content="Summarise a UK Biobank phenotype dataset row-wise — summarise_rowise" />
-<meta property="og:description" content="Allows the user to summarise row-wise across a set of column &quot;groups&quot;. e.g.
-calculate standard deviation values for all systolic and diastolic blood
-pressure readings per eid. Can also accept custom functions (e.g. a function
-to count the number of non-NA values). Custom functions should include a
-'...' parameter. Note: ukb_pheno must be a data table." />
+<meta property="og:title" content="Reformat a dataframe of clinical codes to work with
+extract_first_or_last_clinical_event_multi — reformat_standardised_codelist" />
+<meta property="og:description" content="A utility function that helps reformat the output from map_codes
+or lookup_codes to work with
+extract_first_or_last_clinical_event_multi. See also output
+from generate_self_reported_diabetes_codes_df for an example of
+the format that this function will output." />
 
 
 
@@ -122,93 +124,60 @@ to count the number of non-NA values). Custom functions should include a
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Summarise a UK Biobank phenotype dataset row-wise</h1>
+    <h1>Reformat a dataframe of clinical codes to work with
+<code><a href='extract_first_or_last_clinical_event_multi.html'>extract_first_or_last_clinical_event_multi</a></code></h1>
     
-    <div class="hidden name"><code>summarise_rowise.Rd</code></div>
+    <div class="hidden name"><code>reformat_standardised_codelist.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Allows the user to summarise row-wise across a set of column "groups". e.g.
-calculate standard deviation values for all systolic and diastolic blood
-pressure readings per eid. Can also accept custom functions (e.g. a function
-to count the number of non-NA values). Custom functions should include a
-'...' parameter. <strong>Note: <code>ukb_pheno</code> must be a data table.</strong></p>
+    <p>A utility function that helps reformat the output from <code><a href='map_codes.html'>map_codes</a></code>
+or <code><a href='lookup_codes.html'>lookup_codes</a></code> to work with
+<code><a href='extract_first_or_last_clinical_event_multi.html'>extract_first_or_last_clinical_event_multi</a></code>. See also output
+from <code><a href='generate_self_reported_diabetes_codes_df.html'>generate_self_reported_diabetes_codes_df</a></code> for an example of
+the format that this function will output.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>summarise_rowise</span><span class='op'>(</span>
-  <span class='va'>ukb_pheno</span>,
-  <span class='va'>functions</span>,
-  <span class='va'>data_dict</span>,
-  grouping_col <span class='op'>=</span> <span class='st'>"Field_FieldID"</span>,
-  prefix <span class='op'>=</span> <span class='cn'>NULL</span>,
-  <span class='va'>...</span>
+    <pre class="usage"><span class='fu'>reformat_standardised_codelist</span><span class='op'>(</span>
+  <span class='va'>standardised_codelist</span>,
+  <span class='va'>code_type</span>,
+  <span class='va'>disease</span>,
+  <span class='va'>disease_category</span>,
+  <span class='va'>phenotype_source</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>ukb_pheno</th>
-      <td><p>a UK Biobank phenotype dataset. Must be a data table</p></td>
+      <th>standardised_codelist</th>
+      <td><p>a data frame with column names "code",
+"description", "code_type".</p></td>
     </tr>
     <tr>
-      <th>functions</th>
-      <td><p>a character vector of function names (e.g. <code><a href='https://rdrr.io/r/base/c.html'>c("sd")</a></code>)</p></td>
+      <th>code_type</th>
+      <td><p>character (scalar). The clinical code type e.g. "read2"</p></td>
     </tr>
     <tr>
-      <th>data_dict</th>
-      <td><p>a data dictionary for <code>ukb_pheno</code>. Can be a "filtered"
-version including only the columns to be summarised.</p></td>
+      <th>disease</th>
+      <td><p>character (scalar), e.g. "Secondary polycythaemia"</p></td>
     </tr>
     <tr>
-      <th>grouping_col</th>
-      <td><p>the name of a column in <code>data_dict</code> that indicates
-column groups to summarise</p></td>
+      <th>disease_category</th>
+      <td><p>character (scalar). The subcategory of <code>disease</code>
+that these codes belong to e.g. "Diagnosis of Secondary polycythaemia".</p></td>
     </tr>
     <tr>
-      <th>prefix</th>
-      <td><p>character. An optional prefix to add to the names of all newly
-created columns. Default is <code>NULL</code>.</p></td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td><p>arguments to passed on to summary functions listed in
-<code>functions</code></p></td>
+      <th>phenotype_source</th>
+      <td><p>character (scalar), e.g. "caliber".</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
-<span class='co'># make a custom function that counts the number of non-NA values.</span>
-<span class='co'># Note: include '...', otherwise an error is thrown by including na.rm = TRUE below</span>
+    <p>A data frame with the following column names: 'disease',
+  'description', 'category', 'code_type', 'code' and 'phenotype_source'.</p>
 
-<span class='co'># n_not_na &lt;- function(x, ...) {</span>
-<span class='co'># sum(!is.na(x))</span>
-<span class='co'># }</span>
-
-<span class='co'># summarise all numerical columns in UKB dataset by calculating mean/sd/n_not_na,</span>
-<span class='co'># including argument na.rm = TRUE</span>
-
-<span class='co'># ukb_pheno_summarised &lt;- summarise_rowise(</span>
-<span class='co'># # UKB phenotype dataset as a datatable</span>
-<span class='co'># ukb_pheno = ukb_pheno,</span>
-
-<span class='co'># functions = c("mean", "sd", "n_not_na"),</span>
-
-<span class='co'># # data dictionary generated by make_data_dict(), filtered</span>
-<span class='co'># # for only numerical data</span>
-<span class='co'># data_dict = data_dict %&gt;%</span>
-<span class='co'>#    dplyr::filter(ValueType %in% c("Continuous", "Integer")),</span>
-
-<span class='co'># # to summarise by FieldID</span>
-<span class='co'>#      grouping_col = "Field_FieldID"</span>
-
-<span class='co'># # additional args passed on to `functions`</span>
-<span class='co'>#      na.rm = TRUE</span>
-<span class='co'>#     )</span>
-<span class='op'>}</span>
-</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

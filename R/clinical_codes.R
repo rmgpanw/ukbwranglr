@@ -493,6 +493,81 @@ map_codes <- function(codes,
 
 # Clinical code lists -----------------------------------------------------
 
+#' Reformat a dataframe of clinical codes to work with
+#' \code{\link{extract_first_or_last_clinical_event_multi}}
+#'
+#' A utility function that helps reformat the output from \code{\link{map_codes}}
+#' or \code{\link{lookup_codes}} to work with
+#' \code{\link{extract_first_or_last_clinical_event_multi}}. See also output
+#' from \code{\link{generate_self_reported_diabetes_codes_df}} for an example of
+#' the format that this function will output.
+#'
+#' @param standardised_codelist a data frame with column names "code",
+#'   "description", "code_type".
+#' @param code_type character (scalar). The clinical code type e.g. "read2"
+#' @param disease character (scalar), e.g. "Secondary polycythaemia"
+#' @param disease_category character (scalar). The subcategory of \code{disease}
+#'   that these codes belong to e.g. "Diagnosis of Secondary polycythaemia".
+#' @param phenotype_source character (scalar), e.g. "caliber".
+#'
+#' @return A data frame with the following column names: 'disease',
+#'   'description', 'category', 'code_type', 'code' and 'phenotype_source'.
+#'
+#' @export
+reformat_standardised_codelist <- function(standardised_codelist,
+                                           code_type,
+                                           disease,
+                                           disease_category,
+                                           phenotype_source) {
+  # validate args
+  assertthat::assert_that(any(
+    class(standardised_codelist) %in% c("data.frame", "data.table", "tbl_df")
+  ))
+  assertthat::is.string(code_type)
+  assertthat::is.string(disease)
+  assertthat::is.string(disease_category)
+  assertthat::is.string(phenotype_source)
+
+  match.arg(code_type,
+            choices = ukbwranglr:::clinical_events_sources$data_coding)
+
+  assertthat::assert_that(all(
+    names(standardised_codelist) == c("code", "description", "code_type")
+  ),
+  msg = "Error! `standardised_codelist` must be a data frame with the following headings: 'code', 'description', 'code_type'")
+
+  assertthat::assert_that(
+    all(
+      standardised_codelist$code_type %in% unique(ukbwranglr:::clinical_events_sources$data_coding)
+    ),
+    msg = paste0(
+      "Error! `standardised_codelist$code_type` contains unrecognised code types. Recognised code types: ",
+      stringr::str_c(
+        unique(ukbwranglr:::clinical_events_sources$data_coding),
+        sep = "",
+        collapse = ", "
+      )
+    )
+  )
+
+  # reformat to work with `extract_first_or_last_clinical_event_multi()`
+  standardised_codelist <- standardised_codelist %>%
+    dplyr::mutate(
+      "code_type" = code_type,
+      "disease" = disease,
+      "category" = disease_category,
+      "phenotype_source" = phenotype_source,
+    ) %>%
+    dplyr::select(.data[["disease"]],
+                  .data[["description"]],
+                  .data[["category"]],
+                  .data[["code_type"]],
+                  .data[["code"]],
+                  .data[["phenotype_source"]])
+
+  return(standardised_codelist)
+}
+
 #' Generate a data frame of clinical codes for self-reported diabetes in the UK
 #' Biobank
 #'

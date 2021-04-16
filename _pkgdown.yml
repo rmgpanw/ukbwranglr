@@ -35,6 +35,7 @@ reference:
   - search_codes_by_description
   - get_child_codes
   - map_codes
+  - reformat_standardised_codelist
   - reformat_icd10_codes
 
 - title: Phenotype clinical code lists
