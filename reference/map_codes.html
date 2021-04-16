@@ -135,9 +135,9 @@
   <span class='va'>to</span>,
   ukb_code_mappings <span class='op'>=</span> <span class='fu'><a href='get_ukb_code_mappings.html'>get_ukb_code_mappings</a></span><span class='op'>(</span><span class='op'>)</span>,
   codes_only <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  preferred_description_only <span class='op'>=</span> <span class='cn'>TRUE</span>,
   standardise_output <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  quiet <span class='op'>=</span> <span class='cn'>FALSE</span>
+  quiet <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  preferred_description_only <span class='op'>=</span> <span class='cn'>NULL</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -167,11 +167,6 @@ of <em>unique</em> codes. If <code>FALSE</code>, return a data frame of all resu
 including code descriptions (useful for manual validation).</p></td>
     </tr>
     <tr>
-      <th>preferred_description_only</th>
-      <td><p>bool. Return only preferred descriptions
-for clinical codes with synonyms. Default value is <code>TRUE</code>.</p></td>
-    </tr>
-    <tr>
       <th>standardise_output</th>
       <td><p>bool. If <code>TRUE</code> (default), outputs a data
 frame with columns named 'code', 'description' and 'code_type'. Otherwise
@@ -181,8 +176,15 @@ resource 592</a>).</p></td>
     </tr>
     <tr>
       <th>quiet</th>
-      <td><p>bool. Warning message if any of `codes` are not found for the
-code type being mapped from.</p></td>
+      <td><p>bool. Warning message if any of <code>codes</code> are not found for
+the code type being mapped from.</p></td>
+    </tr>
+    <tr>
+      <th>preferred_description_only</th>
+      <td><p>bool. Return only preferred descriptions
+for clinical codes with synonyms. Can only be <code>TRUE</code> if
+<code>standardise_output</code> is also <code>TRUE</code>. Default value is
+<code>NULL</code>.</p></td>
     </tr>
     </table>
 
