@@ -431,8 +431,8 @@ map_codes <- function(codes,
   }
 
   # do mapping
-  # reformat codes if mapping from icd10
-  if (from == "icd10") {
+  # reformat codes if mapping from icd10 and NOT swapping mapping cols
+  if (from == "icd10" & swap_mapping_cols) {
     codes <- reformat_icd10_codes(icd10_codes = codes,
                                   ukb_code_mappings = ukb_code_mappings)
   }
