@@ -217,7 +217,7 @@ lookup_codes <- function(codes,
   }
 
   # return result
-  if (rlang::is_empty(result)) {
+  if (nrow(result) == 0) {
     message("No matching codes found. Returning `NULL`")
     return(NULL)
   } else {
@@ -303,7 +303,7 @@ search_codes_by_description <- function(reg_expr,
   }
 
   # return result
-  if (rlang::is_empty(result)) {
+  if (nrow(result) == 0) {
     message("No matching codes found. Returning `NULL`")
     return(NULL)
   } else {
