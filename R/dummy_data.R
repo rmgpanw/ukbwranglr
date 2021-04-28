@@ -100,3 +100,18 @@ make_dummy_clinical_events_df <- function(eids = c(1, 2, 3),
     purrr::pmap(make_dummy_clinical_events_df_single_eid) %>%
     dplyr::bind_rows()
 }
+
+#' Make dummy data frame
+#'
+#' Returns a dataframe with 6 rows and columns of types character, integer and factor
+#'
+#' @return df
+#' @noRd
+#' @examples
+make_dummy_df <- function() {
+  data.frame(chr = c(letters[1:5], NA),
+             int = c(1:5, NA),
+             fac = as.factor(c(letters[1:5], NA)),
+             log = c(rep(TRUE, 5), FALSE),
+             chr_rpt = c(rep("a", 3), rep("c", 3)))
+}
