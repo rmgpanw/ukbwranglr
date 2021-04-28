@@ -607,13 +607,19 @@ format_ukb_df_header <- function(colheaders) {
 #'   possible combinations
 #' @noRd
 colname_to_field_inst_array_df <- function(x) {
+  # make x into a df
+  x <- data.frame(descriptive_colnames = x)
 
-  # extract fieldid_instance_array (removing "f")
-  x <- stringr::str_extract(x, pattern = "_f[:digit:]+_[:digit:]+_[:digit:]+$") %>%
-    stringr::str_sub(3L, -1L)
+  # extract fieldid_instance_array (removing "_f")
+  x$fieldid_instance_array <-
+    stringr::str_extract(x$descriptive_colnames,
+                         pattern = "_f[:digit:]+_[:digit:]+_[:digit:]+$") %>%
+    stringr::str_sub(3L,-1L)
 
-  # make into single column tibble
-  x <- tibble::tibble(fieldid_instance_array = x)
+  # make description column (descriptive colname minus fieldid_instance_array)
+  x$description <- stringr::str_replace(x$descriptive_colnames,
+                               paste0("_f", x$fieldid_instance_array),
+                               "")
 
   # separate into field_id, instance and array. Also mutate cols with all
   # possible combinations

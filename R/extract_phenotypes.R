@@ -410,7 +410,7 @@ get_hes_icd9_diagnoses <- function(ukb_pheno,
   hes_icd9_diagnoses <- hes_icd9_diagnoses %>%
     dplyr::filter(!is.na(.data[["f41271_value"]]))
 
-  # recode to ICD10
+  # recode to ICD9
   hes_icd9_diagnoses <- recode_ukbcol(df = hes_icd9_diagnoses,
                                        col_to_recode = "f41271_value",
                                        field_id = "41271",
@@ -585,13 +585,20 @@ get_self_report_non_cancer_diagnoses_icd10 <- function(ukb_pheno,
     dplyr::filter(.data[["Coding"]] == 609 & .data[["Value"]] != -1) %>%
     dplyr::select(tidyselect::all_of(c("Value", "Meaning")))
 
-  mapping_df <- rename_cols(df = mapping_df,
-              old_colnames = c("Value", "Meaning"),
-              new_colnames = c("old_vals", "new_vals"))
+  dict <- mapping_df$Meaning
+  names(dict) <- mapping_df$Value
 
-  self_report_non_cancer_diagnoses_icd10 <- suppressWarnings(recode_column(df = self_report_non_cancer_diagnoses_icd10,
-                                                                     col_to_recode = "code",
-                                                                     mapping_df = mapping_df))
+  self_report_non_cancer_diagnoses_icd10$code <- revalue_vector(self_report_non_cancer_diagnoses_icd10$code,
+                 dict = dict)
+
+  # TO DELETE
+  # mapping_df <- rename_cols(df = mapping_df,
+  #             old_colnames = c("Value", "Meaning"),
+  #             new_colnames = c("old_vals", "new_vals"))
+  #
+  # self_report_non_cancer_diagnoses_icd10 <- suppressWarnings(recode_column(df = self_report_non_cancer_diagnoses_icd10,
+  #                                                                    col_to_recode = "code",
+  #                                                                    mapping_df = mapping_df))
 
   # remove rows with no code (not all self-reported conditions map to ICD10)
   self_report_non_cancer_diagnoses_icd10 <- self_report_non_cancer_diagnoses_icd10 %>%
@@ -845,6 +852,18 @@ drop_source_col = TRUE) {
       return(single_result)
       })
 
+  # TODO - make safely version, and display informative error message re failed jobs
+  # result <- function_list %>%
+  #   purrr::imap(~ {
+  #     fn <- purrr::safely(.x)
+  #     single_result <- fn(ukb_pheno = ukb_pheno,
+  #                         data_dict = data_dict,
+  #                         ukb_codings = ukb_codings)
+  #     message("\nProcessed get diagnosis function ", .y, " of ", length(function_list))
+  #     time_taken_message(start_time)
+  #     return(single_result)
+  #   })
+
   result <- result %>%
     dplyr::bind_rows()
 
@@ -954,12 +973,13 @@ field_id_pivot_longer <- function(ukb_pheno,
   ukb_pheno <- ukb_pheno %>%
     dplyr::select(tidyselect::all_of(c("eid", required_cols)))
 
+  # TO DELETE?
   # get codings for fieldid
-  field_id_codings <- ukb_codings %>%
-    dplyr::filter(.data[["Coding"]] == (data_dict %>%
-                               dplyr::filter(.data[["FieldID"]] == field_id) %>%
-                               .$Coding %>%
-                               utils::head(n = 1)))
+  # field_id_codings <- ukb_codings %>%
+  #   dplyr::filter(.data[["Coding"]] == (data_dict %>%
+  #                              dplyr::filter(.data[["FieldID"]] == field_id) %>%
+  #                              .$Coding %>%
+  #                              utils::head(n = 1)))
 
   ukb_pheno <- ukb_pheno %>%
     tidyr::pivot_longer(
@@ -967,7 +987,8 @@ field_id_pivot_longer <- function(ukb_pheno,
       values_to = paste(paste0("f", field_id), "value", sep = "_")
     )
 
-  ukb_pheno$instance_array <- colname_to_field_inst_array_df(ukb_pheno$name)$instance_array
+  ukb_pheno$instance_array <- stringr::str_extract(ukb_pheno$name,
+                                                   pattern = "[:digit:]+_[:digit:]+$")
 
   # rename
   names(ukb_pheno)[which(names(ukb_pheno) == 'name')] <- paste0("f", field_id)
