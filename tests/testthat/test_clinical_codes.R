@@ -183,6 +183,21 @@ test_that(
   }
 )
 
+test_that("`map_codes()` works as expected for mapping icd10 to icd9 codes (these need reformatting first)", {
+  expect_equal(
+    suppressWarnings(map_codes(
+    codes = "D75.1",
+    from = "icd10",
+    to = "icd9",
+    ukb_code_mappings = ukb_code_mappings,
+    quiet = FALSE,
+    codes_only = FALSE,
+    preferred_description_only = TRUE,
+    standardise_output = TRUE
+  )$code),
+  "2890")
+})
+
 
 # `reformat_standardised_codelist()` --------------------------------------
 
