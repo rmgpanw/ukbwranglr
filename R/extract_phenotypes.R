@@ -296,7 +296,7 @@ extract_first_or_last_clinical_event <- function(df,
 #'   before combining into a single dataframe.
 #'
 #' @inheritParams summarise_rowise
-#' @inheritParams field_id_pivot_longer
+#' @inheritParams read_pheno
 #'
 #' @return Dataframe
 #' @export
@@ -305,6 +305,645 @@ extract_first_or_last_clinical_event <- function(df,
 get_death_data_icd10_diagnoses <- function(ukb_pheno,
                                    data_dict,
                                    ukb_codings) {
+
+  # for required field_ids (see
+  # https://biobank.ndph.ox.ac.uk/showcase/label.cgi?id=100093 )
+
+  # death data does not include dates. This function is a modified version of
+  # `get_diagnosis_basis_fn()`
+  start_time <- proc.time()
+  code_col_field_id <- c("40001", "40002")
+
+  # validate args
+  assertthat::assert_that(
+    "data.table" %in% class(ukb_pheno),
+    msg = "Error! ukb_pheno must be a data table"
+  )
+
+  assertthat::assert_that(
+    (all(code_col_field_id %in% data_dict$FieldID)),
+    msg = paste0(
+      "Error! FieldID ",
+      code_col_field_id,
+      "is not present in data_dict"
+    )
+  )
+
+  # get lists of required columns
+  code_cols <- filter_data_dict(data_dict = data_dict,
+                                filter_col = "FieldID",
+                                filter_value = code_col_field_id,
+                                return_col = "descriptive_colnames",
+                                error_if_missing = TRUE)
+
+  # melt cols
+  ukb_pheno <- data.table::melt(
+    ukb_pheno %>% dplyr::select(tidyselect::all_of(c("eid", code_cols))),
+    measure = code_cols,
+    value.name = "code"
+  )
+
+  ukb_pheno <- ukb_pheno[!is.na(ukb_pheno$code)]
+
+  # relabel code col
+  ukb_pheno <- recode_ukbcol(df = ukb_pheno,
+                             col_to_recode = "code",
+                             # both Field IDsuse the same coding
+                             field_id = code_col_field_id[1],
+                             ukb_data_dict = data_dict,
+                             ukb_codings = ukb_codings,
+                             mapping_direction = "meaning_code")
+
+  # make 'source' col
+  ukb_pheno$variable <- stringr::str_extract(ukb_pheno$variable,
+                                             pattern = "f[:digit:]+_[:digit:]+_[:digit:]+$") %>%
+    stringr::str_extract(pattern = "^f[:digit:]+")
+
+  names(ukb_pheno)[which(names(ukb_pheno) == "variable")] <- "source"
+
+  # make empty date col
+  ukb_pheno$date <- as.Date(NA)
+
+  # return result
+  time_taken_message(start_time)
+  return(ukb_pheno)
+}
+
+
+#' Get hospital inpatient ICD9 diagnoses
+#'
+#' Returns a long format dataframe with all summary hospital inpatient ICD9
+#' codes and associated dates for each UK Biobank participant.
+#'
+#' Reformats the data for FieldIDs 41271 and 41281 (hospital inpatient diagnoses
+#' and dates, see
+#' \href{https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=2002}{category 2002}).
+#'
+#' @inheritParams summarise_rowise
+#' @inheritParams read_pheno
+#'
+#' @return Data frame
+#' @export
+#'
+#' @family get all diagnostic codes
+get_hes_icd9_diagnoses <- function(ukb_pheno,
+                                    data_dict,
+                                    ukb_codings) {
+
+  # for required field_ids (see
+  # https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=2002 )
+  get_diagnoses_basis_fn(ukb_pheno = ukb_pheno,
+                         data_dict = data_dict,
+                         ukb_codings = ukb_codings,
+                         code_col_field_id = "41271",
+                         date_col_field_id = "41281")
+}
+
+
+#' Get hospital inpatient ICD10 diagnoses
+#'
+#' Returns a long format dataframe with all summary hospital inpatient ICD10
+#' codes and associated dates for each UK Biobank participant.
+#'
+#' Reformats the data for FieldIDs 41270 and 41280 (hospital inpatient diagnoses
+#' and dates, see
+#' \href{https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=2002}{category 2002}).
+#'
+#' @inheritParams summarise_rowise
+#' @inheritParams read_pheno
+#'
+#' @return Dataframe
+#' @export
+#'
+#' @family get all diagnostic codes
+get_hes_icd10_diagnoses <- function(ukb_pheno,
+                                    data_dict,
+                                    ukb_codings) {
+
+  # for required field_ids (see
+  # https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=2002 )
+
+  get_diagnoses_basis_fn(
+    ukb_pheno = ukb_pheno,
+    data_dict = data_dict,
+    ukb_codings = ukb_codings,
+    code_col_field_id = "41270",
+    date_col_field_id = "41280"
+  )
+}
+
+
+#' Get self-reported non-cancer diagnoses
+#'
+#' Returns a long format dataframe with all self-reported non-cancer diagnoses
+#' with associated dates for each UK Biobank participant.
+#'
+#' Reformats the data for FieldIDs 20002 and 20008 (self-reported non-cancer
+#' diagnoses and dates, see
+#' \href{https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=100074}{category 100074}). Coded using
+#' \href{https://biobank.ndph.ox.ac.uk/showcase/coding.cgi?id=6}{data coding 6}.
+#'
+#' @inheritParams summarise_rowise
+#' @inheritParams read_pheno
+#' @param remove_special_dates Logical. Remove 'special' date values if
+#'   requested. Default is \code{TRUE}. See
+#'   \href{https://biobank.ndph.ox.ac.uk/ukb/coding.cgi?id=13}{data coding 13}.
+#'
+#' @return Dataframe
+#' @export
+#'
+#' @family get all diagnostic codes
+get_self_report_non_cancer_diagnoses <- function(ukb_pheno,
+                                                 data_dict,
+                                                 ukb_codings,
+                                                 remove_special_dates = TRUE) {
+
+  # for required field_ids (see
+  # https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=2002)
+  result <- get_diagnoses_basis_fn(ukb_pheno = ukb_pheno,
+                         data_dict = data_dict,
+                         ukb_codings = ukb_codings,
+                         code_col_field_id = "20002",
+                         date_col_field_id = "20008")
+
+  if (remove_special_dates) {
+    result <- make_self_report_special_decimal_dates_na(result)
+  }
+
+  # convert date_col from decimal to date type
+  result$date <- lubridate::as_date(lubridate::date_decimal(result$date))
+
+  return(result)
+}
+
+
+#' Get self-reported non-cancer diagnoses (ICD10)
+#'
+#' Returns a long format dataframe with all self-reported non-cancer diagnoses
+#' mapped to 3-character ICD10 codes with associated dates for each UK Biobank participant.
+#'
+#' Reformats the data for FieldIDs 20002 and 20009 (self-reported non-cancer
+#' diagnoses and dates, see
+#' \href{https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=100074}{category 100074}).
+#'
+#' \strong{Note: not all self-reported medical conditions map to ICD10 codes.}
+#' (See \href{https://biobank.ndph.ox.ac.uk/ukb/coding.cgi?id=609}{data coding
+#' 609})
+#'
+#' @inheritParams summarise_rowise
+#' @inheritParams read_pheno
+#' @param remove_special_dates Logical. Remove 'special' date values if
+#'   requested. Default is \code{TRUE}. See
+#'   \href{https://biobank.ndph.ox.ac.uk/ukb/coding.cgi?id=13}{data coding 13}.
+#'
+#' @return Dataframe
+#' @export
+#'
+#' @family get all diagnostic codes
+get_self_report_non_cancer_diagnoses_icd10 <- function(ukb_pheno,
+                                    data_dict,
+                                    ukb_codings,
+                                    remove_special_dates = TRUE) {
+
+  result <-
+    get_self_report_non_cancer_diagnoses(
+      ukb_pheno = ukb_pheno,
+      data_dict = data_dict,
+      ukb_codings = ukb_codings,
+      remove_special_dates = remove_special_dates
+    )
+
+  # ...now recode to ICD10
+  mapping_df <- ukb_codings %>%
+    dplyr::filter(.data[["Coding"]] == 609 & .data[["Value"]] != -1) %>%
+    dplyr::select(tidyselect::all_of(c("Value", "Meaning")))
+
+  dict <- mapping_df$Meaning
+  names(dict) <- mapping_df$Value
+
+  result$code <- suppressWarnings(revalue_vector(result$code,
+                                                 dict = dict,
+                                                 default_value = NA))
+
+  # remove rows with no code (not all self-reported conditions map to ICD10)
+  result <- result %>%
+    dplyr::filter(!is.na(.data[["code"]]))
+
+  # relabel 'source' col to indicate these are icd10 codes
+  result$source <- paste0(result$source, "_icd10")
+
+  return(result)
+}
+
+
+#' Get self-reported cancer diagnoses
+#'
+#' Returns a long format dataframe with all self-reported cancer diagnoses with
+#' associated dates for each UK Biobank participant.
+#'
+#' Reformats the data for FieldIDs 20001 and 20006 (self-reported cancer
+#' diagnoses and dates, see
+#' \href{https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=100074}{category
+#' 100074}). Coded using
+#' \href{https://biobank.ndph.ox.ac.uk/showcase/coding.cgi?id=3}{data coding 3}.
+#'
+#' @inheritParams summarise_rowise
+#' @inheritParams read_pheno
+#' @param remove_special_dates Logical. Remove 'special' date values if
+#'   requested. Default is \code{TRUE}. See
+#'   \href{https://biobank.ndph.ox.ac.uk/ukb/coding.cgi?id=13}{data coding 13}.
+#'
+#' @return Dataframe
+#' @export
+#'
+#' @family get all diagnostic codes
+get_self_report_cancer_diagnoses <- function(ukb_pheno,
+                                             data_dict,
+                                             ukb_codings,
+                                             remove_special_dates = TRUE) {
+
+  # for required field_ids (see
+  # https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=2002)
+
+  result <- get_diagnoses_basis_fn(
+    ukb_pheno = ukb_pheno,
+    data_dict = data_dict,
+    ukb_codings = ukb_codings,
+    code_col_field_id = "20001",
+    date_col_field_id = "20006"
+  )
+
+  if (remove_special_dates) {
+    result <- make_self_report_special_decimal_dates_na(result)
+  }
+
+  # convert date_col from decimal to date type
+  result$date <- lubridate::as_date(lubridate::date_decimal(result$date))
+
+  return(result)
+}
+
+
+#' Get cancer register ICD9 diagnoses
+#'
+#' Returns a long format dataframe with all ICD9 cancer register diagnoses
+#' with associated dates for each UK Biobank participant.
+#'
+#' Reformats the data for FieldIDs 40013 and 40005 (cancer register diagnoses and dates, see
+#' \href{https://biobank.ndph.ox.ac.uk/showcase/label.cgi?id=100092}{category 100092}).
+#'
+#' @inheritParams summarise_rowise
+#' @inheritParams read_pheno
+#'
+#' @return Dataframe
+#' @export
+#'
+#' @family get all diagnostic codes
+get_cancer_register_icd9_diagnoses <- function(ukb_pheno,
+                                             data_dict,
+                                             ukb_codings) {
+
+  # for required field_ids (see
+  # https://biobank.ndph.ox.ac.uk/showcase/label.cgi?id=100092)
+
+  get_diagnoses_basis_fn(
+    ukb_pheno = ukb_pheno,
+    data_dict = data_dict,
+    ukb_codings = ukb_codings,
+    code_col_field_id = "40013",
+    date_col_field_id = "40005"
+  )
+}
+
+
+#' Get cancer register ICD10 diagnoses
+#'
+#' Returns a long format dataframe with all ICD10 cancer register diagnoses
+#' with associated dates for each UK Biobank participant.
+#'
+#' Reformats the data for FieldIDs 40006 and 40005 (cancer register diagnoses and dates, see
+#' \href{https://biobank.ndph.ox.ac.uk/showcase/label.cgi?id=100092}{category 100092}).
+#'
+#' @inheritParams summarise_rowise
+#' @inheritParams read_pheno
+#'
+#' @return Dataframe
+#' @export
+#'
+#' @family get all diagnostic codes
+get_cancer_register_icd10_diagnoses <- function(ukb_pheno,
+                                               data_dict,
+                                               ukb_codings) {
+
+  # for required field_ids (see
+  # https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=2002)
+
+  get_diagnoses_basis_fn(
+    ukb_pheno = ukb_pheno,
+    data_dict = data_dict,
+    ukb_codings = ukb_codings,
+    code_col_field_id = "40006",
+    date_col_field_id = "40005"
+  )
+}
+
+#' Get hospital inpatient OPCS4 operative procedures
+#'
+#' Returns a long format dataframe with all summary hospital inpatient OPCS4
+#' codes and associated dates for each UK Biobank participant.
+#'
+#' Reformats the data for FieldIDs 41272 and 41282 (hospital inpatient OPCS4
+#' operative procedures and dates, see
+#' \href{https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=2005}{category 2005}).
+#'
+#' @inheritParams summarise_rowise
+#' @inheritParams read_pheno
+#'
+#' @return Data frame
+#' @export
+#'
+#' @family get all diagnostic codes
+get_hes_opcs4_operations <- function(ukb_pheno,
+                                     data_dict,
+                                     ukb_codings) {
+  # for required field_ids (see
+  # https://biobank.ctsu.ox.ac.uk/crystal/label.cgi?id=2005 )
+
+  get_diagnoses_basis_fn(ukb_pheno = ukb_pheno,
+                         data_dict = data_dict,
+                         ukb_codings = ukb_codings,
+                         code_col_field_id = "41272",
+                         date_col_field_id = "41282")
+}
+
+#' Get hospital inpatient OPCS3 operative procedures
+#'
+#' Returns a long format dataframe with all summary hospital inpatient OPCS3
+#' codes and associated dates for each UK Biobank participant.
+#'
+#' Reformats the data for FieldIDs 41273 and 41283 (hospital inpatient OPCS3
+#' operative procedures and dates, see
+#' \href{https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=2005}{category 2005}).
+#'
+#' @inheritParams summarise_rowise
+#' @inheritParams read_pheno
+#'
+#' @return Data frame
+#' @export
+#'
+#' @family get all diagnostic codes
+get_hes_opcs3_operations <- function(ukb_pheno,
+                                     data_dict,
+                                     ukb_codings) {
+  # for required field_ids (see
+  # https://biobank.ctsu.ox.ac.uk/crystal/label.cgi?id=2005 )
+
+  get_diagnoses_basis_fn(ukb_pheno = ukb_pheno,
+                         data_dict = data_dict,
+                         ukb_codings = ukb_codings,
+                         code_col_field_id = "41273",
+                         date_col_field_id = "41283")
+}
+
+#' Get all diagnostic codes from multiple data sources
+#'
+#' Extract diagnostic codes from multiple sources
+#'
+#' Loops through a list of functions (\code{function_list}) from the 'get all
+#' diagnostic codes' family and combines the results into a single data frame.
+#'
+#' @param function_list A list of \code{get_XXXX_diagnoses} functions.
+#' @inheritParams get_self_report_non_cancer_diagnoses_icd10
+#'
+#' @return Dataframe
+#' @export
+#' @family get all diagnostic codes
+get_all_diagnostic_codes_multi <- function(function_list = list(
+  get_self_report_non_cancer_diagnoses,
+  get_self_report_non_cancer_diagnoses_icd10,
+  get_self_report_cancer_diagnoses,
+  get_hes_icd9_diagnoses,
+  get_hes_icd10_diagnoses,
+  get_death_data_icd10_diagnoses,
+  get_cancer_register_icd9_diagnoses,
+  get_cancer_register_icd10_diagnoses
+),
+ukb_pheno,
+data_dict,
+ukb_codings) {
+
+  start_time <- proc.time()
+
+  # TODO - make safely version, and display informative error message re failed jobs
+  result <- function_list %>%
+    purrr::imap(~ {
+      fn <- purrr::safely(.x)
+      single_result <- fn(ukb_pheno = ukb_pheno,
+                          data_dict = data_dict,
+                          ukb_codings = ukb_codings)
+      message("\nProcessed get diagnosis function ", .y, " of ", length(function_list))
+      time_taken_message(start_time)
+      return(single_result)
+    })
+
+  result <- result %>%
+    purrr::transpose()
+
+  errors <- result$error %>%
+    purrr::compact() %>%
+    purrr::map("message")
+
+  result <- result$result %>%
+    dplyr::bind_rows()
+
+  # completion message
+  message("Complete!")
+  time_taken_message(start_time)
+
+  # warning messages
+  if (length(errors) > 0) {
+    warning(paste0(length(errors),
+                   " functions failed, generating the error messages above"))
+    errors %>%
+      purrr::walk( ~ message(.x))
+  }
+
+  # return result
+  return(result)
+}
+
+
+# PRIVATE FUNCTIONS -------------------------------------------------------
+
+
+# Get diagnoses helpers ---------------------------------------------------
+
+#' Melt diagnoses code and date columns in a main UKB dataset
+#'
+#' For most clinical events variables in the main UKB dataset there is a
+#' diagnostic code variable and an associated date of event variable. There are
+#' spread over several instances/arrays. This function melts these to long
+#' format.
+#'
+#' @inheritParams read_pheno
+#' @inheritParams summarise_rowise
+#' @param code_col_field_id character. The Field ID representing 'code'
+#'   variables
+#' @param date_col_field_id character. The Field ID representing 'date'
+#'   variables that correspond to \code{code_col_field_id}.
+#'
+#' @return A data table with 'eid', 'source' (Field ID for the code
+#' column), 'code' and 'date' columns.
+get_diagnoses_basis_fn <- function(ukb_pheno,
+                                   data_dict,
+                                   ukb_codings,
+                                   code_col_field_id,
+                                   date_col_field_id) {
+  start_time <- proc.time()
+
+  # validate args
+  assertthat::assert_that(
+    "data.table" %in% class(ukb_pheno),
+    msg = "Error! ukb_pheno must be a data table"
+  )
+
+  assertthat::assert_that(
+    is.character(code_col_field_id) & is.character(date_col_field_id),
+    msg = "Error! Both `code_col_field_id` and `date_col_field_id` must be of type character"
+  )
+
+  assertthat::assert_that(
+    (code_col_field_id %in% data_dict$FieldID) &
+      (date_col_field_id %in% data_dict$FieldID),
+    msg = paste0(
+      "Error! Both FieldID ",
+      code_col_field_id,
+      " and FieldID ",
+      date_col_field_id,
+      " are required, one or both of these is not present in data_dict"
+    )
+  )
+
+  # get lists of required columns
+  code_cols <- filter_data_dict(data_dict = data_dict,
+                                filter_col = "FieldID",
+                                filter_value = code_col_field_id,
+                                return_col = "descriptive_colnames",
+                                error_if_missing = TRUE)
+
+  date_cols <- filter_data_dict(data_dict = data_dict,
+                                filter_col = "FieldID",
+                                filter_value = date_col_field_id,
+                                return_col = "descriptive_colnames",
+                                error_if_missing = TRUE)
+
+  # `code_cols` and `date_cols` may be of different lengths e.g. try searching
+  # the UKB data showcase for FieldIDs 40005 (date of cancer diagnosis) and
+  # 40013 (type of cancer ICD-9). Some instance-arrays may also be omitted if
+  # they contain no data, resulting in apparently 'missing' columns (e.g.
+  # FieldID 40013 should have instance_arrays from 0-0 to 0-14, but may be
+  # missing 12-0, perhaps because some ppts have lef the study and there are
+  # therefore no longer any data entries for these columns)
+
+  # ...all code columns should have a corresponding date column though. An error
+  # is therefore raised here if there are 'missing' date columns.
+  code_cols_instance_arrays <- colname_to_field_inst_array_df(code_cols)
+  date_cols_instance_arrays <- colname_to_field_inst_array_df(date_cols)
+
+
+  colnames_df <- code_cols_instance_arrays %>%
+    dplyr::left_join(date_cols_instance_arrays,
+                     by = "instance_array",
+                     suffix = c(".code", ".date")) %>%
+    dplyr::arrange(as.numeric(.data[["instance.code"]]))
+
+  assertthat::assert_that(
+    sum(is.na(colnames_df$descriptive_colnames.date)) == 0,
+    msg = paste0("Error! Some date columns appear to be missing. Check that all columns for Field ID ",
+                 code_col_field_id,
+                 " have a corresponding column for Field ID ",
+                 date_col_field_id)
+  )
+
+  # update code_cols and date_cols
+  code_cols <- colnames_df$descriptive_colnames.code
+  date_cols <- colnames_df$descriptive_colnames.date
+
+  # check these are actually present in ukb_pheno
+  check_required_cols_exist(df = ukb_pheno,
+                            code_cols,
+                            date_cols)
+
+  # melt cols
+  ukb_pheno <- data.table::melt(
+    ukb_pheno %>% dplyr::select(tidyselect::all_of(c("eid", code_cols, date_cols))),
+    measure = list(code_cols, date_cols),
+    value.name = c("code", "date")
+  )
+
+  ukb_pheno <- ukb_pheno[!is.na(ukb_pheno$code)]
+
+  # relabel code col
+  ukb_pheno <- recode_ukbcol(df = ukb_pheno,
+                             col_to_recode = "code",
+                             field_id = code_col_field_id,
+                             ukb_data_dict = data_dict,
+                             ukb_codings = ukb_codings,
+                             mapping_direction = "meaning_code")
+
+  # make 'source' col
+  ukb_pheno$variable <- paste0("f", code_col_field_id)
+  names(ukb_pheno)[which(names(ukb_pheno) == "variable")] <- "source"
+
+  # return result
+  time_taken_message(start_time)
+  return(ukb_pheno)
+}
+
+make_self_report_special_decimal_dates_na <- function(df) {
+  # Helper function for get_self_report_xxx functions
+
+  # special dates to remove
+  # FID 20006 and 20008; https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=20008
+  # https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=20006
+  self_report_cancer_and_non_cancer_diagnoses_special_dates <- c(-3,-1)
+
+  # remove special dates
+  df$date <- ifelse(
+    test = df$date %in% self_report_cancer_and_non_cancer_diagnoses_special_dates,
+    yes = NA,
+    no = df$date
+  )
+
+  return(df)
+}
+
+# Get diagnoses archived functions ----------------------------------------
+
+#' Get death data ICD10 diagnoses
+#'
+#' Returns a long format dataframe with all death data ICD10 codes for each UK
+#' Biobank participant.
+#'
+#' Reformats the data for FieldIDs 40001 and 40002 (death register
+#' health-related outcomes - primary and secondary causes of death; see
+#' \href{https://biobank.ndph.ox.ac.uk/showcase/label.cgi?id=100093}{category
+#' 100093}).
+#'
+#' @section Under the hood:
+#'
+#'   Converts the data from FieldIDs 40001 and 40002 to long format separately
+#'   before combining into a single dataframe.
+#'
+#' @inheritParams summarise_rowise
+#' @inheritParams field_id_pivot_longer
+#'
+#' @return Dataframe
+#'
+#' @family get all diagnostic codes
+OLD_get_death_data_icd10_diagnoses <- function(ukb_pheno,
+                                           data_dict,
+                                           ukb_codings) {
 
   # required field_ids (see https://biobank.ndph.ox.ac.uk/showcase/label.cgi?id=100093 )
   death_data_field_ids <- c("40001", "40002")
@@ -330,9 +969,9 @@ get_death_data_icd10_diagnoses <- function(ukb_pheno,
     dplyr::filter(!is.na(.data[["f40001_value"]])) # remove rows with no codes
 
   death_data_diagnoses[["f40001"]] <- get_diagnoses_set_index_code_date_cols(get_clinical_events_df = death_data_diagnoses[["f40001"]],
-                                                               index_col = "f40001",
-                                                               code_col = "f40001_value",
-                                                               date_col = "date")
+                                                                             index_col = "f40001",
+                                                                             code_col = "f40001_value",
+                                                                             date_col = "date")
 
   # get all diagnostic codes and dates (and standardise) - fieldid 40002
   death_data_diagnoses[["f40002"]] <- field_id_pivot_longer(
@@ -351,25 +990,25 @@ get_death_data_icd10_diagnoses <- function(ukb_pheno,
     dplyr::filter(!is.na(.data[["f40002_value"]])) # remove rows with no codes
 
   death_data_diagnoses[["f40002"]] <-
-      get_diagnoses_set_index_code_date_cols(
-        get_clinical_events_df = death_data_diagnoses[["f40002"]],
-        index_col = "f40002",
-        code_col = "f40002_value",
-        date_col = "date"
-      )
+    get_diagnoses_set_index_code_date_cols(
+      get_clinical_events_df = death_data_diagnoses[["f40002"]],
+      index_col = "f40002",
+      code_col = "f40002_value",
+      date_col = "date"
+    )
 
   # combine into single df
-    death_data_diagnoses <- dplyr::bind_rows(death_data_diagnoses)
+  death_data_diagnoses <- dplyr::bind_rows(death_data_diagnoses)
 
   # recode to ICD10 (NB at this stage, this column is already contains ICD10
   # codes but additionally includes descriptions e.g. "J95.1 Acute pulmonary
   # insufficiency following thoracic surgery")
-    death_data_diagnoses <- recode_ukbcol(df = death_data_diagnoses,
-                                      col_to_recode = "code",
-                                      field_id = "40002",
-                                      ukb_data_dict = data_dict,
-                                      ukb_codings = ukb_codings,
-                                      mapping_direction = "meaning_code")
+  death_data_diagnoses <- recode_ukbcol(df = death_data_diagnoses,
+                                        col_to_recode = "code",
+                                        field_id = "40002",
+                                        ukb_data_dict = data_dict,
+                                        ukb_codings = ukb_codings,
+                                        mapping_direction = "meaning_code")
 
   return(death_data_diagnoses)
 }
@@ -388,12 +1027,11 @@ get_death_data_icd10_diagnoses <- function(ukb_pheno,
 #' @inheritParams field_id_pivot_longer
 #'
 #' @return Data frame
-#' @export
 #'
 #' @family get all diagnostic codes
-get_hes_icd9_diagnoses <- function(ukb_pheno,
-                                    data_dict,
-                                    ukb_codings) {
+OLD_get_hes_icd9_diagnoses <- function(ukb_pheno,
+                                   data_dict,
+                                   ukb_codings) {
 
   # required field_ids (see https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=2002 )
   hes_icd9_field_ids <- c("41271", "41281")
@@ -412,11 +1050,11 @@ get_hes_icd9_diagnoses <- function(ukb_pheno,
 
   # recode to ICD9
   hes_icd9_diagnoses <- recode_ukbcol(df = hes_icd9_diagnoses,
-                                       col_to_recode = "f41271_value",
-                                       field_id = "41271",
-                                       ukb_data_dict = data_dict,
-                                       ukb_codings = ukb_codings,
-                                       mapping_direction = "meaning_code")
+                                      col_to_recode = "f41271_value",
+                                      field_id = "41271",
+                                      ukb_data_dict = data_dict,
+                                      ukb_codings = ukb_codings,
+                                      mapping_direction = "meaning_code")
 
   # standardise
   hes_icd9_diagnoses <- get_diagnoses_set_index_code_date_cols(
@@ -442,10 +1080,9 @@ get_hes_icd9_diagnoses <- function(ukb_pheno,
 #' @inheritParams field_id_pivot_longer
 #'
 #' @return Dataframe
-#' @export
 #'
 #' @family get all diagnostic codes
-get_hes_icd10_diagnoses <- function(ukb_pheno,
+OLD_get_hes_icd10_diagnoses <- function(ukb_pheno,
                                     data_dict,
                                     ukb_codings) {
 
@@ -466,11 +1103,11 @@ get_hes_icd10_diagnoses <- function(ukb_pheno,
 
   # recode to ICD10
   hes_icd10_diagnoses <- recode_ukbcol(df = hes_icd10_diagnoses,
-                col_to_recode = "f41270_value",
-                field_id = "41270",
-                ukb_data_dict = data_dict,
-                ukb_codings = ukb_codings,
-                mapping_direction = "meaning_code")
+                                       col_to_recode = "f41270_value",
+                                       field_id = "41270",
+                                       ukb_data_dict = data_dict,
+                                       ukb_codings = ukb_codings,
+                                       mapping_direction = "meaning_code")
 
   # standardise
   hes_icd10_diagnoses <- get_diagnoses_set_index_code_date_cols(
@@ -500,10 +1137,9 @@ get_hes_icd10_diagnoses <- function(ukb_pheno,
 #'   \href{https://biobank.ndph.ox.ac.uk/ukb/coding.cgi?id=13}{data coding 13}.
 #'
 #' @return Dataframe
-#' @export
 #'
 #' @family get all diagnostic codes
-get_self_report_non_cancer_diagnoses <- function(ukb_pheno,
+OLD_get_self_report_non_cancer_diagnoses <- function(ukb_pheno,
                                                  data_dict,
                                                  ukb_codings,
                                                  remove_special_dates = TRUE) {
@@ -566,13 +1202,12 @@ get_self_report_non_cancer_diagnoses <- function(ukb_pheno,
 #'   \href{https://biobank.ndph.ox.ac.uk/ukb/coding.cgi?id=13}{data coding 13}.
 #'
 #' @return Dataframe
-#' @export
 #'
 #' @family get all diagnostic codes
-get_self_report_non_cancer_diagnoses_icd10 <- function(ukb_pheno,
-                                    data_dict,
-                                    ukb_codings,
-                                    remove_special_dates = TRUE) {
+OLD_get_self_report_non_cancer_diagnoses_icd10 <- function(ukb_pheno,
+                                                       data_dict,
+                                                       ukb_codings,
+                                                       remove_special_dates = TRUE) {
 
   self_report_non_cancer_diagnoses_icd10 <-
     get_self_report_non_cancer_diagnoses(ukb_pheno = ukb_pheno,
@@ -589,7 +1224,8 @@ get_self_report_non_cancer_diagnoses_icd10 <- function(ukb_pheno,
   names(dict) <- mapping_df$Value
 
   self_report_non_cancer_diagnoses_icd10$code <- revalue_vector(self_report_non_cancer_diagnoses_icd10$code,
-                 dict = dict)
+                                                                dict = dict,
+                                                                default_value = NA)
 
   # TO DELETE
   # mapping_df <- rename_cols(df = mapping_df,
@@ -629,12 +1265,11 @@ get_self_report_non_cancer_diagnoses_icd10 <- function(ukb_pheno,
 #'   \href{https://biobank.ndph.ox.ac.uk/ukb/coding.cgi?id=13}{data coding 13}.
 #'
 #' @return Dataframe
-#' @export
 #'
 #' @family get all diagnostic codes
-get_self_report_cancer_diagnoses <- function(ukb_pheno,
-                                                 data_dict,
-                                                 ukb_codings,
+OLD_get_self_report_cancer_diagnoses <- function(ukb_pheno,
+                                             data_dict,
+                                             ukb_codings,
                                              remove_special_dates = TRUE) {
 
   # required field_ids (see https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=2002)
@@ -654,11 +1289,11 @@ get_self_report_cancer_diagnoses <- function(ukb_pheno,
 
   # recode to ukb codes
   self_report_cancer_diagnoses <- suppressWarnings(recode_ukbcol(df = self_report_cancer_diagnoses,
-                                                                     col_to_recode = "f20001_value",
-                                                                     field_id = "20001",
-                                                                     ukb_data_dict = data_dict,
-                                                                     ukb_codings = ukb_codings,
-                                                                     mapping_direction = "meaning_code"))
+                                                                 col_to_recode = "f20001_value",
+                                                                 field_id = "20001",
+                                                                 ukb_data_dict = data_dict,
+                                                                 ukb_codings = ukb_codings,
+                                                                 mapping_direction = "meaning_code"))
 
   # standardise
   self_report_cancer_diagnoses <- get_diagnoses_set_index_code_date_cols(
@@ -687,12 +1322,11 @@ get_self_report_cancer_diagnoses <- function(ukb_pheno,
 #' @inheritParams field_id_pivot_longer
 #'
 #' @return Dataframe
-#' @export
 #'
 #' @family get all diagnostic codes
-get_cancer_register_icd9_diagnoses <- function(ukb_pheno,
-                                             data_dict,
-                                             ukb_codings) {
+OLD_get_cancer_register_icd9_diagnoses <- function(ukb_pheno,
+                                               data_dict,
+                                               ukb_codings) {
 
   # required field_ids (see https://biobank.ndph.ox.ac.uk/showcase/label.cgi?id=100092 )
   cancer_register_icd9_field_ids <- c("40013", "40005")
@@ -737,11 +1371,11 @@ get_cancer_register_icd9_diagnoses <- function(ukb_pheno,
 
   # recode to ICD9
   cancer_register_icd9_diagnoses <- recode_ukbcol(df = cancer_register_icd9_diagnoses,
-                                      col_to_recode = "f40013_value",
-                                      field_id = "40013",
-                                      ukb_data_dict = data_dict,
-                                      ukb_codings = ukb_codings,
-                                      mapping_direction = "meaning_code")
+                                                  col_to_recode = "f40013_value",
+                                                  field_id = "40013",
+                                                  ukb_data_dict = data_dict,
+                                                  ukb_codings = ukb_codings,
+                                                  mapping_direction = "meaning_code")
 
   # standardise
   cancer_register_icd9_diagnoses <- get_diagnoses_set_index_code_date_cols(
@@ -766,12 +1400,11 @@ get_cancer_register_icd9_diagnoses <- function(ukb_pheno,
 #' @inheritParams field_id_pivot_longer
 #'
 #' @return Dataframe
-#' @export
 #'
 #' @family get all diagnostic codes
-get_cancer_register_icd10_diagnoses <- function(ukb_pheno,
-                                               data_dict,
-                                               ukb_codings) {
+OLD_get_cancer_register_icd10_diagnoses <- function(ukb_pheno,
+                                                data_dict,
+                                                ukb_codings) {
 
   # required field_ids (see https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=2002)
   cancer_register_icd10_field_ids <- c("40006", "40005")
@@ -790,11 +1423,11 @@ get_cancer_register_icd10_diagnoses <- function(ukb_pheno,
 
   # recode to ICD9
   cancer_register_icd10_diagnoses <- recode_ukbcol(df = cancer_register_icd10_diagnoses,
-                                                  col_to_recode = "f40006_value",
-                                                  field_id = "40006",
-                                                  ukb_data_dict = data_dict,
-                                                  ukb_codings = ukb_codings,
-                                                  mapping_direction = "meaning_code")
+                                                   col_to_recode = "f40006_value",
+                                                   field_id = "40006",
+                                                   ukb_data_dict = data_dict,
+                                                   ukb_codings = ukb_codings,
+                                                   mapping_direction = "meaning_code")
 
   # standardise
   cancer_register_icd10_diagnoses <- get_diagnoses_set_index_code_date_cols(
@@ -805,85 +1438,6 @@ get_cancer_register_icd10_diagnoses <- function(ukb_pheno,
 
   return(cancer_register_icd10_diagnoses)
 }
-
-
-#' Get all diagnostic codes from multiple data sources
-#'
-#' Extract diagnostic codes from multiple sources
-#'
-#' Loops through a list of functions (\code{function_list}) from the 'get all
-#' diagnostic codes' family and combines the results into a single data frame.
-#'
-#' @param function_list A list of \code{get_XXXX_diagnoses} functions.
-#' @inheritParams get_self_report_non_cancer_diagnoses_icd10
-#' @param drop_source_col If \code{TRUE}, removes \code{source_col} column. This
-#'   records which column in the main dataset the value in \code{code} column
-#'   came from (retaining this column may be helpful for debugging). Default is
-#'   \code{TRUE}.
-#'
-#' @return Dataframe
-#' @export
-#' @family get all diagnostic codes
-get_all_diagnostic_codes_multi <- function(function_list = list(
-  get_self_report_non_cancer_diagnoses,
-  get_self_report_non_cancer_diagnoses_icd10,
-  get_self_report_cancer_diagnoses,
-  get_hes_icd9_diagnoses,
-  get_hes_icd10_diagnoses,
-  get_death_data_icd10_diagnoses,
-  get_cancer_register_icd9_diagnoses,
-  get_cancer_register_icd10_diagnoses
-),
-ukb_pheno,
-data_dict,
-ukb_codings,
-drop_source_col = TRUE) {
-
-  start_time <- proc.time()
-
-  # loop through functions, then concatenate results
-  result <- function_list %>%
-    purrr::imap(~ {
-      single_result <- .x(ukb_pheno = ukb_pheno,
-                          data_dict = data_dict,
-                          ukb_codings = ukb_codings)
-      message("\nProcessed get diagnosis function ", .y, " of ", length(function_list))
-      time_taken_message(start_time)
-      return(single_result)
-      })
-
-  # TODO - make safely version, and display informative error message re failed jobs
-  # result <- function_list %>%
-  #   purrr::imap(~ {
-  #     fn <- purrr::safely(.x)
-  #     single_result <- fn(ukb_pheno = ukb_pheno,
-  #                         data_dict = data_dict,
-  #                         ukb_codings = ukb_codings)
-  #     message("\nProcessed get diagnosis function ", .y, " of ", length(function_list))
-  #     time_taken_message(start_time)
-  #     return(single_result)
-  #   })
-
-  result <- result %>%
-    dplyr::bind_rows()
-
-  # remove source_col if requested (default is to remove)
-  if (drop_source_col == TRUE) {
-    result <- result %>%
-      dplyr::select(-.data[["source_col"]])
-  }
-
-  # completion message
-  message("Complete!")
-  time_taken_message(start_time)
-
-  # return result
-  return(result)
-}
-
-
-# PRIVATE FUNCTIONS -------------------------------------------------------
-
 
 #' Standardise a long format diagnoses dataframe
 #'
@@ -899,7 +1453,7 @@ drop_source_col = TRUE) {
 #'   requested. Default is \code{FALSE}, as only the self-report fields contain
 #'   such values.
 #' @family get all diagnostic codes
-get_diagnoses_set_index_code_date_cols <- function(get_clinical_events_df,
+OLD_get_diagnoses_set_index_code_date_cols <- function(get_clinical_events_df,
                                                    index_col,
                                                    code_col,
                                                    date_col,
@@ -1079,6 +1633,60 @@ field_id_pivot_longer_multi <- function(field_ids,
   }
 
   return(result)
+}
+
+#' Standardise a long format diagnoses dataframe
+#'
+#' Helper function
+#'
+#' Selects essential columns: eid, field_id, code and date recorded.
+#'
+#' @param get_clinical_events_df a dataframe created by a 'get_X_diagnoses' function
+#' @param index_col Column indicating diagnosis source (e.g. HES, self-report)
+#' @param code_col Column of codes
+#' @param date_col Column of dates when code was recorded
+#' @param remove_special_dates Logical. Remove 'special' date values if
+#'   requested. Default is \code{FALSE}, as only the self-report fields contain
+#'   such values.
+#' @family get all diagnostic codes
+get_diagnoses_set_index_code_date_cols <- function(get_clinical_events_df,
+                                                   index_col,
+                                                   code_col,
+                                                   date_col,
+                                                   remove_special_dates = FALSE) {
+
+  # create 'source' col indicating which FieldID the data (code) comes from
+  get_clinical_events_df$source <- index_col
+
+  # select required columns and rename
+  get_clinical_events_df <- get_clinical_events_df %>%
+    dplyr::select(.data[["eid"]],
+                  .data[["source"]],
+                  code = .data[[code_col]],
+                  date = .data[[date_col]],
+                  source_col = .data[[index_col]])
+
+  # remove self-report special date values if requested
+  if (remove_special_dates == TRUE) {
+
+    # special dates to remove
+    # FID 20006 and 20008; https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=20008
+    # https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=20006
+    self_report_cancer_and_non_cancer_diagnoses_special_dates <- c(
+      -3,
+      -1
+    )
+
+    # remove special dates
+    get_clinical_events_df$date <- ifelse(
+      test = get_clinical_events_df$date %in% self_report_cancer_and_non_cancer_diagnoses_special_dates,
+      yes = NA,
+      no = get_clinical_events_df$date
+    )
+
+  }
+
+  return(get_clinical_events_df)
 }
 
 # Extract specific diagnostic code helpers --------------------------------

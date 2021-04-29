@@ -22,8 +22,8 @@ github repo.}
 Dataframe
 }
 \description{
-Returns a long format dataframe with all hospital inpatient ICD10 codes and associated dates for
-each UK Biobank participant.
+Returns a long format dataframe with all summary hospital inpatient ICD10
+codes and associated dates for each UK Biobank participant.
 }
 \details{
 Reformats the data for FieldIDs 41270 and 41280 (hospital inpatient diagnoses
@@ -32,12 +32,23 @@ and dates, see
 }
 \seealso{
 Other get all diagnostic codes: 
+\code{\link{OLD_get_cancer_register_icd10_diagnoses}()},
+\code{\link{OLD_get_cancer_register_icd9_diagnoses}()},
+\code{\link{OLD_get_death_data_icd10_diagnoses}()},
+\code{\link{OLD_get_diagnoses_set_index_code_date_cols}()},
+\code{\link{OLD_get_hes_icd10_diagnoses}()},
+\code{\link{OLD_get_hes_icd9_diagnoses}()},
+\code{\link{OLD_get_self_report_cancer_diagnoses}()},
+\code{\link{OLD_get_self_report_non_cancer_diagnoses_icd10}()},
+\code{\link{OLD_get_self_report_non_cancer_diagnoses}()},
 \code{\link{get_all_diagnostic_codes_multi}()},
 \code{\link{get_cancer_register_icd10_diagnoses}()},
 \code{\link{get_cancer_register_icd9_diagnoses}()},
 \code{\link{get_death_data_icd10_diagnoses}()},
 \code{\link{get_diagnoses_set_index_code_date_cols}()},
 \code{\link{get_hes_icd9_diagnoses}()},
+\code{\link{get_hes_opcs3_operations}()},
+\code{\link{get_hes_opcs4_operations}()},
 \code{\link{get_self_report_cancer_diagnoses}()},
 \code{\link{get_self_report_non_cancer_diagnoses_icd10}()},
 \code{\link{get_self_report_non_cancer_diagnoses}()},

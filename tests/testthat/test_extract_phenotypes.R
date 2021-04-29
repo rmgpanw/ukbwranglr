@@ -38,7 +38,17 @@ dummy_ukb_data_2eid <- dummy_ukb_data_3eid[c(1, 2), ]
 dummy_ukb_data_all_diagnoses <-
   get_all_diagnostic_codes_multi(ukb_pheno = dummy_ukb_data_1eid,
                                  data_dict = dummy_ukb_data_dict,
-                                 ukb_codings = ukb_codings)
+                                 ukb_codings = ukb_codings,
+                                 function_list = list(
+                                   get_self_report_non_cancer_diagnoses,
+                                   get_self_report_non_cancer_diagnoses_icd10,
+                                   get_self_report_cancer_diagnoses,
+                                   get_hes_icd9_diagnoses,
+                                   get_hes_icd10_diagnoses,
+                                   get_death_data_icd10_diagnoses,
+                                   get_cancer_register_icd9_diagnoses,
+                                   get_cancer_register_icd10_diagnoses
+                                 ))
 
 # dummy clinical_events_df
 dummy_clinical_events <- make_dummy_clinical_events_df(eids = c(1, 2, 3),
@@ -296,28 +306,20 @@ test_that(
   }
 )
 
-# `get_diagnoses_set_index_code_date_cols()` ------------------------------
+# `make_self_report_special_decimal_dates_na()` ------------------------------
 
-test_that("`get_diagnoses_set_index_code_date_cols()` removes special dates (data coding 13, field IDs 20006 and 20008: interpolated year of diagnosis for self-reported cancer/non-cancer illnesses)", {
+test_that("`make_self_report_special_decimal_dates_na()` removes special dates from 'date' column (data coding 13, used for field IDs 20006 and 20008: interpolated year of diagnosis for self-reported cancer/non-cancer illnesses)", {
 
   self_report_non_cancer_diagnoses_unstandardised <- tibble::tribble(
-    ~ eid, ~ f20002, ~ f20002_value, ~ instance_array, ~ f20008, ~ f20008_value,
+    ~ eid, ~ f20002, ~ f20002_value, ~ instance_array, ~ f20008, ~ date,
     "1", "noncancer_illness_code_selfreported_f20002_0_0", "1665", "0_0", "interpolated_year_when_noncancer_illness_first_diagnosed_f20008_0_0", 1998.1,
     "1", "noncancer_illness_code_selfreported_f20002_0_1", "1532", "0_1", "interpolated_year_when_noncancer_illness_first_diagnosed_f20008_0_1", -1,
     "1", "noncancer_illness_code_selfreported_f20002_0_2", "1552", "0_2", "interpolated_year_when_noncancer_illness_first_diagnosed_f20008_0_2", -3,
   )
 
-  self_report_non_cancer_diagnoses_standardised <-
-    get_diagnoses_set_index_code_date_cols(
-      get_clinical_events_df = self_report_non_cancer_diagnoses_unstandardised,
-      index_col = "f20002",
-      code_col = "f20002_value",
-      date_col = "f20008_value",
-      remove_special_dates = TRUE
-    )
-
-  expect_equal(self_report_non_cancer_diagnoses_standardised$date,
-               c(1998.1, NA, NA))
+  expect_equal(
+    make_self_report_special_decimal_dates_na(self_report_non_cancer_diagnoses_unstandardised)$date,
+    c(1998.1, NA, NA))
 })
 
 
@@ -335,26 +337,55 @@ test_that(
   }
 )
 
-# `field_id_pivot_longer_multi()` -----------------------------------------
+test_that(
+  "`get_all_diagnostic_codes_multi()` raises warning message if any errors are generated",
+  {
+    # the dummy data does not include opcs3 or opcs4 fields so these 2 functions will fail
+    expect_warning(
+      get_all_diagnostic_codes_multi(
+        ukb_pheno = dummy_ukb_data_1eid,
+        data_dict = dummy_ukb_data_dict,
+        ukb_codings = ukb_codings,
+        function_list = list(
+          get_hes_icd9_diagnoses,
+          get_hes_opcs3_operations,
+          get_hes_opcs4_operations
+        )
+      ),
+      "functions failed, generating the error messages above"
+    )
+  }
+)
 
-test_that("`field_id_pivot_longer_multi()` correctly matches diagnoses with dates by instance", {
-  result <- field_id_pivot_longer_multi(
-    # field_ids for HES data (icd9)
-    field_ids = c("41271", "41281"),
-    ukb_pheno = dummy_ukb_data_2eid,
-    data_dict = dummy_ukb_data_dict,
-    ukb_codings = ukb_codings)
+test_that(
+  "`get_all_diagnostic_codes_multi()` returns the same results when using older get_diagnoses functions",
+  {
+    OLD_dummy_ukb_data_all_diagnoses <-
+      get_all_diagnostic_codes_multi(ukb_pheno = dummy_ukb_data_1eid,
+                                     data_dict = dummy_ukb_data_dict,
+                                     ukb_codings = ukb_codings,
+                                     function_list = list(
+                                       ukbwranglr:::OLD_get_self_report_non_cancer_diagnoses,
+                                       ukbwranglr:::OLD_get_self_report_non_cancer_diagnoses_icd10,
+                                       ukbwranglr:::OLD_get_self_report_cancer_diagnoses,
+                                       ukbwranglr:::OLD_get_hes_icd9_diagnoses,
+                                       ukbwranglr:::OLD_get_hes_icd10_diagnoses,
+                                       ukbwranglr:::OLD_get_death_data_icd10_diagnoses,
+                                       ukbwranglr:::OLD_get_cancer_register_icd9_diagnoses,
+                                       ukbwranglr:::OLD_get_cancer_register_icd10_diagnoses
+                                     )) %>%
+      suppressWarnings() %>%
+      dplyr::arrange(.data[["eid"]],
+                     .data[["source"]],
+                     .data[["date"]],
+                     .data[["code"]])
 
-  expect_true(is.data.frame(result))
-})
-
-# TODO make a better test - use mockr package:
-# test_that("`field_id_pivot_longer_multi()` correctly raises an error if instance/array do not match between field ids", {
-#   result <- field_id_pivot_longer_multi(
-#     # field_ids for HES data (icd9)
-#     field_ids = c("41271", "41281"),
-#     ukb_pheno = dummy_ukb_data_2eid,
-#     data_dict = dummy_ukb_data_dict,
-#     ukb_codings = ukb_codings)
-#
-# })
+    expect_equivalent(
+      OLD_dummy_ukb_data_all_diagnoses %>% dplyr::select(-.data[["source_col"]]),
+      dummy_ukb_data_all_diagnoses %>% dplyr::arrange(.data[["eid"]],
+                                                      .data[["source"]],
+                                                      .data[["date"]],
+                                                      .data[["code"]])
+    )
+  }
+)

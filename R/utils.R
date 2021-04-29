@@ -529,7 +529,7 @@ recode_ukbcol <- function(df,
   dict <- mapping_df$new_vals
   names(dict) <- mapping_df$old_vals
 
-  df[[col_to_recode]] <- revalue_vector(x = df[[col_to_recode]],
+  df[[col_to_recode]] <- revalue_vector(x = as.character(df[[col_to_recode]]),
                                         dict = dict,
                                         default_value = NULL,
                                         suppress_warnings = FALSE)
@@ -855,8 +855,8 @@ revalue_vector <-
            suppress_warnings = FALSE) {
 
     # raise an error if column is not character/numeric/integer
-    assertthat::assert_that(all(class(x) %in% c("numeric", "integer", "character", "ordered", "factor")),
-                            msg = paste("Error! Selected column must be of type numeric/integer/character/factor. x is type:", class(x)))
+    assertthat::assert_that(all(class(x) %in% c("numeric", "integer", "character", "ordered")),
+                            msg = paste("Error! Selected column must be of type numeric/integer/character. x is type:", class(x)))
 
     # `dict` is a named vector - check the names (keys) are unique
     if (length(unique(names(dict))) != length(dict)) {

@@ -11,8 +11,7 @@ get_all_diagnostic_codes_multi(
     get_cancer_register_icd9_diagnoses, get_cancer_register_icd10_diagnoses),
   ukb_pheno,
   data_dict,
-  ukb_codings,
-  drop_source_col = TRUE
+  ukb_codings
 )
 }
 \arguments{
@@ -28,11 +27,6 @@ where all columns are of type \code{character}. By default, this is
 downloaded from the
 \href{https://github.com/rmgpanw/ukbwranglr_resources}{\code{ukbwranglr_resources}}
 github repo.}
-
-\item{drop_source_col}{If \code{TRUE}, removes \code{source_col} column. This
-records which column in the main dataset the value in \code{code} column
-came from (retaining this column may be helpful for debugging). Default is
-\code{TRUE}.}
 }
 \value{
 Dataframe
@@ -46,12 +40,23 @@ diagnostic codes' family and combines the results into a single data frame.
 }
 \seealso{
 Other get all diagnostic codes: 
+\code{\link{OLD_get_cancer_register_icd10_diagnoses}()},
+\code{\link{OLD_get_cancer_register_icd9_diagnoses}()},
+\code{\link{OLD_get_death_data_icd10_diagnoses}()},
+\code{\link{OLD_get_diagnoses_set_index_code_date_cols}()},
+\code{\link{OLD_get_hes_icd10_diagnoses}()},
+\code{\link{OLD_get_hes_icd9_diagnoses}()},
+\code{\link{OLD_get_self_report_cancer_diagnoses}()},
+\code{\link{OLD_get_self_report_non_cancer_diagnoses_icd10}()},
+\code{\link{OLD_get_self_report_non_cancer_diagnoses}()},
 \code{\link{get_cancer_register_icd10_diagnoses}()},
 \code{\link{get_cancer_register_icd9_diagnoses}()},
 \code{\link{get_death_data_icd10_diagnoses}()},
 \code{\link{get_diagnoses_set_index_code_date_cols}()},
 \code{\link{get_hes_icd10_diagnoses}()},
 \code{\link{get_hes_icd9_diagnoses}()},
+\code{\link{get_hes_opcs3_operations}()},
+\code{\link{get_hes_opcs4_operations}()},
 \code{\link{get_self_report_cancer_diagnoses}()},
 \code{\link{get_self_report_non_cancer_diagnoses_icd10}()},
 \code{\link{get_self_report_non_cancer_diagnoses}()},

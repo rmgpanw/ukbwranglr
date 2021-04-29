@@ -107,7 +107,6 @@ make_dummy_clinical_events_df <- function(eids = c(1, 2, 3),
 #'
 #' @return df
 #' @noRd
-#' @examples
 make_dummy_df <- function() {
   data.frame(chr = c(letters[1:5], NA),
              int = c(1:5, NA),
