@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Standardise a long format diagnoses dataframe — get_diagnoses_set_index_code_date_cols • ukbwranglr</title>
+<title>Get hospital inpatient OPCS3 operative procedures — get_hes_opcs3_operations • ukbwranglr</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,9 @@
 
 
 
-<meta property="og:title" content="Standardise a long format diagnoses dataframe — get_diagnoses_set_index_code_date_cols" />
-<meta property="og:description" content="Helper function" />
+<meta property="og:title" content="Get hospital inpatient OPCS3 operative procedures — get_hes_opcs3_operations" />
+<meta property="og:description" content="Returns a long format dataframe with all summary hospital inpatient OPCS3
+codes and associated dates for each UK Biobank participant." />
 
 
 
@@ -118,53 +119,48 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Standardise a long format diagnoses dataframe</h1>
+    <h1>Get hospital inpatient OPCS3 operative procedures</h1>
     
-    <div class="hidden name"><code>get_diagnoses_set_index_code_date_cols.Rd</code></div>
+    <div class="hidden name"><code>get_hes_opcs3_operations.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Helper function</p>
+    <p>Returns a long format dataframe with all summary hospital inpatient OPCS3
+codes and associated dates for each UK Biobank participant.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_diagnoses_set_index_code_date_cols</span><span class='op'>(</span>
-  <span class='va'>get_clinical_events_df</span>,
-  <span class='va'>index_col</span>,
-  <span class='va'>code_col</span>,
-  <span class='va'>date_col</span>,
-  remove_special_dates <span class='op'>=</span> <span class='cn'>FALSE</span>
-<span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>get_hes_opcs3_operations</span><span class='op'>(</span><span class='va'>ukb_pheno</span>, <span class='va'>data_dict</span>, <span class='va'>ukb_codings</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>get_clinical_events_df</th>
-      <td><p>a dataframe created by a 'get_X_diagnoses' function</p></td>
+      <th>ukb_pheno</th>
+      <td><p>a UK Biobank phenotype dataset. Must be a data table</p></td>
     </tr>
     <tr>
-      <th>index_col</th>
-      <td><p>Column indicating diagnosis source (e.g. HES, self-report)</p></td>
+      <th>data_dict</th>
+      <td><p>a data dictionary for <code>ukb_pheno</code>. Can be a "filtered"
+version including only the columns to be summarised.</p></td>
     </tr>
     <tr>
-      <th>code_col</th>
-      <td><p>Column of codes</p></td>
-    </tr>
-    <tr>
-      <th>date_col</th>
-      <td><p>Column of dates when code was recorded</p></td>
-    </tr>
-    <tr>
-      <th>remove_special_dates</th>
-      <td><p>Logical. Remove 'special' date values if
-requested. Default is <code>FALSE</code>, as only the self-report fields contain
-such values.</p></td>
+      <th>ukb_codings</th>
+      <td><p>The UKB codings dictionary. This should be a data frame
+where all columns are of type <code>character</code>. By default, this is
+downloaded from the
+<a href='https://github.com/rmgpanw/ukbwranglr_resources'><code>ukbwranglr_resources</code></a>
+github repo.</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>Data frame</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Selects essential columns: eid, field_id, code and date recorded.</p>
+    <p>Reformats the data for FieldIDs 41273 and 41283 (hospital inpatient OPCS3
+operative procedures and dates, see
+<a href='https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=2005'>category 2005</a>).</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other get all diagnostic codes: 
@@ -181,9 +177,9 @@ such values.</p></td>
 <code><a href='get_cancer_register_icd10_diagnoses.html'>get_cancer_register_icd10_diagnoses</a>()</code>,
 <code><a href='get_cancer_register_icd9_diagnoses.html'>get_cancer_register_icd9_diagnoses</a>()</code>,
 <code><a href='get_death_data_icd10_diagnoses.html'>get_death_data_icd10_diagnoses</a>()</code>,
+<code><a href='get_diagnoses_set_index_code_date_cols.html'>get_diagnoses_set_index_code_date_cols</a>()</code>,
 <code><a href='get_hes_icd10_diagnoses.html'>get_hes_icd10_diagnoses</a>()</code>,
 <code><a href='get_hes_icd9_diagnoses.html'>get_hes_icd9_diagnoses</a>()</code>,
-<code><a href='get_hes_opcs3_operations.html'>get_hes_opcs3_operations</a>()</code>,
 <code><a href='get_hes_opcs4_operations.html'>get_hes_opcs4_operations</a>()</code>,
 <code><a href='get_self_report_cancer_diagnoses.html'>get_self_report_cancer_diagnoses</a>()</code>,
 <code><a href='get_self_report_non_cancer_diagnoses_icd10.html'>get_self_report_non_cancer_diagnoses_icd10</a>()</code>,
