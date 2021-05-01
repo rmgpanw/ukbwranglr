@@ -476,9 +476,20 @@ map_codes <- function(codes,
       # Note, not all mapping sheets in UKB resource 592 contain descriptions
       # (e.g. 'read_v2_icd9'). Therefore need to use `lookup_codes` if
       # `standardise_output` is `TRUE`
+      if (to == "icd10") {
+        codes <-
+          reformat_icd10_codes(
+            icd10_codes = unique(result[[to_col]]),
+            ukb_code_mappings = ukb_code_mappings,
+            input_icd10_format = "ALT_CODE",
+            output_icd10_format = "ICD10_CODE"
+          )
+      } else {
+        codes <- unique(result[[to_col]])
+      }
       return(
         lookup_codes(
-          codes = unique(result[[to_col]]),
+          codes = codes,
           code_type = to,
           ukb_code_mappings = ukb_code_mappings,
           preferred_description_only = preferred_description_only,
@@ -522,7 +533,8 @@ reformat_standardised_codelist <- function(standardised_codelist,
   # validate args
   assertthat::assert_that(any(
     class(standardised_codelist) %in% c("data.frame", "data.table", "tbl_df")
-  ))
+  ),
+  msg = "Error! standardised_codelist must be a data frame (or tibble/data table")
   assertthat::is.string(code_type)
   assertthat::is.string(disease)
   assertthat::is.string(disease_category)

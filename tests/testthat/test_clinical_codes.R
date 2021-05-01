@@ -198,6 +198,21 @@ test_that("`map_codes()` works as expected for mapping icd10 to icd9 codes (thes
   "2890")
 })
 
+test_that("`map_codes()` works when mapping icd9 to icd10", {
+  expect_equal(
+    map_codes(
+      codes = "0020",
+      from = "icd9",
+      to = "icd10",
+      ukb_code_mappings = ukb_code_mappings,
+      quiet = FALSE,
+      codes_only = FALSE,
+      preferred_description_only = TRUE,
+      standardise_output = TRUE
+    )$code,
+    expected = "A01.0"
+  )
+})
 
 # `reformat_standardised_codelist()` --------------------------------------
 

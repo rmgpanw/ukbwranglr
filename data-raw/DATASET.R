@@ -237,7 +237,9 @@ clinical_events_sources <- tibble::tribble(
   "f41270", "icd10", "Diagnoses - ICD10", "Summary Diagnoses - Hospital inpatient - Health-related outcomes",
   "f41271", "icd9", "Diagnoses - ICD9", "Summary Diagnoses - Hospital inpatient - Health-related outcomes",
   "gpc_r2", "read2", "gp_clinical table - `read_2` column", "Primary care",
-  "gpc_r3", "read3", "gp_clinical table - `read_3` column", "Primary care"
+  "gpc_r3", "read3", "gp_clinical table - `read_3` column", "Primary care",
+  "f41272", "opcs4", "Operative procedures - OPCS4", "Summary Operations - Hospital inpatient - Health-related outcomes",
+  "f41273", "opcs3", "Operative procedures - OPCS3", "Summary Operations - Hospital inpatient - Health-related outcomes"
 )
 
 # SAVE AS R/sysdata.rda -------------------------------------------------------
