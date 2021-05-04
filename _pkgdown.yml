@@ -70,6 +70,7 @@ reference:
   - get_ukb_data_dict_direct
   - get_ukb_codings_direct
   - get_ukb_code_mappings
+  - get_ukb_code_mappings_direct
   - make_empty_clinical_codes_list
   - time_taken_message
 

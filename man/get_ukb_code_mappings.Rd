@@ -26,3 +26,6 @@ to a temporary directory before loading and returning the result.
 
 \strong{Note:} This is a large object (>450 MB)
 }
+\seealso{
+\code{\link{get_ukb_code_mappings_direct}}
+}

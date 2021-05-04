@@ -185,6 +185,7 @@ get_ukb_codings_direct <- function() {
 #'
 #' @return A named list.
 #' @export
+#' @seealso \code{\link{get_ukb_code_mappings_direct}}
 get_ukb_code_mappings <- function() {
   # file destination in tempdir
   ukb_code_mappings_rds <- file.path(tmpdir = tempdir(),
@@ -199,6 +200,49 @@ get_ukb_code_mappings <- function() {
 
   # load
   readRDS(ukb_code_mappings_rds)
+}
+
+#' Get UK Biobank clinical code mappings file directly from UKB website
+#'
+#' Downloads the UK Biobank code mappings file (\code{all_lkps_maps_v2.xlsx},
+#' \href{https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592}{resource 592})
+#' directly from the UKB website to a temporary directory at
+#' \code{\link[base]{tempdir}}. This is then read into R as a named list of data
+#' frames, one for each sheet in the original file.
+#'
+#' \strong{Note:} This is a large object (>450 MB)
+#'
+#' @return A named list.
+#' @export
+#' @seealso \code{\link{get_ukb_code_mappings}}
+get_ukb_code_mappings_direct <- function() {
+  # name of resource 592 excel file
+  primarycare_codings <- "all_lkps_maps_v2.xlsx"
+
+  # filepaths in tempdir
+  primarycare_codings_zip_filepath <- tempfile()
+  primarycare_codings_excel_filepath <- file.path(tempdir(), primarycare_codings)
+
+  # download primary care codings file to tempdir
+  message("Downloading primarycare_codings.zip (UKB resource 592) to tempdir")
+  utils::download.file("https://biobank.ndph.ox.ac.uk/ukb/ukb/auxdata/primarycare_codings.zip",
+                primarycare_codings_zip_filepath)
+
+  # extract excel file only from zip
+  message("Extracting all_lkps_maps_v2.xlsx from zip file to tempdir")
+  utils::unzip(primarycare_codings_zip_filepath,
+               files = primarycare_codings,
+               exdir = tempdir())
+
+  # reading all sheets into named list
+  message("Reading sheets from all_lkps_maps_v2.xlsx to a named list")
+  primarycare_codings_excel_filepath %>%
+    readxl::excel_sheets() %>%
+    purrr::discard(~ .x %in% c("Description", "Contents")) %>% # first 2 sheets not needed
+    purrr::set_names() %>%
+    purrr::map(readxl::read_excel,
+        path = primarycare_codings_excel_filepath,
+        col_types = "text")
 }
 
 

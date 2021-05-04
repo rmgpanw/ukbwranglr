@@ -27,6 +27,7 @@ Imports:
     progress,
     purrr,
     readr,
+    readxl,
     rlang,
     RSQLite,
     skimr,
