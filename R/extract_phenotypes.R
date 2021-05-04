@@ -1903,7 +1903,9 @@ filter_clinical_events_for_list_of_codes <- function(df,
       'data_coding_3',
       'icd9',
       'read2',
-      'read3'
+      'read3',
+      'opcs3',
+      'opcs4'
     ))),
     msg = "Error! check code for `ukbwranglr:::clinical_events_sources$data_coding` and amend the filter statement in this function to address all possible code types")
 
@@ -1917,6 +1919,8 @@ filter_clinical_events_for_list_of_codes <- function(df,
   read3_sources <- get_sources_for_code_type("read3")
   data_coding_6_sources <- get_sources_for_code_type("data_coding_6")
   data_coding_3_sources <- get_sources_for_code_type("data_coding_3")
+  opcs3_sources <- get_sources_for_code_type("opcs3")
+  opcs4_sources <- get_sources_for_code_type("opcs4")
 
   icd9_codes <- codes$icd9
   icd10_codes <- codes$icd10
@@ -1924,6 +1928,8 @@ filter_clinical_events_for_list_of_codes <- function(df,
   read3_codes <- codes$read3
   data_coding_6_codes <- codes$data_coding_6
   data_coding_3_codes <- codes$data_coding_3
+  opcs3_codes <- codes$opcs3
+  opcs4_codes <- codes$opcs4
 
   df <- df %>%
     dplyr::filter(
@@ -1950,6 +1956,14 @@ filter_clinical_events_for_list_of_codes <- function(df,
         (
           .data[["source"]] %in% data_coding_3_sources &
             .data[["code"]] %in% data_coding_3_codes
+        ) |
+        (
+          .data[["source"]] %in% opcs3_sources &
+            .data[["code"]] %in% opcs3_codes
+        ) |
+        (
+          .data[["source"]] %in% opcs4_sources &
+            .data[["code"]] %in% opcs4_codes
         )
     )
 

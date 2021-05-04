@@ -143,7 +143,9 @@ test_that("`clinical_events_sources$data_coding` contains the following:
                  'data_coding_3',
                  'icd9',
                  'read2',
-                 'read3'
+                 'read3',
+                 'opcs3',
+                 'opcs4'
                )))
 
 })

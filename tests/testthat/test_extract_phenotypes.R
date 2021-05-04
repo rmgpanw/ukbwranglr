@@ -51,7 +51,7 @@ dummy_ukb_data_all_diagnoses <-
                                  ))
 
 # dummy clinical_events_df
-dummy_clinical_events <- make_dummy_clinical_events_df(eids = c(1, 2, 3),
+dummy_clinical_events <- ukbwranglr:::make_dummy_clinical_events_df(eids = c(1, 2, 3),
                                                        n_rows = c(200, 200, 200))
 
 # dummy_clinical_events_df as sqlite db
@@ -82,23 +82,24 @@ dummy_clinical_codes_df <- tibble::tribble(
 
 # ***`extract_single_diagnostic_code_record_basis()` -------------------------
 
-# Note: I manually checked this to produce 'expected' below
-min_dates <- extract_single_diagnostic_code_record_basis(df = dummy_clinical_events,
+# Note: I manually checked this to produce 'expected' below. ***This will change
+# whenever ukbwranglr:::clinical_events_sources$source changes***
+min_dates <- ukbwranglr:::extract_single_diagnostic_code_record_basis(df = dummy_clinical_events,
                                                          codes = c("A", "B"),
-                                                         mapping_function = extract_first_or_last_record_mapper,
+                                                         mapping_function = ukbwranglr:::extract_first_or_last_record_mapper,
                                                          min_max = "min")
 
-min_dates_db <- extract_single_diagnostic_code_record_basis(df = dummy_clinical_events_db,
+min_dates_db <- ukbwranglr:::extract_single_diagnostic_code_record_basis(df = dummy_clinical_events_db,
                                                          codes = c("A", "B"),
-                                                         mapping_function = extract_first_or_last_record_mapper,
+                                                         mapping_function = ukbwranglr:::extract_first_or_last_record_mapper,
                                                          min_max = "min")
 
 # min_dates: expected result (- nested `data` col)
 expected <- tibble::tribble(
   ~ eid, ~ source, ~ code, ~ date,
-  1, "f20001", "A", as.Date("2000-01-03"),
-  2, "f20001", "B", as.Date("2000-01-02"),
-  3, "gpc_r2", "B", as.Date("2000-01-02"),
+  1, "gpc_r2", "B", as.Date("2000-01-03"),
+  2, "f40013", "B", as.Date("2000-01-12"),
+  3, "f41270", "A", as.Date("2000-01-04"),
 )
 
 # TESTS -------------------------------------------------------------------
@@ -189,13 +190,13 @@ test_that(
     expect_equal(
       nrow(filter_clinical_events_for_codes(df = dummy_clinical_events,
                                        codes = list("read2" = "A"))),
-      4
+      8
     )
 
     expect_equal(
       nrow(filter_clinical_events_for_codes(df = dummy_clinical_events_db,
                                             codes = list("read2" = "A"))),
-      4
+      8
     )
   }
 )
@@ -328,9 +329,12 @@ test_that("`make_self_report_special_decimal_dates_na()` removes special dates f
 test_that(
   "output from `get_all_diagnostic_codes_multi()` contains all expected source types", {
     # output from `get_all_diagnostic_codes_multi()` won't include primary care data
+    # won't include opcs3/4 either
     expected_sources <- subset(ukbwranglr:::clinical_events_sources$source,
                                !ukbwranglr:::clinical_events_sources$source %in% c("gpc_r2",
-                                                                                   "gpc_r3"))
+                                                                                   "gpc_r3",
+                                                                                   "f41272",
+                                                                                   "f41273"))
 
     expect_equal(sort(unique(dummy_ukb_data_all_diagnoses$source)),
                  sort(expected_sources))
