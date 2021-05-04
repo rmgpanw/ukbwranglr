@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get UK Biobank clinical code mappings file — get_ukb_code_mappings • ukbwranglr</title>
+<title>Get UK Biobank clinical code mappings file directly from UKB website — get_ukb_code_mappings_direct • ukbwranglr</title>
 
 
 <!-- jquery -->
@@ -39,15 +39,12 @@
 
 
 
-<meta property="og:title" content="Get UK Biobank clinical code mappings file — get_ukb_code_mappings" />
-<meta property="og:description" content="Downloads the UK Biobank code mappings file
-(resource 592)
-from the
-ukbwranglr_resources
-github repo. The raw file is a large excel spreadsheet. This has been saved
-in .rds format in
-ukbwranglr_resources
-as a named list of data frames, one for each sheet in the original file." />
+<meta property="og:title" content="Get UK Biobank clinical code mappings file directly from UKB website — get_ukb_code_mappings_direct" />
+<meta property="og:description" content="Downloads the UK Biobank code mappings file (all_lkps_maps_v2.xlsx,
+resource 592)
+directly from the UKB website to a temporary directory at
+tempdir. This is then read into R as a named list of data
+frames, one for each sheet in the original file." />
 
 
 
@@ -125,23 +122,20 @@ as a named list of data frames, one for each sheet in the original file." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get UK Biobank clinical code mappings file</h1>
+    <h1>Get UK Biobank clinical code mappings file directly from UKB website</h1>
     
-    <div class="hidden name"><code>get_ukb_code_mappings.Rd</code></div>
+    <div class="hidden name"><code>get_ukb_code_mappings_direct.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Downloads the UK Biobank code mappings file
-(<a href='https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592'>resource 592</a>)
-from the
-<a href='https://github.com/rmgpanw/ukbwranglr_resources'>ukbwranglr_resources</a>
-github repo. The raw file is a large excel spreadsheet. This has been saved
-in <code>.rds</code> format in
-<a href='https://github.com/rmgpanw/ukbwranglr_resources'>ukbwranglr_resources</a>
-as a named list of data frames, one for each sheet in the original file.</p>
+    <p>Downloads the UK Biobank code mappings file (<code>all_lkps_maps_v2.xlsx</code>,
+<a href='https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592'>resource 592</a>)
+directly from the UKB website to a temporary directory at
+<code><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></code>. This is then read into R as a named list of data
+frames, one for each sheet in the original file.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_ukb_code_mappings</span><span class='op'>(</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>get_ukb_code_mappings_direct</span><span class='op'>(</span><span class='op'>)</span></pre>
 
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
@@ -149,13 +143,10 @@ as a named list of data frames, one for each sheet in the original file.</p>
     <p>A named list.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>This function downloads the <code>ukb_code_mappings.rds</code> file from
-<a href='https://github.com/rmgpanw/ukbwranglr_resources'>ukbwranglr_resources</a>
-to a temporary directory before loading and returning the result.</p>
-<p><strong>Note:</strong> This is a large object (&gt;450 MB)</p>
+    <p><strong>Note:</strong> This is a large object (&gt;450 MB)</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='get_ukb_code_mappings_direct.html'>get_ukb_code_mappings_direct</a></code></p></div>
+    <div class='dont-index'><p><code><a href='get_ukb_code_mappings.html'>get_ukb_code_mappings</a></code></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
