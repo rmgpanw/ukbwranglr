@@ -1882,8 +1882,8 @@ filter_clinical_events_for_codes <- function(df,
                                              codes) {
   # validate args
   expected_colnames <-  c("eid", "source", "code", "date")
-  assertthat::assert_that(all(expected_colnames %in% colnames(df)),
-                          msg = "`df` does not contain the expected columns: eid, source, code, date")
+  # assertthat::assert_that(all(expected_colnames %in% colnames(df)),
+  #                         msg = "`df` does not contain the expected columns: eid, source, code, date")
   assertthat::assert_that(all(class(codes) %in% c("character", "list")),
                           msg = "`codes` must be either a character vector or list")
 
