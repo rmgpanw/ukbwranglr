@@ -1678,22 +1678,21 @@ extract_first_or_last_clinical_event_multi_single_disease <-
     # validate args
     assertthat::is.string(disease)
 
-    assertthat::assert_that(
-      !(
-        unique(clinical_codes_df$disease) %in% clinical_codes_df$category
-      ),
-      msg = paste0(
-        "Error! ",
-        unique(clinical_codes_df$disease),
-        " is present in both the 'disease' and 'category' columns of clinical_code_df"
-      )
-    )
-
     message(paste0("Extracting clinical events for disease: ", disease))
 
     # filter clinical_codes_df for single disease
     clinical_codes_df <- clinical_codes_df %>%
       dplyr::filter(.data[["disease"]] == disease)
+
+    assertthat::assert_that(
+      !(disease %in% clinical_codes_df$category)
+      ,
+      msg = paste0(
+        "Error! ",
+        disease,
+        " is present in both the 'disease' and 'category' columns of clinical_code_df"
+      )
+    )
 
     # prepare clinical_codes_df so that overall summary columns are also created in upper case
     clinical_codes_df <- dplyr::bind_rows(clinical_codes_df,
