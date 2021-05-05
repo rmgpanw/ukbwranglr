@@ -71,6 +71,7 @@ reference:
   - get_ukb_codings_direct
   - get_ukb_code_mappings
   - get_ukb_code_mappings_direct
+  - get_ukb_db
   - make_empty_clinical_codes_list
   - time_taken_message
 

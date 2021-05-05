@@ -127,7 +127,19 @@ extract_codings_for_fieldids <- function(field_ids,
 #'
 #' @export
 get_ukb_data_dict <- function() {
-  fread_tsv_as_character("https://github.com/rmgpanw/ukbwranglr_resources/raw/main/ukb_data_dict_and_codings/Data_Dictionary_Showcase.tsv")
+  # file destination in tempdir
+  ukb_data_dict_rds <- file.path(tmpdir = tempdir(),
+                                     "ukb_data_dict.rds")
+
+
+  # download from ukbwranglr_resources if not already downloaded
+  if(!file.exists(ukb_data_dict_rds)) {
+    utils::download.file(url = "https://github.com/rmgpanw/ukbwranglr_resources/raw/main/_targets/objects/UKB_DATA_DICT",
+                         destfile = ukb_data_dict_rds)
+  }
+
+  # load
+  readRDS(ukb_data_dict_rds)
 }
 
 #' Get UKB codings file
@@ -138,7 +150,19 @@ get_ukb_data_dict <- function() {
 #'
 #' @export
 get_ukb_codings <- function() {
-  fread_tsv_as_character("https://github.com/rmgpanw/ukbwranglr_resources/raw/main/ukb_data_dict_and_codings/Codings.tsv")
+  # file destination in tempdir
+  ukb_codings_rds <- file.path(tmpdir = tempdir(),
+                                 "ukb_codings")
+
+
+  # download from ukbwranglr_resources if not already downloaded
+  if(!file.exists(ukb_codings_rds)) {
+    utils::download.file(url = "https://github.com/rmgpanw/ukbwranglr_resources/raw/main/_targets/objects/UKB_CODINGS",
+                         destfile = ukb_codings_rds)
+  }
+
+  # load
+  readRDS(ukb_codings_rds)
 }
 
 #' Download UKB data dictionary directly from UKB website
@@ -194,7 +218,7 @@ get_ukb_code_mappings <- function() {
 
   # download from ukbwranglr_resources if not already downloaded
   if(!file.exists(ukb_code_mappings_rds)) {
-    utils::download.file(url = "https://github.com/rmgpanw/ukbwranglr_resources/raw/main/Rdata/ukb_code_mappings.rds",
+    utils::download.file(url = "https://github.com/rmgpanw/ukbwranglr_resources/raw/main/_targets/objects/UKB_CODE_MAPPINGS",
                   destfile = ukb_code_mappings_rds)
   }
 
@@ -248,10 +272,48 @@ get_ukb_code_mappings_direct <- function() {
 
 # Download sqlite db containing ukb data dictionary/codings/code mappings --------
 
-# TODO
-# get_ukb_db_base <- function(path) {
-#   download.file(url = )
-# }
+#' Download essential UKB resources as a SQLite database file
+#'
+#' Downloads a file called \code{ukb.db} from the
+#' \href{https://github.com/rmgpanw/ukbwranglr_resources}{ukbwranglr_resources}
+#' repo to the specified directory. This is an SQLite database containing the
+#' \href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{UKB
+#' data dictionary and codings files}, UKB
+#' href{https://biobank.ctsu.ox.ac.uk/crystal/refer.cgi?id=592}{resource 592}
+#' (lookup tables and code mappings for various clinical coding systems) and
+#' clinical code lists from the
+#' \href{https://github.com/spiros/chronological-map-phenotypes}{CALIBER repo}.
+#'
+#' @param directory_path character. The directory to which
+#'
+#' @return NULL
+#' @export
+get_ukb_db <- function(directory_path) {
+  # check ukb.db does not already exist in `directory_path`
+  if (file.exists(file.path(directory_path, "ukb.db"))) {
+    stop(paste0("Error! A file called `ukb.db` already exists in ",
+                directory_path))
+  }
+
+  # zipped file download destination in tempdir
+  ukb_db_esssentials_zip <- file.path(tmpdir = tempdir(),
+                                     "ukb_db_esssentials_zip")
+
+
+  # download from ukbwranglr_resources if not already downloaded
+  if(!file.exists(ukb_db_esssentials_zip)) {
+    utils::download.file(url = "https://github.com/rmgpanw/ukbwranglr_resources/raw/main/ukb.db.zip",
+                         destfile = ukb_db_esssentials_zip)
+  }
+
+  # unzip
+  ukb_db_esssentials_unzipped = utils::unzip(ukb_db_esssentials_zip,
+                                             exdir = directory_path)
+
+  message(paste0("Download complete. Use `con <- DBI::dbConnect(RSQLite::SQLite(), dbname = '",
+  directory_path,
+  "/ukb.db')` to connect"))
+}
 
 
 # Download dummy ukb data -------------------------------------------------
