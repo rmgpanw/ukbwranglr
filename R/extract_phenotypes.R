@@ -1678,9 +1678,6 @@ extract_first_or_last_clinical_event_multi_single_disease <-
     # validate args
     assertthat::is.string(disease)
 
-    assertthat::assert_that(length(unique(clinical_codes_df$disease)) == 1,
-                            msg = "Error! 'disease' column in clinical_codes_df should only contain one unique value")
-
     assertthat::assert_that(
       !(
         unique(clinical_codes_df$disease) %in% clinical_codes_df$category
