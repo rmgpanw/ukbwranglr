@@ -159,11 +159,15 @@ extract_first_or_last_clinical_event_multi <- function(
   # loop through diseases in clinical_codes_df
   result <- unique(clinical_codes_df$disease) %>%
     purrr::set_names() %>%
-    furrr::future_map(extract_first_or_last_clinical_event_multi_single_disease,
-               df = df,
-               clinical_codes_df = clinical_codes_df,
-               min_max = min_max,
-               prefix = prefix)
+    furrr::future_map(
+      ~ extract_first_or_last_clinical_event_multi_single_disease(
+        .x,
+        df = df,
+        clinical_codes_df = clinical_codes_df,
+        min_max = min_max,
+        prefix = prefix
+      )
+    )
 
   # combine
   result <- result %>%
