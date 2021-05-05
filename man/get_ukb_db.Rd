@@ -15,7 +15,7 @@ Downloads a file called \code{ukb.db} from the
 repo to the specified directory. This is an SQLite database containing the
 \href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{UKB
 data dictionary and codings files}, UKB
-href{https://biobank.ctsu.ox.ac.uk/crystal/refer.cgi?id=592}{resource 592}
+\href{https://biobank.ctsu.ox.ac.uk/crystal/refer.cgi?id=592}{resource 592}
 (lookup tables and code mappings for various clinical coding systems) and
 clinical code lists from the
 \href{https://github.com/spiros/chronological-map-phenotypes}{CALIBER repo}.

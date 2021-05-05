@@ -21,6 +21,8 @@ Imports:
     DBI,
     dbplyr,
     dplyr,
+    furrr,
+    future,
     haven,
     lubridate,
     magrittr,

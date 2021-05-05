@@ -117,14 +117,20 @@ mutate_age_at_event_cols <- function(ukb_pheno,
 
 # Extract specific diagnostic codes -------------------------------------------------------
 
-#' Get the earliest record date for multiple phenotypes
+#' Get the earliest record date for multiple phenotype categories
 #'
 #' Builds on \code{\link{extract_first_or_last_clinical_event}}, extracting
-#' either the first or last recorded clinical event for multiple phenotypes.
+#' either the first or last recorded clinical event for multiple phenotype
+#' categories.
 #'
 #' @param clinical_codes_df data frame. Must match the format as per
 #'   \code{\link{generate_self_reported_diabetes_codes_df}}.
 #' @param prefix character. Optionally add a prefix to column names.
+#' @param nThread integer. The number of processes to run in parallel when
+#'   \code{clinical_codes_df} includes multiple diseases. This is used to set
+#'   the number of workers in \code{\link[future]{plan}} with \code{strategy =
+#'   \link[future]{multisession}}, which is passed on to
+#'   \code{\link[furrr]{future_map}}. Default value is \code{NULL}.
 #' @inheritParams extract_single_diagnostic_code_record_basis
 #' @inheritParams extract_first_or_last_clinical_event
 #'
@@ -138,82 +144,29 @@ extract_first_or_last_clinical_event_multi <- function(
   df,
   clinical_codes_df,
   min_max = "min",
-  prefix = NULL
+  prefix = NULL,
+  nThread = NULL
 ) {
   start_time <- proc.time()
-  # clinical_codes_df$category: remove special characters and convert to lower
-  # case. This will be used to label the columns with
-  # `extract_first_or_last_clinical_event()`
-  clinical_codes_df$phenotype_name <- remove_special_characters_and_make_lower_case(
-    clinical_codes_df$category
-  )
 
-  clinical_codes_df$phenotype_name <- paste0(clinical_codes_df$phenotype_name, "_", clinical_codes_df$phenotype_source)
-
-  # add prefix if specified
-  if (!is.null(prefix)) {
-    clinical_codes_df$phenotype_name <- paste0(prefix, clinical_codes_df$phenotype_name)
+  # set number of processes to run in parallel (note, default plan is otherwise
+  # sequential)
+  if (!is.null(nThread)) {
+    assert_integer_ge_1(nThread, "nThread")
+    future::plan(future::multisession, workers = nThread)
   }
 
-  # make 2 named list of code lists for each phenotype: 1 will contain code lists, the other will contain the results from `extract_first_or_last_clinical_event()`
-  list_of_phenotype_codelists <- vector(mode = "list",
-                                        length = length(unique(clinical_codes_df$phenotype_name)))
-  names(list_of_phenotype_codelists) <- sort(unique(clinical_codes_df$phenotype_name))
-
-  list_of_phenotype_results <- list_of_phenotype_codelists
-
-  # populate `list_of_phenotype_codelists` with empty code lists
-  for (phenotype in names(list_of_phenotype_codelists)) {
-    list_of_phenotype_codelists[[phenotype]] <- make_empty_clinical_codes_list()
-  }
-
-  # now populate these code lists" loop through phenotypes
-  for (phenotype in names(list_of_phenotype_codelists)) {
-    # filter codes df for phenotype category
-    single_phenotype_df <- clinical_codes_df %>%
-      dplyr::filter(.data[["phenotype_name"]] == phenotype)
-
-    # loop through code_types to populate code lists for phenotype category
-    for (code_type in single_phenotype_df$code_type) {
-      list_of_phenotype_codelists[[phenotype]][[code_type]] <-
-        single_phenotype_df %>%
-        dplyr::filter(.data[["code_type"]] == code_type) %>%
-        .$code
-    }
-  }
-
-  # now filter `df` for all codes in this `clinical_codes_df`. This is to speed
-  # up the next step.
-
-  # TODO ...may be problematic if returns too large a result though
-  message("Filtering df for all codes in clinical_codes_df")
-  df <- filter_clinical_events_for_codes(df,
-                                         clinical_codes_df$code)
-
-  # exit early with warning if no rows in `df`
-  if(nrow(df) == 0) {
-    warning("Warning! `df` does not contain any of the codes in `clinical_codes_df$code`. Returning `NULL`")
-    return(NULL)
-  }
-
-  # get results: loop through phenotypes
-  message("EXTRACTING EVENT DATES FOR PHENOTYPES\n")
-  n_phenotypes <- length(names(list_of_phenotype_results))
-  i <- 1
-  for (phenotype in names(list_of_phenotype_results)) {
-    message(paste0("Extracting event dates for ", phenotype,
-                   " (Phenotype ", i, " of ", n_phenotypes, ")"))
-    list_of_phenotype_results[[phenotype]] <-
-      extract_first_or_last_clinical_event(df = df,
-                                           codes = list_of_phenotype_codelists[[phenotype]],
-                                           phenotype_name = phenotype,
-                                           min_max = min_max)
-    i <- i + 1
-    time_taken_message(start_time)
-  }
+  # loop through diseases in clinical_codes_df
+  result <- unique(clinical_codes_df$disease) %>%
+    purrr::set_names() %>%
+    furrr::future_map(extract_first_or_last_clinical_event_multi_single_disease,
+               df = df,
+               clinical_codes_df = clinical_codes_df,
+               min_max = min_max,
+               prefix = prefix)
 
   # combine
-  result <- list_of_phenotype_results %>%
+  result <- result %>%
     purrr::reduce(dplyr::full_join, by = "eid")
 
   # return result
@@ -1690,6 +1643,165 @@ get_diagnoses_set_index_code_date_cols <- function(get_clinical_events_df,
 }
 
 # Extract specific diagnostic code helpers --------------------------------
+
+#' Helper function for \code{extract_first_or_last_clinical_event_multi()} - Get
+#' the earliest record date for multiple phenotype categories within a single
+#' disease
+#'
+#' Builds on \code{\link{extract_first_or_last_clinical_event}}, extracting
+#' either the first or last recorded clinical event for multiple phenotype
+#' categories within a single disease
+#'
+#' @param disease scalar character. \code{clinical_codes_df} will be filtered
+#'   for this value in the 'disease' column.
+#' @param clinical_codes_df data frame. Must match the format as per
+#'   \code{\link{generate_self_reported_diabetes_codes_df}}.
+#' @param prefix character. Optionally add a prefix to column names.
+#' @inheritParams extract_single_diagnostic_code_record_basis
+#' @inheritParams extract_first_or_last_clinical_event
+#'
+#' @return Data frame with an "eid" column, and "event_min/max_indicator" and
+#'   "event_min/max_date" columns for each phenotype in the 'category' column of
+#'   \code{clinical_codes_df}.
+#'
+#' @noRd
+#' @family extract specific diagnostic codes functions
+extract_first_or_last_clinical_event_multi_single_disease <-
+  function(disease,
+           df,
+           clinical_codes_df,
+           min_max,
+           prefix) {
+
+    start_time <- proc.time()
+
+    # validate args
+    assertthat::is.string(disease)
+
+    assertthat::assert_that(length(unique(clinical_codes_df$disease)) == 1,
+                            msg = "Error! 'disease' column in clinical_codes_df should only contain one unique value")
+
+    assertthat::assert_that(
+      !(
+        unique(clinical_codes_df$disease) %in% clinical_codes_df$category
+      ),
+      msg = paste0(
+        "Error! ",
+        unique(clinical_codes_df$disease),
+        " is present in both the 'disease' and 'category' columns of clinical_code_df"
+      )
+    )
+
+    message(paste0("Extracting clinical events for disease: ", disease))
+
+    # filter clinical_codes_df for single disease
+    clinical_codes_df <- clinical_codes_df %>%
+      dplyr::filter(.data[["disease"]] == disease)
+
+    # prepare clinical_codes_df so that overall summary columns are also created in upper case
+    clinical_codes_df <- dplyr::bind_rows(clinical_codes_df,
+                                          clinical_codes_df %>%
+                                            dplyr::mutate("category" = disease))
+
+    # clinical_codes_df$category: remove special characters and convert to lower
+    # case. This will be used to label the columns with
+    # `extract_first_or_last_clinical_event()`
+    clinical_codes_df$phenotype_name <-
+      remove_special_characters_and_make_lower_case(clinical_codes_df$category)
+
+    clinical_codes_df$phenotype_name <-
+      paste0(clinical_codes_df$phenotype_name,
+             "_",
+             clinical_codes_df$phenotype_source)
+    clinical_codes_df$phenotype_name <-
+      ifelse(
+        clinical_codes_df$category == clinical_codes_df$disease,
+        toupper(clinical_codes_df$phenotype_name),
+        clinical_codes_df$phenotype_name
+      )
+
+    # add prefix if specified
+    if (!is.null(prefix)) {
+      clinical_codes_df$phenotype_name <-
+        paste0(prefix, clinical_codes_df$phenotype_name)
+    }
+
+    # make 2 named list of code lists for each phenotype: 1 will contain code
+    # lists, the other will contain the results from
+    # `extract_first_or_last_clinical_event()`
+    list_of_phenotype_codelists <- vector(mode = "list",
+                                          length = length(unique(clinical_codes_df$phenotype_name)))
+    names(list_of_phenotype_codelists) <-
+      sort(unique(clinical_codes_df$phenotype_name))
+
+    list_of_phenotype_results <- list_of_phenotype_codelists
+
+    # populate `list_of_phenotype_codelists` with empty code lists
+    for (phenotype in names(list_of_phenotype_codelists)) {
+      list_of_phenotype_codelists[[phenotype]] <-
+        make_empty_clinical_codes_list()
+    }
+
+    # now populate these code lists loop through phenotypes
+    for (phenotype in names(list_of_phenotype_codelists)) {
+      # filter codes df for phenotype category
+      single_phenotype_df <- clinical_codes_df %>%
+        dplyr::filter(.data[["phenotype_name"]] == phenotype)
+
+      # loop through code_types to populate code lists for phenotype category
+      for (code_type in single_phenotype_df$code_type) {
+        list_of_phenotype_codelists[[phenotype]][[code_type]] <-
+          single_phenotype_df[single_phenotype_df$code_type == code_type, ]$code
+      }
+    }
+
+    # now filter `df` for all codes in this `clinical_codes_df`. This is to speed
+    # up the next step.
+
+    # TODO ...may be problematic if returns too large a result though
+    message("Filtering df for all codes in clinical_codes_df")
+    df <- filter_clinical_events_for_codes(df,
+                                           clinical_codes_df$code)
+
+    # exit early with warning if no rows in `df`
+    if (nrow(df) == 0) {
+      warning(
+        "Warning! `df` does not contain any of the codes in `clinical_codes_df$code`. Returning `NULL`"
+      )
+      return(NULL)
+    }
+
+    # get results: loop through phenotypes
+    message("EXTRACTING EVENT DATES FOR PHENOTYPES\n")
+    n_phenotypes <- length(names(list_of_phenotype_results))
+    i <- 1
+    for (phenotype in names(list_of_phenotype_results)) {
+      message(
+        paste0(
+          "Extracting event dates for ",
+          phenotype,
+          " (Phenotype ",
+          i,
+          " of ",
+          n_phenotypes,
+          ")"
+        )
+      )
+      list_of_phenotype_results[[phenotype]] <-
+        extract_first_or_last_clinical_event(
+          df = df,
+          codes = list_of_phenotype_codelists[[phenotype]],
+          phenotype_name = phenotype,
+          min_max = min_max
+        )
+      i <- i + 1
+      time_taken_message(start_time)
+    }
+
+    # combine
+    list_of_phenotype_results %>%
+      purrr::reduce(dplyr::full_join, by = "eid")
+  }
 
 #' Extract a single record from a dataframe generated by one of the
 #' \code{get_XXX_diagnoses} functions (generic)

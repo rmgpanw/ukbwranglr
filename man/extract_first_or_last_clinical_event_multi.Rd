@@ -2,13 +2,14 @@
 % Please edit documentation in R/extract_phenotypes.R
 \name{extract_first_or_last_clinical_event_multi}
 \alias{extract_first_or_last_clinical_event_multi}
-\title{Get the earliest record date for multiple phenotypes}
+\title{Get the earliest record date for multiple phenotype categories}
 \usage{
 extract_first_or_last_clinical_event_multi(
   df,
   clinical_codes_df,
   min_max = "min",
-  prefix = NULL
+  prefix = NULL,
+  nThread = NULL
 )
 }
 \arguments{
@@ -22,6 +23,12 @@ by one of the \code{get_XXX_diagnoses} functions}
 latest date that on of the specified \code{codes} appears.}
 
 \item{prefix}{character. Optionally add a prefix to column names.}
+
+\item{nThread}{integer. The number of processes to run in parallel when
+\code{clinical_codes_df} includes multiple diseases. This is used to set
+the number of workers in \code{\link[future]{plan}} with \code{strategy =
+\link[future]{multisession}}, which is passed on to
+\code{\link[furrr]{future_map}}. Default value is \code{NULL}.}
 }
 \value{
 Data frame with an "eid" column, and "event_min/max_indicator" and
@@ -30,7 +37,8 @@ Data frame with an "eid" column, and "event_min/max_indicator" and
 }
 \description{
 Builds on \code{\link{extract_first_or_last_clinical_event}}, extracting
-either the first or last recorded clinical event for multiple phenotypes.
+either the first or last recorded clinical event for multiple phenotype
+categories.
 }
 \seealso{
 Other extract specific diagnostic codes functions: 

@@ -105,6 +105,38 @@ expected <- tibble::tribble(
 # TESTS -------------------------------------------------------------------
 
 
+# `extract_first_or_last_clinical_event_multi_single_disease()` --------------------------
+
+test_that(
+  "`extract_first_or_last_clinical_event_multi_single_disease()` returns the expected column names", {
+    result <-
+      ukbwranglr:::extract_first_or_last_clinical_event_multi_single_disease(
+        disease = "Diabetes",
+        df = dummy_clinical_events,
+        clinical_codes_df = dummy_clinical_codes_df,
+        min_max = "min",
+        prefix = "testy_"
+      )
+
+    expect_equal(
+      names(result),
+      c(
+        "eid",
+        "testy_DIABETES_TEST_min_date",
+        "testy_DIABETES_TEST_indicator",
+        "testy_diabetes_unspecified_test_min_date",
+        "testy_diabetes_unspecified_test_indicator",
+        "testy_gestational_diabetes_test_min_date",
+        "testy_gestational_diabetes_test_indicator",
+        "testy_type_1_diabetes_test_min_date",
+        "testy_type_1_diabetes_test_indicator",
+        "testy_type_2_diabetes_test_min_date",
+        "testy_type_2_diabetes_test_indicator"
+      )
+    )
+  }
+)
+
 # `extract_first_or_last_clinical_event_multi()` --------------------------
 
 test_that(
@@ -118,6 +150,8 @@ test_that(
       names(result),
       c(
         "eid",
+        "testy_DIABETES_TEST_min_date",
+        "testy_DIABETES_TEST_indicator",
         "testy_diabetes_unspecified_test_min_date",
         "testy_diabetes_unspecified_test_indicator",
         "testy_gestational_diabetes_test_min_date",
@@ -126,7 +160,7 @@ test_that(
         "testy_type_1_diabetes_test_indicator",
         "testy_type_2_diabetes_test_min_date",
         "testy_type_2_diabetes_test_indicator"
-        )
+      )
     )
   }
 )
