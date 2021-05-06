@@ -150,7 +150,9 @@ extract_first_or_last_clinical_event_multi <- function(
   result <- unique(clinical_codes_df$disease) %>%
     purrr::set_names() %>%
     purrr::map(~ {
-      message(paste0("\n***PROCESSING DISEASE ", counter, " OF ", n_diseases, "***\n"))
+      message(paste0("\n***PROCESSING DISEASE ", counter, " OF ", n_diseases, "***"))
+      time_taken_message(start_time)
+      message("\n")
 
       extract_first_or_last_clinical_event_multi_single_disease(
         .x,
