@@ -8,8 +8,7 @@ extract_first_or_last_clinical_event_multi(
   df,
   clinical_codes_df,
   min_max = "min",
-  prefix = NULL,
-  nThread = NULL
+  prefix = NULL
 )
 }
 \arguments{
@@ -23,12 +22,6 @@ by one of the \code{get_XXX_diagnoses} functions}
 latest date that on of the specified \code{codes} appears.}
 
 \item{prefix}{character. Optionally add a prefix to column names.}
-
-\item{nThread}{integer. The number of processes to run in parallel when
-\code{clinical_codes_df} includes multiple diseases. This is used to set
-the number of workers in \code{\link[future]{plan}} with \code{strategy =
-\link[future]{multisession}}, which is passed on to
-\code{\link[furrr]{future_map}}. Default value is \code{NULL}.}
 }
 \value{
 Data frame with an "eid" column, and "event_min/max_indicator" and

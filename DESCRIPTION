@@ -20,6 +20,7 @@ Imports:
     assertthat,
     data.table,
     DBI,
+    dbplyr,
     dplyr,
     furrr,
     future,
