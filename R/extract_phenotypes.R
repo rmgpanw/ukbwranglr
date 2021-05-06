@@ -1672,8 +1672,7 @@ extract_first_or_last_clinical_event_multi_single_disease <-
     message(paste0("Extracting clinical events for disease: ", disease))
 
     # filter clinical_codes_df for single disease
-    clinical_codes_df <- clinical_codes_df %>%
-      dplyr::filter(.data[["disease"]] == disease)
+    clinical_codes_df <- clinical_codes_df[clinical_codes_df$disease == disease, ]
 
     assertthat::assert_that(
       !(disease %in% clinical_codes_df$category)
