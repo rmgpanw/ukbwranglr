@@ -126,11 +126,6 @@ mutate_age_at_event_cols <- function(ukb_pheno,
 #' @param clinical_codes_df data frame. Must match the format as per
 #'   \code{\link{generate_self_reported_diabetes_codes_df}}.
 #' @param prefix character. Optionally add a prefix to column names.
-#' @param nThread integer. The number of processes to run in parallel when
-#'   \code{clinical_codes_df} includes multiple diseases. This is used to set
-#'   the number of workers in \code{\link[future]{plan}} with \code{strategy =
-#'   \link[future]{multisession}}, which is passed on to
-#'   \code{\link[furrr]{future_map}}. Default value is \code{NULL}.
 #' @inheritParams extract_single_diagnostic_code_record_basis
 #' @inheritParams extract_first_or_last_clinical_event
 #'
@@ -144,22 +139,14 @@ extract_first_or_last_clinical_event_multi <- function(
   df,
   clinical_codes_df,
   min_max = "min",
-  prefix = NULL,
-  nThread = NULL
+  prefix = NULL
 ) {
   start_time <- proc.time()
-
-  # set number of processes to run in parallel (note, default plan is otherwise
-  # sequential)
-  if (!is.null(nThread)) {
-    assert_integer_ge_1(nThread, "nThread")
-    future::plan(future::multisession, workers = nThread)
-  }
 
   # loop through diseases in clinical_codes_df
   result <- unique(clinical_codes_df$disease) %>%
     purrr::set_names() %>%
-    furrr::future_map(
+    purrr::map(
       ~ extract_first_or_last_clinical_event_multi_single_disease(
         .x,
         df = df,
@@ -1882,8 +1869,8 @@ filter_clinical_events_for_codes <- function(df,
                                              codes) {
   # validate args
   expected_colnames <-  c("eid", "source", "code", "date")
-  # assertthat::assert_that(all(expected_colnames %in% colnames(df)),
-  #                         msg = "`df` does not contain the expected columns: eid, source, code, date")
+  assertthat::assert_that(all(expected_colnames %in% colnames(df)),
+                          msg = "`df` does not contain the expected columns: eid, source, code, date")
   assertthat::assert_that(all(class(codes) %in% c("character", "list")),
                           msg = "`codes` must be either a character vector or list")
 
