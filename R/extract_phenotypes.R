@@ -154,6 +154,8 @@ extract_first_or_last_clinical_event_multi <- function(
       time_taken_message(start_time)
       message("\n")
 
+      counter <<- counter + 1
+
       extract_first_or_last_clinical_event_multi_single_disease(
         .x,
         df = df,
@@ -161,8 +163,6 @@ extract_first_or_last_clinical_event_multi <- function(
         min_max = min_max,
         prefix = prefix
       )
-
-      counter <<- counter + 1
     })
 
   # combine
