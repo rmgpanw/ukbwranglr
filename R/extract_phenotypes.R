@@ -144,17 +144,24 @@ extract_first_or_last_clinical_event_multi <- function(
   start_time <- proc.time()
 
   # loop through diseases in clinical_codes_df
+  n_diseases <- length(unique(clinical_codes_df$disease))
+  counter = 1
+
   result <- unique(clinical_codes_df$disease) %>%
     purrr::set_names() %>%
-    purrr::map(
-      ~ extract_first_or_last_clinical_event_multi_single_disease(
+    purrr::map(~ {
+      message(paste0("\n***PROCESSING DISEASE ", counter, " OF ", n_diseases, "***\n"))
+
+      extract_first_or_last_clinical_event_multi_single_disease(
         .x,
         df = df,
         clinical_codes_df = clinical_codes_df,
         min_max = min_max,
         prefix = prefix
       )
-    )
+
+      counter <<- counter + 1
+    })
 
   # combine
   result <- result %>%
@@ -1758,7 +1765,7 @@ extract_first_or_last_clinical_event_multi_single_disease <-
     }
 
     # get results: loop through phenotypes
-    message("EXTRACTING EVENT DATES FOR PHENOTYPES\n")
+    message("EXTRACTING EVENT DATES FOR PHENOTYPES")
     n_phenotypes <- length(names(list_of_phenotype_results))
     i <- 1
     for (phenotype in names(list_of_phenotype_results)) {
