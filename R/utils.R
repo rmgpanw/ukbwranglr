@@ -135,7 +135,8 @@ get_ukb_data_dict <- function() {
   # download from ukbwranglr_resources if not already downloaded
   if(!file.exists(ukb_data_dict_rds)) {
     utils::download.file(url = "https://github.com/rmgpanw/ukbwranglr_resources/raw/main/_targets/objects/UKB_DATA_DICT",
-                         destfile = ukb_data_dict_rds)
+                         destfile = ukb_data_dict_rds,
+                         mode = "wb")
   }
 
   # load
@@ -158,7 +159,8 @@ get_ukb_codings <- function() {
   # download from ukbwranglr_resources if not already downloaded
   if(!file.exists(ukb_codings_rds)) {
     utils::download.file(url = "https://github.com/rmgpanw/ukbwranglr_resources/raw/main/_targets/objects/UKB_CODINGS",
-                         destfile = ukb_codings_rds)
+                         destfile = ukb_codings_rds,
+                         mode = "wb")
   }
 
   # load
@@ -219,7 +221,8 @@ get_ukb_code_mappings <- function() {
   # download from ukbwranglr_resources if not already downloaded
   if(!file.exists(ukb_code_mappings_rds)) {
     utils::download.file(url = "https://github.com/rmgpanw/ukbwranglr_resources/raw/main/_targets/objects/UKB_CODE_MAPPINGS",
-                  destfile = ukb_code_mappings_rds)
+                  destfile = ukb_code_mappings_rds,
+                  mode = "wb")
   }
 
   # load
@@ -250,7 +253,8 @@ get_ukb_code_mappings_direct <- function() {
   # download primary care codings file to tempdir
   message("Downloading primarycare_codings.zip (UKB resource 592) to tempdir")
   utils::download.file("https://biobank.ndph.ox.ac.uk/ukb/ukb/auxdata/primarycare_codings.zip",
-                primarycare_codings_zip_filepath)
+                primarycare_codings_zip_filepath,
+                mode = "wb")
 
   # extract excel file only from zip
   message("Extracting all_lkps_maps_v2.xlsx from zip file to tempdir")
@@ -303,7 +307,8 @@ get_ukb_db <- function(directory_path) {
   # download from ukbwranglr_resources if not already downloaded
   if(!file.exists(ukb_db_esssentials_zip)) {
     utils::download.file(url = "https://github.com/rmgpanw/ukbwranglr_resources/raw/main/ukb.db.zip",
-                         destfile = ukb_db_esssentials_zip)
+                         destfile = ukb_db_esssentials_zip,
+                         mode = "wb")
   }
 
   # unzip
