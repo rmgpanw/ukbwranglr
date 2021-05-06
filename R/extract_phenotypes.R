@@ -167,6 +167,7 @@ extract_first_or_last_clinical_event_multi <- function(
 
   # combine
   result <- result %>%
+    purrr::compact() %>%
     purrr::reduce(dplyr::full_join, by = "eid")
 
   # return result
@@ -1795,6 +1796,7 @@ extract_first_or_last_clinical_event_multi_single_disease <-
 
     # combine
     list_of_phenotype_results %>%
+      purrr::compact() %>%
       purrr::reduce(dplyr::full_join, by = "eid")
   }
 
