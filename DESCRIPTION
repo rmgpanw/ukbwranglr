@@ -14,6 +14,7 @@ Suggests:
     haven,
     knitr,
     rmarkdown,
+    rsconnect,
     testthat,
     learnr
 VignetteBuilder: knitr
