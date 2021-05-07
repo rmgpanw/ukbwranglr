@@ -9,6 +9,7 @@
 status](https://github.com/rmgpanw/ukbwranglr/workflows/R-CMD-check/badge.svg)](https://github.com/rmgpanw/ukbwranglr/actions)
 [![Codecov test
 coverage](https://codecov.io/gh/rmgpanw/ukbwranglr/branch/main/graph/badge.svg)](https://codecov.io/gh/rmgpanw/ukbwranglr?branch=main)
+
 <!-- badges: end -->
 
 ***–UNDER CONSTRUCTION–***
@@ -54,9 +55,9 @@ phenotype file can be loaded into R with human-readable labels:
 
 `ukbwranglr` can also help to:
 
-  - Identify participants with certain health conditions or taking
+-   Identify participants with certain health conditions or taking
     certain medications (with dates)
-  - Summarise biomarker measurements (e.g. extract the mean systolic
+-   Summarise biomarker measurements (e.g. extract the mean systolic
     blood pressure across repeated measurements)
 
 Please see [‘getting
@@ -84,9 +85,11 @@ devtools::install_github("rmgpanw/ukbwranglr")
 3.  Read your selected columns into R
 
 This process is outlined below for dummy UK Biobank data generated using
-the [tofu library](https://github.com/spiros/tofu).
+the [tofu library](https://github.com/spiros/tofu) (*Spiros Denaxas.
+(2020). spiros/tofu: Updated release for DOI (Version v1.1). Zenodo.
+<http://doi.org/10.5281/zenodo.3634604>*).
 
-#### 1\. Create data dictionary
+#### 1. Create data dictionary
 
 ``` r
 # load package
@@ -96,7 +99,7 @@ library(ukbwranglr)
 data_dict <- make_data_dict("MY_UKB_FILE.tab")
 ```
 
-#### 2\. Filter data dictionary for required variables
+#### 2. Filter data dictionary for required variables
 
 ``` r
 # Filter for sex, year of birth, BMI and self-reported noncancer-illness fields
@@ -107,7 +110,7 @@ data_dict <- data_dict %>%
                                20002))
 ```
 
-#### 3\. Read selected columns into R
+#### 3. Read selected columns into R
 
 ``` r
 ukb_pheno <- read_pheno(path = "MY_UKB_FILE.tab", 

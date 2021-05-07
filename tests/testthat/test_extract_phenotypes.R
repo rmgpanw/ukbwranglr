@@ -56,7 +56,8 @@ dummy_clinical_events <- ukbwranglr:::make_dummy_clinical_events_df(eids = c(1, 
 
 # dummy_clinical_events_df as sqlite db
 # Create an ephemeral in-memory RSQLite database
-con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+con <- DBI::dbConnect(RSQLite::SQLite(),
+                      ":memory:")
 
 # copy dummy_clinical_events_df to db
 dplyr::copy_to(con,
@@ -147,7 +148,7 @@ test_that(
                                                prefix = "testy_")
 
     expect_equal(
-      names(result),
+      names(result[[1]]),
       c(
         "eid",
         "testy_DIABETES_TEST_min_date",
@@ -164,6 +165,91 @@ test_that(
     )
   }
 )
+
+# THIS WORKS WHEN RUN LOCALLY BUT NOT WHEN RUNNING TESTS WITH R-CMD-CHECK
+
+# test_that(
+#   "`extract_first_or_last_clinical_event_multi()` works with tbl object", {
+#     result <- extract_first_or_last_clinical_event_multi(df = dummy_clinical_events_db,
+#                                                          clinical_codes_df = dummy_clinical_codes_df,
+#                                                          min_max = "min",
+#                                                          prefix = "testy_")
+#
+#     expect_equal(
+#       names(result[[1]]),
+#       c(
+#         "eid",
+#         "testy_DIABETES_TEST_min_date",
+#         "testy_DIABETES_TEST_indicator",
+#         "testy_diabetes_unspecified_test_min_date",
+#         "testy_diabetes_unspecified_test_indicator",
+#         "testy_gestational_diabetes_test_min_date",
+#         "testy_gestational_diabetes_test_indicator",
+#         "testy_type_1_diabetes_test_min_date",
+#         "testy_type_1_diabetes_test_indicator",
+#         "testy_type_2_diabetes_test_min_date",
+#         "testy_type_2_diabetes_test_indicator"
+#       )
+#     )
+#   }
+# )
+
+test_that(
+  "`extract_first_or_last_clinical_event_multi()` works with parallel processing, data frame clinical events", {
+    result <- extract_first_or_last_clinical_event_multi(df = dummy_clinical_events,
+                                                         clinical_codes_df = dummy_clinical_codes_df,
+                                                         min_max = "min",
+                                                         prefix = "testy_",
+                                                         workers = 2)
+
+    expect_equal(
+      names(result[[1]]),
+      c(
+        "eid",
+        "testy_DIABETES_TEST_min_date",
+        "testy_DIABETES_TEST_indicator",
+        "testy_diabetes_unspecified_test_min_date",
+        "testy_diabetes_unspecified_test_indicator",
+        "testy_gestational_diabetes_test_min_date",
+        "testy_gestational_diabetes_test_indicator",
+        "testy_type_1_diabetes_test_min_date",
+        "testy_type_1_diabetes_test_indicator",
+        "testy_type_2_diabetes_test_min_date",
+        "testy_type_2_diabetes_test_indicator"
+      )
+    )
+  }
+)
+
+# NOT WORKING - CANNOT TEST WITH A DUMMY DATABASE THAT IS STORED IN TEMPDIR OR
+# MEMORY (CANNOT SHARE THIS BETWEEN MULTIPLE SESSIONS RUNNING IN PARALLEL)
+
+# test_that(
+#   "`extract_first_or_last_clinical_event_multi()` works with parallel processing, tbl clinical events", {
+#     result <- extract_first_or_last_clinical_event_multi(df = dummy_clinical_events_db,
+#                                                          clinical_codes_df = dummy_clinical_codes_df,
+#                                                          min_max = "min",
+#                                                          prefix = "testy_",
+#                                                          workers = 2)
+#
+#     expect_equal(
+#       names(result[[1]]),
+#       c(
+#         "eid",
+#         "testy_DIABETES_TEST_min_date",
+#         "testy_DIABETES_TEST_indicator",
+#         "testy_diabetes_unspecified_test_min_date",
+#         "testy_diabetes_unspecified_test_indicator",
+#         "testy_gestational_diabetes_test_min_date",
+#         "testy_gestational_diabetes_test_indicator",
+#         "testy_type_1_diabetes_test_min_date",
+#         "testy_type_1_diabetes_test_indicator",
+#         "testy_type_2_diabetes_test_min_date",
+#         "testy_type_2_diabetes_test_indicator"
+#       )
+#     )
+#   }
+# )
 
 # `mutate_age_at_event_cols()` --------------------------------------------
 

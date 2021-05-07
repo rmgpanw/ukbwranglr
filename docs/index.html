@@ -80,6 +80,7 @@
 <a href="#ukbwranglr" class="anchor"></a>ukbwranglr</h1></div>
 <!-- badges: start -->
 
+<!-- badges: end -->
 <p><strong><em>–UNDER CONSTRUCTION–</em></strong></p>
 </div>
 <div id="overview" class="section level1">
@@ -87,34 +88,34 @@
 <a href="#overview" class="anchor"></a>Overview</h1>
 <p>The goal of <code>ukbwranglr</code> is to facilitate exploratory analyses with UK Biobank phenotype data. A selection of columns from a raw UK Biobank phenotype file can be loaded into R with human-readable labels:</p>
 <p><em>Raw data appearance:</em></p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co">#&gt;      eid 31-0.0 34-0.0 21000-0.0 20002-0.0 21001-0.0</span></span>
-<span id="cb1-2"><a href="#cb1-2"></a><span class="co">#&gt; 1: fake1      0   1952        NA      1665   20.1115</span></span>
-<span id="cb1-3"><a href="#cb1-3"></a><span class="co">#&gt; 2: fake2      0   1946      4001      1383   30.1536</span></span>
-<span id="cb1-4"><a href="#cb1-4"></a><span class="co">#&gt; 3: fake3      1   1951         3      1197   22.8495</span></span>
-<span id="cb1-5"><a href="#cb1-5"></a><span class="co">#&gt; 4: fake4      0   1956        NA      1441   23.4904</span></span>
-<span id="cb1-6"><a href="#cb1-6"></a><span class="co">#&gt; 5: fake5     NA     NA        -3      1429   29.2752</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      eid 31-0.0 34-0.0 21000-0.0 20002-0.0 21001-0.0</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1: fake1      0   1952        NA      1665   20.1115</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2: fake2      0   1946      4001      1383   30.1536</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3: fake3      1   1951         3      1197   22.8495</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4: fake4      0   1956        NA      1441   23.4904</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5: fake5     NA     NA        -3      1429   29.2752</span></span></code></pre></div>
 <p><em>Appearance when loaded using <code><a href="reference/read_pheno.html">ukbwranglr::read_pheno()</a></code>:</em></p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co">#&gt;      eid sex_f31_0_0 year_of_birth_f34_0_0 ethnic_background_f21000_0_0</span></span>
-<span id="cb2-2"><a href="#cb2-2"></a><span class="co">#&gt; 1: fake1      Female                  1952                         &lt;NA&gt;</span></span>
-<span id="cb2-3"><a href="#cb2-3"></a><span class="co">#&gt; 2: fake2      Female                  1946                    Caribbean</span></span>
-<span id="cb2-4"><a href="#cb2-4"></a><span class="co">#&gt; 3: fake3        Male                  1951       Asian or Asian British</span></span>
-<span id="cb2-5"><a href="#cb2-5"></a><span class="co">#&gt; 4: fake4      Female                  1956                         &lt;NA&gt;</span></span>
-<span id="cb2-6"><a href="#cb2-6"></a><span class="co">#&gt; 5: fake5        &lt;NA&gt;                    NA         Prefer not to answer</span></span>
-<span id="cb2-7"><a href="#cb2-7"></a><span class="co">#&gt; 6: fake6        Male                  1948       Asian or Asian British</span></span>
-<span id="cb2-8"><a href="#cb2-8"></a><span class="co">#&gt;    noncancer_illness_code_selfreported_f20002_0_0</span></span>
-<span id="cb2-9"><a href="#cb2-9"></a><span class="co">#&gt; 1:                menopausal symptoms / menopause</span></span>
-<span id="cb2-10"><a href="#cb2-10"></a><span class="co">#&gt; 2:                            dermatopolymyositis</span></span>
-<span id="cb2-11"><a href="#cb2-11"></a><span class="co">#&gt; 3:        kidney stone/ureter stone/bladder stone</span></span>
-<span id="cb2-12"><a href="#cb2-12"></a><span class="co">#&gt; 4:                                        malaria</span></span>
-<span id="cb2-13"><a href="#cb2-13"></a><span class="co">#&gt; 5:                                     acromegaly</span></span>
-<span id="cb2-14"><a href="#cb2-14"></a><span class="co">#&gt; 6:                                inguinal hernia</span></span>
-<span id="cb2-15"><a href="#cb2-15"></a><span class="co">#&gt;    body_mass_index_bmi_f21001_0_0</span></span>
-<span id="cb2-16"><a href="#cb2-16"></a><span class="co">#&gt; 1:                        20.1115</span></span>
-<span id="cb2-17"><a href="#cb2-17"></a><span class="co">#&gt; 2:                        30.1536</span></span>
-<span id="cb2-18"><a href="#cb2-18"></a><span class="co">#&gt; 3:                        22.8495</span></span>
-<span id="cb2-19"><a href="#cb2-19"></a><span class="co">#&gt; 4:                        23.4904</span></span>
-<span id="cb2-20"><a href="#cb2-20"></a><span class="co">#&gt; 5:                        29.2752</span></span>
-<span id="cb2-21"><a href="#cb2-21"></a><span class="co">#&gt; 6:                        28.2567</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      eid sex_f31_0_0 year_of_birth_f34_0_0 ethnic_background_f21000_0_0</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1: fake1      Female                  1952                         &lt;NA&gt;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2: fake2      Female                  1946                    Caribbean</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3: fake3        Male                  1951       Asian or Asian British</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4: fake4      Female                  1956                         &lt;NA&gt;</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5: fake5        &lt;NA&gt;                    NA         Prefer not to answer</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6: fake6        Male                  1948       Asian or Asian British</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    noncancer_illness_code_selfreported_f20002_0_0</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1:                menopausal symptoms / menopause</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2:                            dermatopolymyositis</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3:        kidney stone/ureter stone/bladder stone</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4:                                        malaria</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5:                                     acromegaly</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6:                                inguinal hernia</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    body_mass_index_bmi_f21001_0_0</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1:                        20.1115</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2:                        30.1536</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3:                        22.8495</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4:                        23.4904</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5:                        29.2752</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6:                        28.2567</span></span></code></pre></div>
 <p><code>ukbwranglr</code> can also help to:</p>
 <ul>
 <li>Identify participants with certain health conditions or taking certain medications (with dates)</li>
@@ -138,7 +139,7 @@
 <li>Filter this for your required variables</li>
 <li>Read your selected columns into R</li>
 </ol>
-<p>This process is outlined below for dummy UK Biobank data generated using the <a href="https://github.com/spiros/tofu">tofu library</a>.</p>
+<p>This process is outlined below for dummy UK Biobank data generated using the <a href="https://github.com/spiros/tofu">tofu library</a> (<em>Spiros Denaxas. (2020). spiros/tofu: Updated release for DOI (Version v1.1). Zenodo. <a href="http://doi.org/10.5281/zenodo.3634604" class="uri">http://doi.org/10.5281/zenodo.3634604</a></em>).</p>
 <div id="1-create-data-dictionary" class="section level4">
 <h4 class="hasAnchor">
 <a href="#1-create-data-dictionary" class="anchor"></a>1. Create data dictionary</h4>
