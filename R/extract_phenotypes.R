@@ -209,7 +209,7 @@ extract_first_or_last_clinical_event_multi <- function(
 
     # check that no functions have been applied to the tbl
     if (!is.null(df$op$name)) {
-      stop("Error! `df` is a tbl object - it should not have any functions applied to it.")
+      stop("Error! `df` is a tbl object - it should not have any functions applied to it if using parallel processing (i.e. workers >= 1).")
     }
 
     db_path <- df$src$con@dbname
