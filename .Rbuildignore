@@ -16,3 +16,5 @@
 ^ukbwranglr\.Rcheck$
 ^ukbwranglr.*\.tar\.gz$
 ^ukbwranglr.*\.tgz$
+^inst/tutorials/1-Read-UKB-data-into-R\.Rmd/1-Read-UKB-data-into-R-Rmd\.Rmd$
+^inst/tutorials/1-Read-UKB-data-into-R/1-Read-UKB-data-into-R\.Rmd$
