@@ -216,7 +216,8 @@ extract_first_or_last_clinical_event_multi <- function(
                                     df = df,
                                     clinical_codes_df = clinical_codes_df,
                                     min_max = min_max,
-                                    prefix = prefix))
+                                    prefix = prefix),
+                        .progress = TRUE)
 
   } else if ("data.frame" %in% class(df) |
              is.null(workers)) {
@@ -229,7 +230,8 @@ extract_first_or_last_clinical_event_multi <- function(
       clinical_codes_df = clinical_codes_df,
       min_max = min_max,
       prefix = prefix
-    ))
+    ),
+    .progress = TRUE)
 
   } else {
     stop("Error! Please raise an issue to fix this function")
