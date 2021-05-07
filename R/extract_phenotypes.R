@@ -218,7 +218,8 @@ extract_first_or_last_clinical_event_multi <- function(
                                     min_max = min_max,
                                     prefix = prefix))
 
-  } else if ("data.frame" %in% class(df)) {
+  } else if ("data.frame" %in% class(df) |
+             is.null(workers)) {
 
   result <- unique(clinical_codes_df$disease) %>%
     purrr::set_names() %>%
@@ -230,6 +231,8 @@ extract_first_or_last_clinical_event_multi <- function(
       prefix = prefix
     ))
 
+  } else {
+    stop("Error! Please raise an issue to fix this function")
   }
 
   # TO DELETE - combining all elements can increase the object size
