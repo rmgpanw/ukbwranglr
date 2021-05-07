@@ -14,7 +14,8 @@ Suggests:
     haven,
     knitr,
     rmarkdown,
-    testthat
+    testthat,
+    learnr
 VignetteBuilder: knitr
 Imports:
     assertthat,

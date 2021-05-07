@@ -13,3 +13,5 @@
 ^codecov\.yml$
 ^_pkgdown\.yml$
 ^\.travis\.yml$
+^inst/tutorials/1-Read-UKB-data-into-R\.Rmd/1-Read-UKB-data-into-R-Rmd\.Rmd$
+^inst/tutorials/1-Read-UKB-data-into-R/1-Read-UKB-data-into-R\.Rmd$

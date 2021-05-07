@@ -30,8 +30,4 @@ A long format data frame with 3 columns: \itemize{ \item eid \item
 Helper function. Selects the columns relating to a specified FieldID (plus
 the \code{eid} column) and applies \code{\link[tidyr]{pivot_longer}}.
 }
-\seealso{
-Other extract disease outcomes helpers: 
-\code{\link{field_id_pivot_longer_multi}()}
-}
 \concept{extract disease outcomes helpers}

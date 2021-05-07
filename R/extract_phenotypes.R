@@ -1546,7 +1546,6 @@ OLD_get_diagnoses_set_index_code_date_cols <- function(get_clinical_events_df,
 #'   'f' and suffixed by '_value') }
 #'
 #' @family extract disease outcomes helpers
-#' @noRd
 field_id_pivot_longer <- function(ukb_pheno,
                                   field_id,
                                   data_dict,

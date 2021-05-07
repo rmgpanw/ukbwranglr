@@ -1,0 +1,73 @@
+---
+title: "1. Read UKB data into R"
+output: learnr::tutorial
+runtime: shiny_prerendered
+description: "Make a data dictionary and load selected variables from a UKB dataset into R"
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(ukbwranglr)
+knitr::opts_chunk$set(echo = FALSE)
+
+# get dummy data
+ukb_file_path <- download_dummy_ukb_data_to_tempdir()
+ukb_data_dict <- get_ukb_data_dict()
+ukb_codings <- get_ukb_codings()
+
+my_data_dict <- make_data_dict(ukb_pheno = ukb_file_path,
+                               delim = ",",
+                               ukb_data_dict = ukb_data_dict)
+
+ukb_pheno <- read_pheno(path = ukb_file_path, 
+                        delim = ",", 
+                        data_dict = my_data_dict, 
+                        ukb_codings = ukb_codings)
+```
+
+
+## Make data dictionary and load selected variables into R
+
+### Download the UKB data dictionary and UKB codings files
+
+`ukb_data_dict` and `ukb_codings` have already been downloaded with `get_ukb_data_dict()` and `get_ukb_codings()`
+
+```{r view-ukb-data-dict, exercise=TRUE}
+# code to download UKB data dictionary
+# ukb_data_dict <- get_ukb_data_dict()
+
+head(ukb_data_dict)
+```
+
+```{r view-ukb-codings, exercise=TRUE}
+# code to download UKB data dictionary
+# ukb_codings <- get_ukb_codings()
+
+head(ukb_codings)
+```
+
+
+### Make data dictionary
+
+```{r make-data-dict, exercise=TRUE}
+# code to make data dict
+# my_data_dict <- make_data_dict(ukb_pheno = ukb_file_path, 
+#                                delim = ",", 
+#                                ukb_data_dict = ukb_data_dict)
+
+# view first few line
+head(my_data_dict)
+```
+
+### Read selected variables into R
+
+```{r load-ukb-data, exercise=TRUE}
+# code to read UKB data into R
+# ukb_pheno <- read_pheno(path = ukb_file_path, 
+#                         delim = ",", 
+#                         data_dict = my_data_dict, 
+#                         ukb_codings = ukb_codings)
+
+# view result
+head(ukb_pheno)
+```

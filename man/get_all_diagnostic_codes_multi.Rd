@@ -40,15 +40,6 @@ diagnostic codes' family and combines the results into a single data frame.
 }
 \seealso{
 Other get all diagnostic codes: 
-\code{\link{OLD_get_cancer_register_icd10_diagnoses}()},
-\code{\link{OLD_get_cancer_register_icd9_diagnoses}()},
-\code{\link{OLD_get_death_data_icd10_diagnoses}()},
-\code{\link{OLD_get_diagnoses_set_index_code_date_cols}()},
-\code{\link{OLD_get_hes_icd10_diagnoses}()},
-\code{\link{OLD_get_hes_icd9_diagnoses}()},
-\code{\link{OLD_get_self_report_cancer_diagnoses}()},
-\code{\link{OLD_get_self_report_non_cancer_diagnoses_icd10}()},
-\code{\link{OLD_get_self_report_non_cancer_diagnoses}()},
 \code{\link{get_cancer_register_icd10_diagnoses}()},
 \code{\link{get_cancer_register_icd9_diagnoses}()},
 \code{\link{get_death_data_icd10_diagnoses}()},
