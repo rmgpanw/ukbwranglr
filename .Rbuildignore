@@ -13,3 +13,6 @@
 ^codecov\.yml$
 ^_pkgdown\.yml$
 ^\.travis\.yml$
+^ukbwranglr\.Rcheck$
+^ukbwranglr.*\.tar\.gz$
+^ukbwranglr.*\.tgz$
