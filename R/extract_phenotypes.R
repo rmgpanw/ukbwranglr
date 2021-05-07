@@ -126,12 +126,18 @@ mutate_age_at_event_cols <- function(ukb_pheno,
 #' @param clinical_codes_df data frame. Must match the format as per
 #'   \code{\link{generate_self_reported_diabetes_codes_df}}.
 #' @param prefix character. Optionally add a prefix to column names.
+#' @param workers integer. The number of processes to run in parallel when
+#'   \code{clinical_codes_df} includes multiple diseases. This is used to set
+#'   the number of workers in \code{\link[future]{plan}} with \code{strategy =
+#'   \link[future]{multisession}}, which is passed on to
+#'   \code{\link[furrr]{future_map}}. Default value is \code{NULL}.
 #' @inheritParams extract_single_diagnostic_code_record_basis
 #' @inheritParams extract_first_or_last_clinical_event
 #'
-#' @return Data frame with an "eid" column, and "event_min/max_indicator" and
-#'   "event_min/max_date" columns for each phenotype in the 'category' column of
-#'   \code{clinical_codes_df}.
+#' @return A named list of data frames, one for each disease. Each data frame
+#'   has an "eid" column, and "event_min/max_indicator" and "event_min/max_date"
+#'   columns for each phenotype in the 'category' column of
+#'   \code{clinical_codes_df} for that disease.
 #' @export
 #'
 #' @family extract specific diagnostic codes functions
@@ -139,36 +145,99 @@ extract_first_or_last_clinical_event_multi <- function(
   df,
   clinical_codes_df,
   min_max = "min",
-  prefix = NULL
+  prefix = NULL,
+  workers = NULL
 ) {
   start_time <- proc.time()
+
+  # validate args
+  assertthat::assert_that(
+    (
+      (suppressWarnings(all(class(df) == c("tbl_SQLiteConnection", "tbl_dbi", "tbl_sql", "tbl_lazy", "tbl")))) |
+    ("data.frame" %in% class(df))
+    ),
+    msg = "Error! df must either be a data frame or a tbl object"
+  )
+
+  # set plan if using parallel processing
+  if (!is.null(workers)) {
+    assert_integer_ge_1(workers, "workers")
+    future::plan(future::multisession, workers = workers)
+  }
+
+  # make mapper function
+  mapper_fn <- function(disease,
+                        db_path = NULL,
+                        table_name = NULL,
+                        df,
+                        clinical_codes_df,
+                        min_max,
+                        prefix) {
+    message(paste0("\n***PROCESSING DISEASE ", counter, " OF ", n_diseases, "***"))
+    time_taken_message(start_time)
+    message("\n")
+
+    counter <<- counter + 1
+
+    # see note below re non-exportable objects and parallel processing
+    if (!is.null(db_path) & !is.null(table_name)) {
+      con <- DBI::dbConnect(RSQLite::SQLite(), dbname = db_path)
+      df <- dplyr::tbl(con, table_name)
+    }
+
+    extract_first_or_last_clinical_event_multi_single_disease(
+      disease = disease,
+      df = df,
+      clinical_codes_df = clinical_codes_df,
+      min_max = min_max,
+      prefix = prefix
+    )
+  }
 
   # loop through diseases in clinical_codes_df
   n_diseases <- length(unique(clinical_codes_df$disease))
   counter = 1
 
+  # if using parallel processing (!is.null(workers)) and df is a tbl, need to
+  # extract the SQLite db path and table name. Non-exportable objects (like db
+  # connections) won't work with parallel processing
+  if (suppressWarnings(all(class(df) == c("tbl_SQLiteConnection", "tbl_dbi", "tbl_sql", "tbl_lazy", "tbl"))) &
+      !is.null(workers)) {
+
+    # get db_path and table_name from df
+    db_path <- df$src$con@dbname
+    table_name <- gsub("`", "", as.character(df$op$x))
+
+    result <- unique(clinical_codes_df$disease) %>%
+      purrr::set_names() %>%
+      furrr::future_map(~ mapper_fn(.x,
+                                    db_path = db_path,
+                                    table_name = table_name,
+                                    df = df,
+                                    clinical_codes_df = clinical_codes_df,
+                                    min_max = min_max,
+                                    prefix = prefix))
+
+  } else if ("data.frame" %in% class(df)) {
+
   result <- unique(clinical_codes_df$disease) %>%
     purrr::set_names() %>%
-    purrr::map(~ {
-      message(paste0("\n***PROCESSING DISEASE ", counter, " OF ", n_diseases, "***"))
-      time_taken_message(start_time)
-      message("\n")
+    furrr::future_map(~ mapper_fn(
+      .x,
+      df = df,
+      clinical_codes_df = clinical_codes_df,
+      min_max = min_max,
+      prefix = prefix
+    ))
 
-      counter <<- counter + 1
+  }
 
-      extract_first_or_last_clinical_event_multi_single_disease(
-        .x,
-        df = df,
-        clinical_codes_df = clinical_codes_df,
-        min_max = min_max,
-        prefix = prefix
-      )
-    })
-
-  # combine
-  result <- result %>%
-    purrr::compact() %>%
-    purrr::reduce(dplyr::full_join, by = "eid")
+  # TO DELETE - combining all elements can increase the object size
+  # significantly. Therefore, return as a named list instead. The user can then
+  # combine if needed # combine result <- result %>% purrr::compact()
+  #
+  # if (!rlang::is_empty(result)) { result <- result %>%
+  # purrr::reduce(dplyr::full_join, by = "eid") }
 
   # return result
   message("COMPLETE!")
@@ -746,6 +815,7 @@ ukb_codings) {
 #' @param date_col_field_id character. The Field ID representing 'date'
 #'   variables that correspond to \code{code_col_field_id}.
 #'
+#' @noRd
 #' @return A data table with 'eid', 'source' (Field ID for the code
 #' column), 'code' and 'date' columns.
 get_diagnoses_basis_fn <- function(ukb_pheno,
@@ -893,7 +963,7 @@ make_self_report_special_decimal_dates_na <- function(df) {
 #' @inheritParams field_id_pivot_longer
 #'
 #' @return Dataframe
-#'
+#' @noRd
 #' @family get all diagnostic codes
 OLD_get_death_data_icd10_diagnoses <- function(ukb_pheno,
                                            data_dict,
@@ -981,7 +1051,7 @@ OLD_get_death_data_icd10_diagnoses <- function(ukb_pheno,
 #' @inheritParams field_id_pivot_longer
 #'
 #' @return Data frame
-#'
+#' @noRd
 #' @family get all diagnostic codes
 OLD_get_hes_icd9_diagnoses <- function(ukb_pheno,
                                    data_dict,
@@ -1034,7 +1104,7 @@ OLD_get_hes_icd9_diagnoses <- function(ukb_pheno,
 #' @inheritParams field_id_pivot_longer
 #'
 #' @return Dataframe
-#'
+#' @noRd
 #' @family get all diagnostic codes
 OLD_get_hes_icd10_diagnoses <- function(ukb_pheno,
                                     data_dict,
@@ -1091,7 +1161,7 @@ OLD_get_hes_icd10_diagnoses <- function(ukb_pheno,
 #'   \href{https://biobank.ndph.ox.ac.uk/ukb/coding.cgi?id=13}{data coding 13}.
 #'
 #' @return Dataframe
-#'
+#' @noRd
 #' @family get all diagnostic codes
 OLD_get_self_report_non_cancer_diagnoses <- function(ukb_pheno,
                                                  data_dict,
@@ -1156,7 +1226,7 @@ OLD_get_self_report_non_cancer_diagnoses <- function(ukb_pheno,
 #'   \href{https://biobank.ndph.ox.ac.uk/ukb/coding.cgi?id=13}{data coding 13}.
 #'
 #' @return Dataframe
-#'
+#' @noRd
 #' @family get all diagnostic codes
 OLD_get_self_report_non_cancer_diagnoses_icd10 <- function(ukb_pheno,
                                                        data_dict,
@@ -1219,7 +1289,7 @@ OLD_get_self_report_non_cancer_diagnoses_icd10 <- function(ukb_pheno,
 #'   \href{https://biobank.ndph.ox.ac.uk/ukb/coding.cgi?id=13}{data coding 13}.
 #'
 #' @return Dataframe
-#'
+#' @noRd
 #' @family get all diagnostic codes
 OLD_get_self_report_cancer_diagnoses <- function(ukb_pheno,
                                              data_dict,
@@ -1276,7 +1346,7 @@ OLD_get_self_report_cancer_diagnoses <- function(ukb_pheno,
 #' @inheritParams field_id_pivot_longer
 #'
 #' @return Dataframe
-#'
+#' @noRd
 #' @family get all diagnostic codes
 OLD_get_cancer_register_icd9_diagnoses <- function(ukb_pheno,
                                                data_dict,
@@ -1354,7 +1424,7 @@ OLD_get_cancer_register_icd9_diagnoses <- function(ukb_pheno,
 #' @inheritParams field_id_pivot_longer
 #'
 #' @return Dataframe
-#'
+#' @noRd
 #' @family get all diagnostic codes
 OLD_get_cancer_register_icd10_diagnoses <- function(ukb_pheno,
                                                 data_dict,
@@ -1407,6 +1477,7 @@ OLD_get_cancer_register_icd10_diagnoses <- function(ukb_pheno,
 #'   requested. Default is \code{FALSE}, as only the self-report fields contain
 #'   such values.
 #' @family get all diagnostic codes
+#' @noRd
 OLD_get_diagnoses_set_index_code_date_cols <- function(get_clinical_events_df,
                                                    index_col,
                                                    code_col,
@@ -1463,6 +1534,7 @@ OLD_get_diagnoses_set_index_code_date_cols <- function(get_clinical_events_df,
 #'   'f' and suffixed by '_value') }
 #'
 #' @family extract disease outcomes helpers
+#' @noRd
 field_id_pivot_longer <- function(ukb_pheno,
                                   field_id,
                                   data_dict,
@@ -1526,7 +1598,7 @@ field_id_pivot_longer <- function(ukb_pheno,
 #' @inheritParams field_id_pivot_longer
 #'
 #' @return Dataframe.
-#'
+#' @noRd
 #' @family extract disease outcomes helpers
 field_id_pivot_longer_multi <- function(field_ids,
                                         ukb_pheno,

@@ -24,11 +24,12 @@ DUMMY_DATA_PATH <- config$PATHS$DUMMY_DATA_PATH
 # <img src="man/figures/test.png" align="right" width="100" />
 ```
 
-# ukbwranglr 
+# ukbwranglr
 
 <!-- badges: start -->
-[![R build status](https://github.com/rmgpanw/ukbwranglr/workflows/R-CMD-check/badge.svg)](https://github.com/rmgpanw/ukbwranglr/actions)
-[![Codecov test coverage](https://codecov.io/gh/rmgpanw/ukbwranglr/branch/main/graph/badge.svg)](https://codecov.io/gh/rmgpanw/ukbwranglr?branch=main)
+
+[![R build status](https://github.com/rmgpanw/ukbwranglr/workflows/R-CMD-check/badge.svg)](https://github.com/rmgpanw/ukbwranglr/actions) [![Codecov test coverage](https://codecov.io/gh/rmgpanw/ukbwranglr/branch/main/graph/badge.svg)](https://codecov.io/gh/rmgpanw/ukbwranglr?branch=main)
+
 <!-- badges: end -->
 
 ***--UNDER CONSTRUCTION--***
@@ -78,10 +79,10 @@ ukbwranglr_data_selected_cols %>%
 
 `ukbwranglr` can also help to:
 
-- Identify participants with certain health conditions or taking certain medications (with dates)
-- Summarise biomarker measurements (e.g. extract the mean systolic blood pressure across repeated measurements)
+-   Identify participants with certain health conditions or taking certain medications (with dates)
+-   Summarise biomarker measurements (e.g. extract the mean systolic blood pressure across repeated measurements)
 
-Please see ['getting started'](https://rmgpanw.github.io/ukbwranglr/articles/ukbwranglr.html) on the [package documentation website](https://rmgpanw.github.io/ukbwranglr/index.html) for further details. 
+Please see ['getting started'](https://rmgpanw.github.io/ukbwranglr/articles/ukbwranglr.html) on the [package documentation website](https://rmgpanw.github.io/ukbwranglr/index.html) for further details.
 
 ## Installation
 
@@ -96,11 +97,11 @@ devtools::install_github("rmgpanw/ukbwranglr")
 
 **Steps:**
 
-1. Create a data dictionary specific to your UK Biobank file
-1. Filter this for your required variables
-1. Read your selected columns into R
+1.  Create a data dictionary specific to your UK Biobank file
+2.  Filter this for your required variables
+3.  Read your selected columns into R
 
-This process is outlined below for dummy UK Biobank data generated using the [tofu library](https://github.com/spiros/tofu).
+This process is outlined below for dummy UK Biobank data generated using the [tofu library](https://github.com/spiros/tofu) (*Spiros Denaxas. (2020). spiros/tofu: Updated release for DOI (Version v1.1). Zenodo. http://doi.org/10.5281/zenodo.3634604*).
 
 #### 1. Create data dictionary
 
