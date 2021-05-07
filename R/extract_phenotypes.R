@@ -163,6 +163,7 @@ extract_first_or_last_clinical_event_multi <- function(
   if (!is.null(workers)) {
     assert_integer_ge_1(workers, "workers")
     future::plan(future::multisession, workers = workers)
+    on.exit(future::plan(future::sequential))
   }
 
   # make mapper function
@@ -205,6 +206,12 @@ extract_first_or_last_clinical_event_multi <- function(
       !is.null(workers)) {
 
     # get db_path and table_name from df
+
+    # check that no functions have been applied to the tbl
+    if (!is.null(df$op$name)) {
+      stop("Error! `df` is a tbl object - it should not have any functions applied to it.")
+    }
+
     db_path <- df$src$con@dbname
     table_name <- gsub("`", "", as.character(df$op$x))[1]
 
