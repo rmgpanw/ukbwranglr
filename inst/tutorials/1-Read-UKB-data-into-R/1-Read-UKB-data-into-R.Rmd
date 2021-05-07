@@ -21,7 +21,11 @@ my_data_dict <- make_data_dict(ukb_pheno = ukb_file_path,
 
 ukb_pheno <- read_pheno(path = ukb_file_path, 
                         delim = ",", 
-                        data_dict = my_data_dict, 
+                        data_dict = my_data_dict[my_data_dict$FieldID %in% c("eid", 
+                                                                             "21000", 
+                                                                             "31", 
+                                                                             "34", 
+                                                                             "30750"), ], 
                         ukb_codings = ukb_codings)
 ```
 
@@ -36,6 +40,7 @@ ukb_pheno <- read_pheno(path = ukb_file_path,
 # code to download UKB data dictionary
 # ukb_data_dict <- get_ukb_data_dict()
 
+# view first few lines
 head(ukb_data_dict)
 ```
 
@@ -43,6 +48,7 @@ head(ukb_data_dict)
 # code to download UKB data dictionary
 # ukb_codings <- get_ukb_codings()
 
+# view first few lines
 head(ukb_codings)
 ```
 
@@ -55,7 +61,7 @@ head(ukb_codings)
 #                                delim = ",", 
 #                                ukb_data_dict = ukb_data_dict)
 
-# view first few line
+# view first few lines
 head(my_data_dict)
 ```
 
@@ -68,6 +74,6 @@ head(my_data_dict)
 #                         data_dict = my_data_dict, 
 #                         ukb_codings = ukb_codings)
 
-# view result
+# view first few lines of selected columns
 head(ukb_pheno)
 ```
