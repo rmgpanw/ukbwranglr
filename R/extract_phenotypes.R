@@ -206,7 +206,7 @@ extract_first_or_last_clinical_event_multi <- function(
 
     # get db_path and table_name from df
     db_path <- df$src$con@dbname
-    table_name <- gsub("`", "", as.character(df$op$x))
+    table_name <- gsub("`", "", as.character(df$op$x))[1]
 
     result <- unique(clinical_codes_df$disease) %>%
       purrr::set_names() %>%
