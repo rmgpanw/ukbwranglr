@@ -12,7 +12,7 @@ extract_first_or_last_clinical_event(
 )
 }
 \arguments{
-\item{df}{Either a dataframe or a \code{\link[dplyr]{tbl}} object generated
+\item{df}{Either a dataframe or a \code{\link[dbplyr]{tbl_dbi}} object generated
 by one of the \code{get_XXX_diagnoses} functions}
 
 \item{codes}{Either a character vector or named list of diagnostic codes. If

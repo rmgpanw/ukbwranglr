@@ -9,11 +9,12 @@ extract_first_or_last_clinical_event_multi(
   clinical_codes_df,
   min_max = "min",
   prefix = NULL,
-  workers = NULL
+  workers = NULL,
+  df_pre_filtering_fn = NULL
 )
 }
 \arguments{
-\item{df}{Either a dataframe or a \code{\link[dplyr]{tbl}} object generated
+\item{df}{Either a dataframe or a \code{\link[dbplyr]{tbl_dbi}} object generated
 by one of the \code{get_XXX_diagnoses} functions}
 
 \item{clinical_codes_df}{data frame. Must match the format as per
@@ -29,6 +30,13 @@ latest date that on of the specified \code{codes} appears.}
 the number of workers in \code{\link[future]{plan}} with \code{strategy =
 \link[future]{multisession}}, which is passed on to
 \code{\link[furrr]{future_map}}. Default value is \code{NULL}.}
+
+\item{df_pre_filtering_fn}{function. Optionally supply a function to
+pre-filter \code{df}.For example, filter for only self-reported clinical
+events with 'function(df) df %>% dplyr::filter(source == "f20002")'.
+The function should only have one argument e.g. 'df'. This is designed to
+enable parallel processing when \code{df} is a
+\code{\link[dbplyr]{tbl_dbi}} object. Default value is \code{NULL}.}
 }
 \value{
 A named list of data frames, one for each disease. Each data frame

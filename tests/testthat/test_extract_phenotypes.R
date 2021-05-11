@@ -66,7 +66,7 @@ dplyr::copy_to(con,
         "dummy_clinical_events",
         overwrite = TRUE)
 
-# get tbl_sql object
+# get tbl_dbi object
 dummy_clinical_events_db <- dplyr::tbl(con, "dummy_clinical_events")
 
 # should match output from `generate_self_reported_diabetes_codes_df()`
@@ -291,7 +291,7 @@ test_that(
 )
 
 test_that(
-  "`extract_single_diagnostic_code_record_basis()` extracts the correct earliest and latest dates - all sources and class(df) = tbl_sql",
+  "`extract_single_diagnostic_code_record_basis()` extracts the correct earliest and latest dates - all sources and class(df) = tbl_dbi",
   {
     # expectations
     expect_equal(min_dates_db$eid, expected$eid)
@@ -380,7 +380,7 @@ test_that(
                                                             icd10 = "B"))
 
     result_db <- filter_clinical_events_for_list_of_codes(dummy_clinical_events_db,
-                                                       df_class = "tbl_sql",
+                                                       df_class = "tbl_dbi",
                                                        list(read2 = "A",
                                                             icd10 = "B"))
 

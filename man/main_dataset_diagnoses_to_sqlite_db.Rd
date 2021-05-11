@@ -13,7 +13,7 @@ main_dataset_diagnoses_to_sqlite_db(
 )
 }
 \arguments{
-\item{df}{Either a dataframe or a \code{\link[dplyr]{tbl}} object generated
+\item{df}{Either a dataframe or a \code{\link[dbplyr]{tbl_dbi}} object generated
 by one of the \code{get_XXX_diagnoses} functions}
 
 \item{table}{Character. Name of table to write to.}

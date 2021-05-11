@@ -131,6 +131,13 @@ mutate_age_at_event_cols <- function(ukb_pheno,
 #'   the number of workers in \code{\link[future]{plan}} with \code{strategy =
 #'   \link[future]{multisession}}, which is passed on to
 #'   \code{\link[furrr]{future_map}}. Default value is \code{NULL}.
+#' @param df_pre_filtering_fn function. Optionally supply a function to
+#'   pre-filter \code{df}.For example, filter for only self-reported clinical
+#'   events with 'function(df) df %>% dplyr::filter(source == "f20002")'.
+#'   The function should only have one argument e.g. 'df'. This is designed to
+#'   enable parallel processing when \code{df} is a
+#'   \code{\link[dbplyr]{tbl_dbi}} object. Default value is \code{NULL}.
+#'
 #' @inheritParams extract_single_diagnostic_code_record_basis
 #' @inheritParams extract_first_or_last_clinical_event
 #'
@@ -146,7 +153,8 @@ extract_first_or_last_clinical_event_multi <- function(
   clinical_codes_df,
   min_max = "min",
   prefix = NULL,
-  workers = NULL
+  workers = NULL,
+  df_pre_filtering_fn = NULL
 ) {
   start_time <- proc.time()
 
@@ -156,7 +164,7 @@ extract_first_or_last_clinical_event_multi <- function(
       (suppressWarnings(all(class(df) == c("tbl_SQLiteConnection", "tbl_dbi", "tbl_sql", "tbl_lazy", "tbl")))) |
     ("data.frame" %in% class(df))
     ),
-    msg = "Error! df must either be a data frame or a tbl object"
+    msg = "Error! df must either be a data frame or a tbl_dbi object"
   )
 
   # set plan if using parallel processing
@@ -168,12 +176,13 @@ extract_first_or_last_clinical_event_multi <- function(
 
   # make mapper function
   mapper_fn <- function(disease,
-                        db_path = NULL,
-                        table_name = NULL,
                         df,
                         clinical_codes_df,
                         min_max,
-                        prefix) {
+                        prefix,
+                        df_pre_filtering_fn,
+                        db_path = NULL,
+                        table_name = NULL) {
     message(paste0("\n***PROCESSING DISEASE ", counter, " OF ", n_diseases, "***"))
     time_taken_message(start_time)
     message("\n")
@@ -184,6 +193,10 @@ extract_first_or_last_clinical_event_multi <- function(
     if (!is.null(db_path) & !is.null(table_name)) {
       con <- DBI::dbConnect(RSQLite::SQLite(), dbname = db_path)
       df <- dplyr::tbl(con, table_name)
+    }
+
+    if (!is.null(df_pre_filtering_fn)) {
+      df <- df_pre_filtering_fn(df)
     }
 
     extract_first_or_last_clinical_event_multi_single_disease(
@@ -199,7 +212,7 @@ extract_first_or_last_clinical_event_multi <- function(
   n_diseases <- length(unique(clinical_codes_df$disease))
   counter = 1
 
-  # if using parallel processing (!is.null(workers)) and df is a tbl, need to
+  # if using parallel processing (!is.null(workers)) and df is a tbl_dbi object, need to
   # extract the SQLite db path and table name. Non-exportable objects (like db
   # connections) won't work with parallel processing
   if (suppressWarnings(all(class(df) == c("tbl_SQLiteConnection", "tbl_dbi", "tbl_sql", "tbl_lazy", "tbl"))) &
@@ -207,9 +220,9 @@ extract_first_or_last_clinical_event_multi <- function(
 
     # get db_path and table_name from df
 
-    # check that no functions have been applied to the tbl
+    # check that no functions have been applied to the tbl_dbi object
     if (!is.null(df$op$name)) {
-      stop("Error! `df` is a tbl object - it should not have any functions applied to it if using parallel processing (i.e. workers >= 1).")
+      stop("Error! `df` is a tbl_dbi object - it should not have any functions applied to it if using parallel processing (i.e. workers >= 1). Please supply a filtering function to the arg `df_pre_filtering_fn` instead.")
     }
 
     db_path <- df$src$con@dbname
@@ -223,7 +236,8 @@ extract_first_or_last_clinical_event_multi <- function(
                                     df = df,
                                     clinical_codes_df = clinical_codes_df,
                                     min_max = min_max,
-                                    prefix = prefix),
+                                    prefix = prefix,
+                                    df_pre_filtering_fn = df_pre_filtering_fn),
                         .progress = TRUE)
 
   } else if ("data.frame" %in% class(df) &
@@ -236,7 +250,8 @@ extract_first_or_last_clinical_event_multi <- function(
       df = df,
       clinical_codes_df = clinical_codes_df,
       min_max = min_max,
-      prefix = prefix
+      prefix = prefix,
+      df_pre_filtering_fn = df_pre_filtering_fn
     ),
     .progress = TRUE)
 
@@ -248,7 +263,8 @@ extract_first_or_last_clinical_event_multi <- function(
           df = df,
           clinical_codes_df = clinical_codes_df,
           min_max = min_max,
-          prefix = prefix
+          prefix = prefix,
+          df_pre_filtering_fn = df_pre_filtering_fn
         ))
 
     } else {
@@ -1901,7 +1917,7 @@ extract_first_or_last_clinical_event_multi_single_disease <-
 #' at least one of these and extract a single row per eid (e.g. the earliest
 #' date that one of the diagnostic codes appears).
 #'
-#' @param df Either a dataframe or a \code{\link[dplyr]{tbl}} object generated
+#' @param df Either a dataframe or a \code{\link[dbplyr]{tbl_dbi}} object generated
 #'   by one of the \code{get_XXX_diagnoses} functions
 #' @param codes Either a character vector or named list of diagnostic codes. If
 #'   a list, then each named item should be a character vector of codes (use
@@ -1926,7 +1942,7 @@ extract_single_diagnostic_code_record_basis <- function(df,
   assertthat::assert_that("function" %in% class(mapping_function),
                           msg = "`mapping_function` must be a function")
 
-  # filter clinical events (a df or tbl_sql object) for codes (a character
+  # filter clinical events (a df or tbl_dbi object) for codes (a character
   # vector, or a named list of codes)
   df <- filter_clinical_events_for_codes(df = df,
                                          codes = codes)
@@ -1959,12 +1975,12 @@ extract_single_diagnostic_code_record_basis <- function(df,
 #'
 #' Performs the code filtering step in
 #' \code{\link{extract_single_diagnostic_code_record_basis}}. \code{df} can be
-#' either a data frame or a tbl_sql object. \code{codes} may be either a
+#' either a data frame or a tbl_dbi object. \code{codes} may be either a
 #' character vector of codes or a named list of codes (format as per
 #' \code{\link{make_empty_clinical_codes_list}}). For the latter, codes are
 #' filtered by code type.
 #'
-#' @param df_class character. Either "df", or "tbl_sql".
+#' @param df_class character. Either "df", or "tbl_dbi".
 #' @inheritParams  extract_single_diagnostic_code_record_basis
 #'
 #' @return a data frame
@@ -1998,13 +2014,13 @@ filter_clinical_events_for_codes <- function(df,
 
   # filter for selected codes. Depends on:
 
-  # 1: Whether `df` is a dataframe or tbl_sql object
+  # 1: Whether `df` is a dataframe or tbl_dbi object
   # 2: Whether `codes` is a character vector or list
 
   # TODO replace nested ifelse statements with S3
   # methods?
 
-  # if `df` is a "tbl_sql" object
+  # if `df` is a "tbl_dbi" object
   if (all(class(df) %in% c(
     "tbl_SQLiteConnection",
     "tbl_dbi",
@@ -2022,7 +2038,7 @@ filter_clinical_events_for_codes <- function(df,
       # filter for codes only within sources that use that code_type
 
       df <- filter_clinical_events_for_list_of_codes(df,
-                                                     df_class = "tbl_sql",
+                                                     df_class = "tbl_dbi",
                                                      codes = codes)
     }
 
@@ -2064,7 +2080,7 @@ filter_clinical_events_for_codes <- function(df,
 #' \code{\link{filter_clinical_events_for_codes}} when \code{codes}
 #' is of class \code{list}.
 #'
-#' @param df_class character. Either "df", or "tbl_sql".
+#' @param df_class character. Either "df", or "tbl_dbi".
 #' @inheritParams  extract_single_diagnostic_code_record_basis
 #'
 #' @return a data frame
@@ -2074,7 +2090,7 @@ filter_clinical_events_for_list_of_codes <- function(df,
                                                      codes) {
   # validate args
   match.arg(arg = df_class,
-            choices = c("df", "tbl_sql"))
+            choices = c("df", "tbl_dbi"))
 
   if (df_class == "df") {
     assertthat::assert_that(
@@ -2083,14 +2099,14 @@ filter_clinical_events_for_list_of_codes <- function(df,
                                                                                        sep = "",
                                                                                        collapse = ", "))
     )
-  } else if (df_class == "tbl_sql") {
+  } else if (df_class == "tbl_dbi") {
     assertthat::assert_that(
       all(class(df) %in% c("tbl_SQLiteConnection",
                            "tbl_dbi",
                            "tbl_sql",
                            "tbl_lazy",
                            "tbl")),
-      msg = paste("Error! arg `df_class` == 'tbl_sql' but `class(df)` is: ", stringr::str_c(class(df),
+      msg = paste("Error! arg `df_class` == 'tbl_dbi' but `class(df)` is: ", stringr::str_c(class(df),
                                                                                             sep = "",
                                                                                             collapse = ", "))
     )
@@ -2112,7 +2128,7 @@ filter_clinical_events_for_list_of_codes <- function(df,
     ))),
     msg = "Error! check code for `ukbwranglr:::clinical_events_sources$data_coding` and amend the filter statement in this function to address all possible code types")
 
-  # filter Note: for dbplyr (tbl_sql objects), cannot use
+  # filter Note: for dbplyr (tbl_dbi objects), cannot use
   # `get_sources_for_code_type("icd9")` or `codes$icd9` in the filter statement
   # below. It will silently return an error result
 
@@ -2170,7 +2186,7 @@ filter_clinical_events_for_list_of_codes <- function(df,
         )
     )
 
-  if (df_class == "tbl_sql") {
+  if (df_class == "tbl_dbi") {
     df <- df %>%
       dplyr::collect() %>%
       # need to convert this from character to a date
