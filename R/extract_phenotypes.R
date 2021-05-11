@@ -226,8 +226,8 @@ extract_first_or_last_clinical_event_multi <- function(
                                     prefix = prefix),
                         .progress = TRUE)
 
-  } else if ("data.frame" %in% class(df) |
-             is.null(workers)) {
+  } else if ("data.frame" %in% class(df) &
+             !is.null(workers)) {
 
   result <- unique(clinical_codes_df$disease) %>%
     purrr::set_names() %>%
@@ -240,7 +240,18 @@ extract_first_or_last_clinical_event_multi <- function(
     ),
     .progress = TRUE)
 
-  } else {
+  } else if (is.null(workers)) {
+      result <- unique(clinical_codes_df$disease) %>%
+        purrr::set_names() %>%
+        purrr::map(~ mapper_fn(
+          .x,
+          df = df,
+          clinical_codes_df = clinical_codes_df,
+          min_max = min_max,
+          prefix = prefix
+        ))
+
+    } else {
     stop("Error! Please raise an issue to fix this function")
   }
 
