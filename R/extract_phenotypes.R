@@ -238,7 +238,8 @@ extract_first_or_last_clinical_event_multi <- function(
                                     min_max = min_max,
                                     prefix = prefix,
                                     df_pre_filtering_fn = df_pre_filtering_fn),
-                        .progress = TRUE)
+                        .progress = TRUE,
+                        seed = TRUE)
 
   } else if ("data.frame" %in% class(df) &
              !is.null(workers)) {
@@ -253,7 +254,8 @@ extract_first_or_last_clinical_event_multi <- function(
       prefix = prefix,
       df_pre_filtering_fn = df_pre_filtering_fn
     ),
-    .progress = TRUE)
+    .progress = TRUE,
+    seed = TRUE)
 
   } else if (is.null(workers)) {
       result <- unique(clinical_codes_df$disease) %>%
