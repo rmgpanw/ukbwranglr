@@ -641,26 +641,43 @@ reformat_icd10_codes <- function(icd10_codes,
   assertthat::assert_that(input_icd10_format != output_icd10_format,
                           msg = "Error for `reformat_icd10_codes()`! Input and output icd10 formats cannot be the same")
 
-  # reformat icd10 codes
-  result <- ukb_code_mappings$icd10_lkp %>%
-    dplyr::filter(.data[[input_icd10_format]] %in% icd10_codes) %>%
+  # TO DELETE reformat icd10 codes
+  # result <- ukb_code_mappings$icd10_lkp %>%
+  #   dplyr::filter(.data[[input_icd10_format]] %in% icd10_codes) %>%
+  #   dplyr::collect()
+
+  icd10_lkp <- ukb_code_mappings$icd10_lkp %>%
     dplyr::collect()
 
-  if (input_icd10_format == "ICD10_CODE") {
     # some ICD10_CODE values have multiple associated ALT_CODEs - the ALT_CODEs
     # include modifiers 4 and 5. (e.g. ICD-10 codes M00, M77, M07, M72, M65, S52
     # or S72). Need to take only ony ALT_CODE in these cases (slice(1L) takes
     # the first of each group, which should be the ALT_CODE without any
     # modifiers)
-    result <- result %>%
-      dplyr::group_by(.data[["ICD10_CODE"]]) %>%
+
+    # this is not the case the other way around (ALT_CODE to ICD10_CODE),
+    # however running this step does not prolong the function time significantly
+
+    # note, there are a couple of NA values as the last line of the icd10_lkp
+    # sheet contains a statement re permissions
+    icd10_lkp <- icd10_lkp %>%
+      dplyr::filter(!is.na(.data[[input_icd10_format]])) %>%
+      dplyr::group_by(.data[[input_icd10_format]]) %>%
       dplyr::slice(1L) %>%
       dplyr::ungroup()
-  }
 
-  result <- result %>%
-    .[[output_icd10_format]] %>%
-    unique()
+  dict <- icd10_lkp[[output_icd10_format]]
+  names(dict) <- icd10_lkp[[input_icd10_format]]
+
+  result <- revalue_vector(icd10_codes,
+                 dict = dict,
+                 default_value = NULL,
+                 suppress_warnings = TRUE)
+
+  # TO DELETE
+  # result <- result %>%
+  #   .[[output_icd10_format]] %>%
+  #   unique()
 
   if (rlang::is_empty(result)) {
     warning("Warning! `reformat_icd10_codes()` found no icd10 code matches. Returning NULL")

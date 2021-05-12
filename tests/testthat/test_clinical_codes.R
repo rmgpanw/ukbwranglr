@@ -310,3 +310,43 @@ test_that("`warning_if_codes_not_found()` produces a waring message appropriatel
 
 
 })
+
+# `reformat_icd10_codes()` ------------------------------------------------
+test_that("`reformat_icd10_codes()` returns the expected values for ICD10_CODE to ALT_CODE", {
+  expect_equal(
+    # warning raised because "I714" not present in ICD10_CODE col of icd10_lkp
+    # sheet
+    reformat_icd10_codes(
+        icd10_codes = c("D75.1",
+                        "H40", # will be the same for ICD10_CODE and ALT_CODE
+                        "H40.1",
+                        "I714", # not in ICD10_CODE col
+                        "M00.0"), # multiple associated ALT_CODEs
+        ukb_code_mappings = ukb_code_mappings,
+        input_icd10_format = "ICD10_CODE",
+        output_icd10_format = "ALT_CODE"
+      ),
+    c("D751", "H40", "H401", "I714", "M000")
+  )
+})
+
+test_that("`reformat_icd10_codes()` returns the expected values for ALT_CODE to ICD10_CODE", {
+  expect_equal(
+    # warning raised because "I714" not present in ICD10_CODE col of icd10_lkp
+    # sheet
+    reformat_icd10_codes(
+        icd10_codes = c("D751",
+                        "H40", # will be the same for ICD10_CODE and ALT_CODE
+                        "H401",
+                        "I714", # not in ICD10_CODE col
+                        "M000", # multiple associated ALT_CODEs - all map to "M00.0"
+                        "M0001",
+                        "M0002"),
+        ukb_code_mappings = ukb_code_mappings,
+        input_icd10_format = "ALT_CODE",
+        output_icd10_format = "ICD10_CODE"
+      ),
+    c("D75.1", "H40", "H40.1", "I71.4", "M00.0", "M00.0", "M00.0")
+  )
+})
+
