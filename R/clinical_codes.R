@@ -647,10 +647,15 @@ reformat_icd10_codes <- function(icd10_codes,
     dplyr::collect()
 
   if (input_icd10_format == "ICD10_CODE") {
-    # see ICD-10 codes M00, M77, M07, M72, M65, S52 or S72 to see why this is
-    # necessary
+    # some ICD10_CODE values have multiple associated ALT_CODEs - the ALT_CODEs
+    # include modifiers 4 and 5. (e.g. ICD-10 codes M00, M77, M07, M72, M65, S52
+    # or S72). Need to take only ony ALT_CODE in these cases (slice(1L) takes
+    # the first of each group, which should be the ALT_CODE without any
+    # modifiers)
     result <- result %>%
-      dplyr::filter(is.na(.data[["MODIFIER_4"]]) & is.na(.data[["MODIFIER_5"]]))
+      dplyr::group_by(.data[["ICD10_CODE"]]) %>%
+      dplyr::slice(1L) %>%
+      dplyr::ungroup()
   }
 
   result <- result %>%
