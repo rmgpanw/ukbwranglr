@@ -315,9 +315,7 @@ get_ukb_db <- function(directory_path) {
   ukb_db_esssentials_unzipped = utils::unzip(ukb_db_esssentials_zip,
                                              exdir = directory_path)
 
-  message(paste0("Download complete. Use `con <- DBI::dbConnect(RSQLite::SQLite(), dbname = '",
-  directory_path,
-  "/ukb.db')` to connect"))
+  message("Download complete. Use `con <- DBI::dbConnect(RSQLite::SQLite(), dbname = file.path(tempdir(), 'ukb.db'))` to connect")
 }
 
 
