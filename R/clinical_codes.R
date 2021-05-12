@@ -644,7 +644,16 @@ reformat_icd10_codes <- function(icd10_codes,
   # reformat icd10 codes
   result <- ukb_code_mappings$icd10_lkp %>%
     dplyr::filter(.data[[input_icd10_format]] %in% icd10_codes) %>%
-    dplyr::collect() %>%
+    dplyr::collect()
+
+  if (input_icd10_format == "ICD10_CODE") {
+    # see ICD-10 codes M00, M77, M07, M72, M65, S52 or S72 to see why this is
+    # necessary
+    result <- result %>%
+      dplyr::filter(is.na(.data[["MODIFIER_4"]]) & is.na(.data[["MODIFIER_5"]]))
+  }
+
+  result <- result %>%
     .[[output_icd10_format]] %>%
     unique()
 
