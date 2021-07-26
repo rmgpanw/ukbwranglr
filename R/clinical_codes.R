@@ -42,6 +42,7 @@ get_child_codes <- function(codes,
                             ukb_code_mappings = get_ukb_code_mappings(),
                             codes_only = TRUE,
                             preferred_description_only = TRUE,
+                            standardise_output = TRUE,
                             quiet = FALSE) {
   # validate args
   match.arg(arg = code_type,
@@ -54,6 +55,9 @@ get_child_codes <- function(codes,
 
   assertthat::assert_that(is.logical(codes_only),
                           msg = "`code_only` must be either 'TRUE' or 'FALSE'")
+
+  assertthat::assert_that(!(codes_only & standardise_output),
+                          msg = "Error! `codes_only` and `standardise_output` cannot both be `TRUE`")
 
   # check all sheets are present
   assertthat::assert_that(
@@ -78,6 +82,20 @@ get_child_codes <- function(codes,
   }
 
   # add "^" at start and ".*" at end
+
+  # TODO - change "^" to "^\\", which will
+  # escape '.' at the start of any codes. Add tests - shouldn't affect strings
+  # that don't start with a wildcard (e.g. "E11", but should protect against
+  # e.g. ".11"). Update vignettes on clinical codes: also check if any coding
+  # systems actually start with '.' (couldn't see this in icd10)
+
+  # TODO - add option to return standardised code list. Maybe use lookup_codes to achieve this(?)
+
+  # TODO - ukbwranglr_resources, for opcs4 and icd10 codes, use get_child codes
+  # to append these for 3 character icd10/opcs4 codes (see caliber wraning note
+  # here: https://www.caliberresearch.org/portal/show/diabcomp_hes) Ask val, it
+  # says 'unless explicitly noted otherwise' - examples of this?
+
   codes <- paste0("^", codes, ".*")
 
   # combine into single string, separated by "|"
@@ -97,7 +115,7 @@ get_child_codes <- function(codes,
   }
 
   # return result
-  if (rlang::is_empty(result)) {
+  if (nrow(result) == 0) {
     message("No matching codes found. Returning `NULL`")
     return(NULL)
   } else {
@@ -110,10 +128,44 @@ get_child_codes <- function(codes,
     #                              search_col = ukb_code_mappings[[lkp_sheet]][[code_col]])
     # }
 
+    if (quiet == FALSE) {
+      warning_if_codes_not_found(
+        codes = codes,
+        code_type = code_col,
+        search_col = ukb_code_mappings[[mapping_sheet]] %>%
+          dplyr::collect() %>%
+          .[[from_col]]
+      )
+    }
+
     # return either unique codes only, or df including code descriptions
     if (codes_only) {
       return(
         unique(result[[code_col]])
+      )
+    } else if (standardise_output) {
+      # Note, not all mapping sheets in UKB resource 592 contain descriptions
+      # (e.g. 'read_v2_icd9'). Therefore need to use `lookup_codes` if
+      # `standardise_output` is `TRUE`
+      if (code_type == "icd10") {
+        codes <-
+          reformat_icd10_codes(
+            icd10_codes = unique(result[[code_col]]),
+            ukb_code_mappings = ukb_code_mappings,
+            input_icd10_format = "ALT_CODE",
+            output_icd10_format = "ICD10_CODE"
+          )
+      } else {
+        codes <- unique(result[[to_col]])
+      }
+      return(
+        lookup_codes(
+          codes = codes,
+          code_type = to,
+          ukb_code_mappings = ukb_code_mappings,
+          preferred_description_only = preferred_description_only,
+          quiet = quiet
+        )
       )
     } else {
       return(result)
@@ -449,27 +501,18 @@ map_codes <- function(codes,
     # warning if any `codes` not present in `from_col`
     # TODO - warning if duplicates found in `codes`
     if (quiet == FALSE) {
-      warning_if_codes_not_found(codes = codes,
-                                 code_type = from,
-                                 search_col = ukb_code_mappings[[mapping_sheet]] %>%
-                                   dplyr::collect() %>%
-                                   .[[from_col]])
+      warning_if_codes_not_found(
+        codes = codes,
+        code_type = from,
+        search_col = ukb_code_mappings[[mapping_sheet]] %>%
+          dplyr::collect() %>%
+          .[[from_col]]
+      )
     }
 
     # return either unique codes only, or df including descriptions
     if (codes_only) {
       result <- unique(result[[to_col]])
-
-      # TO DELETE - this doesn't work. Try map_codes(c("C10E.", "C108."), from
-      # =" read2", to = "icd10") to see why...
-
-      # # reformat codes if output is icd10 codes
-      # if (to == "icd10") {
-      #   result <- reformat_icd10_codes(icd10_codes = result,
-      #                        ukb_code_mappings = ukb_code_mappings,
-      #                        input_icd10_format = "ALT_CODE",
-      #                        output_icd10_format = "ICD10_CODE")
-      # }
 
       return(result)
     } else if (standardise_output) {
@@ -496,7 +539,7 @@ map_codes <- function(codes,
           quiet = quiet
         )
       )
-      } else {
+    } else {
       return(result)
     }
   }
@@ -841,3 +884,76 @@ warning_if_codes_not_found <-
       )
     }
   }
+
+
+#' Helper function for exploring and mapping clinical codes
+#'
+#' @param result
+#' @param ukb_code_mappings
+#' @param code_col
+#' @param codes_only
+#' @param standardise_output
+#' @param quiet
+#' @param preferred_description_only
+#'
+#' @return
+#' @export
+#'
+#' @examples
+return_results_clinical_codes <- function(result,
+                                          ukb_code_mappings,
+                                          code_col,
+                                          codes_only,
+                                          standardise_output,
+                                          quiet,
+                                          preferred_description_only) {
+  if (nrow(result) == 0) {
+    message("\nNo codes found after mapping. Returning `NULL`")
+    return(NULL)
+  } else {
+    # warning if any `codes` not present in `from_col`
+    # TODO - warning if duplicates found in `codes`
+    if (quiet == FALSE) {
+      warning_if_codes_not_found(
+        codes = codes,
+        code_type = from,
+        search_col = ukb_code_mappings[[mapping_sheet]] %>%
+          dplyr::collect() %>%
+          .[[from_col]]
+      )
+    }
+
+    # return either unique codes only, or df including descriptions
+    if (codes_only) {
+      result <- unique(result[[to_col]])
+
+      return(result)
+    } else if (standardise_output) {
+      # Note, not all mapping sheets in UKB resource 592 contain descriptions
+      # (e.g. 'read_v2_icd9'). Therefore need to use `lookup_codes` if
+      # `standardise_output` is `TRUE`
+      if (to == "icd10") {
+        codes <-
+          reformat_icd10_codes(
+            icd10_codes = unique(result[[to_col]]),
+            ukb_code_mappings = ukb_code_mappings,
+            input_icd10_format = "ALT_CODE",
+            output_icd10_format = "ICD10_CODE"
+          )
+      } else {
+        codes <- unique(result[[to_col]])
+      }
+      return(
+        lookup_codes(
+          codes = codes,
+          code_type = to,
+          ukb_code_mappings = ukb_code_mappings,
+          preferred_description_only = preferred_description_only,
+          quiet = quiet
+        )
+      )
+    } else {
+      return(result)
+    }
+  }
+}
