@@ -127,7 +127,7 @@
              code_type <span class="op">=</span> <span class="st">"read2"</span>,
              ukb_code_mappings <span class="op">=</span> <span class="va">ukb_code_mappings</span>,
              preferred_description_only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 2 x 3</span>
+<span class="co">#&gt; # A tibble: 2 × 3</span>
 <span class="co">#&gt;   code  description                         code_type</span>
 <span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;                               &lt;chr&gt;    </span>
 <span class="co">#&gt; 1 C108. Insulin dependent diabetes mellitus read2    </span>
@@ -140,7 +140,7 @@
              ukb_code_mappings <span class="op">=</span> <span class="va">ukb_code_mappings</span>,
              preferred_description_only <span class="op">=</span> <span class="cn">TRUE</span>,
              standardise_output <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 2 x 3</span>
+<span class="co">#&gt; # A tibble: 2 × 3</span>
 <span class="co">#&gt;   read_code term_code term_description                   </span>
 <span class="co">#&gt;   &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt;                              </span>
 <span class="co">#&gt; 1 C108.     00        Insulin dependent diabetes mellitus</span>
@@ -159,7 +159,7 @@
           from <span class="op">=</span> <span class="st">"read2"</span>, 
           to <span class="op">=</span> <span class="st">"read3"</span>, 
           ukb_code_mappings <span class="op">=</span> <span class="va">ukb_code_mappings</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 5 x 3</span>
+<span class="co">#&gt; # A tibble: 5 × 3</span>
 <span class="co">#&gt;   code  description                                code_type</span>
 <span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;                                      &lt;chr&gt;    </span>
 <span class="co">#&gt; 1 X40J4 Type I diabetes mellitus                   read3    </span>
@@ -179,7 +179,7 @@
           preferred_description_only <span class="op">=</span> <span class="cn">FALSE</span>,
           standardise_output <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="fu">tidyselect</span><span class="fu">::</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html">contains</a></span><span class="op">(</span><span class="st">"V3"</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 2 x 4</span>
+<span class="co">#&gt; # A tibble: 2 × 4</span>
 <span class="co">#&gt;   READV3_CODE TERMV3_CODE TERMV3_TYPE TERMV3_DESC                               </span>
 <span class="co">#&gt;   &lt;chr&gt;       &lt;chr&gt;       &lt;chr&gt;       &lt;chr&gt;                                     </span>
 <span class="co">#&gt; 1 D4103       Y20e3       P           Polycythaemia due to cyanotic respiratory…</span>
@@ -194,7 +194,7 @@
           codes_only <span class="op">=</span> <span class="cn">FALSE</span>,
           preferred_description_only <span class="op">=</span> <span class="cn">TRUE</span>,
           standardise_output <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 2 x 3</span>
+<span class="co">#&gt; # A tibble: 2 × 3</span>
 <span class="co">#&gt;   code  description                                        code_type</span>
 <span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;                                              &lt;chr&gt;    </span>
 <span class="co">#&gt; 1 D4103 Polycythaemia due to cyanotic respiratory disease  read3    </span>
@@ -239,7 +239,7 @@
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ukb_code_mappings</span><span class="op">$</span><span class="va">read_v2_icd10</span> <span class="op">%&gt;%</span> 
   <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_detect.html">str_detect</a></span><span class="op">(</span><span class="va">icd10_code</span>, pattern <span class="op">=</span> <span class="st">"H360"</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 17 x 3</span>
+<span class="co">#&gt; # A tibble: 17 × 3</span>
 <span class="co">#&gt;    read_code icd10_code  icd10_code_def</span>
 <span class="co">#&gt;    &lt;chr&gt;     &lt;chr&gt;       &lt;chr&gt;         </span>
 <span class="co">#&gt;  1 C1087     E103D H360A 7             </span>
@@ -275,7 +275,7 @@
                           codes_only <span class="op">=</span> <span class="cn">FALSE</span>,
                           preferred_description_only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 6 x 3</span>
+<span class="co">#&gt; # A tibble: 6 × 3</span>
 <span class="co">#&gt;   read_code term_code term_description                                          </span>
 <span class="co">#&gt;   &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt;                                                     </span>
 <span class="co">#&gt; 1 2BBJ.     00        O/E - no right diabetic retinopathy                       </span>
@@ -318,7 +318,7 @@
                 ukb_code_mappings <span class="op">=</span> <span class="va">ukb_code_mappings</span>, 
                 codes_only <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 6 x 3</span>
+<span class="co">#&gt; # A tibble: 6 × 3</span>
 <span class="co">#&gt;   read_code term_code term_description                                          </span>
 <span class="co">#&gt;   &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt;                                                     </span>
 <span class="co">#&gt; 1 C108.     00        Insulin dependent diabetes mellitus                       </span>
