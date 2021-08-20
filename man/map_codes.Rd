@@ -25,8 +25,8 @@ map_codes(
 \item{ukb_code_mappings}{the \code{ukb_code_mappings} list returned by
 \code{\link{get_ukb_code_mappings}}.}
 
-\item{codes_only}{bool. If \code{TRUE} (default), return a character vector
-of \emph{unique} codes. If \code{FALSE}, return a data frame of all results
+\item{codes_only}{bool. If \code{TRUE}, return a character vector
+of \emph{unique} codes. If \code{FALSE} (default), return a data frame of all results
 including code descriptions (useful for manual validation).}
 
 \item{standardise_output}{bool. If \code{TRUE} (default), outputs a data

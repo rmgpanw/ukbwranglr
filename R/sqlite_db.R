@@ -270,5 +270,160 @@ gp_clinical_to_sqlite_db <- function(df, remove_special_dates = TRUE) {
   return(df)
 }
 
+#' Create a SQLite database with a \code{clinical_events} table
+#'
+#' Creates a SQLite database called \code{ukb.db} containing all tables from
+#' \code{\link{get_ukb_db}}, plus an additional table called
+#' \code{clinical_events}. This is a long format table combining all clinical
+#' events as listed in \code{ukbwranglr:::clinical_events_sources}. TODO - add
+#' self-reported operative procedures.
+#'
+#' @param ukb_pheno_path character. Path to the main UKB dataset file.
+#' @param gp_clinical_path character. Path to the UKB primary care clinical
+#'   events file (\code{gp_clinical.txt}).
+#' @param ukb_db_dir character. Directory where \code{ukb.db} should be written
+#'   to. An error is raised if a file called \code{ukb.db} already exists here.
+#' @param allow_missing_fields logical. If TRUE, create database regardless of
+#'   whether the main UKB dataset file is missing any required clinical events
+#'   fields. Default is \code{FALSE}.
+#'
+#' @return NULL
+#' @export
+make_clinical_events_db <- function(ukb_pheno_path,
+                                    gp_clinical_path,
+                                    ukb_db_dir,
+                                    allow_missing_fields = FALSE) {
+  # get ukb.db
+  message("Downloading ukb.db from ukbwranglr_resources")
+  ukb_db_path <- get_ukb_db(ukb_db_dir)
+
+  # collect ukb data dict and codings files from db
+  message("Getting UKB data dict and codings")
+  con <- DBI::dbConnect(RSQLite::SQLite(), dbname = ukb_db_path)
+  ukb_db_tbl_list <- list_tbls_from_dbconn(con)
+
+  ukb_data_dict <- ukb_db_tbl_list$ukb_data_dict %>% dplyr::collect()
+  ukb_codings <- ukb_db_tbl_list$ukb_codings %>% dplyr::collect()
+
+  DBI::dbDisconnect(con) # TODO amend `main_dataset_diagnoses_to_sqlite_db` to require con object as arg
+  ukbwranglr:::time_taken_message(start_time)
+
+  # make data dictionary and filter for required FieldIDs
+  message("Creating data dictionary for UKB main dataset")
+  data_dict <- make_data_dict(ukb_pheno_path,
+                              delim = "\t",
+                              ukb_data_dict = ukb_data_dict)
+  ukbwranglr:::time_taken_message(start_time)
+
+  # check that all required cols are present
+  assertthat::assert_that("eid" %in% data_dict$FieldID,
+                          msg = "Error! 'eid' column  is missing from the main UKB dataset")
+
+  required_fields <- c(
+    # self-reported, death certificate and HES diagnoses
+    ukbwranglr:::DIAGNOSES_FIELD_IDS,
+    # operations Field IDs
+    # OPCS4
+    "41272",
+    "41282",
+    # OPCS3
+    "41273",
+    "41283"
+  )
+
+  missing_fields <- subset(required_fields,
+                           !(required_fields %in% data_dict$FieldID))
+
+  if (!allow_missing_fields) {
+    assertthat::assert_that(
+      length(missing_fields) == 0,
+      msg = paste0(
+        "Error! Some required field IDs are missing from the main UKB dataset: "
+      ),
+      stringr::str_c(missing_fields, sep = "", collapse = ", ")
+    )
+  } else if (allow_missing_fields) {
+    if (length(missing_fields) > 0) {
+      warning(
+        paste0("Some required field IDs are missing from the main UKB dataset: "),
+        stringr::str_c(missing_fields, sep = "", collapse = ", ")
+      )
+    }
+  }
+
+  # read selected diagnoses cols into R
+  message("Reading diagnosis columns from UKB main dataset into R")
+  ukb_pheno <- read_pheno(path = ukb_pheno_path,
+                          data_dict = data_dict,
+                          ukb_data_dict = ukb_data_dict,
+                          ukb_codings = ukb_codings,
+                          clean_dates = FALSE,
+                          clean_selected_continuous_and_integers = FALSE)
+  ukbwranglr:::time_taken_message(start_time)
+
+
+  # create long format dataframe containing all diagnostic codes in main dataset
+
+  message("Reshaping data on diagnosis into long format")
+  list_of_get_diagnostic_codes_functions <-
+    list(
+      get_death_data_icd10_diagnoses,
+      get_hes_icd9_diagnoses,
+      get_hes_icd10_diagnoses,
+      get_self_report_non_cancer_diagnoses,
+      get_self_report_non_cancer_diagnoses_icd10,
+      get_self_report_cancer_diagnoses,
+      get_cancer_register_icd9_diagnoses,
+      get_cancer_register_icd10_diagnoses,
+      get_hes_opcs3_operations,
+      get_hes_opcs4_operations
+    )
+
+  all_diagnostic_codes_in_main_ukb_dataset <-
+    get_all_diagnostic_codes_multi(ukb_pheno = ukb_pheno,
+                                   data_dict = data_dict,
+                                   ukb_codings = ukb_codings,
+                                   function_list = list_of_get_diagnostic_codes_functions)
+  time_taken_message(start_time)
+
+  # add diagnoses to database ---------------------------------------------------------------
+  message("Writing long format diagnoses data from main UKB dataset to database")
+  con <- main_dataset_diagnoses_to_sqlite_db(
+    df = all_diagnostic_codes_in_main_ukb_dataset,
+    db_path = ukb_db_path,
+    table = "clinical_events"
+  )
+
+  time_taken_message(start_time)
+
+  # now append (preprocessed) primary care data to 'clinical_events' table ---------------------------------------------------------------
+  message("Appending UKB primary care clinical events data 'clinical events' table")
+  file_to_sqlite_db(file = gp_clinical_path,
+                    col_types = readr::cols(.default = "c"), # all cols as type character
+                    db_path = ukb_db_path,
+                    table = "clinical_events",
+                    chunk_size = 500000,
+                    delim = "\t",
+                    append = TRUE, # set to TRUE if appending to an existing table
+                    verbose = TRUE,
+                    data_processing_function = gp_clinical_to_sqlite_db)
+  time_taken_message(start_time)
+
+  # set index on 'code'/'source'/'eid' columns for faster lookups
+  message("Setting index on 'source' and 'code' columns in UKB database 'clinical_events' table")
+  sql_index_source <- "CREATE INDEX idx_clinical_events_source ON clinical_events (source);"
+  sql_index_code <- "CREATE INDEX idx_clinical_events_code ON clinical_events (code);"
+  sql_index_eid <- "CREATE INDEX idx_clinical_events_eid ON clinical_events (eid);"
+  DBI::dbSendQuery(con, statement = sql_index_source)
+  DBI::dbSendQuery(con, statement = sql_index_code)
+  DBI::dbSendQuery(con, statement = sql_index_eid)
+
+  # close connection and completion message
+  DBI::dbDisconnect(con)
+
+  message("Success! UKB database setup complete")
+  time_taken_message(start_time)
+}
+
 # PRIVATE FUNCTIONS -------------------------------------------------------
 

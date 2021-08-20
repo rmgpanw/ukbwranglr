@@ -25,8 +25,8 @@ Must be one of \code{read2}, \code{read3}, \code{icd9}, \code{icd10},
 
 \item{ignore_case}{Should case differences be ignored in the match?}
 
-\item{codes_only}{bool. If \code{TRUE} (default), return a character vector
-of \emph{unique} codes. If \code{FALSE}, return a data frame of all results
+\item{codes_only}{bool. If \code{TRUE}, return a character vector
+of \emph{unique} codes. If \code{FALSE} (default), return a data frame of all results
 including code descriptions (useful for manual validation).}
 
 \item{preferred_description_only}{bool. Return only preferred descriptions

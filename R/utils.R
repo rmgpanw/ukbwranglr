@@ -288,9 +288,10 @@ get_ukb_code_mappings_direct <- function() {
 #' clinical code lists from the
 #' \href{https://github.com/spiros/chronological-map-phenotypes}{CALIBER repo}.
 #'
-#' @param directory_path character. The directory to which
+#' @param directory_path character. The directory where \code{ukb.db} will be
+#'   downloaded to.
 #'
-#' @return NULL
+#' @return Returns path to \code{ukb.db} as a string invisibly
 #' @export
 get_ukb_db <- function(directory_path) {
   # check ukb.db does not already exist in `directory_path`
@@ -311,11 +312,21 @@ get_ukb_db <- function(directory_path) {
                          mode = "wb")
   }
 
-  # unzip
+  # unzip to requested directory
   ukb_db_esssentials_unzipped = utils::unzip(ukb_db_esssentials_zip,
                                              exdir = directory_path)
 
-  message("Download complete. Use `con <- DBI::dbConnect(RSQLite::SQLite(), dbname = file.path(tempdir(), 'ukb.db'))` to connect")
+  path_to_ukb_db <- file.path(directory_path, "ukb.db")
+
+  message(
+    paste0(
+      "Download complete. Use `con <- DBI::dbConnect(RSQLite::SQLite(), dbname = '",
+      path_to_ukb_db,
+      "')` to connect"
+    )
+  )
+
+  invisible(path_to_ukb_db)
 }
 
 
@@ -437,6 +448,27 @@ time_taken_message <- function(start_time) {
           " minutes, ",
           (round(time_taken[3] %% 60)),
           " seconds.")
+}
+
+#' Make a named list of \code{tbl} objects from a \code{DBIConnection} object
+#'
+#' A convenience function that returns a list of \code{\link[dplyr]{tbl}}
+#' objects from a \code{DBIConnection} object, named as per the database table names.
+#'
+#' @param conn A DBIConnection object, as returned by
+#'   \code{\link[DBI]{dbConnect}}.
+#'
+#' @return Named list
+#' @export
+#' @examples
+#' con <- DBI::dbConnect(RSQLite::SQLite(), dbname = ":memory:")
+#' dplyr::copy_to(con, head(iris), "iris")
+#' dplyr::copy_to(con, head(mtcars), "mtcars")
+#' db_tables <- list_tbls_from_dbconn(con)
+list_tbls_from_dbconn <- function(conn) {
+  DBI::dbListTables(conn) %>%
+    purrr::set_names() %>%
+    purrr::map(~ dplyr::tbl(conn, .x))
 }
 
 # PRIVATE FUNCTIONS -------------------------------------------------------

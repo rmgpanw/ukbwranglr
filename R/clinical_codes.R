@@ -27,8 +27,8 @@
 #'   \code{bnf}, \code{dmd}, \code{read2_drugs} or \code{opcs4}.
 #' @param ukb_code_mappings the \code{ukb_code_mappings} list returned by
 #'   \code{\link{get_ukb_code_mappings}}.
-#' @param codes_only bool. If \code{TRUE} (default), return a character vector
-#'   of \emph{unique} codes. If \code{FALSE}, return a data frame of all results
+#' @param codes_only bool. If \code{TRUE}, return a character vector
+#'   of \emph{unique} codes. If \code{FALSE} (default), return a data frame of all results
 #'   including code descriptions (useful for manual validation).
 #' @param quiet bool. Warning message if any of \code{codes} are not found for
 #'   the supplied \code{code_type}.
@@ -41,7 +41,7 @@
 get_child_codes <- function(codes,
                             code_type,
                             ukb_code_mappings = get_ukb_code_mappings(),
-                            codes_only = TRUE,
+                            codes_only = FALSE,
                             preferred_description_only = TRUE,
                             standardise_output = TRUE,
                             quiet = FALSE) {

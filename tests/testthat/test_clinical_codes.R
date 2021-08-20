@@ -31,6 +31,7 @@ test_that("`get_child_codes()` returns the expected nuber of results", {
       code_type = "read2",
       ukb_code_mappings = ukb_code_mappings,
       codes_only = TRUE,
+      standardise_output = FALSE
     )
   ),
   expected = 27)

@@ -8,7 +8,7 @@ get_child_codes(
   codes,
   code_type,
   ukb_code_mappings = get_ukb_code_mappings(),
-  codes_only = TRUE,
+  codes_only = FALSE,
   preferred_description_only = TRUE,
   standardise_output = TRUE,
   quiet = FALSE
@@ -24,8 +24,8 @@ Must be one of \code{read2}, \code{read3}, \code{icd9}, \code{icd10},
 \item{ukb_code_mappings}{the \code{ukb_code_mappings} list returned by
 \code{\link{get_ukb_code_mappings}}.}
 
-\item{codes_only}{bool. If \code{TRUE} (default), return a character vector
-of \emph{unique} codes. If \code{FALSE}, return a data frame of all results
+\item{codes_only}{bool. If \code{TRUE}, return a character vector
+of \emph{unique} codes. If \code{FALSE} (default), return a data frame of all results
 including code descriptions (useful for manual validation).}
 
 \item{preferred_description_only}{bool. Return only preferred descriptions

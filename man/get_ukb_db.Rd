@@ -7,7 +7,11 @@
 get_ukb_db(directory_path)
 }
 \arguments{
-\item{directory_path}{character. The directory to which}
+\item{directory_path}{character. The directory where \code{ukb.db} will be
+downloaded to.}
+}
+\value{
+Returns path to \code{ukb.db} as a string invisibly
 }
 \description{
 Downloads a file called \code{ukb.db} from the
