@@ -87,7 +87,6 @@ reference:
 - contents:
   - extract_single_diagnostic_code_record_basis
   - field_id_pivot_longer
-  - field_id_pivot_longer_multi
   - get_diagnoses_set_index_code_date_cols
   - gp_clinical_to_sqlite_db
 

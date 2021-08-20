@@ -176,7 +176,8 @@ t1dm_read2 <- c("C10E.", "C108.")
 get_child_codes(codes = t1dm_read2, 
                 code_type = "read2", 
                 ukb_code_mappings = ukb_code_mappings, 
-                codes_only = TRUE)
+                codes_only = TRUE,
+                standardise_output = FALSE)
 ```
 
 > **Note:** Some coding systems include a '.' (e.g. ICD-10) - this may return unexpected results with `get_child_codes()`, as this function searches using regexs and '.' is interpreted as a wildcard.

@@ -77,7 +77,8 @@ the first row of the output data frame.
 
 Missing (\code{NA}) column names will generate a warning, and be filled
 in with dummy names \code{X1}, \code{X2} etc. Duplicate column names
-will generate a warning and be made unique with a numeric suffix.}
+will generate a warning and be made unique, see \code{name_repair} to control
+how this is done.}
 
 \item{locale}{The locale controls defaults that vary from place to place.
 The default locale is US-centric (like R), but you can use
@@ -94,18 +95,18 @@ values (the default) or strings.}
 \item{comment}{A string used to identify comments. Any text after the
 comment characters will be silently ignored.}
 
-\item{trim_ws}{Should leading and trailing whitespace be trimmed from
+\item{trim_ws}{Should leading and trailing whitespace (ASCII spaces and tabs) be trimmed from
 each field before parsing it?}
 
-\item{skip}{Number of lines to skip before reading data.}
+\item{skip}{Number of lines to skip before reading data. If \code{comment} is
+supplied any commented lines are ignored \emph{after} skipping.}
 
-\item{guess_max}{Maximum number of records to use for guessing column types.}
+\item{guess_max}{Maximum number of lines to use for guessing column types.}
 
 \item{progress}{Display a progress bar? By default it will only display
-in an interactive session and not while knitting a document. The display
-is updated every 50,000 values and will only display if estimated reading
-time is 5 seconds or more. The automatic progress bar can be disabled by
-setting option \code{readr.show_progress} to \code{FALSE}.}
+in an interactive session and not while knitting a document. The automatic
+progress bar can be disabled by setting option \code{readr.show_progress} to
+\code{FALSE}.}
 
 \item{skip_empty_rows}{Should blank rows be ignored altogether? i.e. If this
 option is \code{TRUE} then blank rows will not be represented at all.  If it is

@@ -65,7 +65,7 @@ make_data_dict <- function(ukb_pheno,
 
   # make mapping df
   # convert column names to a tibble and append 'mapping' columns
-  mapping_df <- dplyr::tibble(
+  data_dict <- dplyr::tibble(
     colheaders_raw = colheaders_raw,
     colheaders_processed = colheaders
     ) %>%
@@ -86,23 +86,46 @@ make_data_dict <- function(ukb_pheno,
 
 
   # mutate 'descriptive_colnames' column
-  mapping_df <- mutate_descriptive_columns(data_dict = mapping_df)
+  data_dict <- mutate_descriptive_columns(data_dict = data_dict)
 
   # mutate 'cont_int_to_na' column: indicates whether all special codings for a
   # continuous/integer variable can be cleaned to 'NA' (see also
   # `ukb_select_codings_to_na.Rmd`)
-  mapping_df$cont_int_to_na <- dplyr::case_when(
+  data_dict$cont_int_to_na <- dplyr::case_when(
       # CONVERT TO NA
-    mapping_df$Coding %in% ukbwranglr:::cont_and_int_codings_to_na ~ TRUE,
+    data_dict$Coding %in% ukbwranglr:::cont_and_int_codings_to_na ~ TRUE,
 
       # DO *NOT* CONVERT TO NA
-    mapping_df$Coding %in% ukbwranglr:::cont_and_int_codings_NOT_to_na ~ FALSE,
+    data_dict$Coding %in% ukbwranglr:::cont_and_int_codings_NOT_to_na ~ FALSE,
       TRUE ~ FALSE
     )
 
-  ## return mapping_df
-  return(mapping_df)
+  ## return data_dict
+  return(data_dict)
 }
+
+
+# TEST --------------------------------------------------------------------
+
+
+# read_pheno2 <- function() {
+#
+# }
+#
+# ukb_data_dict <- get_ukb_data_dict()
+# ukb_codings <- get_ukb_codings()
+# table(ukb_data_dict$ValueType)
+#
+# ukb_dummy <- download_dummy_ukb_data_to_tempdir()
+#
+# ukb_dummy_raw <- data.table::fread(ukb_dummy)
+# ukb_dummy_data_dict <- make_data_dict(ukb_dummy_raw)
+
+# categorical needs reading as type character (e.g. icd10 codes)
+
+# 1. make valuetype:R class list/dictionaryread as
+
+# TEST END ----------------------------------------------------------------
 
 
 

@@ -35,6 +35,7 @@
 #' @param preferred_description_only bool. Return only preferred descriptions
 #'   for clinical codes with synonyms. Default value is \code{TRUE}.
 #'
+#' @inheritParams lookup_codes
 #' @export
 #' @family Clinical code lookups and mappings
 get_child_codes <- function(codes,
@@ -131,10 +132,10 @@ get_child_codes <- function(codes,
     if (quiet == FALSE) {
       warning_if_codes_not_found(
         codes = codes,
-        code_type = code_col,
-        search_col = ukb_code_mappings[[mapping_sheet]] %>%
+        code_type = code_type,
+        search_col = ukb_code_mappings[[lkp_sheet]] %>%
           dplyr::collect() %>%
-          .[[from_col]]
+          .[[code_col]]
       )
     }
 
@@ -156,12 +157,12 @@ get_child_codes <- function(codes,
             output_icd10_format = "ICD10_CODE"
           )
       } else {
-        codes <- unique(result[[to_col]])
+        codes <- unique(result[[code_col]])
       }
       return(
         lookup_codes(
           codes = codes,
-          code_type = to,
+          code_type = code_type,
           ukb_code_mappings = ukb_code_mappings,
           preferred_description_only = preferred_description_only,
           quiet = quiet
@@ -886,20 +887,7 @@ warning_if_codes_not_found <-
   }
 
 
-#' Helper function for exploring and mapping clinical codes
-#'
-#' @param result
-#' @param ukb_code_mappings
-#' @param code_col
-#' @param codes_only
-#' @param standardise_output
-#' @param quiet
-#' @param preferred_description_only
-#'
-#' @return
-#' @export
-#'
-#' @examples
+# Helper function for exploring and mapping clinical codes
 return_results_clinical_codes <- function(result,
                                           ukb_code_mappings,
                                           code_col,
