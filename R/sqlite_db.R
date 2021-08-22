@@ -293,6 +293,8 @@ make_clinical_events_db <- function(ukb_pheno_path,
                                     gp_clinical_path,
                                     ukb_db_dir,
                                     allow_missing_fields = FALSE) {
+  start_time <- proc.time()
+
   # get ukb.db
   message("Downloading ukb.db from ukbwranglr_resources")
   ukb_db_path <- get_ukb_db(ukb_db_dir)
