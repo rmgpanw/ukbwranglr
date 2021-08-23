@@ -1,3 +1,5 @@
+destination: docs
+
 reference:
 - title: Loading UK Biobank data
   desc: Make a data dictionary and optionally select columns to read into R
