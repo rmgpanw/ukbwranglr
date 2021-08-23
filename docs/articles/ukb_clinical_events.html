@@ -62,7 +62,14 @@
   </ul>
 </li>
       </ul>
-<ul class="nav navbar-nav navbar-right"></ul>
+<ul class="nav navbar-nav navbar-right">
+<li>
+  <a href="https://github.com/rmgpanw/ukbwranglr/">
+    <span class="fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
 <!--/.nav-collapse -->
   </div>
@@ -72,13 +79,13 @@
 
       
 
-      </header><script src="ukb_clinical_events_files/header-attrs-2.6/header-attrs.js"></script><div class="row">
+      </header><script src="ukb_clinical_events_files/header-attrs-2.10/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Clinical events</h1>
             
       
-      
+      <small class="dont-index">Source: <a href="https://github.com/rmgpanw/ukbwranglr/blob/master/vignettes/ukb_clinical_events.Rmd"><code>vignettes/ukb_clinical_events.Rmd</code></a></small>
       <div class="hidden name"><code>ukb_clinical_events.Rmd</code></div>
 
     </div>
@@ -194,7 +201,7 @@
 <span class="va">table_nodes</span> <span class="op">&lt;-</span> <span class="fu">xml2</span><span class="fu">::</span><span class="fu"><a href="http://xml2.r-lib.org/reference/xml_find_all.html">xml_find_all</a></span><span class="op">(</span><span class="va">html_page</span>, <span class="st">"//table"</span><span class="op">)</span>
 
 <span class="va">ukb_selfreport_non_cancer_codings_readable</span> <span class="op">&lt;-</span>
-  <span class="fu">rvest</span><span class="fu">::</span><span class="fu"><a href="https://rvest.tidyverse.org/reference/html_table.html">html_table</a></span><span class="op">(</span><span class="va">table_nodes</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>
+  <span class="fu">rvest</span><span class="fu">::</span><span class="fu">html_table</span><span class="op">(</span><span class="va">table_nodes</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>
 
 <span class="co"># filter for those that were selectable (i.e. no 'special' values like -1)</span>
 <span class="va">ukb_selfreport_non_cancer_codings_readable</span> <span class="op">&lt;-</span>
@@ -244,7 +251,7 @@
                                  <span class="va">selected_codes</span>,
                                  min_max <span class="op">=</span> <span class="st">"min"</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span> <span class="co"># display first few rows only</span>
-<span class="co">#&gt; # A tibble: 6 x 3</span>
+<span class="co">#&gt; # A tibble: 6 × 3</span>
 <span class="co">#&gt;   eid     event_min_date event_indicator</span>
 <span class="co">#&gt;   &lt;chr&gt;   &lt;date&gt;         &lt;lgl&gt;          </span>
 <span class="co">#&gt; 1 fake13  2007-09-30     TRUE           </span>
@@ -455,7 +462,7 @@
                                  <span class="va">selected_codes</span>,
                                  min_max <span class="op">=</span> <span class="st">"min"</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 4 x 3</span>
+<span class="co">#&gt; # A tibble: 4 × 3</span>
 <span class="co">#&gt;   eid    event_min_date event_indicator</span>
 <span class="co">#&gt;   &lt;chr&gt;  &lt;date&gt;         &lt;lgl&gt;          </span>
 <span class="co">#&gt; 1 fake77 1965-11-01     TRUE           </span>
