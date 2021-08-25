@@ -347,8 +347,8 @@ make_clinical_events_db <- function(ukb_pheno_path,
   } else if (allow_missing_fields) {
     if (length(missing_fields) > 0) {
       warning(
-        paste0("Some required field IDs are missing from the main UKB dataset: "),
-        stringr::str_c(missing_fields, sep = "", collapse = ", ")
+        paste0("Some required field IDs are missing from the main UKB dataset: ",
+        stringr::str_c(missing_fields, sep = "", collapse = ", "))
       )
     }
   }
