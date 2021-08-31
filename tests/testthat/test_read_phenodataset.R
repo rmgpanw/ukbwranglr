@@ -9,7 +9,7 @@ ukb_data_dict <- get_ukb_data_dict()
 ukb_codings <- get_ukb_codings()
 
 # make data dictionary
-data_dict <- make_data_dict(ukb_pheno = dummy_ukb_data_filepath,
+data_dict <- make_data_dict(ukb_main = dummy_ukb_data_filepath,
                delim = ",",
                ukb_data_dict = ukb_data_dict)
 
@@ -61,7 +61,7 @@ test_that(
         "year_of_birth_f34_0_0",
         "month_of_birth_f52_0_0",
         "ethnic_background_f21000_0_0",
-        "noncancer_illness_code_selfreported_f20002_0_0",
+        "non_cancer_illness_code_self_reported_f20002_0_0",
         "body_mass_index_bmi_f21001_0_0"
       )
     )

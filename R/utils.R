@@ -854,6 +854,14 @@ assert_all_df_cols_are_type_character <- function(df, arg_name) {
 
 # Miscellaneous helpers ---------------------------------------------------
 
+check_all_vector_values_unique <- function(x,
+                                           x_name) {
+  assertthat::assert_that(length(x) == length(unique(x)),
+                          msg = paste0("Error! ",
+                                       x_name,
+                                       " contains non-unique values"))
+}
+
 #' Check required columns are present
 #'
 #' Combines supplied character vectors into a single vector, then checks whether
@@ -938,9 +946,22 @@ rename_cols <- function(df, old_colnames, new_colnames) {
 #' @noRd
 remove_special_characters_and_make_lower_case <- function(string) {
   # Replace special characters
+
+  # make '+/-' '_plus_or_minus_
+  string <- stringr::str_replace_all(string, "\\+/-", "_plus_or_minus_")
+
+  # make '+' 'plus'
+  string <- stringr::str_replace_all(string, "\\+", "_plus_")
+
+  # make '<=' 'le'
+  string <- stringr::str_replace_all(string, "<=", "_less_or_equal_")
+
+  # make ' - ' '_to_'
+  string <- stringr::str_replace_all(string, " - ", "_to_")
+
   # characters to be replaced with "_"
-  to_underscore <- c(" - ",
-                     " ",
+  to_underscore <- c("-",
+                     "\\s",
                      "/",
                      "\\.")
 
@@ -953,16 +974,24 @@ remove_special_characters_and_make_lower_case <- function(string) {
                  "\\)",
                  "\\-",
                  ",",
-                 ":")
+                 ":",
+                 "`",
+                 "#",
+                 "\\[",
+                 "\\]",
+                 "_+$")
 
   for (char in to_remove) {
     string <- stringr::str_replace_all(string, char, "")
   }
 
-  # Make lower case
+  # make lower case
   string <- tolower(string)
 
-  # Return result
+  # remove any repeated '_' (this should go last)
+  string <- stringr::str_replace_all(string, "__+", "_")
+
+  # return result
   return(string)
 }
 
