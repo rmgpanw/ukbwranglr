@@ -145,3 +145,40 @@ test_that("`revalue_vector()` raises error if df[[colname]] is not of class nume
                "logical")
 })
 
+
+# `remove_special_characters_and_make_lower_case` -------------------------
+
+test_that("`remove_special_characters_and_make_lower_case()` returns expected results", {
+  expect_equal(
+    remove_special_characters_and_make_lower_case("Fraction acceleration <= 10 milli-gravities"),
+               "fraction_acceleration_less_or_equal_10_milli_gravities")
+
+  expect_equal(
+    remove_special_characters_and_make_lower_case("Wear duration during 23:00 - 23:59"),
+  "wear_duration_during_2300_to_2359")
+
+  expect_equal(
+    remove_special_characters_and_make_lower_case("Unique minutes of wear in a 24 hour cycle (scattered over multiple days)"),
+    "unique_minutes_of_wear_in_a_24_hour_cycle_scattered_over_multiple_days"
+  )
+
+  expect_equal(
+    remove_special_characters_and_make_lower_case("Readings exceeding +/-8 gravities before calibration"),
+    "readings_exceeding_plus_or_minus_8_gravities_before_calibration",
+  )
+
+  expect_equal(
+    remove_special_characters_and_make_lower_case("Fraction acceleration <= 10 milli-gravities"),
+    "fraction_acceleration_less_or_equal_10_milli_gravities"
+  )
+
+  expect_equal(
+    remove_special_characters_and_make_lower_case("Number of days/week walked 10+ minutes"),
+    "number_of_days_week_walked_10_plus_minutes"
+  )
+
+  expect_equal(
+    remove_special_characters_and_make_lower_case("FI1 : numeric addition test"),
+    "fi1_numeric_addition_test"
+  )
+})
