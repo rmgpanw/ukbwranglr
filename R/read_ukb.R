@@ -8,7 +8,7 @@
 #' Generate a UK Biobank data dictionary
 #'
 #' Creates a data dictionary from either a raw UK Biobank main dataset file or a
-#' data frame if this has already loaded into R.
+#' data frame if this has already been loaded into R.
 #'
 #' @param ukb_main Either the path to a UKB main dataset file (character string)
 #'   or a data frame.
@@ -24,7 +24,8 @@
 #'    github repo.
 #'
 #' @return A data dictionary (data frame) specific to \code{ukb_main}. This
-#'   includes a column of descriptive names.
+#'   includes columns with descriptive column names ("descriptive_colnames") and
+#'   the current column names ("colheaders_raw").
 #' @export
 make_data_dict <- function(ukb_main,
                            delim = "\t",
@@ -91,16 +92,70 @@ make_data_dict <- function(ukb_main,
   # mutate 'descriptive_colnames' column
   data_dict <- mutate_descriptive_columns(data_dict = data_dict)
 
+  # make ValueType column for eid type 'Integer'
+  data_dict$ValueType <- ifelse(data_dict$FieldID == "eid",
+                                yes = "Integer",
+                                no = data_dict$ValueType)
+
   ## return data_dict
   return(data_dict)
 }
+
+read_ukb_raw_basis <- function(path,
+                         delim = "\t",
+                         data_dict,
+                         ukb_data_dict = get_ukb_data_dict(),
+                         ukb_codings = get_ukb_codings(),
+                         na.strings = c("", "NA"),
+                         read_with = "fread",
+                         callback = readr::DataFrameCallback$new(function(x, pos) x),
+                         ...) {
+  # low level function to read a UKB main dataset file specifying col types. Can
+  # use either data.table or readr
+
+  # validate args
+  match.arg(read_with,
+            choices = c("fread", "read_delim_chunked"))
+
+  data_dict <- indicate_coltype_in_data_dict(data_dict = data_dict,
+                                ukb_codings = ukb_codings)
+
+  # make coltype args (for both `fread` and `readr`)
+  coltypes_fread <- stats::setNames(
+    data_dict$col_types_fread,
+    data_dict$colheaders_raw
+  )
+
+  coltypes_readr <- stats::setNames(data_dict$col_types_readr,
+                                    data_dict$colheaders_raw) %>%
+    as.list() %>%
+    do.call(readr::cols_only, .)
+
+  # read data
+  switch(read_with,
+         fread = data.table::fread(path,
+                                   select = coltypes_fread,
+                                   na.strings = na.strings,
+                                   sep = delim,
+                                   ...),
+         readr::read_delim_chunked(file = path,
+                                   callback = callback,
+                                   delim = delim,
+                                   na = na.strings,
+                                   ...))
+}
+
+label_ukb_raw <- function() {
+
+}
+
 
 
 # PRIVATE FUNCTIONS -------------------------------------------------------
 
 #' Processes a ukb main dataset header to match the form 'f.5912.0.0'
 #'
-#' Helper function for \code{make_data_dict()}
+#' Helper function for \code{make_data_dict}
 #'
 #' @param colheaders A character vector. The first item should contain 'eid'
 #'   i.e. the first column should be the eid column.
@@ -172,8 +227,51 @@ mutate_descriptive_columns <- function(data_dict) {
   data_dict <- data_dict %>%
     dplyr::select(
       .data[["descriptive_colnames"]],
-      .data[["Field_FieldID"]],
       tidyselect::everything()
+    )
+
+  return(data_dict)
+}
+
+indicate_coltype_in_data_dict <- function(data_dict,
+                                          ukb_codings) {
+  # helper for `read_ukb*`
+
+  # codings in ukb_codings that can be read as integers
+  ukb_codings_coercible_to_integer <- ukb_codings %>%
+    dplyr::mutate("Value_coercible_to_integer" = dplyr::case_when(
+      !is.na(suppressWarnings(as.integer(.data[["Value"]]))) ~ TRUE,
+      is.na(suppressWarnings(as.integer(.data[["Value"]]))) ~ FALSE
+    )) %>%
+    dplyr::group_by(.data[["Coding"]]) %>%
+    # identify codings where *all* values are coercible to integer
+    dplyr::summarise("coercible_to_integer" = dplyr::case_when(
+      mean(.data[["Value_coercible_to_integer"]]) == 1 ~ TRUE,
+      TRUE ~ FALSE
+    )) %>%
+    dplyr::filter(.data[["coercible_to_integer"]]) %>%
+    dplyr::pull(.data[["Coding"]])
+
+  # add column to data_dict indicating column type
+  data_dict <- data_dict %>%
+    dplyr::mutate(
+      "col_types_readr" = dplyr::case_when(
+        ((.data[["ValueType"]] == "Integer") |
+           (.data[["Coding"]] %in% ukb_codings_coercible_to_integer) |
+           (.data[["FieldID"]] == "eid")) ~ "i",
+        .data[["ValueType"]] == "Continuous" ~ "d",
+        .data[["ValueType"]] == "Date" ~ "D",
+        # Default is type character
+        TRUE ~ "c"
+      )
+    ) %>%
+    dplyr::mutate(
+      "col_types_fread" = dplyr::case_when(
+        .data[["col_types_readr"]] == "i" ~ "integer",
+        .data[["col_types_readr"]] == "d" ~ "double",
+        .data[["col_types_readr"]] == "D" ~ "Date",
+        .data[["col_types_readr"]] == "c" ~ "character"
+      )
     )
 
   return(data_dict)

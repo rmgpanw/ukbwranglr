@@ -41,7 +41,8 @@ DIAGNOSES_FIELD_IDS <- c(
 
 # make list containing nonsense dates
 nonsense_dates_categories <- c(
-  "PRIMARY_CARE"
+  "PRIMARY_CARE",
+  "MAIN_DATASET"
 )
 
 NONSENSE_DATES <- vector(mode = "list", length = length(nonsense_dates_categories))
@@ -52,6 +53,18 @@ NONSENSE_DATES$PRIMARY_CARE <- c("01/01/1901",
                                  "02/02/1902",
                                  "03/03/1903",
                                  "07/07/2037")
+
+# from codings 1313, 272, 586 and 819
+NONSENSE_DATES$MAIN_DATASET <- c(
+  '1904-04-04',
+  '1900-01-01',
+  '1910-01-01',
+  '1920-01-01',
+  '1930-01-01',
+  '1901-01-01',
+  '1902-02-02',
+  '1903-03-03',
+  '2037-07-07')
 
 # UKB CODE MAPPINGS -------------------------------------------------------
 

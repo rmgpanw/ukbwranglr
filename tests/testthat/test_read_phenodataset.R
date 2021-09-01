@@ -25,13 +25,11 @@ dummy_ukb_read_pheno <-  read_pheno(path = dummy_ukb_data_filepath,
 
 # TESTS -------------------------------------------------------------------
 
-
 # `make_data_dict()` ------------------------------------------------------
 
-# TODO make better tests
 test_that("`make_data_dict()` works", {
-  expect_equal(names(data_dict)[1:5],
-               c("descriptive_colnames", "Field_FieldID", "colheaders_raw", "colheaders_processed", "FieldID"))
+  expect_equal(names(data_dict)[1:4],
+               c("descriptive_colnames", "colheaders_raw", "colheaders_processed", "FieldID"))
 })
 
 # `read_pheno()` ----------------------------------------------------------
@@ -94,5 +92,32 @@ test_that(
 
     expect_equal(format_ukb_df_header(raw_headers),
                  raw_headers)
+  }
+)
+
+# `indicate_coltype_in_data_dict()` ---------------------------------------
+
+test_that(
+  "`indicate_coltype_in_data_dict()` returns the expected values", {
+    data_dict_coltypes <- indicate_coltype_in_data_dict(data_dict = dplyr::bind_rows(data_dict,
+                                                                                     data.frame(ValueType = c("something_else",
+                                                                                                              "Date"))),
+                                  ukb_codings = ukb_codings) %>%
+      dplyr::group_by(.data[["ValueType"]]) %>%
+      dplyr::slice(1L) %>%
+      dplyr::select(tidyselect::all_of(c(
+        "ValueType",
+        "col_types_readr",
+        "col_types_fread"
+      )))
+
+    expect_equal(data_dict_coltypes$ValueType,
+                 c("Categorical multiple", "Categorical single", "Continuous", "Date", "Integer", "something_else"))
+
+    expect_equal(data_dict_coltypes$col_types_readr,
+                 c("i", "i", "d", "D", "i", "c"))
+
+    expect_equal(data_dict_coltypes$col_types_fread,
+                 c("integer", "integer", "double", "Date", "integer", "character"))
   }
 )
