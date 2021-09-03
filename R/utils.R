@@ -1032,3 +1032,8 @@ revalue_vector <-
 
     return(x)
   }
+
+extract_file_ext <- function(x) {
+  stringr::str_extract(x, "\\.[:alpha:]+") %>%
+    stringr::str_remove_all("\\.")
+}

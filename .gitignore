@@ -7,3 +7,4 @@ config.ini
 ukbwranglr.Rcheck/
 ukbwranglr*.tar.gz
 ukbwranglr*.tgz
+tests.Rmd

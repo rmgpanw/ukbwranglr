@@ -13,15 +13,31 @@ data_dict <- make_data_dict(ukb_main = dummy_ukb_data_filepath,
                delim = ",",
                ukb_data_dict = ukb_data_dict)
 
+# read raw dummy data
+ukb_main_raw <- read_ukb_raw_basis(path = dummy_ukb_data_filepath,
+                                   delim = ",",
+                                   data_dict = data_dict,
+                                   ukb_data_dict = ukb_data_dict,
+                                   ukb_codings = ukb_codings,
+                                   read_with = "fread")
+
 # read dummy data with `read_pheno()`
-dummy_ukb_read_pheno <-  read_pheno(path = dummy_ukb_data_filepath,
+system.time(dummy_ukb_main <-  read_pheno(path = dummy_ukb_data_filepath,
                                     delim = ",",
                                     data_dict = data_dict,
                                     ukb_data_dict = ukb_data_dict,
                                     ukb_codings = ukb_codings,
                                     clean_dates = FALSE,
                                     clean_selected_continuous_and_integers = FALSE,
-                                    data.table = FALSE)
+                                    data.table = FALSE))
+
+system.time(ukb_main <- read_ukb(path = dummy_ukb_data_filepath,
+                     delim = ",",
+                     data_dict,
+                     ukb_data_dict = ukb_data_dict,
+                     ukb_codings = ukb_codings,
+                     na.strings = c("", "NA"),
+                     n_labels_threshold = 22))
 
 # TESTS -------------------------------------------------------------------
 
@@ -35,17 +51,40 @@ test_that("`make_data_dict()` works", {
 # `read_pheno()` ----------------------------------------------------------
 
 test_that("`read_pheno()` correctly reads a file", {
-  expect_equal(names(dummy_ukb_read_pheno),
+  expect_equal(names(dummy_ukb_main),
                data_dict$descriptive_colnames)
 
-  expect_equal(dummy_ukb_read_pheno$year_of_birth_f34_0_0[1:6],
+  expect_equal(dummy_ukb_main$year_of_birth_f34_0_0[1:6],
                c(1952, 1946, 1951, 1956, NA, 1948))
 
   # convert from factor to character for simpler testing
-  expect_equal(as.character(dummy_ukb_read_pheno$ethnic_background_f21000_0_0[1:6]),
+  expect_equal(as.character(dummy_ukb_main$ethnic_background_f21000_0_0[1:6]),
                c(NA, "Caribbean", "Asian or Asian British", NA, "Prefer not to answer", "Asian or Asian British"))
 })
 
+
+# `read_ukb()` ------------------------------------------------------------
+
+test_that("`read_ukb()` works", {
+  ukb
+})
+
+# `label_ukb_main()` --------------------------------------------------------
+
+# test_that("`label_ukb_main()` works", {
+#   testy <- ukb_main_raw %>%
+#     rename_ukb_main(
+#       data_dict = data_dict,
+#       old_colnames_col = "colheaders_raw",
+#       new_colnames_col = "descriptive_colnames"
+#     ) %>%
+#     label_ukb_main(
+#       data_dict = data_dict,
+#       ukb_codings = ukb_codings,
+#       colnames_col = "descriptive_colnames",
+#       n_labels_threshold = 22
+#     )
+# })
 
 # `mutate_descriptive_columns()` ------------------------------------------
 
