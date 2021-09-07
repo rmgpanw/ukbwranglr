@@ -12,8 +12,6 @@ rowise_min_max_date(
 )
 }
 \arguments{
-\item{ukb_pheno}{a UK Biobank phenotype dataset. Must be a data table}
-
 \item{selected_date_cols}{Character vector of column names}
 
 \item{new_colname}{Name of new column to be created}

@@ -840,6 +840,114 @@ ukb_codings) {
 # PRIVATE FUNCTIONS -------------------------------------------------------
 
 
+# Tidy clinical events ----------------------------------------------------
+
+tidy_clinical_events_basis <- function(ukb_main,
+                                   data_dict,
+                                   ukb_codings,
+                                   code_col_field_id,
+                                   date_col_field_id) {
+  start_time <- proc.time()
+
+  # validate args
+  assertthat::assert_that(
+    data.table::is.data.table(ukb_pheno),
+    msg = "Error! ukb_main must be a data table (try 'data.table::as.data.table(ukb_main)')"
+  )
+
+  assertthat::assert_that(
+    is.character(code_col_field_id) & is.character(date_col_field_id),
+    msg = "Error! Both `code_col_field_id` and `date_col_field_id` must be of type character"
+  )
+
+  assertthat::assert_that(
+    (code_col_field_id %in% data_dict$FieldID) &
+      (date_col_field_id %in% data_dict$FieldID),
+    msg = paste0(
+      "Error! Both FieldID ",
+      code_col_field_id,
+      " and FieldID ",
+      date_col_field_id,
+      " are required, one or both of these is not present in data_dict"
+    )
+  )
+
+  # get lists of required columns
+  code_cols <- filter_data_dict(data_dict = data_dict,
+                                filter_col = "FieldID",
+                                filter_value = code_col_field_id,
+                                return_col = "descriptive_colnames",
+                                error_if_missing = TRUE)
+
+  date_cols <- filter_data_dict(data_dict = data_dict,
+                                filter_col = "FieldID",
+                                filter_value = date_col_field_id,
+                                return_col = "descriptive_colnames",
+                                error_if_missing = TRUE)
+
+  # Note: `code_cols` and `date_cols` may be of different lengths e.g. try searching
+  # the UKB data showcase for FieldIDs 40005 (date of cancer diagnosis) and
+  # 40013 (type of cancer ICD-9). Some instance-arrays may also be omitted if
+  # they contain no data, resulting in apparently 'missing' columns (e.g.
+  # FieldID 40013 should have instance_arrays from 0-0 to 0-14, but may be
+  # missing 12-0, perhaps because some ppts have left the study and there are
+  # therefore no longer any data entries for these columns)
+
+  # ...all code columns should have a corresponding date column though. An error
+  # is therefore raised here if there are 'missing' date columns.
+  code_cols_instance_arrays <- colname_to_field_inst_array_df(code_cols)
+  date_cols_instance_arrays <- colname_to_field_inst_array_df(date_cols)
+
+
+  colnames_df <- code_cols_instance_arrays %>%
+    dplyr::left_join(date_cols_instance_arrays,
+                     by = "instance_array",
+                     suffix = c(".code", ".date")) %>%
+    dplyr::arrange(as.numeric(.data[["instance.code"]]))
+
+  assertthat::assert_that(
+    sum(is.na(colnames_df$descriptive_colnames.date)) == 0,
+    msg = paste0("Error! Some date columns appear to be missing. Check that all columns for Field ID ",
+                 code_col_field_id,
+                 " have a corresponding column for Field ID ",
+                 date_col_field_id)
+  )
+
+  # update code_cols and date_cols
+  code_cols <- colnames_df$descriptive_colnames.code
+  date_cols <- colnames_df$descriptive_colnames.date
+
+  # check these are actually present in ukb_pheno
+  check_required_cols_exist(df = ukb_pheno,
+                            code_cols,
+                            date_cols)
+
+  # melt cols
+  ukb_pheno <- data.table::melt(
+    ukb_pheno %>% dplyr::select(tidyselect::all_of(c("eid", code_cols, date_cols))),
+    measure = list(code_cols, date_cols),
+    value.name = c("code", "date")
+  )
+
+  ukb_pheno <- ukb_pheno[!is.na(ukb_pheno$code)]
+
+  # relabel code col
+  ukb_pheno <- recode_ukbcol(df = ukb_pheno,
+                             col_to_recode = "code",
+                             field_id = code_col_field_id,
+                             ukb_data_dict = data_dict,
+                             ukb_codings = ukb_codings,
+                             mapping_direction = "meaning_code")
+
+  # make 'source' col
+  ukb_pheno$variable <- paste0("f", code_col_field_id)
+  names(ukb_pheno)[which(names(ukb_pheno) == "variable")] <- "source"
+
+  # return result
+  time_taken_message(start_time)
+  return(ukb_pheno)
+}
+
 # Get diagnoses helpers ---------------------------------------------------
 
 #' Melt diagnoses code and date columns in a main UKB dataset

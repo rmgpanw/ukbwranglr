@@ -106,6 +106,10 @@ expected <- tibble::tribble(
 # TESTS -------------------------------------------------------------------
 
 
+# `tidy_clinical_events_basis()`  -----------------------------------------
+
+
+
 # `extract_first_or_last_clinical_event_multi_single_disease()` --------------------------
 
 test_that(

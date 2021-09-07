@@ -24,9 +24,10 @@ Biobank
 }
 \value{
 A data dictionary (data frame) specific to \code{ukb_main}. This
-  includes a column of descriptive names.
+  includes columns with descriptive column names ("descriptive_colnames") and
+  the current column names ("colheaders_raw").
 }
 \description{
 Creates a data dictionary from either a raw UK Biobank main dataset file or a
-data frame if this has already loaded into R.
+data frame if this has already been loaded into R.
 }

@@ -31,13 +31,31 @@ system.time(dummy_ukb_main <-  read_pheno(path = dummy_ukb_data_filepath,
                                     clean_selected_continuous_and_integers = FALSE,
                                     data.table = FALSE))
 
-system.time(ukb_main <- read_ukb(path = dummy_ukb_data_filepath,
-                     delim = ",",
-                     data_dict,
-                     ukb_data_dict = ukb_data_dict,
-                     ukb_codings = ukb_codings,
-                     na.strings = c("", "NA"),
-                     n_labels_threshold = 22))
+system.time(
+  ukb_main <- read_ukb(
+    path = dummy_ukb_data_filepath,
+    delim = ",",
+    data_dict,
+    ukb_data_dict = ukb_data_dict,
+    ukb_codings = ukb_codings,
+    na.strings = c("", "NA"),
+    n_labels_threshold = 22
+  )
+)
+
+example_colheaders_df <-
+  data.frame(
+    descriptive_ch = c(
+      "eid",
+      "verbal_interview_duration_f3_0_0",
+      "date_of_death_f40000_0_0"
+    ),
+    dta_ch = c("n_eid", "n_3_0_0", "ts_40000_0_0"),
+    txt_ch = c("eid", "3-0.0", "40000-0.0"),
+    r_ch = c("f.eid", "f.3.0.0", "f.40000.0.0"),
+    processed_ch = c("feid", "f3_0_0", "f40000_0_0"),
+    processed_ch_derived = c("feid", "f3_0", "f40000")
+  )
 
 # TESTS -------------------------------------------------------------------
 
@@ -66,7 +84,7 @@ test_that("`read_pheno()` correctly reads a file", {
 # `read_ukb()` ------------------------------------------------------------
 
 test_that("`read_ukb()` works", {
-  ukb
+
 })
 
 # `label_ukb_main()` --------------------------------------------------------
@@ -109,28 +127,39 @@ test_that(
 
 test_that(
   "`format_ukb_df_header()` reformats .dta style raw ukb column names", {
-    raw_headers <- c("n_eid", "n_3_0_0", "ts_40000_0_0")
-
-    expect_equal(format_ukb_df_header(raw_headers),
-                 c("f.eid", "f.3.0.0", "f.40000.0.0"))
+    expect_equal(format_ukb_df_header(example_colheaders_df$dta_ch),
+                 example_colheaders_df$processed_ch)
   }
 )
 
 test_that(
   "`format_ukb_df_header()` reformats .txt style raw ukb column names", {
-    raw_headers <- c("eid", "20002-0.0")
-
-    expect_equal(format_ukb_df_header(raw_headers),
-                 c("f.eid", "f.20002.0.0"))
+    expect_equal(format_ukb_df_header(example_colheaders_df$txt_ch),
+                 example_colheaders_df$processed_ch)
   }
 )
 
 test_that(
-  "`format_ukb_df_header()` does NOT reformat .tab (R) style raw ukb column names", {
-    raw_headers <- c("f.eid", "f.20002.0.0")
+  "`format_ukb_df_header()` reformats .tab (R) style raw ukb column names", {
+    expect_equal(format_ukb_df_header(example_colheaders_df$r_ch),
+                 example_colheaders_df$processed_ch)
+  }
+)
 
-    expect_equal(format_ukb_df_header(raw_headers),
-                 raw_headers)
+test_that(
+  "`format_ukb_df_header()` reformats descriptive style ukb column names", {
+    expect_equal(format_ukb_df_header(example_colheaders_df$descriptive_ch),
+                 example_colheaders_df$processed_ch)
+  }
+)
+
+test_that(
+  "`format_ukb_df_header()` does NOT reformat ukb column names already processed by `format_ukb_df_header()`, including derived variables", {
+    expect_equal(format_ukb_df_header(example_colheaders_df$processed_ch),
+                 example_colheaders_df$processed_ch)
+
+    expect_equal(format_ukb_df_header(example_colheaders_df$processed_ch_derived),
+                 example_colheaders_df$processed_ch_derived)
   }
 )
 
@@ -158,5 +187,30 @@ test_that(
 
     expect_equal(data_dict_coltypes$col_types_fread,
                  c("integer", "integer", "double", "Date", "integer", "character"))
+  }
+)
+
+# `colname_to_field_inst_array_df()` --------------------------------------
+
+test_that(
+  "`colname_to_field_inst_array_df()` returns the expected values", {
+    processed_ch_result <- colname_to_field_inst_array_df(example_colheaders_df$processed_ch)
+    processed_ch_derived_result <- colname_to_field_inst_array_df(example_colheaders_df$processed_ch_derived)
+    descriptive_ch_result <- colname_to_field_inst_array_df(example_colheaders_df$descriptive_ch)
+
+    expect_equal(processed_ch_result$description,
+                 c(NA, NA, NA))
+
+    expect_equal(processed_ch_result$fieldid_instance_array,
+                 c("eid", "3_0_0", "40000_0_0"))
+
+    expect_equal(processed_ch_derived_result$instance,
+                 c(NA, "0", NA))
+
+    expect_equal(processed_ch_derived_result$array,
+                 c(NA, NA, NA))
+
+    expect_equal(descriptive_ch_result$description,
+                 c("eid", "verbal_interview_duration", "date_of_death"))
   }
 )

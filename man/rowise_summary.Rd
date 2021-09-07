@@ -7,8 +7,6 @@
 rowise_summary(ukb_pheno, function_name, selected_cols, new_colname)
 }
 \arguments{
-\item{ukb_pheno}{a UK Biobank phenotype dataset. Must be a data table}
-
 \item{function_name}{A function name as a character}
 
 \item{selected_cols}{Character vector of column names}

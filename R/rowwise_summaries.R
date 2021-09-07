@@ -2,6 +2,139 @@
 
 # EXPORTED FUNCTIONS ----------------------------------------------------
 
+#' Summarise numerical variables
+#'
+#' Summarises numerical variables with repeated measurements either by field
+#' (i.e. all available measurements) or by instance (i.e. for all measurements
+#' at each assessment visit). Currently available summary options are mean,
+#' minimum, maximum and sum.
+#'
+#' @param summary_function The summary function to be applied. Options are
+#'   "Mean", "Min", "Max" or "Sum"
+#' @param summarise_by Whether to summarise by "Field" or by "Instance".
+#' @param drop If \code{TRUE}, removes the numerical variables being summarised
+#'   from the result. Default value is \code{FALSE}
+#' @inheritParams make_data_dict
+#'
+#' @return A data frame
+#' @export
+summarise_numerical_variables <- function(ukb_main,
+                                          data_dict,
+                                          summary_function = "Mean",
+                                          summarise_by = "Field",
+                                          .drop = FALSE) {
+  start_time <- proc.time()
+
+  # validate args
+  match.arg(summary_function,
+            choices = c("Mean", "Min", "Max", "Sum"))
+
+  match.arg(summarise_by,
+            choices = c("Field", "Instance"))
+
+  # rowwise summary functions
+  function_list <- list(
+    Mean = rowMeans,
+    Min = pmin,
+    Max = pmax,
+    Sum = rowSums
+  )
+
+  # filter for numerical variables with more than one instance and create names
+  # for summary cols (depends on whether summarising by Field or by Instance)
+  numerical_vars_to_summarise <- data_dict %>%
+    dplyr::filter(.data[["ValueType"]] %in% c("Continuous", "Integer")) %>%
+    dplyr::filter(.data[["Field"]] != "eid") %>%
+    dplyr::mutate("Field" = tolower(.data[["Field"]]))
+
+  if (summarise_by == "Field") {
+    numerical_vars_to_summarise <- numerical_vars_to_summarise %>%
+      dplyr::filter(as.numeric(.data[["Instances"]]) > 1) %>%
+      dplyr::mutate(summary_colname = paste0(summary_function,
+                                             " ",
+                                             .data[["Field"]]))
+  } else if (summarise_by == "Instance") {
+    numerical_vars_to_summarise <- numerical_vars_to_summarise %>%
+      dplyr::filter(as.numeric(.data[["Array"]]) > 1) %>%
+      dplyr::mutate(summary_colname = paste0(summary_function,
+                                             " ",
+                                             .data[["Field"]],
+                                             " (",
+                                             .data[["instance"]], ")"))
+  }
+
+  # exit if no variables to summarise
+  assertthat::assert_that(nrow(numerical_vars_to_summarise) > 0,
+                          msg = paste0("Error! No numerical variables to summarise by ",
+                                       summarise_by,
+                                       ". Check data dictionary"))
+
+  # split by new summary col labels
+  numerical_vars_to_summarise <- split(numerical_vars_to_summarise,
+                                       numerical_vars_to_summarise$summary_colname)
+
+  # number of summary cols
+  message(paste0("Number of summary columns to make: ", length(names(
+    numerical_vars_to_summarise
+  ))))
+
+  for (new_col in names(numerical_vars_to_summarise)) {
+    # make new summary colname and cols to summarise
+    new_col_name <-
+      remove_special_characters_and_make_lower_case(new_col)
+
+    selected_cols <-
+      numerical_vars_to_summarise[[new_col]][["descriptive_colnames"]]
+
+    # summarise - different approaches required for pmin/pmax vs rowMeans/rowSums
+    if (summary_function %in% c("Min", "Max")) {
+      if (data.table::is.data.table(ukb_main)) {
+        ukb_main[[new_col_name]] <-
+          do.call(function_list[[summary_function]], c(ukb_main[, ..selected_cols], list(na.rm = TRUE)))
+      } else {
+        ukb_main[[new_col_name]] <-
+          do.call(function_list[[summary_function]], c(ukb_main[, selected_cols, drop = FALSE], list(na.rm = TRUE)))
+      }
+    } else if (summary_function %in% c("Mean", "Sum")) {
+      ukb_main <- ukb_main %>%
+        dplyr::mutate(!!new_col_name := function_list[[summary_function]](dplyr::across(
+          tidyselect::all_of(selected_cols)
+        ), na.rm = TRUE))
+    }
+
+    ukb_main[[new_col_name]] <-
+      haven::labelled(x = ukb_main[[new_col_name]],
+                      labels = NULL,
+                      label = new_col)
+
+    # warning if only one column was summarised (this column would equal the summary column if so)
+    if (length(selected_cols == 1)) {
+      warning(
+        paste0(
+          "Warning! Summary column '",
+          new_col_name,
+          "' was summarised from  only a single column: '",
+          selected_cols,
+          "'. Are there missing instances/arrays in the dataset for this FieldID?\n"
+        )
+      )
+    }
+
+    # remove summarised columns if requested
+    if (.drop) {
+      ukb_main <- ukb_main %>%
+        dplyr::select(-tidyselect::all_of(selected_cols))
+    }
+  }
+
+  time_taken_message(start_time)
+  return(ukb_main)
+}
+
+# PRIVATE FUNCTIONS -------------------------------------------------------
+
+# Dev ---------------------------------------------------------------------
+
 #' Summarise a UK Biobank phenotype dataset row-wise
 #'
 #' Allows the user to summarise row-wise across a set of column "groups". e.g.
@@ -60,8 +193,6 @@ summarise_rowise <- function(ukb_pheno,
                              prefix = NULL,
                              ...) {
 
-  start_time <- proc.time()
-
   # validate args
   assertthat::is.string(grouping_col)
 
@@ -93,10 +224,10 @@ summarise_rowise <- function(ukb_pheno,
   # new summary colnames: paste function names with grouping_col (e.g.
   # mean_blood_pressure...)
   new_colnames <- base::expand.grid(functions,
-                              col_groups_to_summarise$group,
-                              stringsAsFactors = FALSE)
-    # expand.grid makes all possible combinations of functions/col_group_names,
-    # now paste these together to create new colnames
+                                    col_groups_to_summarise$group,
+                                    stringsAsFactors = FALSE)
+  # expand.grid makes all possible combinations of functions/col_group_names,
+  # now paste these together to create new colnames
   new_colnames$new_colnames <- paste(new_colnames$Var1,
                                      new_colnames$Var2,
                                      sep = "_")
@@ -157,18 +288,18 @@ summarise_rowise <- function(ukb_pheno,
 
     # mutate summary cols for col_group
     ukb_pheno[
-    # i
-    ,
+      # i
+      ,
 
-    # j
-    col_groups_summary_dict$new_colnames[[col_group]]$new_colnames := purrr::map(
-      functions,
-      dt_rowwise_fn,
-      .SD,
-      ...),
+      # j
+      col_groups_summary_dict$new_colnames[[col_group]]$new_colnames := purrr::map(
+        functions,
+        dt_rowwise_fn,
+        .SD,
+        ...),
 
-    # by
-    .SDcols = col_groups_summary_dict$cols_to_summarise[[col_group]]$descriptive_colnames]
+      # by
+      .SDcols = col_groups_summary_dict$cols_to_summarise[[col_group]]$descriptive_colnames]
   }
 
   # time taken message
@@ -187,126 +318,13 @@ summarise_rowise <- function(ukb_pheno,
                                        c(.data[["new_colnames"]]))$new_colnames
   message(paste0(
     "Appended, ", length(new_colnames_vector), " new columns: ", stringr::str_c(new_colnames_vector,
-                                                           sep = "",
-                                                           collapse = ", ")
-    ))
+                                                                                sep = "",
+                                                                                collapse = ", ")
+  ))
 
   return(ukb_pheno)
 }
 
-#' Mutate mean/min/max values across instances for numerical UKB fields
-#'
-#' Much faster than \code{\link{summarise_rowise}}. However, can only summarise
-#' mean, max or min values row-wise
-#'
-#' @param mean_min_max must be one of "rowMeans", "pmin" or "pmax". Default =
-#'   "rowMeans"
-#' @inheritParams field_id_pivot_longer
-#'
-#' @return the UKB df with additional columns with min/max/mean values across instances
-#'   for numerical UKB fields
-#' @export
-summarise_rowise_numerical_mean_min_max <- function(ukb_pheno,
-                                       data_dict,
-                                       mean_min_max = "rowMeans") {
-  # Function to mutate mean values for numerical fields in a ukb phenotype file ***WITHOUT SPECIAL CODING VALUES***
-  match.arg(mean_min_max,
-            choices = c("rowMeans", "pmin", "pmax"))
-
-  start_time <- proc.time()
-
-  # Functions (private) ---------------------------------------------------------------
-
-  # nest ukb_mapping_df by Field and mutate names for mean_cols
-  nest_data_dict_by_field <- function(.data_dict) {
-    .data_dict_nested <- .data_dict %>%
-      dplyr::filter(
-        (.data[["ValueType"]] %in% c('Continuous', 'Integer')) &
-          (
-            #***IMPORTANT*** filters for either:
-            ## 1. Cols without special coding values
-            (is.na(.data[["Coding"]])) |
-              ## 2. Cols with special coding values that have been 'cleaned' to 'NA' by `ukb_parse()`
-              (!is.na(.data[["Coding"]]) & .data[["cont_int_to_na"]] == TRUE)
-            ## ...i.e. filters out any continuous/integer cols with remaining 'uncleaned' special values
-          )) %>%
-      dplyr::group_by(.data[["Field_FieldID"]]) %>%
-      tidyr::nest()
-
-    .data_dict_nested$new_colname = paste(mean_min_max,
-                                          .data_dict_nested$Field_FieldID,
-                                   sep = '_')
-
-    return(.data_dict_nested)
-  }
-
-  # extract vector of descriptive_colnames matching a Field
-  extract_descriptive_colnames_for_field <- function(.data_dict_nested,
-                                                     .field) {
-    .data_dict_nested[(.data_dict_nested$Field_FieldID == .field), ][[2]][[1]][['descriptive_colnames']]
-  }
-
-  # mutate mean columns (his is a messy function...)
-  mutate_mean_col <- function(.ukb_pheno, .mean_col_name, .selected_cols) {
-    # assign temp name to new col
-    .ukb_pheno <- .ukb_pheno %>%
-      dplyr::mutate("new_col" = rowMeans(dplyr::across(tidyselect::all_of(.selected_cols)),
-                                       na.rm = TRUE))
-
-    # rename (messy, but works...)
-    names(.ukb_pheno)[length(names(.ukb_pheno))] <- .mean_col_name
-
-    # return result
-    return(.ukb_pheno)
-  }
-
-  # Main body of function ---------------------------------------------------
-  ## filter data_dict for only columns present in ukb_pheno
-  data_dict <- data_dict %>%
-    dplyr::filter(.data[["descriptive_colnames"]] %in% names(ukb_pheno))
-
-  ## nest data dict by Field
-  data_dict_nested <- nest_data_dict_by_field(.data_dict = data_dict)
-
-  if (mean_min_max %in% c("pmin", "pmax")) {
-    ## loop through Fields to mutate min/max value columns TODO got code from
-    #this link:
-    #https://stackoverflow.com/questions/35778954/data-table-and-pmin-with-na-rm-true-argument
-    #...can probably redo so that this also accepts "rowMeans" (make similar to
-    #the data.table cde in summarise_rowise())
-
-    for (Field_FieldID in data_dict_nested$Field_FieldID) {
-      ukb_pheno <- ukb_pheno[
-        # i
-        ,
-
-        # j
-        data_dict_nested[(data_dict_nested$Field_FieldID == Field_FieldID),]$new_colname := do.call(mean_min_max, c(.SD, list(na.rm =
-                                                                                                                                          TRUE))),
-
-        # by = columns to summarise
-        .SDcols = extract_descriptive_colnames_for_field(.data_dict_nested = data_dict_nested,
-                                                         .field = Field_FieldID)]
-    }
-  } else if (mean_min_max == "rowMeans") {
-    for (Field_FieldID in data_dict_nested$Field_FieldID) {
-      ukb_pheno <- mutate_mean_col(.ukb_pheno = ukb_pheno,
-                                .selected_cols = extract_descriptive_colnames_for_field(.data_dict_nested = data_dict_nested,
-                                                                                        .field = Field_FieldID),
-                                .mean_col_name = data_dict_nested[(data_dict_nested$Field_FieldID == Field_FieldID), ]$new_colname)
-    }
-  }
-
-  ## warning message
-  message('\n\nReminder: please ensure that "ukb_pheno" has been "cleaned" and renamed by read_pheno().
-  Also, any columns with special values that have not been converted to "NA" will not have been summarised by this function')
-
-  # time taken message
-  time_taken_message(start_time)
-
-  ## return result
-  return(ukb_pheno)
-}
 
 #' Get rowise min/max date from UKB dataset
 #'
@@ -318,7 +336,7 @@ summarise_rowise_numerical_mean_min_max <- function(ukb_pheno,
 #' The special date coding-IDs are 1313, 272, 586 and 819. Note: these are also
 #' used in the linked primary care dataset.
 #'
-#' @inheritParams summarise_rowise_numerical_mean_min_max
+#' @inheritParams read_pheno
 #' @param selected_date_cols Character vector of column names
 #' @param new_colname Name of new column to be created
 #' @param min_max Character. Must be either "pmin" or "pmax"
@@ -331,6 +349,7 @@ rowise_min_max_date <- function(ukb_pheno,
                                 selected_date_cols,
                                 new_colname,
                                 min_max = "pmin") {
+  start_time <- proc.time()
 
   # check min_max arg is either pmin or pmax
   match.arg(min_max,
@@ -386,7 +405,7 @@ rowise_min_max_date <- function(ukb_pheno,
                                                              NA,
                                                              (x))}),
     .SDcols = selected_date_cols
-    ]
+  ]
 
   # mutate min/max date rowise
   ukb_pheno_subset[
@@ -420,9 +439,9 @@ rowise_min_max_date <- function(ukb_pheno,
 #'
 #' @export
 rowise_summary <- function(ukb_pheno,
-                   function_name,
-                   selected_cols,
-                   new_colname) {
+                           function_name,
+                           selected_cols,
+                           new_colname) {
 
   ukb_pheno[, c(new_colname) := purrr::map(
     function_name,
@@ -431,8 +450,6 @@ rowise_summary <- function(ukb_pheno,
 
   return(ukb_pheno)
 }
-
-# PRIVATE FUNCTIONS -------------------------------------------------------
 
 #' Helper function for summarise_rowise()
 #'
