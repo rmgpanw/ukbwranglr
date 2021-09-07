@@ -338,16 +338,17 @@ indicate_coltype_in_data_dict <- function(data_dict,
   # already 'integer', or the coded value is coercible to integer as identified
   # above)
   data_dict <- data_dict %>%
+    dplyr::mutate("col_types_readr" = dplyr::case_when(((.data[["ValueType"]] == "Integer") |
+                                                          (.data[["Coding"]] %in% ukb_codings_coercible_to_integer) |
+                                                          (.data[["FieldID"]] == "eid")
+    ) ~ "i",
+    # Default is type character
+    TRUE ~ "c")) %>%
+    # ValueType 'Continuous' overrides the above
     dplyr::mutate(
-      "col_types_readr" = dplyr::case_when(
-        ((.data[["ValueType"]] == "Integer") |
-           (.data[["Coding"]] %in% ukb_codings_coercible_to_integer) |
-           (.data[["FieldID"]] == "eid")) ~ "i",
-        .data[["ValueType"]] == "Continuous" ~ "d",
-        .data[["ValueType"]] == "Date" ~ "D",
-        # Default is type character
-        TRUE ~ "c"
-      )
+      "col_types_readr" = dplyr::case_when(.data[["ValueType"]] == "Continuous" ~ "d",
+                                           .data[["ValueType"]] == "Date" ~ "D",
+                                           TRUE ~ .data[["col_types_readr"]])
     ) %>%
     dplyr::mutate(
       "col_types_fread" = dplyr::case_when(
@@ -654,9 +655,10 @@ label_df_by_coding <- function(df,
   # all codings to label
   all_codings <- names(codings_list)
 
-  # integer codings
+  # integer/double codings - note that some continuous variables have coded
+  # values (e.g. FID 20006, interpolated year when cancer first diagnosed)
   integer_codings <- data_dict %>%
-    dplyr::filter(.data[[data_dict_coltype_col]] == "integer") %>%
+    dplyr::filter(.data[[data_dict_coltype_col]] %in% c("integer", "double")) %>%
     dplyr::pull(.data[[data_dict_coding_col]]) %>%
     as.integer()
 
@@ -701,6 +703,7 @@ label_df_by_coding <- function(df,
     dplyr::pull(.data[[data_dict_colname_col]])
 
   for (column in non_coded_columns_to_label) {
+
     df[[column]] <- haven::labelled(x = df[[column]],
                                     labels = NULL,
                                     label = data_dict[data_dict[[data_dict_colname_col]] == column, data_dict_variable_label_col][[1]])

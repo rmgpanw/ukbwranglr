@@ -19,16 +19,14 @@ ukb_codings <- get_ukb_codings()
 
 # get dummy ukb data (contains all diagnoses columns) and load single eid for testing
 dummy_ukb_data_path <- download_dummy_ukb_data_to_tempdir()
-dummy_ukb_data_dict <- make_data_dict(ukb_pheno = dummy_ukb_data_path,
+dummy_ukb_data_dict <- make_data_dict(ukb_main = dummy_ukb_data_path,
                                       delim = ",",
                                       ukb_data_dict = ukb_data_dict)
-dummy_ukb_data_3eid <- read_pheno(path = dummy_ukb_data_path,
+dummy_ukb_data_3eid <- read_ukb(path = dummy_ukb_data_path,
                              delim = ",",
                              data_dict = dummy_ukb_data_dict,
                              ukb_data_dict = ukb_data_dict,
                              ukb_codings = ukb_codings,
-                             clean_dates = FALSE,
-                             clean_selected_continuous_and_integers = FALSE,
                              nrows = 3)
 
 dummy_ukb_data_1eid <- dummy_ukb_data_3eid[1, ]

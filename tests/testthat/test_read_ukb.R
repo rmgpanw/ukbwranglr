@@ -89,20 +89,12 @@ test_that("`read_ukb()` works", {
 
 # `label_ukb_main()` --------------------------------------------------------
 
-# test_that("`label_ukb_main()` works", {
-#   testy <- ukb_main_raw %>%
-#     rename_ukb_main(
-#       data_dict = data_dict,
-#       old_colnames_col = "colheaders_raw",
-#       new_colnames_col = "descriptive_colnames"
-#     ) %>%
-#     label_ukb_main(
-#       data_dict = data_dict,
-#       ukb_codings = ukb_codings,
-#       colnames_col = "descriptive_colnames",
-#       n_labels_threshold = 22
-#     )
-# })
+test_that(
+  "`label_ukb_main()` works for coded continuous variable FID 20006 (interpolated year when cancer first diagnosed)",
+  {
+
+  }
+)
 
 # `mutate_descriptive_columns()` ------------------------------------------
 
