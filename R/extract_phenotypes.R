@@ -842,8 +842,26 @@ ukb_codings) {
 
 # Tidy clinical events ----------------------------------------------------
 
+#' Melt diagnoses code and date columns in a UKB main dataset
+#'
+#' For most clinical events variables in the UKB main dataset there is a
+#' diagnostic code variable and an associated date of event variable. There are
+#' spread over several instances/arrays. This function melts these to long
+#' format.
+#'
+#' @inheritParams read_pheno
+#' @inheritParams summarise_rowise
+#' @param code_col_field_id character. The Field ID representing 'code'
+#'   variables
+#' @param date_col_field_id character. The Field ID representing 'date'
+#'   variables that correspond to \code{code_col_field_id}.
+#'
+#' @noRd
+#' @return A data table with 'eid', 'source' (Field ID for the code
+#' column), 'code' and 'date' columns.
 tidy_clinical_events_basis <- function(ukb_main,
                                    data_dict,
+                                   data_dict_colname_col,
                                    ukb_codings,
                                    code_col_field_id,
                                    date_col_field_id) {
@@ -851,7 +869,7 @@ tidy_clinical_events_basis <- function(ukb_main,
 
   # validate args
   assertthat::assert_that(
-    data.table::is.data.table(ukb_pheno),
+    data.table::is.data.table(ukb_main),
     msg = "Error! ukb_main must be a data table (try 'data.table::as.data.table(ukb_main)')"
   )
 
@@ -876,13 +894,13 @@ tidy_clinical_events_basis <- function(ukb_main,
   code_cols <- filter_data_dict(data_dict = data_dict,
                                 filter_col = "FieldID",
                                 filter_value = code_col_field_id,
-                                return_col = "descriptive_colnames",
+                                return_col = data_dict_colname_col,
                                 error_if_missing = TRUE)
 
   date_cols <- filter_data_dict(data_dict = data_dict,
                                 filter_col = "FieldID",
                                 filter_value = date_col_field_id,
-                                return_col = "descriptive_colnames",
+                                return_col = data_dict_colname_col,
                                 error_if_missing = TRUE)
 
   # Note: `code_cols` and `date_cols` may be of different lengths e.g. try searching
@@ -903,7 +921,9 @@ tidy_clinical_events_basis <- function(ukb_main,
     dplyr::left_join(date_cols_instance_arrays,
                      by = "instance_array",
                      suffix = c(".code", ".date")) %>%
-    dplyr::arrange(as.numeric(.data[["instance.code"]]))
+    dplyr::arrange(as.numeric(.data[["instance.code"]])) %>%
+    tibble::rownames_to_column() %>%
+    dplyr::mutate("rowname" = as.integer(.data[["rowname"]]))
 
   assertthat::assert_that(
     sum(is.na(colnames_df$descriptive_colnames.date)) == 0,
@@ -914,38 +934,50 @@ tidy_clinical_events_basis <- function(ukb_main,
   )
 
   # update code_cols and date_cols
-  code_cols <- colnames_df$descriptive_colnames.code
-  date_cols <- colnames_df$descriptive_colnames.date
+  code_cols <- colnames_df$colnames.code
+  date_cols <- colnames_df$colnames.date
 
-  # check these are actually present in ukb_pheno
-  check_required_cols_exist(df = ukb_pheno,
+  # check these are actually present in ukb_main
+  check_required_cols_exist(df = ukb_main,
                             code_cols,
                             date_cols)
 
+  browser()
   # melt cols
-  ukb_pheno <- data.table::melt(
-    ukb_pheno %>% dplyr::select(tidyselect::all_of(c("eid", code_cols, date_cols))),
+  ukb_main <- data.table::melt(
+    ukb_main %>% dplyr::select(tidyselect::all_of(c("eid", code_cols, date_cols))),
     measure = list(code_cols, date_cols),
     value.name = c("code", "date")
   )
 
-  ukb_pheno <- ukb_pheno[!is.na(ukb_pheno$code)]
+  # add instance_array col
+  ukb_main$variable <- revalue_vector(
+    x = as.integer(ukb_main$variable),
+    dict = stats::setNames(object = colnames_df$instance_array,
+                           nm = colnames_df$rowname),
+    default_value = NULL,
+    suppress_warnings = FALSE,
+    strict = TRUE
+  )
 
-  # relabel code col
-  ukb_pheno <- recode_ukbcol(df = ukb_pheno,
-                             col_to_recode = "code",
-                             field_id = code_col_field_id,
-                             ukb_data_dict = data_dict,
-                             ukb_codings = ukb_codings,
-                             mapping_direction = "meaning_code")
+  ukb_main <- ukb_main[!is.na(ukb_main$code)]
 
   # make 'source' col
-  ukb_pheno$variable <- paste0("f", code_col_field_id)
-  names(ukb_pheno)[which(names(ukb_pheno) == "variable")] <- "source"
+  ukb_main$source <- paste0("f", code_col_field_id)
+
+  # rename 'variable' to 'index'
+  names(ukb_main)[which(names(ukb_main) == "variable")] <- "index"
+
+  # rearrange cols
+  ukb_main <- dplyr::select(ukb_main, tidyselect::all_of(c("eid",
+                                                           "source",
+                                                           "index",
+                                                           "code",
+                                                           "date")))
 
   # return result
   time_taken_message(start_time)
-  return(ukb_pheno)
+  return(ukb_main)
 }
 
 # Get diagnoses helpers ---------------------------------------------------

@@ -405,14 +405,14 @@ indicate_coltype_in_data_dict <- function(data_dict,
     # ValueType 'Continuous' overrides the above
     dplyr::mutate(
       "col_types_readr" = dplyr::case_when(.data[["ValueType"]] == "Continuous" ~ "d",
-                                           .data[["ValueType"]] == "Date" ~ "D",
+                                           .data[["ValueType"]] == "Date" ~ "c",
                                            TRUE ~ .data[["col_types_readr"]])
     ) %>%
     dplyr::mutate(
       "col_types_fread" = dplyr::case_when(
         .data[["col_types_readr"]] == "i" ~ "integer",
         .data[["col_types_readr"]] == "d" ~ "double",
-        .data[["col_types_readr"]] == "D" ~ "Date",
+        .data[["col_types_readr"]] == "D" ~ "character",
         .data[["col_types_readr"]] == "c" ~ "character"
       )
     )
@@ -737,6 +737,7 @@ label_df_by_coding <- function(df,
                                    total = nrow(data_dict))
   pb$tick(0)
 
+  browser()
   # loop through codings
   for (single_coding in all_codings) {
 

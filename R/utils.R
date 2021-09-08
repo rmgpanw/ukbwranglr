@@ -602,7 +602,7 @@ recode_ukbcol <- function(df,
   mapping_df <- recode_column_coding_meaning_value_mapping_df(field_id = field_id,
                                                                ukb_data_dict = ukb_data_dict,
                                                                ukb_codings = ukb_codings,
-                                                               mapping_direction = "meaning_code")
+                                                               mapping_direction = mapping_direction)
 
   # remove coding values with multiple associated meanings for categorical fields
   # (see also misc_ukb_codings.Rmd)
@@ -634,11 +634,6 @@ recode_ukbcol <- function(df,
                                         dict = dict,
                                         default_value = NULL,
                                         suppress_warnings = FALSE)
-
-  # OLD - to delete
-  # df <- recode_column(df = df,
-  #                      col_to_recode = col_to_recode,
-  #                      mapping_df = mapping_df)
 
   return(df)
 }
@@ -981,6 +976,8 @@ remove_special_characters_and_make_lower_case <- function(string) {
 #'   relabelled contains values not present in \code{dict}. This message is
 #'   silenced if \code{suppress_warnings} is \code{TRUE}. Default value is
 #'   \code{FALSE}.
+#' @param strict bool. If \code{TRUE}, raise error if if dict does not include
+#'   all values in x
 #'
 #' @return A relabelled vector.
 #' @noRd
@@ -988,7 +985,8 @@ revalue_vector <-
   function(x,
            dict,
            default_value = NULL,
-           suppress_warnings = FALSE) {
+           suppress_warnings = FALSE,
+           strict = FALSE) {
 
     # raise an error if column is not character/numeric/integer
     assertthat::assert_that(all(class(x) %in% c("numeric", "integer", "character", "ordered")),
@@ -1004,10 +1002,24 @@ revalue_vector <-
       assertthat::are_equal(length(default_value), 1)
     }
 
+    # get any values not incldued in dict
+    vals_missing_from_dict <-
+      subset(x,!(x %in% names(dict)))
+
+    # strict - error if dict does not include all values in x
+    if (strict) {
+      if (!rlang::is_empty(vals_missing_from_dict)) {
+        stop(
+          paste0(
+            "The column to be relabelled contains values that are not present in `dict`. Number of values = ",
+            length(vals_missing_from_dict)
+          )
+        )
+      }
+    }
+
     # warning message if dict does not include all values in x
     if (!suppress_warnings) {
-      vals_missing_from_dict <-
-        subset(x,!(x %in% names(dict)))
       if (!rlang::is_empty(vals_missing_from_dict)) {
         warning(
           paste0(

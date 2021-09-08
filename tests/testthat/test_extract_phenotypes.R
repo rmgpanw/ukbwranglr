@@ -106,7 +106,12 @@ expected <- tibble::tribble(
 
 # `tidy_clinical_events_basis()`  -----------------------------------------
 
-
+tidy_clinical_events_basis(ukb_main = dummy_ukb_data_3eid,
+                           data_dict = dummy_ukb_data_dict,
+                           data_dict_colname_col = "descriptive_colnames",
+                           ukb_codings = ukb_codings,
+                           code_col_field_id = "41270",
+                           date_col_field_id = "41280")
 
 # `extract_first_or_last_clinical_event_multi_single_disease()` --------------------------
 
