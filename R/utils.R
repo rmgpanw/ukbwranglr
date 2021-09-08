@@ -939,7 +939,8 @@ remove_special_characters_and_make_lower_case <- function(string) {
                  "#",
                  "\\[",
                  "\\]",
-                 "_+$")
+                 "_+$",
+                 "'")
 
   for (char in to_remove) {
     string <- stringr::str_replace_all(string, char, "")

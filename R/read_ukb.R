@@ -361,16 +361,11 @@ mutate_descriptive_columns <- function(data_dict) {
 
     warning(
       paste0(
-        "Unable to generate descriptive colnames for ",
+        "\nWarning. Unable to generate descriptive colnames for ",
         length(unique(
           duplicated_descriptive_colnames$colheaders_raw
         )),
-        " columns: ",
-        stringr::str_c(
-          unique(duplicated_descriptive_colnames$colheaders_raw),
-          sep = "",
-          collapse = ", "
-        )
+        " columns.\n"
       )
     )
   }
@@ -459,25 +454,33 @@ read_ukb_raw_basis <- function(path,
 
   # read data
   message("Reading data into R")
-  switch(read_with,
-         fread = data.table::fread(path,
-                                   select = coltypes_fread,
-                                   na.strings = na.strings,
-                                   sep = delim,
-                                   nrows = nrows,
-                                   ...),
-         read_delim_chunked = readr::read_delim_chunked(file = path,
-                                   callback = callback,
-                                   delim = delim,
-                                   na = na.strings,
-                                   col_types = coltypes_readr,
-                                   chunk_size = chunk_size,
-                                   ...),
-         read_dta = haven::read_dta(file = path,
-                                    col_select = tidyselect::all_of(data_dict$colheaders_raw),
-                                    n_max = nrows,
-                                    ...)
-         )
+  switch(
+    read_with,
+    fread = data.table::fread(
+      path,
+      select = coltypes_fread,
+      na.strings = na.strings,
+      sep = delim,
+      nrows = nrows,
+      ...
+    ),
+    read_delim_chunked = readr::read_delim_chunked(
+      file = path,
+      callback = callback,
+      delim = delim,
+      na = na.strings,
+      col_types = coltypes_readr,
+      chunk_size = chunk_size,
+      ...
+    ),
+    read_dta = haven::read_dta(
+      file = path,
+      col_select = tidyselect::all_of(data_dict$colheaders_raw),
+      n_max = nrows,
+      ...
+    ) %>%
+      update_column_classes(coltypes = coltypes_fread)
+  )
 }
 
 rename_ukb_main <- function(ukb_main,
@@ -725,8 +728,18 @@ label_df_by_coding <- function(df,
     dplyr::pull(.data[[data_dict_coding_col]]) %>%
     as.integer()
 
+  non_coded_columns_to_label <- data_dict %>%
+    dplyr::filter(is.na(.data[[data_dict_coding_col]])) %>%
+    dplyr::pull(.data[[data_dict_colname_col]])
+
+  # progress bar - one tick per column
+  pb <- progress::progress_bar$new(format = "[:bar] :current/:total (:percent)",
+                                   total = nrow(data_dict))
+  pb$tick(0)
+
   # loop through codings
   for (single_coding in all_codings) {
+
     # colnames using this coding
     columns_to_label <-
       data_dict_list[[single_coding]][[data_dict_colname_col]]
@@ -744,6 +757,9 @@ label_df_by_coding <- function(df,
 
     # label variables and values
     for (column in columns_to_label) {
+      # progress bar
+      pb$tick(1)
+
       variable_label = data_dict[data_dict[[data_dict_colname_col]] == column, data_dict_variable_label_col][[1]]
 
       # checks
@@ -755,7 +771,7 @@ label_df_by_coding <- function(df,
       }
 
       # for debugging
-      print(column)
+      # print(column)
 
       df[[column]] <- haven::labelled(x = df[[column]],
                                       labels = value_labels,
@@ -764,14 +780,13 @@ label_df_by_coding <- function(df,
   }
 
   # label remaining variables (i.e. those without associated codings/value labels)
-  non_coded_columns_to_label <- data_dict %>%
-    dplyr::filter(is.na(.data[[data_dict_coding_col]])) %>%
-    dplyr::pull(.data[[data_dict_colname_col]])
-
   for (column in non_coded_columns_to_label) {
 
+    pb$tick(1)
+
     # for debugging
-    print(column)
+    # print(column)
+
     df[[column]] <- haven::labelled(x = df[[column]],
                                     labels = NULL,
                                     label = data_dict[data_dict[[data_dict_colname_col]] == column, data_dict_variable_label_col][[1]])
@@ -780,6 +795,58 @@ label_df_by_coding <- function(df,
   # error if nothing was labelled
   assertthat::assert_that(!rlang::is_empty(all_codings) | !rlang::is_empty(non_coded_columns_to_label),
                           msg = "Error! No value or variable labels were applied")
+
+  return(df)
+}
+
+update_column_classes <- function(df,
+                                  coltypes) {
+  # coltypes must be a named character vector with the following allowed values
+  assertthat::assert_that(all(
+    unique(coltypes) %in% c("character",
+                                  "Date",
+                                  "double",
+                                  "integer")
+  ))
+
+  # for each class, coerce all relevant columns to this class
+  message("Updating column classes")
+
+  pb <- progress::progress_bar$new(format = "[:bar] :current/:total (:percent)",
+                                   total = length(unique(coltypes)))
+  pb$tick(0)
+
+  for (column_type in unique(coltypes)) {
+    # progress bar
+    pb$tick(1)
+
+    columns_to_reclass <-
+      names(subset(coltypes, coltypes == column_type))
+
+    df <- switch(
+      column_type,
+      character = df %>%
+        dplyr::mutate(dplyr::across(
+          tidyselect::all_of(columns_to_reclass),
+          as.character
+        )),
+      Date =  df %>%
+        dplyr::mutate(dplyr::across(
+          tidyselect::all_of(columns_to_reclass),
+          as.Date
+        )),
+      double =  df %>%
+        dplyr::mutate(dplyr::across(
+          tidyselect::all_of(columns_to_reclass),
+          as.double
+        )),
+      integer =  df %>%
+        dplyr::mutate(dplyr::across(
+          tidyselect::all_of(columns_to_reclass),
+          as.integer
+        ))
+    )
+  }
 
   return(df)
 }
