@@ -79,6 +79,7 @@ make_data_dict <- function(ukb_main,
       sep = "_",
       into = c("FieldID", "instance", "array"),
       remove = FALSE,
+      extra = "drop",
       fill = "right" # 'eid' column will not separate so will raise an error without this option
     ) %>%
 
@@ -90,10 +91,26 @@ make_data_dict <- function(ukb_main,
     dplyr::left_join(y = ukb_data_dict,
                      by = "FieldID")
 
+  # remove non-existent FieldIDs
+  data_dict <- data_dict %>%
+    dplyr::mutate(
+      "unrecognised_fid" = dplyr::case_when(
+        !(.data[["FieldID"]] %in% c("eid", ukb_data_dict$FieldID)) ~ TRUE,
+        TRUE ~ FALSE
+      )
+    ) %>%
+    dplyr::mutate(dplyr::across(tidyselect::all_of(c("FieldID",
+                                                     "instance",
+                                                     "array")),
+                                ~ ifelse(.data[["unrecognised_fid"]] == TRUE,
+                                         yes = NA,
+                                         no = .x))) %>%
+    dplyr::select(-.data[["unrecognised_fid"]])
+
   # mutate 'descriptive_colnames' column
   data_dict <- mutate_descriptive_columns(data_dict = data_dict)
 
-  # make ValueType column for eid type 'Integer'
+  # add ValueType column for eid - type 'Integer'
   data_dict$ValueType <- ifelse(data_dict$FieldID == "eid",
                                 yes = "Integer",
                                 no = data_dict$ValueType)
@@ -155,7 +172,7 @@ read_ukb <- function(path,
   # make data_dict if not supplied
   if (is.null(data_dict)) {
     message("Creating data dictionary")
-    data_dict <- make_data_dict(ukb_main = dummy_ukb_data_filepath,
+    data_dict <- make_data_dict(ukb_main = path,
                                 delim = delim,
                                 ukb_data_dict = ukb_data_dict)
   }
@@ -163,10 +180,14 @@ read_ukb <- function(path,
   # read with haven or fread, dependent on file extension
   file_extension <- extract_file_ext(path)
   read_with <- switch(file_extension,
-         dta = "haven",
+         dta = "read_dta",
          txt = "fread",
          tsv = "fread",
+         tab = "fread",
          csv = "fread")
+
+  assertthat::assert_that(!is.null(read_with),
+                          msg = paste0("Error! Unrecognised file extension: ", file_extension))
 
   N_STEPS <-  1 + descriptive_colnames + labelled
   STEP <- 1
@@ -204,11 +225,17 @@ read_ukb <- function(path,
     STEP <- STEP + 1
     message(paste0("STEP ", STEP, " of ", N_STEPS))
 
+    if (descriptive_colnames) {
+      colnames_col <- "descriptive_colnames"
+    } else {
+      colnames_col <- "colheaders_raw"
+    }
+
     result <- label_ukb_main(
       ukb_main = result,
       data_dict = data_dict,
       ukb_codings = ukb_codings,
-      colnames_col = "descriptive_colnames",
+      colnames_col = colnames_col,
       n_labels_threshold = n_labels_threshold
     )
   }
@@ -312,6 +339,42 @@ mutate_descriptive_columns <- function(data_dict) {
       tidyselect::everything()
     )
 
+  # check for duplicate names - set to 'colheaders raw' if this is unique
+  duplicated_descriptive_colnames <- data_dict %>%
+    dplyr::group_by(.data[["descriptive_colnames"]]) %>%
+    dplyr::mutate(n = dplyr::n()) %>%
+    dplyr::ungroup() %>%
+    dplyr::filter(n > 1)
+
+  if (nrow(duplicated_descriptive_colnames) > 0) {
+
+    assertthat::assert_that(length(unique(data_dict$colheaders_raw)) == nrow(data_dict),
+                            msg = "Error! Data dictionary contains non-unique values in `colhedaers_raw` column")
+
+    data_dict <- data_dict %>%
+      dplyr::mutate(
+        "descriptive_colnames" = dplyr::case_when(
+          .data[["descriptive_colnames"]] %in% duplicated_descriptive_colnames$descriptive_colnames ~ .data[["colheaders_raw"]],
+          TRUE ~ .data[["descriptive_colnames"]]
+        )
+      )
+
+    warning(
+      paste0(
+        "Unable to generate descriptive colnames for ",
+        length(unique(
+          duplicated_descriptive_colnames$colheaders_raw
+        )),
+        " columns: ",
+        stringr::str_c(
+          unique(duplicated_descriptive_colnames$colheaders_raw),
+          sep = "",
+          collapse = ", "
+        )
+      )
+    )
+  }
+
   return(data_dict)
 }
 
@@ -411,7 +474,7 @@ read_ukb_raw_basis <- function(path,
                                    chunk_size = chunk_size,
                                    ...),
          read_dta = haven::read_dta(file = path,
-                                    col_select = tidyselect(all_of(data_dict$colheaders_raw)),
+                                    col_select = tidyselect::all_of(data_dict$colheaders_raw),
                                     n_max = nrows,
                                     ...)
          )
@@ -691,6 +754,9 @@ label_df_by_coding <- function(df,
         variable_label <- NULL
       }
 
+      # for debugging
+      print(column)
+
       df[[column]] <- haven::labelled(x = df[[column]],
                                       labels = value_labels,
                                       label = variable_label)
@@ -704,6 +770,8 @@ label_df_by_coding <- function(df,
 
   for (column in non_coded_columns_to_label) {
 
+    # for debugging
+    print(column)
     df[[column]] <- haven::labelled(x = df[[column]],
                                     labels = NULL,
                                     label = data_dict[data_dict[[data_dict_colname_col]] == column, data_dict_variable_label_col][[1]])
