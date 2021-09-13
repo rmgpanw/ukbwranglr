@@ -182,3 +182,11 @@ test_that("`remove_special_characters_and_make_lower_case()` returns expected re
     "fi1_numeric_addition_test"
   )
 })
+
+# `validate_clinical_codes()` ---------------------------------------------
+
+test_that(
+  "`validate_clinical_codes`() returns expected error messages", {
+
+  }
+)

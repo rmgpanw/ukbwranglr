@@ -68,20 +68,26 @@ make_dummy_clinical_events_df_single_eid <- function(eid = 1,
   set.seed(eid)
 
   eid <- rep(eid, n_rows)
-  source <- sample(ukbwranglr:::clinical_events_sources$source,
+  source <- sample(CLINICAL_EVENTS_SOURCES$source,
                    size = n_rows,
                    replace = TRUE)
+  index <- sample(letters[11:20],
+                  size = n_rows,
+                  replace = TRUE)
   code <- sample(LETTERS[1:10],
                  size = n_rows,
                  replace = TRUE)
-  date <- sample(seq(as.Date("2000/01/01"),
-                     by = "day",
-                     length.out = 200),
-                 size = n_rows,
-                 replace = TRUE)
+  date <- as.character(sample(
+    seq(as.Date("2000/01/01"),
+        by = "day",
+        length.out = 200),
+    size = n_rows,
+    replace = TRUE
+  ))
 
   tibble::tibble(eid = eid,
                  source = source,
+                 index = index,
                  code = code,
                  date = date)
 }

@@ -5,29 +5,29 @@
 \title{Mutate age at event columns}
 \usage{
 mutate_age_at_event_cols(
-  ukb_pheno,
+  ukb_main,
   dob_col = "dob",
   date_col_regex = "_date$",
   date_col_regex_replacement = "_age"
 )
 }
 \arguments{
-\item{ukb_pheno}{a UK Biobank phenotype data frame containing "eid" and date
-of birth columns, as well as date columns matching the regex supplied to
+\item{ukb_main}{a UKB main dataset (data frame) containing a column named "eid" and a date
+of birth column, as well as date columns matching the regex supplied to
 the \code{date_col_regex} argument.}
 
 \item{dob_col}{character. The name of the date of birth column in
-\code{ukb_pheno}.}
+\code{ukb_main}.}
 
 \item{date_col_regex}{character. A regular expression that matches the date
-columns to be processed in \code{ukb_pheno}.}
+columns to be processed in \code{ukb_main}.}
 
 \item{date_col_regex_replacement}{character. New "age-at-event" columns will
 have names matching those of the input date columns, replacing the regex
 supplied to \code{date_col_regex} with this string.}
 }
 \value{
-A dataframe with additional "age-at-event" columns
+A data frame with additional "age at event" columns
 }
 \description{
 Mutates numeric columns with the age at event for all columns that
@@ -35,14 +35,14 @@ match the regex supplied to \code{date_col_regex}.
 }
 \examples{
 # dummy data
-dummy_ukb_pheno <- tibble::tribble(
+dummy_ukb_main <- tibble::tribble(
 ~ eid, ~ dob, ~ event_date,
-1, as.Date("2000-01-01"), as.Date("2010-01-01")
+1, "2000-01-01", "2010-01-01"
 )
 
 # mutate age at event col
 mutate_age_at_event_cols(
-  dummy_ukb_pheno,
+  dummy_ukb_main,
   dob_col = "dob",
   date_col_regex = "_date$",
   date_col_regex_replacement = "_age"

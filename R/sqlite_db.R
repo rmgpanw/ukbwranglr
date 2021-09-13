@@ -275,8 +275,7 @@ gp_clinical_to_sqlite_db <- function(df, remove_special_dates = TRUE) {
 #' Creates a SQLite database called \code{ukb.db} containing all tables from
 #' \code{\link{get_ukb_db}}, plus an additional table called
 #' \code{clinical_events}. This is a long format table combining all clinical
-#' events as listed in \code{ukbwranglr:::clinical_events_sources}. TODO - add
-#' self-reported operative procedures.
+#' events as listed in \code{ukbwranglr:::CLINICAL_EVENTS_SOURCES}.
 #'
 #' @param ukb_pheno_path character. Path to the main UKB dataset file.
 #' @param gp_clinical_path character. Path to the UKB primary care clinical

@@ -21,7 +21,7 @@ or a data frame.}
 
 \item{summarise_by}{Whether to summarise by "Field" or by "Instance".}
 
-\item{drop}{If \code{TRUE}, removes the numerical variables being summarised
+\item{.drop}{If \code{TRUE}, removes the numerical variables being summarised
 from the result. Default value is \code{FALSE}}
 }
 \value{

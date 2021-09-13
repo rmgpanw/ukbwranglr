@@ -230,7 +230,7 @@ test_that("`reformat_standardised_codelist()` returns the expected output format
                   code_type = "read2",
                   disease = "T1DM",
                   disease_category = "T1DM GP diagnosis",
-                  phenotype_source = "test"
+                  author = "test"
                 ) %>%
                 names(),
               c(
@@ -239,7 +239,7 @@ test_that("`reformat_standardised_codelist()` returns the expected output format
                 'category',
                 'code_type',
                 'code',
-                'phenotype_source'
+                'author'
               )
             )
           })
@@ -255,7 +255,7 @@ test_that("`reformat_standardised_codelist()` raises error with invalid args", {
       code_type = "read2",
       disease = "T1DM",
       disease_category = "T1DM GP diagnosis",
-      phenotype_source = "test"
+      author = "test"
     ),
     regexp = "contains unrecognised code types. Recognised code types: icd10, data_coding_6, data_coding_3, icd9, read2, read3"
   )
@@ -270,7 +270,7 @@ test_that("`reformat_standardised_codelist()` raises error with invalid args", {
       code_type = "read2",
       disease = "T1DM",
       disease_category = "T1DM GP diagnosis",
-      phenotype_source = "test"
+      author = "test"
     ),
     regexp = "must be a data frame with the following headings: 'code', 'description', 'code_type'"
   )

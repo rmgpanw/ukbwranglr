@@ -549,12 +549,12 @@ map_codes <- function(codes,
 # Clinical code lists -----------------------------------------------------
 
 #' Reformat a dataframe of clinical codes to work with
-#' \code{\link{extract_first_or_last_clinical_event_multi}}
+#' \code{\link{extract_phenotypes}}
 #'
 #' A utility function that helps reformat the output from \code{\link{map_codes}}
 #' or \code{\link{lookup_codes}} to work with
-#' \code{\link{extract_first_or_last_clinical_event_multi}}. See also output
-#' from \code{\link{generate_self_reported_diabetes_codes_df}} for an example of
+#' \code{\link{extract_phenotypes}}. See also output
+#' from \code{\link{example_clinical_codes}} for an example of
 #' the format that this function will output.
 #'
 #' @param standardised_codelist a data frame with column names "code",
@@ -563,17 +563,16 @@ map_codes <- function(codes,
 #' @param disease character (scalar), e.g. "Secondary polycythaemia"
 #' @param disease_category character (scalar). The subcategory of \code{disease}
 #'   that these codes belong to e.g. "Diagnosis of Secondary polycythaemia".
-#' @param phenotype_source character (scalar), e.g. "caliber".
+#' @param author character (scalar), e.g. "caliber".
 #'
 #' @return A data frame with the following column names: 'disease',
-#'   'description', 'category', 'code_type', 'code' and 'phenotype_source'.
-#'
-#' @export
+#'   'description', 'category', 'code_type', 'code' and 'author'.
+#' @noRd
 reformat_standardised_codelist <- function(standardised_codelist,
                                            code_type,
                                            disease,
                                            disease_category,
-                                           phenotype_source) {
+                                           author) {
   # validate args
   assertthat::assert_that(any(
     class(standardised_codelist) %in% c("data.frame", "data.table", "tbl_df")
@@ -582,10 +581,10 @@ reformat_standardised_codelist <- function(standardised_codelist,
   assertthat::is.string(code_type)
   assertthat::is.string(disease)
   assertthat::is.string(disease_category)
-  assertthat::is.string(phenotype_source)
+  assertthat::is.string(author)
 
   match.arg(code_type,
-            choices = ukbwranglr:::clinical_events_sources$data_coding)
+            choices = CLINICAL_EVENTS_SOURCES$data_coding)
 
   assertthat::assert_that(all(
     names(standardised_codelist) == c("code", "description", "code_type")
@@ -594,55 +593,61 @@ reformat_standardised_codelist <- function(standardised_codelist,
 
   assertthat::assert_that(
     all(
-      standardised_codelist$code_type %in% unique(ukbwranglr:::clinical_events_sources$data_coding)
+      standardised_codelist$code_type %in% unique(CLINICAL_EVENTS_SOURCES$data_coding)
     ),
     msg = paste0(
       "Error! `standardised_codelist$code_type` contains unrecognised code types. Recognised code types: ",
       stringr::str_c(
-        unique(ukbwranglr:::clinical_events_sources$data_coding),
+        unique(CLINICAL_EVENTS_SOURCES$data_coding),
         sep = "",
         collapse = ", "
       )
     )
   )
 
-  # reformat to work with `extract_first_or_last_clinical_event_multi()`
+  # reformat to work with `extract_phenotypes()`
   standardised_codelist <- standardised_codelist %>%
     dplyr::mutate(
       "code_type" = code_type,
       "disease" = disease,
       "category" = disease_category,
-      "phenotype_source" = phenotype_source,
+      "author" = author,
     ) %>%
     dplyr::select(.data[["disease"]],
                   .data[["description"]],
                   .data[["category"]],
                   .data[["code_type"]],
                   .data[["code"]],
-                  .data[["phenotype_source"]])
+                  .data[["author"]])
 
   return(standardised_codelist)
 }
 
-#' Generate a data frame of clinical codes for self-reported diabetes in the UK
-#' Biobank
+#' Generate an example data frame of clinical codes for diabetes
 #'
-#' Data frames of this format may be used with
-#' \code{\link{extract_first_or_last_clinical_event_multi}} to facilitate
-#' identification of clinical events (e.g. date of diabetes diagnosis).
+#' Data frames of this format may be used with \code{\link{extract_phenotypes}}.
+#' Use \code{\link{validate_clinical_codes}} to check whether a clinical codes
+#' data frame meets all requirements.
 #'
-#' @return Data frame
+#' Note: this example is not an exhaustive list of codes for diabetes.
+#'
+#' @return A data frame of selected clinical codes for diabetes.
 #' @export
+#' @seealso \code{\link{validate_clinical_codes}}
 #'
 #' @examples
-#' generate_self_reported_diabetes_codes_df()
-generate_self_reported_diabetes_codes_df <- function() {
+#' example_clinical_codes()
+example_clinical_codes <- function() {
   tibble::tribble(
-    ~ disease, ~ description, ~ category, ~ code_type, ~ code, ~ phenotype_source,
+    ~ disease, ~ description, ~ category, ~ code_type, ~ code, ~ author,
     "Diabetes", "diabetes", "Diabetes unspecified", "data_coding_6", "1220", "ukbwr",
     "Diabetes", "gestational diabetes", "Gestational diabetes", "data_coding_6", "1221", "ukbwr",
-    "Diabetes", "type 1 diabetes", "Type 1 diabetes", "data_coding_6", "1222", "ukbwr",
-    "Diabetes", "type 2 diabetes", "Type 2 diabetes", "data_coding_6", "1223", "ukbwr",
+    "Diabetes", "type 1 diabetes", "Type 1 DM", "data_coding_6", "1222", "ukbwr",
+    "Diabetes", "type 2 diabetes", "Type 2 DM", "data_coding_6", "1223", "ukbwr",
+    "Diabetes", "Type 1 diabetes mellitus", "Type 1 DM", "icd10", "E10", "ukbwr",
+    "Diabetes", "Type 2 diabetes mellitus", "Type 2 DM", "icd10", "E11", "ukbwr",
+    "Diabetes", "Insulin dependent diabetes mellitus", "Type 1 DM", "read2", "C108.", "ukbwr",
+    "Diabetes", "Non-insulin dependent diabetes mellitus", "Type 2 DM", "read2", "C109.", "ukbwr",
   )
 }
 

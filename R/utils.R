@@ -312,19 +312,129 @@ get_ukb_db <- function(directory_path) {
 #' }
 download_dummy_ukb_data_to_tempdir <- function() {
   # file path in tempdir
-  dummy_ukb_data_tempdir_path <- tempfile(pattern = "dummy_ukb_data",
-                                          tmpdir = tempdir(),
-                                          fileext = ".csv")
+  dummy_ukb_data_tempdir_path <- file.path(tmpdir = tempdir(),
+                                           "dummy_ukb_data.csv")
 
   # download dummy data from ukbwranglr
-  utils::download.file("https://raw.githubusercontent.com/rmgpanw/ukbwranglr_resources/main/dummy_ukb_data/dummy_ukb_data.csv",
-                destfile = dummy_ukb_data_tempdir_path)
+  if (!file.exists(dummy_ukb_data_tempdir_path)) {
+    message("Downloaded dummy UKB data to `tempdir()`")
+    utils::download.file(
+      "https://raw.githubusercontent.com/rmgpanw/ukbwranglr_resources/main/dummy_ukb_data/dummy_ukb_data.csv",
+      destfile = dummy_ukb_data_tempdir_path,
+      mode = "wb"
+    )
+  }
 
   # return file path
-  message("Downloaded dummy UKB data to `tempdir()`. Returning path to file")
+  message("Returning path to dummy UKB data file")
   return(dummy_ukb_data_tempdir_path)
 }
 
+
+# Validation helpers ------------------------------------------------------
+
+#' Validate a clinical codes data frame
+#'
+#' Checks whether a data frame of clinical codes is correctly formatted for use
+#' with \code{\link{extract_phenotypes}}.
+#'
+#' Performs the following checks:
+#'
+#' \itemize{
+#' \item Expected column names
+#' \item All columns are of type character
+#' \item No missing values in any column
+#' \item All values under \code{code_type} are recognised
+#' \item All codes (for each \code{code_type}) are unique for each \code{disease}/\code{author} combination
+#' }
+#'
+#' Note that currently this does not check whether clinical codes exist for the
+#' coding system specified by the \code{code_type} column.
+#'
+#' @param clinical_codes A data frame. See \code{\link{example_clinical_codes}}
+#'   for an example.
+#'
+#' @return Returns \code{TRUE} if all checks pass.
+#' @export
+#'
+#' @examples
+#' validate_clinical_codes(example_clinical_codes())
+validate_clinical_codes <- function(clinical_codes) {
+  standard_message <- ". Use example_clinical_codes() for an example"
+
+  # check is a data frame
+  assertthat::assert_that(is.data.frame(clinical_codes),
+                          msg = paste0("Error! clinical_codes must be a data frame",
+                                       standard_message))
+
+  # check for expected column names
+  assertthat::assert_that(all(names(clinical_codes) == names(example_clinical_codes())),
+                          msg = paste0("Error! clinical_codes should have the following column headers: ",
+                                       stringr::str_c(names(example_clinical_codes()),
+                                                      sep = "",
+                                                      collapse = ", "),
+                                       standard_message))
+
+  # check all cols are type character
+  assertthat::assert_that(
+    all(
+      (clinical_codes %>%
+          purrr::map_chr(class)) == "character"),
+    msg = paste0("Error! all columns in clinical_codes should be of type character. ",
+                 standard_message)
+  )
+
+  # check there are no NA values
+  cols_with_NA <- clinical_codes %>%
+    purrr::map( ~ ifelse(sum(is.na(.x)) > 0,
+                         yes = TRUE,
+                         no = FALSE)) %>%
+    purrr::keep(~ .x) %>%
+    names()
+
+  assertthat::assert_that(rlang::is_empty(cols_with_NA),
+                          msg = paste0("Error! there should be no missing values in clinical_codes. The following columns contain NA's: ",
+                                       stringr::str_c(cols_with_NA,
+                                                      sep = "",
+                                                      collapse = ", "),
+                                       standard_message))
+
+  # check all values in code_type are recognised
+  unique_clinical_code_types <- unique(clinical_codes$code_type)
+  unrecognised_code_types <- subset(unique_clinical_code_types,
+                                    !unique_clinical_code_types %in% unique(CLINICAL_EVENTS_SOURCES$data_coding))
+
+  assertthat::assert_that(rlang::is_empty(unrecognised_code_types),
+                          msg = paste0("Error! code_type column in clinical_codes contains unrecognised code_types: ",
+                                       stringr::str_c(unrecognised_code_types,
+                                                      sep = "",
+                                                      collapse = ", "),
+                                       standard_message))
+
+  # check all codes are unique per disease
+  diseases_with_non_unique_codes <- data.frame(disease_author = paste(clinical_codes$disease,
+                                                                      clinical_codes$author,
+                                                                      sep = "_"),
+                                               code_code_type = paste(clinical_codes$code,
+                                                                      clinical_codes$code_type,
+                                                                      sep = "_"))
+
+  diseases_with_non_unique_codes <-
+    split(diseases_with_non_unique_codes,
+          diseases_with_non_unique_codes$disease_author)
+
+  diseases_with_non_unique_codes <- diseases_with_non_unique_codes %>%
+    purrr::map_lgl(~ length(unique(.x$code_code_type)) != nrow(.x)) %>%
+    purrr::keep(~ .x)
+
+  assertthat::assert_that(rlang::is_empty(diseases_with_non_unique_codes),
+                          msg = paste0("Error! Each disease/author in clinical_codes must have a unique set of clinical codes/code_type. The following disease_author combinations contain non-unique code_code_types: ",
+                                       stringr::str_c(diseases_with_non_unique_codes,
+                                                      sep = "",
+                                                      collapse = ", ")))
+
+  return(TRUE)
+}
 
 # Miscellaneous -----------------------------------------------------------
 
@@ -377,13 +487,13 @@ mutate_dob <- function(ukb_pheno, data_dict) {
 #' \code{\link{extract_first_or_last_clinical_event}} and its related functions.
 #'
 #' @return A named list
-#' @export
 #'
 #' @seealso \code{\link{extract_first_or_last_clinical_event}}
+#' @noRd
 #' @examples
 #' make_empty_clinical_codes_list()
 make_empty_clinical_codes_list <- function() {
-  ukbwranglr:::clinical_events_sources$data_coding %>%
+  CLINICAL_EVENTS_SOURCES$data_coding %>%
     unique() %>%
     purrr::set_names() %>%
     purrr::map( ~ NULL)
@@ -396,7 +506,7 @@ make_empty_clinical_codes_list <- function() {
 #' `start_time` parameter to this function.
 #'
 #' @param start_time The start time.
-#' @export
+#' @noRd
 #' @return A message stating time taken since start time
 time_taken_message <- function(start_time) {
   # get time taken
@@ -410,22 +520,30 @@ time_taken_message <- function(start_time) {
           " seconds.")
 }
 
-#' Make a named list of \code{tbl} objects from a \code{DBIConnection} object
+#' Make a named list of \code{tbl_dbi} objects from a \code{DBIConnection}
+#' object
 #'
-#' A convenience function that returns a list of \code{\link[dplyr]{tbl}}
-#' objects from a \code{DBIConnection} object, named as per the database table names.
+#' A convenience function that returns a list of \code{tbl_dbi}
+#' objects from a \code{DBIConnection} object, named as per the database table
+#' names.
+#'
+#' See the \href{https://dbplyr.tidyverse.org/articles/dbplyr.html}{introduction
+#' to dbplyr} vignette for getting started with databases and
+#' \code{\link[dplyr]{dplyr}}.
 #'
 #' @param conn A DBIConnection object, as returned by
 #'   \code{\link[DBI]{dbConnect}}.
 #'
-#' @return Named list
+#' @return A named list of \code{tbl_dbi} objects
 #' @export
 #' @examples
 #' con <- DBI::dbConnect(RSQLite::SQLite(), dbname = ":memory:")
-#' dplyr::copy_to(con, head(iris), "iris")
-#' dplyr::copy_to(con, head(mtcars), "mtcars")
-#' db_tables <- list_tbls_from_dbconn(con)
-list_tbls_from_dbconn <- function(conn) {
+#' dplyr::copy_to(con, head(iris), "iris_head")
+#' dplyr::copy_to(con, head(mtcars), "mtcars_head")
+#' db_tables <- make_list_of_tbls_from_db(con)
+#' db_tables$iris_head
+#' db_table$mtcars_head
+make_list_of_tbls_from_db <- function(conn) {
   DBI::dbListTables(conn) %>%
     purrr::set_names() %>%
     purrr::map(~ dplyr::tbl(conn, .x))
@@ -494,7 +612,7 @@ filter_data_dict <- function(data_dict,
       )
     )
   } else if (any(!filter_value %in% data_dict[[filter_col]]) &
-             error_if_missing) {
+             (error_if_missing == TRUE)) {
     stop(
       paste0(
         "Error! The following values are not present in the data dictionary (under column ",
@@ -912,7 +1030,7 @@ remove_special_characters_and_make_lower_case <- function(string) {
   string <- stringr::str_replace_all(string, "<=", "_less_or_equal_")
 
   # make ' - ' '_to_'
-  string <- stringr::str_replace_all(string, " - ", "_to_")
+  string <- stringr::str_replace_all(string, "[:digit:]+ - [:digit:]+", "_to_")
 
   # characters to be replaced with "_"
   to_underscore <- c("-",
@@ -989,8 +1107,8 @@ revalue_vector <-
            strict = FALSE) {
 
     # raise an error if column is not character/numeric/integer
-    assertthat::assert_that(all(class(x) %in% c("numeric", "integer", "character", "ordered")),
-                            msg = paste("Error! Selected column must be of type numeric/integer/character. x is type:", class(x)))
+    assertthat::assert_that(all(class(x) %in% c("numeric", "integer", "character", "ordered", "haven_labelled", "vctrs_vctr")),
+                            msg = paste("Error! Selected column must be of type numeric/integer/character/haven_labelled. x is type:", class(x)))
 
     # `dict` is a named vector - check the names (keys) are unique
     if (length(unique(names(dict))) != length(dict)) {

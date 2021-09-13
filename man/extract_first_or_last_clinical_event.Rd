@@ -5,20 +5,13 @@
 \title{Get the earliest record date for a set of diagnostic codes}
 \usage{
 extract_first_or_last_clinical_event(
-  df,
+  clinical_events,
   codes,
   min_max = "min",
   phenotype_name = "event"
 )
 }
 \arguments{
-\item{df}{Either a dataframe or a \code{\link[dbplyr]{tbl_dbi}} object generated
-by one of the \code{get_XXX_diagnoses} functions}
-
-\item{codes}{Either a character vector or named list of diagnostic codes. If
-a list, then each named item should be a character vector of codes (use
-\code{\link{make_empty_clinical_codes_list}}).}
-
 \item{min_max}{can be either "min" or "max". Extracts either the earliest or
 latest date that on of the specified \code{codes} appears.}
 
@@ -43,9 +36,4 @@ and retrieve, if available, the earliest or latest recorded date.
   is then retrieved, as specified by \code{min_max}.
 }
 
-\seealso{
-Other extract specific diagnostic codes functions: 
-\code{\link{extract_first_or_last_clinical_event_multi}()},
-\code{\link{extract_single_diagnostic_code_record_basis}()}
-}
 \concept{extract specific diagnostic codes functions}

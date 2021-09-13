@@ -12,7 +12,7 @@
 #' @param summary_function The summary function to be applied. Options are
 #'   "Mean", "Min", "Max" or "Sum"
 #' @param summarise_by Whether to summarise by "Field" or by "Instance".
-#' @param drop If \code{TRUE}, removes the numerical variables being summarised
+#' @param .drop If \code{TRUE}, removes the numerical variables being summarised
 #'   from the result. Default value is \code{FALSE}
 #' @inheritParams make_data_dict
 #'
@@ -120,7 +120,7 @@ summarise_numerical_variables <- function(ukb_main,
       )
     }
 
-    # remove summarised columns if requested
+    # remove summarised columns
     if (.drop) {
       ukb_main <- ukb_main %>%
         dplyr::select(-tidyselect::all_of(selected_cols))

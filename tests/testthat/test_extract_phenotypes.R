@@ -1,15 +1,7 @@
 
+# Note that the dummy data formats dates as DD/MM/YYYY, whereas UKB formats these as YYYY-MM-DD
+
 # SETUP -------------------------------------------------------------------
-
-# GENERATE DUMMY DATA -----------------------------------------------------
-
-# TODO make function to generate dummy clinical events df. Write tests for
-# extract_first_diagnostic_code_record (redo to have arg specifying
-# earliest/latest date)
-# Look at TODO email re ukb_explore
-
-# Functions ---------------------------------------------------------------
-
 
 # Make dummy data ---------------------------------------------------------
 
@@ -17,39 +9,97 @@
 ukb_data_dict <- get_ukb_data_dict()
 ukb_codings <- get_ukb_codings()
 
+# This is now replaced with `dummy_ukb_main_clinical_events` below
+
 # get dummy ukb data (contains all diagnoses columns) and load single eid for testing
-dummy_ukb_data_path <- download_dummy_ukb_data_to_tempdir()
-dummy_ukb_data_dict <- make_data_dict(ukb_main = dummy_ukb_data_path,
-                                      delim = ",",
-                                      ukb_data_dict = ukb_data_dict)
-dummy_ukb_data_3eid <- read_ukb(path = dummy_ukb_data_path,
-                             delim = ",",
-                             data_dict = dummy_ukb_data_dict,
-                             ukb_data_dict = ukb_data_dict,
-                             ukb_codings = ukb_codings,
-                             nrows = 3)
+# dummy_ukb_data_path <- download_dummy_ukb_data_to_tempdir()
+# dummy_ukb_data_dict <- make_data_dict(ukb_main = dummy_ukb_data_path,
+#                                       delim = ",",
+#                                       ukb_data_dict = ukb_data_dict)
+# dummy_ukb_data_2eid <- read_ukb(path = dummy_ukb_data_path,
+#                              delim = ",",
+#                              data_dict = dummy_ukb_data_dict %>%
+#                                dplyr::filter(FieldID == "eid" |
+#                                                (instance %in% c("0", "2") &
+#                                                   array %in% c("0", "3") &
+#                                                   FieldID %in% as.character(purrr::flatten(CLINICAL_EVENTS_FIELD_IDS)))),
+#                              ukb_data_dict = ukb_data_dict,
+#                              ukb_codings = ukb_codings,
+#                              nrows = 2)
 
-dummy_ukb_data_1eid <- dummy_ukb_data_3eid[1, ]
-dummy_ukb_data_2eid <- dummy_ukb_data_3eid[c(1, 2), ]
+# manually create dummy data for 2 eids (copied from `dummy_ukb_data_2eid` above and appended
+# operations fields, reformatted dates)
+dummy_ukb_main_clinical_events <- data.table::data.table(
+  eid = c(1, 2),
+  cancer_code_self_reported_f20001_0_0 = c(1048, 1046),
+  cancer_code_self_reported_f20001_0_3 = c(1005, 1003),
+  cancer_code_self_reported_f20001_2_0 = c(1045, 1028),
+  cancer_code_self_reported_f20001_2_3 = c(1017, 1039),
+  non_cancer_illness_code_self_reported_f20002_0_0 = c(1665, 1383),
+  non_cancer_illness_code_self_reported_f20002_0_3 = c(1223, 1352),
+  non_cancer_illness_code_self_reported_f20002_2_0 = c(1514, 1447),
+  non_cancer_illness_code_self_reported_f20002_2_3 = c(NA, 1165),
+  interpolated_year_when_cancer_first_diagnosed_f20006_0_0 = c(2012.8173, 2016.0638),
+  interpolated_year_when_cancer_first_diagnosed_f20006_0_3 = c(2007.0874, 2023.1635),
+  interpolated_year_when_cancer_first_diagnosed_f20006_2_0 = c(2023.2047, 2024.0358),
+  interpolated_year_when_cancer_first_diagnosed_f20006_2_3 = c(2014.7373, 2013.2044),
+  interpolated_year_when_non_cancer_illness_first_diagnosed_f20008_0_0 = c(1998.9782, 2011.0121),
+  interpolated_year_when_non_cancer_illness_first_diagnosed_f20008_0_3 = c(2003.1527, 2020.502),
+  interpolated_year_when_non_cancer_illness_first_diagnosed_f20008_2_0 = c(2011.2636, 1981.1627),
+  interpolated_year_when_non_cancer_illness_first_diagnosed_f20008_2_3 = c(2018.786, 1983.0059),
+  diagnoses_icd10_f41270_0_0 = c('X715', 'T630'),
+  diagnoses_icd10_f41270_0_3 = c('D550', 'M0087'),
+  diagnoses_icd9_f41271_0_0 = c('E89115', 'E8326'),
+  diagnoses_icd9_f41271_0_3 = c(NA, '75513'),
+  date_of_first_in_patient_diagnosis_icd10_f41280_0_0 = c('1955-11-12', '1939-02-16'),
+  date_of_first_in_patient_diagnosis_icd10_f41280_0_3 = c('1910-02-19', '1965-08-08'),
+  date_of_first_in_patient_diagnosis_icd9_f41281_0_0 = c('1917-10-08', '1955-02-11'),
+  date_of_first_in_patient_diagnosis_icd9_f41281_0_3 = c('1969-11-23', '1956-09-12'),
+  underlying_primary_cause_of_death_icd10_f40001_0_0 = c('X095', 'A162'),
+  contributory_secondary_causes_of_death_icd10_f40002_0_0 = c('P912', 'V374'),
+  contributory_secondary_causes_of_death_icd10_f40002_0_3 = c('X715', NA),
+  date_of_cancer_diagnosis_f40005_0_0 = c('1956-11-24', '1910-10-04'),
+  date_of_cancer_diagnosis_f40005_2_0 = c('1962-09-04', NA),
+  type_of_cancer_icd10_f40006_0_0 = c('M4815', NA),
+  type_of_cancer_icd10_f40006_2_0 = c('C850', 'W192'),
+  type_of_cancer_icd9_f40013_0_0 = c('27134', '9626'),
+  type_of_cancer_icd9_f40013_2_0 = c('2042', 'E90200'),
+  operative_procedures_opcs4_f41272_0_0 = c('A01', 'A023'),
+  operative_procedures_opcs4_f41272_0_3 = c('A018', 'A02'),
+  date_of_first_operative_procedure_opcs4_f41282_0_0 = c('1956-11-24', '1910-10-04'),
+  date_of_first_operative_procedure_opcs4_f41282_0_3 = c('1969-11-23', '1956-09-12'),
+  operative_procedures_opcs3_f41273_0_0 = c('001', '0011'),
+  operative_procedures_opcs3_f41273_0_3 = c('0081', '0071'),
+  date_of_first_operative_procedure_opcs3_f41283_0_0 = c('1969-11-23', '1956-09-12'),
+  date_of_first_operative_procedure_opcs3_f41283_0_3 = c('1955-11-12', '1939-02-16'),
+  operation_code_f20004_0_0 = c(1102, 1105),
+  operation_code_f20004_0_3 = c(1108, 1109),
+  interpolated_year_when_operation_took_place_f20010_0_0 = c(2012.8173, 2016.0638),
+  interpolated_year_when_operation_took_place_f20010_0_3 = c(2008.2342, NA)
+)
 
-# test all `get_XXX_diagnoses()` functions at once (by default, should include all of these)
-dummy_ukb_data_all_diagnoses <-
-  get_all_diagnostic_codes_multi(ukb_pheno = dummy_ukb_data_1eid,
-                                 data_dict = dummy_ukb_data_dict,
-                                 ukb_codings = ukb_codings,
-                                 function_list = list(
-                                   get_self_report_non_cancer_diagnoses,
-                                   get_self_report_non_cancer_diagnoses_icd10,
-                                   get_self_report_cancer_diagnoses,
-                                   get_hes_icd9_diagnoses,
-                                   get_hes_icd10_diagnoses,
-                                   get_death_data_icd10_diagnoses,
-                                   get_cancer_register_icd9_diagnoses,
-                                   get_cancer_register_icd10_diagnoses
-                                 ))
+# tidy clinical events
+dummy_ukb_main_clinical_events_tidy <- tidy_clinical_events(ukb_main = dummy_ukb_main_clinical_events,
+                                                     ukb_data_dict = ukb_data_dict,
+                                                     ukb_codings = ukb_codings,
+                                                     clinical_events = c(
+                                                       "death_icd10",
+                                                       "self_report_non_cancer",
+                                                       "self_report_non_cancer_icd10",
+                                                       "self_report_cancer",
+                                                       "self_report_operation",
+                                                       "cancer_register_icd9",
+                                                       "cancer_register_icd10",
+                                                       "summary_hes_icd9",
+                                                       "summary_hes_icd10",
+                                                       "summary_hes_opcs3",
+                                                       "summary_hes_opcs4"
+                                                     ),
+                                                     strict = FALSE,
+                                                     .details_only = FALSE)
 
 # dummy clinical_events_df
-dummy_clinical_events <- ukbwranglr:::make_dummy_clinical_events_df(eids = c(1, 2, 3),
+dummy_clinical_events <- make_dummy_clinical_events_df(eids = c(1, 2, 3),
                                                        n_rows = c(200, 200, 200))
 
 # dummy_clinical_events_df as sqlite db
@@ -67,9 +117,9 @@ dplyr::copy_to(con,
 # get tbl_dbi object
 dummy_clinical_events_db <- dplyr::tbl(con, "dummy_clinical_events")
 
-# should match output from `generate_self_reported_diabetes_codes_df()`
+# should match output from `example_clinical_codes()`
 dummy_clinical_codes_df <- tibble::tribble(
-  ~ disease, ~ description, ~ category, ~ code_type, ~ code, ~ phenotype_source,
+  ~ disease, ~ description, ~ category, ~ code_type, ~ code, ~ author,
   "Diabetes", "diabetes", "Diabetes unspecified", "icd10", "D", "test",
   "Diabetes", "gestational diabetes", "Gestational diabetes", "icd10", "E", "test",
   "Diabetes", "type 1 diabetes", "Type 1 diabetes", "read3", "H", "test",
@@ -77,51 +127,250 @@ dummy_clinical_codes_df <- tibble::tribble(
   "Diabetes", "type 2 diabetes", "Type 2 diabetes", "data_coding_6", "D", "test",
 )
 
-# Process dummy data (and record expected results) ------------------------
+# Process dummy tidy clinical events data (and record expected results) ------------------------
 
-# ***`extract_single_diagnostic_code_record_basis()` -------------------------
-
-# Note: I manually checked this to produce 'expected' below. ***This will change
-# whenever ukbwranglr:::clinical_events_sources$source changes***
-min_dates <- ukbwranglr:::extract_single_diagnostic_code_record_basis(df = dummy_clinical_events,
+# Note: this is manually checked to produce 'expected' below. ***will change
+# whenever CLINICAL_EVENTS_SOURCES$source changes***
+min_dates <- extract_single_diagnostic_code_record_basis(clinical_events = dummy_clinical_events,
                                                          codes = c("A", "B"),
-                                                         mapping_function = ukbwranglr:::extract_first_or_last_record_mapper,
+                                                         mapping_function = extract_first_or_last_record_mapper,
                                                          min_max = "min")
 
-min_dates_db <- ukbwranglr:::extract_single_diagnostic_code_record_basis(df = dummy_clinical_events_db,
+min_dates_db <- extract_single_diagnostic_code_record_basis(clinical_events = dummy_clinical_events_db,
                                                          codes = c("A", "B"),
-                                                         mapping_function = ukbwranglr:::extract_first_or_last_record_mapper,
+                                                         mapping_function = extract_first_or_last_record_mapper,
                                                          min_max = "min")
 
 # min_dates: expected result (- nested `data` col)
 expected <- tibble::tribble(
   ~ eid, ~ source, ~ code, ~ date,
-  1, "gpc_r2", "B", as.Date("2000-01-03"),
-  2, "f40013", "B", as.Date("2000-01-12"),
-  3, "f41270", "A", as.Date("2000-01-04"),
+  1, "f41271", "B", "2000-01-03",
+  2, "f20002", "A", "2000-01-13",
+  3, "f20002", "B", "2000-01-01",
 )
 
 # TESTS -------------------------------------------------------------------
 
+# `tidy_clinical_events()`  -----------------------------------------
 
-# `tidy_clinical_events_basis()`  -----------------------------------------
+test_that(
+  "output from `tidy_clinical_events()` contains all expected source types", {
+    # won't contain gp read codes
+    expect_equal(sort(unique(dplyr::bind_rows(dummy_ukb_main_clinical_events_tidy)$source)),
+                 sort(subset(CLINICAL_EVENTS_SOURCES$source, !CLINICAL_EVENTS_SOURCES$source %in% c("gpc_r2",
+                                                                                                    "gpc_r3"))))
+  }
+)
 
-tidy_clinical_events_basis(ukb_main = dummy_ukb_data_3eid,
-                           data_dict = dummy_ukb_data_dict,
-                           data_dict_colname_col = "descriptive_colnames",
+test_that(
+  "`tidy_clinical_events()` raises warning message if any clinical event types are missing from ukb_main",
+  {
+    expect_warning(
+      tidy_clinical_events(ukb_main = dummy_ukb_main_clinical_events %>%
+                             dplyr::select(-tidyselect::contains("operation")),
+                           ukb_data_dict = ukb_data_dict,
                            ukb_codings = ukb_codings,
-                           code_col_field_id = "41270",
-                           date_col_field_id = "41280")
+                           clinical_events = c(
+                             "death_icd10",
+                             # "self_report_non_cancer",
+                             # "self_report_non_cancer_icd10",
+                             # "self_report_cancer",
+                             "self_report_operation"
+                             # "cancer_register_icd9",
+                             # "cancer_register_icd10",
+                             # "summary_hes_icd9",
+                             # "summary_hes_icd10",
+                             # "summary_hes_opcs3",
+                             # "summary_hes_opcs4"
+                           ),
+                           strict = FALSE,
+                           .details_only = FALSE),
+      ": self_report_operation. Use")
+  }
+)
+
+test_that(
+  "`tidy_clinical_events()` raises error if any clinical event types are missing from ukb_main and strict = TRUE",
+  {
+    expect_error(
+      tidy_clinical_events(ukb_main = dummy_ukb_main_clinical_events %>%
+                             dplyr::select(-tidyselect::contains("operation")),
+                           ukb_data_dict = ukb_data_dict,
+                           ukb_codings = ukb_codings,
+                           clinical_events = c(
+                             "death_icd10",
+                             # "self_report_non_cancer",
+                             # "self_report_non_cancer_icd10",
+                             # "self_report_cancer",
+                             "self_report_operation"
+                             # "cancer_register_icd9",
+                             # "cancer_register_icd10",
+                             # "summary_hes_icd9",
+                             # "summary_hes_icd10",
+                             # "summary_hes_opcs3",
+                             # "summary_hes_opcs4"
+                           ),
+                           strict = TRUE,
+                           .details_only = FALSE),
+      ": self_report_operation. Use")
+  }
+)
+
+# note: use `rawutil::print_df_as_call_to_tibble` to generate expected tibbles
+# after manually checking they are correct
+
+test_that(
+  "`Expected results returned`tidy_clinical_events` returns the expected results for 'death_icd10'", {
+    expect_equivalent(dummy_ukb_main_clinical_events_tidy$death_icd10,
+                      tibble::tibble(
+                        eid = c(1, 2, 1, 2, 1),
+                        source = c('f40001', 'f40001', 'f40002', 'f40002', 'f40002'),
+                        index = c('0_0', '0_0', '0_0', '0_0', '0_3'),
+                        code = c('X095', 'A162', 'P912', 'V374', 'X715'),
+                        date = as.character(c(NA, NA, NA, NA, NA)),
+                      ))
+  }
+)
+
+test_that(
+  "`Expected results returned`tidy_clinical_events` returns the expected results for 'self_report_non_cancer'", {
+    expect_equivalent(dummy_ukb_main_clinical_events_tidy$self_report_non_cancer,
+                      tibble::tibble(
+                        eid = c(1, 2, 1, 2, 1, 2, 2),
+                        source = c('f20002', 'f20002', 'f20002', 'f20002', 'f20002', 'f20002', 'f20002'),
+                        index = c('0_0', '0_0', '0_3', '0_3', '2_0', '2_0', '2_3'),
+                        code = c('1665', '1383', '1223', '1352', '1514', '1447', '1165'),
+                        date = c('1998-12-24', '2011-01-05', '2003-02-25', '2020-07-02', '2011-04-07', '1981-03-01', '1983-01-03'),
+                      ))
+  }
+)
+
+test_that(
+  "`Expected results returned`tidy_clinical_events` returns the expected results for 'self_report_non_cancer_icd10'", {
+    expect_equivalent(dummy_ukb_main_clinical_events_tidy$self_report_non_cancer_icd10,
+                      tibble::tibble(
+                        eid = c(1, 2, 1, 2, 1, 2, 2),
+                        source = c('f20002_icd10', 'f20002_icd10', 'f20002_icd10', 'f20002_icd10', 'f20002_icd10', 'f20002_icd10', 'f20002_icd10'),
+                        index = c('0_0', '0_0', '0_3', '0_3', '2_0', '2_0', '2_3'),
+                        code = c('N95', 'M33', 'E11', 'N84', 'N30', 'D61', 'K85'),
+                        date = c('1998-12-24', '2011-01-05', '2003-02-25', '2020-07-02', '2011-04-07', '1981-03-01', '1983-01-03'),
+                      ))
+  }
+)
+
+test_that(
+  "`Expected results returned`tidy_clinical_events` returns the expected results for 'self_report_cancer'", {
+    expect_equivalent(dummy_ukb_main_clinical_events_tidy$self_report_cancer,
+                      tibble::tibble(
+                        eid = c(1, 2, 1, 2, 1, 2, 1, 2),
+                        source = c('f20001', 'f20001', 'f20001', 'f20001', 'f20001', 'f20001', 'f20001', 'f20001'),
+                        index = c('0_0', '0_0', '0_3', '0_3', '2_0', '2_0', '2_3', '2_3'),
+                        code = c('1048', '1046', '1005', '1003', '1045', '1028', '1017', '1039'),
+                        date = c('2012-10-26', '2016-01-24', '2007-02-01', '2023-03-01', '2023-03-16', '2024-01-14', '2014-09-27', '2013-03-16'),
+                      ))
+  }
+)
+
+test_that(
+  "`Expected results returned`tidy_clinical_events` returns the expected results for 'self_report_operation'", {
+    expect_equivalent(dummy_ukb_main_clinical_events_tidy$self_report_operation,
+                      tibble::tibble(
+                        eid = c(1, 2, 1, 2),
+                        source = c('f20004', 'f20004', 'f20004', 'f20004'),
+                        index = c('0_0', '0_0', '0_3', '0_3'),
+                        code = c('1102', '1105', '1108', '1109'),
+                        date = c('2012-10-26', '2016-01-24', '2008-03-26', NA),
+                      ))
+  }
+)
+
+test_that(
+  "`Expected results returned`tidy_clinical_events` returns the expected results for 'cancer_register_icd9'", {
+    expect_equivalent(dummy_ukb_main_clinical_events_tidy$cancer_register_icd9,
+                      tibble::tibble(
+                        eid = c(1, 2, 1, 2),
+                        source = c('f40013', 'f40013', 'f40013', 'f40013'),
+                        index = c('0_0', '0_0', '2_0', '2_0'),
+                        code = c('27134', '9626', '2042', 'E90200'),
+                        date = c('1956-11-24', '1910-10-04', '1962-09-04', NA),
+                      ))
+  }
+)
+
+test_that(
+  "`Expected results returned`tidy_clinical_events` returns the expected results for 'cancer_register_icd10'", {
+    expect_equivalent(dummy_ukb_main_clinical_events_tidy$cancer_register_icd10,
+                      tibble::tibble(
+                        eid = c(1, 1, 2),
+                        source = c('f40006', 'f40006', 'f40006'),
+                        index = c('0_0', '2_0', '2_0'),
+                        code = c('M4815', 'C850', 'W192'),
+                        date = c('1956-11-24', '1962-09-04', NA),
+                      ))
+  }
+)
+
+test_that(
+  "`Expected results returned`tidy_clinical_events` returns the expected results for 'summary_hes_icd9'", {
+    expect_equivalent(dummy_ukb_main_clinical_events_tidy$summary_hes_icd9,
+                      tibble::tibble(
+                        eid = c(1, 2, 2),
+                        source = c('f41271', 'f41271', 'f41271'),
+                        index = c('0_0', '0_0', '0_3'),
+                        code = c('E89115', 'E8326', '75513'),
+                        date = c('1917-10-08', '1955-02-11', '1956-09-12'),
+                      ))
+  }
+)
+
+test_that(
+  "`Expected results returned`tidy_clinical_events` returns the expected results for 'summary_hes_icd10'", {
+    expect_equivalent(dummy_ukb_main_clinical_events_tidy$summary_hes_icd10,
+                      tibble::tibble(
+                        eid = c(1, 2, 1, 2),
+                        source = c('f41270', 'f41270', 'f41270', 'f41270'),
+                        index = c('0_0', '0_0', '0_3', '0_3'),
+                        code = c('X715', 'T630', 'D550', 'M0087'),
+                        date = c('1955-11-12', '1939-02-16', '1910-02-19', '1965-08-08'),
+                      ))
+  }
+)
+
+test_that(
+  "`Expected results returned`tidy_clinical_events` returns the expected results for 'summary_hes_opcs3'", {
+    expect_equivalent(dummy_ukb_main_clinical_events_tidy$summary_hes_opcs3,
+                      tibble::tibble(
+                        eid = c(1, 2, 1, 2),
+                        source = c('f41273', 'f41273', 'f41273', 'f41273'),
+                        index = c('0_0', '0_0', '0_3', '0_3'),
+                        code = c('001', '0011', '0081', '0071'),
+                        date = c('1969-11-23', '1956-09-12', '1955-11-12', '1939-02-16'),
+                      ))
+  }
+)
+
+test_that(
+  "`Expected results returned`tidy_clinical_events` returns the expected results for 'summary_hes_opcs4'", {
+    expect_equivalent(dummy_ukb_main_clinical_events_tidy$summary_hes_opcs4,
+                      tibble::tibble(
+                        eid = c(1, 2, 1, 2),
+                        source = c('f41272', 'f41272', 'f41272', 'f41272'),
+                        index = c('0_0', '0_0', '0_3', '0_3'),
+                        code = c('A01', 'A023', 'A018', 'A02'),
+                        date = c('1956-11-24', '1910-10-04', '1969-11-23', '1956-09-12'),
+                      ))
+  }
+)
 
 # `extract_first_or_last_clinical_event_multi_single_disease()` --------------------------
 
 test_that(
   "`extract_first_or_last_clinical_event_multi_single_disease()` returns the expected column names", {
     result <-
-      ukbwranglr:::extract_first_or_last_clinical_event_multi_single_disease(
+      extract_first_or_last_clinical_event_multi_single_disease(
         disease = "Diabetes",
-        df = dummy_clinical_events,
-        clinical_codes_df = dummy_clinical_codes_df,
+        clinical_events = dummy_clinical_events,
+        clinical_codes = dummy_clinical_codes_df,
         min_max = "min",
         prefix = "testy_"
       )
@@ -145,12 +394,12 @@ test_that(
   }
 )
 
-# `extract_first_or_last_clinical_event_multi()` --------------------------
+# `extract_phenotypes()` --------------------------
 
 test_that(
-  "`extract_first_or_last_clinical_event_multi()` returns the expected column names", {
-    result <- extract_first_or_last_clinical_event_multi(df = dummy_clinical_events,
-                                               clinical_codes_df = dummy_clinical_codes_df,
+  "`extract_phenotypes()` returns the expected column names", {
+    result <- extract_phenotypes(clinical_events = dummy_clinical_events,
+                                               clinical_codes = dummy_clinical_codes_df,
                                                min_max = "min",
                                                prefix = "testy_")
 
@@ -173,12 +422,12 @@ test_that(
   }
 )
 
-# THIS WORKS WHEN RUN LOCALLY BUT NOT WHEN RUNNING TESTS WITH R-CMD-CHECK
+# This works when run locally but not when running tests with r-cmd-check
 
 # test_that(
 #   "`extract_first_or_last_clinical_event_multi()` works with tbl object", {
-#     result <- extract_first_or_last_clinical_event_multi(df = dummy_clinical_events_db,
-#                                                          clinical_codes_df = dummy_clinical_codes_df,
+#     result <- extract_first_or_last_clinical_event_multi(clinical_events = dummy_clinical_events_db,
+#                                                          clinical_codes = dummy_clinical_codes_df,
 #                                                          min_max = "min",
 #                                                          prefix = "testy_")
 #
@@ -202,9 +451,10 @@ test_that(
 # )
 
 test_that(
-  "`extract_first_or_last_clinical_event_multi()` works with parallel processing, data frame clinical events", {
-    result <- extract_first_or_last_clinical_event_multi(df = dummy_clinical_events,
-                                                         clinical_codes_df = dummy_clinical_codes_df,
+  # need to rebuild package to include any changes when running this test
+  "`extract_phenotypes()` works with parallel processing, data frame clinical events", {
+    result <- extract_phenotypes(clinical_events = dummy_clinical_events,
+                                                         clinical_codes = dummy_clinical_codes_df,
                                                          min_max = "min",
                                                          prefix = "testy_",
                                                          workers = 2)
@@ -228,13 +478,13 @@ test_that(
   }
 )
 
-# NOT WORKING - CANNOT TEST WITH A DUMMY DATABASE THAT IS STORED IN TEMPDIR OR
-# MEMORY (CANNOT SHARE THIS BETWEEN MULTIPLE SESSIONS RUNNING IN PARALLEL)
+# Test not working - cannot test with a dummy database that is stored in tempdir
+# or memory (cannot share this between multiple sessions running in parallel)
 
 # test_that(
 #   "`extract_first_or_last_clinical_event_multi()` works with parallel processing, tbl clinical events", {
-#     result <- extract_first_or_last_clinical_event_multi(df = dummy_clinical_events_db,
-#                                                          clinical_codes_df = dummy_clinical_codes_df,
+#     result <- extract_first_or_last_clinical_event_multi(clinical_events = dummy_clinical_events_db,
+#                                                          clinical_codes = dummy_clinical_codes_df,
 #                                                          min_max = "min",
 #                                                          prefix = "testy_",
 #                                                          workers = 2)
@@ -264,7 +514,7 @@ test_that(
   "`mutate_age_at_event_cols()` creates the expected age-at-event columns", {
     dummy_ukb_pheno <- tibble::tribble(
       ~ eid, ~ dob, ~ event_date,
-      1, as.Date("2000-01-01"), as.Date("2010-01-01")
+      1, "2000-01-01", "2010-01-01"
     )
 
     result <- mutate_age_at_event_cols(dummy_ukb_pheno,
@@ -287,7 +537,7 @@ test_that(
 # `extract_single_diagnostic_code_record_basis()` -------------------------
 
 test_that(
-  "`extract_single_diagnostic_code_record_basis()` extracts the correct earliest and latest dates - all sources and class(df) = dataframe",
+  "`extract_single_diagnostic_code_record_basis()` extracts the correct earliest and latest dates - all sources and class(clinical_events) = dataframe",
   {
     # expectations
     expect_equal(min_dates$eid, expected$eid)
@@ -298,7 +548,7 @@ test_that(
 )
 
 test_that(
-  "`extract_single_diagnostic_code_record_basis()` extracts the correct earliest and latest dates - all sources and class(df) = tbl_dbi",
+  "`extract_single_diagnostic_code_record_basis()` extracts the correct earliest and latest dates - all sources and class(clinical_events) = tbl_dbi",
   {
     # expectations
     expect_equal(min_dates_db$eid, expected$eid)
@@ -315,15 +565,15 @@ test_that(
   "`filter_clinical_events_for_codes()` (helper function for `extract_single_diagnostic_code_record_basis()`) returns the expected number of rows",
   {
     expect_equal(
-      nrow(filter_clinical_events_for_codes(df = dummy_clinical_events,
+      nrow(filter_clinical_events_for_codes(clinical_events = dummy_clinical_events,
                                        codes = list("read2" = "A"))),
-      8
+      7
     )
 
     expect_equal(
-      nrow(filter_clinical_events_for_codes(df = dummy_clinical_events_db,
+      nrow(filter_clinical_events_for_codes(clinical_events = dummy_clinical_events_db,
                                             codes = list("read2" = "A"))),
-      8
+      7
     )
   }
 )
@@ -450,73 +700,6 @@ test_that("`make_self_report_special_decimal_dates_na()` removes special dates f
     c(1998.1, NA, NA))
 })
 
+# CLOSE DBI CONNECTION ----------------------------------------------------
 
-# `get_all_diagnostic_codes_multi()` --------------------------------------
-
-test_that(
-  "output from `get_all_diagnostic_codes_multi()` contains all expected source types", {
-    # output from `get_all_diagnostic_codes_multi()` won't include primary care data
-    # won't include opcs3/4 either
-    expected_sources <- subset(ukbwranglr:::clinical_events_sources$source,
-                               !ukbwranglr:::clinical_events_sources$source %in% c("gpc_r2",
-                                                                                   "gpc_r3",
-                                                                                   "f41272",
-                                                                                   "f41273"))
-
-    expect_equal(sort(unique(dummy_ukb_data_all_diagnoses$source)),
-                 sort(expected_sources))
-  }
-)
-
-test_that(
-  "`get_all_diagnostic_codes_multi()` raises warning message if any errors are generated",
-  {
-    # the dummy data does not include opcs3 or opcs4 fields so these 2 functions will fail
-    expect_warning(
-      get_all_diagnostic_codes_multi(
-        ukb_pheno = dummy_ukb_data_1eid,
-        data_dict = dummy_ukb_data_dict,
-        ukb_codings = ukb_codings,
-        function_list = list(
-          get_hes_icd9_diagnoses,
-          get_hes_opcs3_operations,
-          get_hes_opcs4_operations
-        )
-      ),
-      "functions failed, generating the error messages above"
-    )
-  }
-)
-
-test_that(
-  "`get_all_diagnostic_codes_multi()` returns the same results when using older get_diagnoses functions",
-  {
-    OLD_dummy_ukb_data_all_diagnoses <-
-      get_all_diagnostic_codes_multi(ukb_pheno = dummy_ukb_data_1eid,
-                                     data_dict = dummy_ukb_data_dict,
-                                     ukb_codings = ukb_codings,
-                                     function_list = list(
-                                       ukbwranglr:::OLD_get_self_report_non_cancer_diagnoses,
-                                       ukbwranglr:::OLD_get_self_report_non_cancer_diagnoses_icd10,
-                                       ukbwranglr:::OLD_get_self_report_cancer_diagnoses,
-                                       ukbwranglr:::OLD_get_hes_icd9_diagnoses,
-                                       ukbwranglr:::OLD_get_hes_icd10_diagnoses,
-                                       ukbwranglr:::OLD_get_death_data_icd10_diagnoses,
-                                       ukbwranglr:::OLD_get_cancer_register_icd9_diagnoses,
-                                       ukbwranglr:::OLD_get_cancer_register_icd10_diagnoses
-                                     )) %>%
-      suppressWarnings() %>%
-      dplyr::arrange(.data[["eid"]],
-                     .data[["source"]],
-                     .data[["date"]],
-                     .data[["code"]])
-
-    expect_equivalent(
-      OLD_dummy_ukb_data_all_diagnoses %>% dplyr::select(-.data[["source_col"]]),
-      dummy_ukb_data_all_diagnoses %>% dplyr::arrange(.data[["eid"]],
-                                                      .data[["source"]],
-                                                      .data[["date"]],
-                                                      .data[["code"]])
-    )
-  }
-)
+DBI::dbDisconnect(con)

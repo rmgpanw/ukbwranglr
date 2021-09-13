@@ -254,18 +254,23 @@ read_ukb <- function(path,
 #'
 #' @param colheaders A character vector. The first item should contain 'eid'
 #'   i.e. the first column should be the eid column.
+#' @param eid_first logical. If \code{TRUE} (default) then will raise error if
+#'   first item in \code{colheaders} does not contain "eid"
 #'
 #' @return A ukb main dataset header (character vector) of the form
 #'   'f_5912_0_0'. Returns the header unaltered if already in this form
 #'
 #' @noRd
-format_ukb_df_header <- function(colheaders) {
+format_ukb_df_header <- function(colheaders,
+                                 eid_first = TRUE) {
 
-  assertthat::assert_that(stringr::str_detect(colheaders[1],
-                                              "eid"),
-                          msg = "Error! First column name should include 'eid'")
+  if (eid_first) {
+    assertthat::assert_that(stringr::str_detect(colheaders[1],
+                                                "eid"),
+                            msg = "Error! First column name should include 'eid'")
 
-  colheaders[1] <- "feid"
+    colheaders[1] <- "feid"
+  }
 
   # Process colheaders not of the form 'f_5912_0_0'
 
@@ -737,7 +742,6 @@ label_df_by_coding <- function(df,
                                    total = nrow(data_dict))
   pb$tick(0)
 
-  browser()
   # loop through codings
   for (single_coding in all_codings) {
 
@@ -787,7 +791,6 @@ label_df_by_coding <- function(df,
 
     # for debugging
     # print(column)
-
     df[[column]] <- haven::labelled(x = df[[column]],
                                     labels = NULL,
                                     label = data_dict[data_dict[[data_dict_colname_col]] == column, data_dict_variable_label_col][[1]])
@@ -805,9 +808,9 @@ update_column_classes <- function(df,
   # coltypes must be a named character vector with the following allowed values
   assertthat::assert_that(all(
     unique(coltypes) %in% c("character",
-                                  "Date",
-                                  "double",
-                                  "integer")
+                            "Date",
+                            "double",
+                            "integer")
   ))
 
   # for each class, coerce all relevant columns to this class
