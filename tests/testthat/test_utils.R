@@ -186,7 +186,73 @@ test_that("`remove_special_characters_and_make_lower_case()` returns expected re
 # `validate_clinical_codes()` ---------------------------------------------
 
 test_that(
-  "`validate_clinical_codes`() returns expected error messages", {
+  "`validate_clinical_codes()` returns TRUE for `example_clinical_codes()`", {
+    expect_true(validate_clinical_codes(example_clinical_codes()))
+  }
+)
 
+test_that(
+  "`validate_clinical_codes()` returns error if expected column names are not present", {
+    expect_error(
+      validate_clinical_codes(iris, "Error! clinical_codes should have the following column headers:"))
+  }
+)
+
+test_that(
+  "`validate_clinical_codes()` returns error if not all columns are type character", {
+    expect_error(
+        example_clinical_codes() %>%
+          dplyr::mutate("disease" = as.factor(.data[["disease"]])) %>%
+          validate_clinical_codes(),
+        "Error! all columns in clinical_codes should be of type character"
+        )
+  }
+)
+
+test_that(
+  "`validate_clinical_codes()` returns error missing values are present", {
+    expect_error(
+        example_clinical_codes() %>%
+          dplyr::mutate("code_type" = ifelse(.data[["code_type"]] == "icd10",
+                                             NA,
+                                             .data[["code_type"]])) %>%
+          validate_clinical_codes(),
+        "Error! There should be no missing values in clinical_codes"
+    )
+  }
+)
+
+test_that(
+  "`validate_clinical_codes()` returns error missing if unrecognised code_types are present", {
+    expect_error(
+      example_clinical_codes() %>%
+        dplyr::mutate("code_type" = ifelse(.data[["code_type"]] == "icd10",
+                                           "unrecognised_code_type",
+                                           .data[["code_type"]])) %>%
+        validate_clinical_codes(),
+      "Error! code_type column in clinical_codes contains unrecognised code types"
+    )
+  }
+)
+
+test_that("`validate_clinical_codes()` returns error with non-unique codes for 1 or more disease/author combinations",
+          {
+            expect_error(
+              rbind(example_clinical_codes(),
+                    example_clinical_codes()) %>%
+                validate_clinical_codes(),
+              "Error! Each disease/author in clinical_codes must have a unique set of clinical codes/code_type"
+            )
+          })
+
+test_that(
+  "`validate_clinical_codes()` passes with unique codes per disease/author combinations",
+  {
+    expect_true(
+      example_clinical_codes() %>%
+        dplyr::mutate("author" = "ukbwr2") %>%
+        rbind(example_clinical_codes()) %>%
+        validate_clinical_codes()
+    )
   }
 )

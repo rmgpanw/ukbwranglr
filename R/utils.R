@@ -338,18 +338,14 @@ download_dummy_ukb_data_to_tempdir <- function() {
 #' Checks whether a data frame of clinical codes is correctly formatted for use
 #' with \code{\link{extract_phenotypes}}.
 #'
-#' Performs the following checks:
+#' Checks that:
 #'
-#' \itemize{
-#' \item Expected column names
-#' \item All columns are of type character
-#' \item No missing values in any column
-#' \item All values under \code{code_type} are recognised
-#' \item All codes (for each \code{code_type}) are unique for each \code{disease}/\code{author} combination
-#' }
+#' \itemize{ \item Expected column names are present \item All columns are of
+#' type character \item No missing values are present in any column \item Each
+#' disease (for each \code{author}) contains a unique set of clinical codes}
 #'
-#' Note that currently this does not check whether clinical codes exist for the
-#' coding system specified by the \code{code_type} column.
+#' Note that currently this does not check whether the clinical codes themselves
+#' are valid (i.e. whether a clinical code exists for a given coding system).
 #'
 #' @param clinical_codes A data frame. See \code{\link{example_clinical_codes}}
 #'   for an example.
@@ -359,8 +355,9 @@ download_dummy_ukb_data_to_tempdir <- function() {
 #'
 #' @examples
 #' validate_clinical_codes(example_clinical_codes())
-validate_clinical_codes <- function(clinical_codes) {
-  standard_message <- ". Use example_clinical_codes() for an example"
+validate_clinical_codes <- function(clinical_codes,
+                                    return_diseases_with_non_unique_codes = FALSE) {
+  standard_message <- ". Use example_clinical_codes() to see a valid clinical_codes example"
 
   # check is a data frame
   assertthat::assert_that(is.data.frame(clinical_codes),
@@ -380,7 +377,7 @@ validate_clinical_codes <- function(clinical_codes) {
     all(
       (clinical_codes %>%
           purrr::map_chr(class)) == "character"),
-    msg = paste0("Error! all columns in clinical_codes should be of type character. ",
+    msg = paste0("Error! All columns in clinical_codes should be of type character. ",
                  standard_message)
   )
 
@@ -393,7 +390,7 @@ validate_clinical_codes <- function(clinical_codes) {
     names()
 
   assertthat::assert_that(rlang::is_empty(cols_with_NA),
-                          msg = paste0("Error! there should be no missing values in clinical_codes. The following columns contain NA's: ",
+                          msg = paste0("Error! There should be no missing values in clinical_codes. The following columns contain NA's: ",
                                        stringr::str_c(cols_with_NA,
                                                       sep = "",
                                                       collapse = ", "),
@@ -405,31 +402,20 @@ validate_clinical_codes <- function(clinical_codes) {
                                     !unique_clinical_code_types %in% unique(CLINICAL_EVENTS_SOURCES$data_coding))
 
   assertthat::assert_that(rlang::is_empty(unrecognised_code_types),
-                          msg = paste0("Error! code_type column in clinical_codes contains unrecognised code_types: ",
+                          msg = paste0("Error! code_type column in clinical_codes contains unrecognised code types: ",
                                        stringr::str_c(unrecognised_code_types,
                                                       sep = "",
                                                       collapse = ", "),
                                        standard_message))
 
   # check all codes are unique per disease
-  diseases_with_non_unique_codes <- data.frame(disease_author = paste(clinical_codes$disease,
-                                                                      clinical_codes$author,
-                                                                      sep = "_"),
-                                               code_code_type = paste(clinical_codes$code,
-                                                                      clinical_codes$code_type,
-                                                                      sep = "_"))
+  diseases_with_non_unique_codes <- identify_diseases_with_non_unique_codes(clinical_codes)
 
-  diseases_with_non_unique_codes <-
-    split(diseases_with_non_unique_codes,
-          diseases_with_non_unique_codes$disease_author)
-
-  diseases_with_non_unique_codes <- diseases_with_non_unique_codes %>%
-    purrr::map_lgl(~ length(unique(.x$code_code_type)) != nrow(.x)) %>%
-    purrr::keep(~ .x)
-
-  assertthat::assert_that(rlang::is_empty(diseases_with_non_unique_codes),
-                          msg = paste0("Error! Each disease/author in clinical_codes must have a unique set of clinical codes/code_type. The following disease_author combinations contain non-unique code_code_types: ",
-                                       stringr::str_c(diseases_with_non_unique_codes,
+  assertthat::assert_that(is.null(diseases_with_non_unique_codes),
+                          msg = paste0("Error! Each disease/author in clinical_codes must have a unique set of clinical codes/code_type. The following ",
+                                       length(diseases_with_non_unique_codes$disease_author),
+                                       " disease_author combinations contain non-unique codes per code_type: ",
+                                       stringr::str_c(diseases_with_non_unique_codes$disease_author,
                                                       sep = "",
                                                       collapse = ", ")))
 
@@ -543,7 +529,7 @@ time_taken_message <- function(start_time) {
 #' db_tables <- make_list_of_tbls_from_db(con)
 #' db_tables$iris_head
 #' db_table$mtcars_head
-make_list_of_tbls_from_db <- function(conn) {
+db_list_tables <- function(conn) {
   DBI::dbListTables(conn) %>%
     purrr::set_names() %>%
     purrr::map(~ dplyr::tbl(conn, .x))
@@ -924,6 +910,50 @@ assert_all_df_cols_are_type_character <- function(df, arg_name) {
   )
 }
 
+
+# Validation helpers ------------------------------------------------------
+
+identify_diseases_with_non_unique_codes <- function(clinical_codes) {
+  # helper function for validate_clinical_codes()
+
+  # make df of all disease/author and code/code_type combinations
+  diseases_with_non_unique_codes <- data.frame(disease_author = paste(caliber_codes$disease,
+                                                                      caliber_codes$author,
+                                                                      sep = "_"),
+                                               code_code_type = paste(caliber_codes$code,
+                                                                      caliber_codes$code_type,
+                                                                      sep = "_"))
+
+  # identify disease/author combinations with non-unique codes
+  diseases_with_non_unique_codes <- diseases_with_non_unique_codes %>%
+    dplyr::group_by(.data[["disease_author"]],
+                    .data[["code_code_type"]]) %>%
+    dplyr::mutate(n = dplyr::n()) %>%
+    dplyr::filter(n > 1) %>%
+    dplyr::ungroup()
+
+  # if any are identified, filter clinical_codes for the relevant rows
+  if (nrow(diseases_with_non_unique_codes) > 0) {
+
+    diseases_with_non_unique_codes <- diseases_with_non_unique_codes %>%
+      tidyr::separate("disease_author",
+                      into = c("disease", "author"),
+                      sep = "_",
+                      remove = FALSE) %>%
+      tidyr::separate("code_code_type",
+                      into = c("code", "code_type"),
+                      sep = "_")
+
+    clinical_codes <- clinical_codes %>%
+      dplyr::semi_join(diseases_with_non_unique_codes,
+                       by = c("disease", "code_type", "code", "author"))
+
+    return(list(clinical_codes = clinical_codes,
+                disease_author = unique(diseases_with_non_unique_codes$disease_author)))
+  } else {
+    invisible(NULL)
+  }
+}
 
 # Miscellaneous helpers ---------------------------------------------------
 
