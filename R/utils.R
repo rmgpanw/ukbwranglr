@@ -449,34 +449,51 @@ validate_clinical_codes <- function(clinical_codes,
 #' \href{https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=52}{52} respectively) as
 #' the first date of the month.
 #'
-#' @inheritParams field_id_pivot_longer
+#' @inheritParams tidy_clinical_events
 #'
 #' @return a vector of estimated dates of birth
 #' @export
-mutate_dob <- function(ukb_pheno, data_dict) {
+#' @examples
+#' \dontrun{
+#'  ukb_main$dob <- mutate_dob(ukb_main)
+#' }
+mutate_dob <- function(ukb_main,
+                       ukb_data_dict = get_ukb_data_dict(),
+                       .details_only = FALSE) {
+  # if required field IDs requested
+  if (.details_only) {
+    return(
+      list(required_field_ids = c(yob = "34", mob = "52"))
+    )
+  }
+
+  data_dict <- make_data_dict(ukb_main,
+                              ukb_data_dict = ukb_data_dict)
+
   # select only the 2 required Field IDs
   required_cols <- get_colnames_for_fieldids(
     field_ids = c("34", "52"),
     data_dict = data_dict,
-    scalar_output = FALSE
+    scalar_output = FALSE,
+    error_if_missing = TRUE
   )
 
-  ukb_pheno <- ukb_pheno %>%
+  ukb_main <- ukb_main %>%
     dplyr::select(tidyselect::all_of(required_cols))
 
   # rename
-  names(ukb_pheno) <- c('yob', 'mob')
+  names(ukb_main) <- c('yob', 'mob')
 
-  # vcheck that 'mob' column is a factor
+  # check that 'mob' column is either a factor or integer
   assertthat::assert_that(
-    is.factor(ukb_pheno$mob),
+    is.factor(ukb_main$mob) | is.integer(ukb_main$mob),
     msg = "Error! The month of birth column (Field ID 52) must be a factor"
   )
 
   # estimate dob
-  ukb_pheno %>%
+  ukb_main %>%
     dplyr::mutate("dob" = paste(.data[["yob"]],
-                                as.integer(.data[["mob"]]), # need to extract integer value e.g. 'January' == 1
+                                as.integer(.data[["mob"]]), # need to extract if a factor integer value e.g. 'January' == 1
                                 01, # first day of month
                                 sep = '-')) %>%
     .$dob %>%
@@ -484,26 +501,7 @@ mutate_dob <- function(ukb_pheno, data_dict) {
     lubridate::ymd()
 }
 
-#' Display time taken message
-#'
-#' Helper function for displaying time taken messages within other functions. Use
-#' \code{\link[base]{proc.time}} at start of function and supply this as the
-#' `start_time` parameter to this function.
-#'
-#' @param start_time The start time.
-#' @noRd
-#' @return A message stating time taken since start time
-time_taken_message <- function(start_time) {
-  # get time taken
-  time_taken <- proc.time() - start_time
 
-  # display message
-  message("Time taken: ",
-          (time_taken[3] %/% 60),
-          " minutes, ",
-          (round(time_taken[3] %% 60)),
-          " seconds.")
-}
 
 #' Make a named list of \code{tbl_dbi} objects from a \code{DBIConnection}
 #' object
@@ -532,6 +530,21 @@ db_list_tables <- function(conn) {
   DBI::dbListTables(conn) %>%
     purrr::set_names() %>%
     purrr::map(~ dplyr::tbl(conn, .x))
+}
+
+#' Details for UK Biobank clinical events data
+#'
+#' Returns a data frame with details of clinical events data that is currently
+#' processed by \code{\link{ukbwranglr}} functions.
+#'
+#' @return A data frame
+#' @export
+#'
+#' @seealso \code{\link{tidy_clinical_events}}
+#' @examples
+#' clinical_events_sources()
+clinical_events_sources <- function() {
+  CLINICAL_EVENTS_SOURCES
 }
 
 # PRIVATE FUNCTIONS -------------------------------------------------------
@@ -1322,4 +1335,25 @@ check_if_all_list_items_are_null <- function(a_list) {
     purrr::map_lgl(is.null) %>%
     purrr::keep(~ !.x) %>%
     rlang::is_empty()
+}
+
+#' Display time taken message
+#'
+#' Helper function for displaying time taken messages within other functions. Use
+#' \code{\link[base]{proc.time}} at start of function and supply this as the
+#' `start_time` parameter to this function.
+#'
+#' @param start_time The start time.
+#' @noRd
+#' @return A message stating time taken since start time
+time_taken_message <- function(start_time) {
+  # get time taken
+  time_taken <- proc.time() - start_time
+
+  # display message
+  message("Time taken: ",
+          (time_taken[3] %/% 60),
+          " minutes, ",
+          (round(time_taken[3] %% 60)),
+          " seconds.")
 }

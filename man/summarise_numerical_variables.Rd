@@ -13,7 +13,7 @@ summarise_numerical_variables(
 )
 }
 \arguments{
-\item{ukb_main}{Either the path to a UKB main dataset file (character string)
+\item{ukb_main}{Either the path to a UK Biobank main dataset file (character string)
 or a data frame.}
 
 \item{summary_function}{The summary function to be applied. Options are

@@ -7,7 +7,7 @@
 make_data_dict(ukb_main, delim = "\\t", ukb_data_dict = get_ukb_data_dict())
 }
 \arguments{
-\item{ukb_main}{Either the path to a UKB main dataset file (character string)
+\item{ukb_main}{Either the path to a UK Biobank main dataset file (character string)
 or a data frame.}
 
 \item{delim}{Delimiter for the UKB main dataset file. Default is "\\t".

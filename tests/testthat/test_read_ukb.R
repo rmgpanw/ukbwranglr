@@ -175,10 +175,10 @@ test_that(
                  c("Categorical multiple", "Categorical single", "Continuous", "Date", "Integer", "something_else"))
 
     expect_equal(data_dict_coltypes$col_types_readr,
-                 c("i", "i", "d", "D", "i", "c"))
+                 c("i", "i", "d", "c", "i", "c"))
 
     expect_equal(data_dict_coltypes$col_types_fread,
-                 c("integer", "integer", "double", "Date", "integer", "character"))
+                 c("integer", "integer", "double", "character", "integer", "character"))
   }
 )
 

@@ -4,7 +4,25 @@
 \alias{mutate_dob}
 \title{Estimate participant date of birth}
 \usage{
-mutate_dob(ukb_pheno, data_dict)
+mutate_dob(
+  ukb_main,
+  ukb_data_dict = get_ukb_data_dict(),
+  .details_only = FALSE
+)
+}
+\arguments{
+\item{ukb_main}{A UK Biobank main dataset. Must be a \code{\link[data.table]}}
+
+\item{ukb_data_dict}{The UKB data dictionary (available online at the UK
+Biobank
+\href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{data
+ showcase}. This should be a data frame where all columns are of type
+\code{character}. By default, this is downloaded from the
+\href{https://github.com/rmgpanw/ukbwranglr_resources}{\code{ukbwranglr_resources}}
+ github repo.}
+
+\item{.details_only}{If \code{TRUE}, return a list detailing required Field
+IDs}
 }
 \value{
 a vector of estimated dates of birth
