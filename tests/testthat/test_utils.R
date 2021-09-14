@@ -194,7 +194,7 @@ test_that(
 test_that(
   "`validate_clinical_codes()` returns error if expected column names are not present", {
     expect_error(
-      validate_clinical_codes(iris, "Error! clinical_codes should have the following column headers:"))
+      suppressWarnings(validate_clinical_codes(iris)), "Error! clinical_codes should have the following column headers:")
   }
 )
 
@@ -204,7 +204,7 @@ test_that(
         example_clinical_codes() %>%
           dplyr::mutate("disease" = as.factor(.data[["disease"]])) %>%
           validate_clinical_codes(),
-        "Error! all columns in clinical_codes should be of type character"
+        "Error! All columns in clinical_codes should be of type character"
         )
   }
 )
@@ -235,18 +235,28 @@ test_that(
   }
 )
 
-test_that("`validate_clinical_codes()` returns error with non-unique codes for 1 or more disease/author combinations",
+test_that("`validate_clinical_codes()` returns error by default with overlapping disease categories",
           {
             expect_error(
               rbind(example_clinical_codes(),
                     example_clinical_codes()) %>%
                 validate_clinical_codes(),
-              "Error! Each disease/author in clinical_codes must have a unique set of clinical codes/code_type"
+              "Error! Overlapping disease categories detected"
+            )
+          })
+
+test_that("`validate_clinical_codes()` optionally raises a warning with overlapping disease categories",
+          {
+            expect_warning(
+              rbind(example_clinical_codes(),
+                    example_clinical_codes()) %>%
+                validate_clinical_codes(allow_overlapping_categories = TRUE),
+              "Warning! Overlapping disease categories detected"
             )
           })
 
 test_that(
-  "`validate_clinical_codes()` passes with unique codes per disease/author combinations",
+  "`validate_clinical_codes()` passes with no overlapping disease categories",
   {
     expect_true(
       example_clinical_codes() %>%

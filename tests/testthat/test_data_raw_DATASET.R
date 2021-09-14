@@ -55,8 +55,8 @@ test_that("`ukb_code_mappings_sheet_names` and `ukb_code_mappings_code_types` co
 test_that("`clinical_code_mappings_map` has no spelling mistakes", {
   expect_equal(
     object = sort(unique(c(
-      ukbwranglr:::clinical_code_mappings_map$from,
-      ukbwranglr:::clinical_code_mappings_map$to))),
+      CLINICAL_CODE_MAPPINGS_MAP$from,
+      CLINICAL_CODE_MAPPINGS_MAP$to))),
     expected = sort(
       # minus 'dmd' - there is no code mapping sheet for this
       ukb_code_mappings_code_types[-which(ukb_code_mappings_code_types == "dmd")]
@@ -64,21 +64,21 @@ test_that("`clinical_code_mappings_map` has no spelling mistakes", {
   )
 
   expect_true(
-    all(ukbwranglr:::clinical_code_mappings_map$mapping_sheet %in% ukbwranglr:::ukb_code_mappings_sheet_names)
+    all(CLINICAL_CODE_MAPPINGS_MAP$mapping_sheet %in% ukbwranglr:::ukb_code_mappings_sheet_names)
   )
 })
 
 test_that("`clinical_code_mappings_map` has only unique to_from mapping combinations", {
   expect_true(
     length(
-      paste(ukbwranglr:::clinical_code_mappings_map$from, ukbwranglr:::clinical_code_mappings_map$to, sep = "_")
-    ) == nrow(ukbwranglr:::clinical_code_mappings_map)
+      paste(CLINICAL_CODE_MAPPINGS_MAP$from, CLINICAL_CODE_MAPPINGS_MAP$to, sep = "_")
+    ) == nrow(CLINICAL_CODE_MAPPINGS_MAP)
   )
 })
 
 test_that("`clinical_code_mappings_map` has only unique values in 'mapping_sheet' column", {
   expect_true(
-    length(unique(ukbwranglr:::clinical_code_mappings_map$mapping_sheet)) == nrow(ukbwranglr:::clinical_code_mappings_map)
+    length(unique(CLINICAL_CODE_MAPPINGS_MAP$mapping_sheet)) == nrow(CLINICAL_CODE_MAPPINGS_MAP)
   )
 })
 
@@ -88,7 +88,7 @@ test_that(
     # check colnames for each mapping sheet
     lambda <- function() {
     result <- NULL
-    for (sheet in ukbwranglr:::clinical_code_mappings_map$mapping_sheet) {
+    for (sheet in CLINICAL_CODE_MAPPINGS_MAP$mapping_sheet) {
       if (all(
         c(
           get_value_for_mapping_sheet(mapping_sheet = sheet, value = "from_col"),

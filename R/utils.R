@@ -341,22 +341,28 @@ download_dummy_ukb_data_to_tempdir <- function() {
 #' Checks that:
 #'
 #' \itemize{ \item Expected column names are present \item All columns are of
-#' type character \item No missing values are present in any column \item Each
-#' disease (for each \code{author}) contains a unique set of clinical codes}
+#' type character \item No missing values are present in any column \item No
+#' disease categories overlap with each other i.e. each disease (for each
+#' \code{author}) contains a unique set of clinical codes. Overlapping disease
+#' categories may optionally be permitted by setting
+#' \code{allow_overlapping_categories} to \code{TRUE}}
 #'
 #' Note that currently this does not check whether the clinical codes themselves
 #' are valid (i.e. whether a clinical code exists for a given coding system).
 #'
 #' @param clinical_codes A data frame. See \code{\link{example_clinical_codes}}
 #'   for an example.
+#' @param allow_overlapping_categories. If \code{TRUE}, will pass with a warning
+#'   if any codes are duplicated between disease categories. If \code{FALSE}, an
+#'   error will be raised. Default value is \code{FALSE}.
 #'
-#' @return Returns \code{TRUE} if all checks pass.
+#' @return Returns invisibly \code{TRUE} if all checks pass.
 #' @export
 #'
 #' @examples
 #' validate_clinical_codes(example_clinical_codes())
 validate_clinical_codes <- function(clinical_codes,
-                                    return_diseases_with_non_unique_codes = FALSE) {
+                                    allow_overlapping_categories = FALSE) {
   standard_message <- ". Use example_clinical_codes() to see a valid clinical_codes example"
 
   # check is a data frame
@@ -408,18 +414,30 @@ validate_clinical_codes <- function(clinical_codes,
                                                       collapse = ", "),
                                        standard_message))
 
-  # check all codes are unique per disease
-  diseases_with_non_unique_codes <- identify_diseases_with_non_unique_codes(clinical_codes)
+  # check for overlapping disease categories - raise either warning or error if any detected
+  overlapping_disease_categories <- identify_overlapping_disease_categories(clinical_codes)
 
-  assertthat::assert_that(is.null(diseases_with_non_unique_codes),
-                          msg = paste0("Error! Each disease/author in clinical_codes must have a unique set of clinical codes/code_type. The following ",
-                                       length(diseases_with_non_unique_codes$disease_author),
-                                       " disease_author combinations contain non-unique codes per code_type: ",
-                                       stringr::str_c(diseases_with_non_unique_codes$disease_author,
-                                                      sep = "",
-                                                      collapse = ", ")))
+  if (!is.null(overlapping_disease_categories)) {
+    overlapping_disease_categories
+  }
 
-  return(TRUE)
+  if (allow_overlapping_categories) {
+    if (!is.null(overlapping_disease_categories)) {
+      warning(paste0("Warning! Overlapping disease categories detected. The following ",
+             length(overlapping_disease_categories$disease_author),
+             " disease(s) (author) contain overlapping disease categories: ",
+             overlapping_disease_categories$disease_author_string))
+    }
+  } else {
+  assertthat::assert_that(is.null(overlapping_disease_categories),
+                          msg = paste0("Error! Overlapping disease categories detected. Each disease/author in clinical_codes should have a unique set of clinical codes/code_type. The following ",
+                                       length(overlapping_disease_categories$disease_author),
+                                       " disease(s) (author) contain overlapping disease categories: ",
+                                       overlapping_disease_categories$disease_author_string,
+                                       ". Set `allow_overlapping_categories` to `TRUE` to ignore these."))
+  }
+
+  invisible(TRUE)
 }
 
 # Miscellaneous -----------------------------------------------------------
@@ -464,25 +482,6 @@ mutate_dob <- function(ukb_pheno, data_dict) {
     .$dob %>%
     # convert to date format
     lubridate::ymd()
-}
-
-#' Create an empty list to be populated with diagnostic codes
-#'
-#' Returns a named list, where names are for different clinical coding systems.
-#' This is to be populated with clinical codes and used with
-#' \code{\link{extract_first_or_last_clinical_event}} and its related functions.
-#'
-#' @return A named list
-#'
-#' @seealso \code{\link{extract_first_or_last_clinical_event}}
-#' @noRd
-#' @examples
-#' make_empty_clinical_codes_list()
-make_empty_clinical_codes_list <- function() {
-  CLINICAL_EVENTS_SOURCES$data_coding %>%
-    unique() %>%
-    purrr::set_names() %>%
-    purrr::map( ~ NULL)
 }
 
 #' Display time taken message
@@ -913,19 +912,19 @@ assert_all_df_cols_are_type_character <- function(df, arg_name) {
 
 # Validation helpers ------------------------------------------------------
 
-identify_diseases_with_non_unique_codes <- function(clinical_codes) {
+identify_overlapping_disease_categories <- function(clinical_codes) {
   # helper function for validate_clinical_codes()
 
   # make df of all disease/author and code/code_type combinations
-  diseases_with_non_unique_codes <- data.frame(disease_author = paste(caliber_codes$disease,
-                                                                      caliber_codes$author,
-                                                                      sep = "_"),
-                                               code_code_type = paste(caliber_codes$code,
-                                                                      caliber_codes$code_type,
-                                                                      sep = "_"))
+  overlapping_disease_categories <- data.frame(disease_author = paste(clinical_codes$disease,
+                                                                      clinical_codes$author,
+                                                                      sep = "_DISEASE_AUTHOR_"),
+                                               code_code_type = paste(clinical_codes$code,
+                                                                      clinical_codes$code_type,
+                                                                      sep = "_DISEASE_AUTHOR_"))
 
   # identify disease/author combinations with non-unique codes
-  diseases_with_non_unique_codes <- diseases_with_non_unique_codes %>%
+  overlapping_disease_categories <- overlapping_disease_categories %>%
     dplyr::group_by(.data[["disease_author"]],
                     .data[["code_code_type"]]) %>%
     dplyr::mutate(n = dplyr::n()) %>%
@@ -933,23 +932,32 @@ identify_diseases_with_non_unique_codes <- function(clinical_codes) {
     dplyr::ungroup()
 
   # if any are identified, filter clinical_codes for the relevant rows
-  if (nrow(diseases_with_non_unique_codes) > 0) {
+  if (nrow(overlapping_disease_categories) > 0) {
 
-    diseases_with_non_unique_codes <- diseases_with_non_unique_codes %>%
+    overlapping_disease_categories <- overlapping_disease_categories %>%
       tidyr::separate("disease_author",
                       into = c("disease", "author"),
-                      sep = "_",
+                      sep = "_DISEASE_AUTHOR_",
                       remove = FALSE) %>%
       tidyr::separate("code_code_type",
                       into = c("code", "code_type"),
-                      sep = "_")
+                      sep = "_DISEASE_AUTHOR_")
 
     clinical_codes <- clinical_codes %>%
-      dplyr::semi_join(diseases_with_non_unique_codes,
+      dplyr::semi_join(overlapping_disease_categories,
                        by = c("disease", "code_type", "code", "author"))
 
+    # return list containing the subset of clinical_codes with duplicated codes
+    # and unique disease_author combinations (both as a vector and a single
+    # string for convenience)
     return(list(clinical_codes = clinical_codes,
-                disease_author = unique(diseases_with_non_unique_codes$disease_author)))
+                disease_author = unique(overlapping_disease_categories$disease_author),
+                disease_author_string = unique(overlapping_disease_categories$disease_author) %>%
+                  stringr::str_replace("_DISEASE_AUTHOR_",
+                                       " (") %>%
+                  paste0(")") %>%
+                  stringr::str_c(sep = "",
+                                 collapse = ", ")))
   } else {
     invisible(NULL)
   }
@@ -1286,4 +1294,32 @@ colname_to_field_inst_array_df <- function(x) {
                           length(final_col_order))
 
   return(x)
+}
+
+
+#' Create an empty list to be populated with diagnostic codes
+#'
+#' Returns a named list, where names are for different clinical coding systems.
+#' This is to be populated with clinical codes and used with
+#' \code{\link{extract_first_or_last_clinical_event}} and its related functions.
+#'
+#' @return A named list
+#'
+#' @seealso \code{\link{extract_first_or_last_clinical_event}}
+#' @noRd
+#' @examples
+#' make_empty_clinical_codes_list()
+make_empty_clinical_codes_list <- function() {
+  CLINICAL_EVENTS_SOURCES$data_coding %>%
+    unique() %>%
+    purrr::set_names() %>%
+    purrr::map( ~ NULL)
+}
+
+check_if_all_list_items_are_null <- function(a_list) {
+  # returns TRUE if all items are NULL, otherwise returns FALSE
+  a_list %>%
+    purrr::map_lgl(is.null) %>%
+    purrr::keep(~ !.x) %>%
+    rlang::is_empty()
 }

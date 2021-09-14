@@ -410,11 +410,11 @@ map_codes <- function(codes,
 
   match.arg(arg = from,
             choices = ukbwranglr:::code_type_to_lkp_sheet_map_df$code)
-            # choices = ukbwranglr:::clinical_code_mappings_map$from)
+            # choices = CLINICAL_CODE_MAPPINGS_MAP$from)
 
   match.arg(arg = to,
             choices = ukbwranglr:::code_type_to_lkp_sheet_map_df$code)
-            # choices = ukbwranglr:::clinical_code_mappings_map$to)
+            # choices = CLINICAL_CODE_MAPPINGS_MAP$to)
 
   assertthat::assert_that(
     is.character(codes),
@@ -752,10 +752,10 @@ reformat_icd10_codes <- function(icd10_codes,
 #' @noRd
 #' @family Clinical code lookups and mappings
 get_from_to_mapping_sheet <- function(from, to) {
-  ukbwranglr:::clinical_code_mappings_map[
+  CLINICAL_CODE_MAPPINGS_MAP[
     (
-      ukbwranglr:::clinical_code_mappings_map[["from"]] == from &
-        ukbwranglr:::clinical_code_mappings_map[["to"]] == to
+      CLINICAL_CODE_MAPPINGS_MAP[["from"]] == from &
+        CLINICAL_CODE_MAPPINGS_MAP[["to"]] == to
     ),
   ][["mapping_sheet"]]
 }
@@ -763,11 +763,11 @@ get_from_to_mapping_sheet <- function(from, to) {
 #' Helper function for \code{\link{map_codes}}
 #'
 #' Returns the requested value for a 'mapping_sheet' in
-#' \code{ukbwranglr:::clinical_code_mappings_map}.
+#' \code{CLINICAL_CODE_MAPPINGS_MAP}.
 #'
 #' @param mapping_sheet character
 #' @param value character. column name from
-#'   \code{ukbwranglr:::clinical_code_mappings_map} (apart from
+#'   \code{CLINICAL_CODE_MAPPINGS_MAP} (apart from
 #'   "mapping_sheet").
 #'
 #' @return character (scalar)
@@ -779,20 +779,20 @@ get_value_for_mapping_sheet <- function(mapping_sheet,
   # validate args
   match.arg(
     arg = mapping_sheet,
-    choices = ukbwranglr:::clinical_code_mappings_map[["mapping_sheet"]]
+    choices = CLINICAL_CODE_MAPPINGS_MAP[["mapping_sheet"]]
   )
 
   match.arg(
     arg = value,
     choices = subset(
-      names(ukbwranglr:::clinical_code_mappings_map),
-      subset = names(ukbwranglr:::clinical_code_mappings_map) != "mapping_sheet"
+      names(CLINICAL_CODE_MAPPINGS_MAP),
+      subset = names(CLINICAL_CODE_MAPPINGS_MAP) != "mapping_sheet"
     )
   )
 
   # return specified `value`
-  ukbwranglr:::clinical_code_mappings_map[
-    ukbwranglr:::clinical_code_mappings_map[["mapping_sheet"]] == mapping_sheet,
+  CLINICAL_CODE_MAPPINGS_MAP[
+    CLINICAL_CODE_MAPPINGS_MAP[["mapping_sheet"]] == mapping_sheet,
   ][[value]]
 }
 

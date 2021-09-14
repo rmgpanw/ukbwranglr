@@ -7,7 +7,9 @@ ukb_code_mappings <- ukbwranglr::get_ukb_code_mappings()
 # FIELD_ID_GROUPS ---------------------------------------------------------
 
 CLINICAL_EVENTS_FIELD_IDS <- list(
-  death_icd10 = c(primary_code_fid = "40001", secondary_code_fid = "40002"),
+  # for death data, code_fid includes primary and secondary causes
+  primary_death_icd10 = c(code_fid = "40001", date_fid = "40000"),
+  secondary_death_icd10 = c(code_fid = "40002", date_fid = "40000"),
   self_report_non_cancer = c(code_fid = "20002", date_fid = "20008"),
   self_report_non_cancer_icd10 = c(code_fid = "20002", date_fid = "20008"),
   self_report_cancer = c(code_fid = "20001", date_fid = "20006"),
@@ -127,7 +129,7 @@ code_type_to_lkp_sheet_map_df <- tibble::tribble(
 # 'mapping_sheet': the appropriate mapping sheet to use for a 'from'/'to' combination
 # 'from_col' and 'to_col': the columns to use when mapping
 # Note, `preferred_synonym_col` and `preferred_code` refer to `to_col`
-clinical_code_mappings_map <- tibble::tribble(
+CLINICAL_CODE_MAPPINGS_MAP <- tibble::tribble(
   ~ from, ~ to, ~ mapping_sheet, ~ from_col, ~ to_col, ~ preferred_synonym_col, ~ preferred_code,
   "icd9", "icd10", "icd9_icd10", "ICD9", "ICD10", NA, NA,
   "read2_drugs", "bnf", "read_v2_drugs_bnf", "read_code", "bnf_code", NA, NA,
@@ -180,8 +182,8 @@ usethis::use_data(
   CLINICAL_EVENTS_FIELD_IDS,
 
   # TODO - review these special ukb codings
-  cont_and_int_codings_to_na,
-  cont_and_int_codings_NOT_to_na,
+  # cont_and_int_codings_to_na,
+  # cont_and_int_codings_NOT_to_na,
 
   # nonsense dates
   NONSENSE_DATES,
@@ -192,7 +194,7 @@ usethis::use_data(
   colnames_for_ukb_code_mappings_sheet_names,
 
   code_type_to_lkp_sheet_map_df,
-  clinical_code_mappings_map,
+  CLINICAL_CODE_MAPPINGS_MAP,
 
   # clinical events schema
   CLINICAL_EVENTS_SOURCES,

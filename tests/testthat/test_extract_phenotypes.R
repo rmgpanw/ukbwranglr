@@ -56,8 +56,11 @@ dummy_ukb_main_clinical_events <- data.table::data.table(
   date_of_first_in_patient_diagnosis_icd9_f41281_0_0 = c('1917-10-08', '1955-02-11'),
   date_of_first_in_patient_diagnosis_icd9_f41281_0_3 = c('1969-11-23', '1956-09-12'),
   underlying_primary_cause_of_death_icd10_f40001_0_0 = c('X095', 'A162'),
+  underlying_primary_cause_of_death_icd10_f40001_1_3 = c('X095', 'A162'),
   contributory_secondary_causes_of_death_icd10_f40002_0_0 = c('P912', 'V374'),
-  contributory_secondary_causes_of_death_icd10_f40002_0_3 = c('X715', NA),
+  contributory_secondary_causes_of_death_icd10_f40002_1_0 = c('X715', NA),
+  date_of_death_f40000_0_0 = c('1917-10-08', '1955-02-11'),
+  date_of_death_f40000_1_0 = c('1910-02-19', '1965-08-08'),
   date_of_cancer_diagnosis_f40005_0_0 = c('1956-11-24', '1910-10-04'),
   date_of_cancer_diagnosis_f40005_2_0 = c('1962-09-04', NA),
   type_of_cancer_icd10_f40006_0_0 = c('M4815', NA),
@@ -220,7 +223,7 @@ test_that(
 # after manually checking they are correct
 
 test_that(
-  "`Expected results returned`tidy_clinical_events` returns the expected results for 'death_icd10'", {
+  "``tidy_clinical_events` returns the expected results for 'death_icd10'", {
     expect_equivalent(dummy_ukb_main_clinical_events_tidy$death_icd10,
                       tibble::tibble(
                         eid = c(1, 2, 1, 2, 1),
@@ -233,7 +236,7 @@ test_that(
 )
 
 test_that(
-  "`Expected results returned`tidy_clinical_events` returns the expected results for 'self_report_non_cancer'", {
+  "``tidy_clinical_events` returns the expected results for 'self_report_non_cancer'", {
     expect_equivalent(dummy_ukb_main_clinical_events_tidy$self_report_non_cancer,
                       tibble::tibble(
                         eid = c(1, 2, 1, 2, 1, 2, 2),
@@ -246,7 +249,7 @@ test_that(
 )
 
 test_that(
-  "`Expected results returned`tidy_clinical_events` returns the expected results for 'self_report_non_cancer_icd10'", {
+  "``tidy_clinical_events` returns the expected results for 'self_report_non_cancer_icd10'", {
     expect_equivalent(dummy_ukb_main_clinical_events_tidy$self_report_non_cancer_icd10,
                       tibble::tibble(
                         eid = c(1, 2, 1, 2, 1, 2, 2),
@@ -259,7 +262,7 @@ test_that(
 )
 
 test_that(
-  "`Expected results returned`tidy_clinical_events` returns the expected results for 'self_report_cancer'", {
+  "``tidy_clinical_events` returns the expected results for 'self_report_cancer'", {
     expect_equivalent(dummy_ukb_main_clinical_events_tidy$self_report_cancer,
                       tibble::tibble(
                         eid = c(1, 2, 1, 2, 1, 2, 1, 2),
@@ -272,7 +275,7 @@ test_that(
 )
 
 test_that(
-  "`Expected results returned`tidy_clinical_events` returns the expected results for 'self_report_operation'", {
+  "``tidy_clinical_events` returns the expected results for 'self_report_operation'", {
     expect_equivalent(dummy_ukb_main_clinical_events_tidy$self_report_operation,
                       tibble::tibble(
                         eid = c(1, 2, 1, 2),
@@ -285,7 +288,7 @@ test_that(
 )
 
 test_that(
-  "`Expected results returned`tidy_clinical_events` returns the expected results for 'cancer_register_icd9'", {
+  "``tidy_clinical_events` returns the expected results for 'cancer_register_icd9'", {
     expect_equivalent(dummy_ukb_main_clinical_events_tidy$cancer_register_icd9,
                       tibble::tibble(
                         eid = c(1, 2, 1, 2),
@@ -298,7 +301,7 @@ test_that(
 )
 
 test_that(
-  "`Expected results returned`tidy_clinical_events` returns the expected results for 'cancer_register_icd10'", {
+  "``tidy_clinical_events` returns the expected results for 'cancer_register_icd10'", {
     expect_equivalent(dummy_ukb_main_clinical_events_tidy$cancer_register_icd10,
                       tibble::tibble(
                         eid = c(1, 1, 2),
@@ -311,7 +314,7 @@ test_that(
 )
 
 test_that(
-  "`Expected results returned`tidy_clinical_events` returns the expected results for 'summary_hes_icd9'", {
+  "``tidy_clinical_events` returns the expected results for 'summary_hes_icd9'", {
     expect_equivalent(dummy_ukb_main_clinical_events_tidy$summary_hes_icd9,
                       tibble::tibble(
                         eid = c(1, 2, 2),
@@ -324,7 +327,7 @@ test_that(
 )
 
 test_that(
-  "`Expected results returned`tidy_clinical_events` returns the expected results for 'summary_hes_icd10'", {
+  "``tidy_clinical_events` returns the expected results for 'summary_hes_icd10'", {
     expect_equivalent(dummy_ukb_main_clinical_events_tidy$summary_hes_icd10,
                       tibble::tibble(
                         eid = c(1, 2, 1, 2),
@@ -337,7 +340,7 @@ test_that(
 )
 
 test_that(
-  "`Expected results returned`tidy_clinical_events` returns the expected results for 'summary_hes_opcs3'", {
+  "``tidy_clinical_events` returns the expected results for 'summary_hes_opcs3'", {
     expect_equivalent(dummy_ukb_main_clinical_events_tidy$summary_hes_opcs3,
                       tibble::tibble(
                         eid = c(1, 2, 1, 2),
@@ -350,7 +353,7 @@ test_that(
 )
 
 test_that(
-  "`Expected results returned`tidy_clinical_events` returns the expected results for 'summary_hes_opcs4'", {
+  "``tidy_clinical_events` returns the expected results for 'summary_hes_opcs4'", {
     expect_equivalent(dummy_ukb_main_clinical_events_tidy$summary_hes_opcs4,
                       tibble::tibble(
                         eid = c(1, 2, 1, 2),
