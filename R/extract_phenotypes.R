@@ -889,14 +889,25 @@ extract_phenotypes_single_disease <-
           ")"
         )
       )
-      list_of_phenotype_results[[phenotype]] <-
-        extract_clinical_events(
+
+       result <- extract_clinical_events(
           clinical_events = clinical_events,
           clinical_codes_list = list_of_phenotype_codelists[[phenotype]],
           phenotype_name = phenotype,
           min_max = min_max,
           keep_all = keep_all
         )
+
+       # if result is `NULL`, it must be assigned as a list with single square
+       # brackets, otherwise it will remove this item will be completely removed
+       # from the list. See this stackoverflow post:
+       # https://stackoverflow.com/a/7945259
+       if (is.null(result)) {
+         list_of_phenotype_results[phenotype] <- list(NULL)
+       } else {
+         list_of_phenotype_results[[phenotype]] <- result
+       }
+
       i <- i + 1
       time_taken_message(start_time)
     }
@@ -951,6 +962,11 @@ extract_clinical_events <- function(clinical_events,
                                       min_max = min_max),
     keep_all = keep_all
   )
+
+  # exit early returning `NULL` if clinical_events is empty
+  if (nrow(clinical_events) == 0) {
+    return(NULL)
+  }
 
   # select just eid and date cols
   selected_cols <- c("eid", "date")
@@ -1152,7 +1168,6 @@ extract_first_or_last_record_mapper <- function(df,
              .$result)
   }
 
-  browser()
   # otherwise, return first date
   df[selected_date,] %>%
     tidyr::unite("result", sep = "_SEP_", remove = TRUE) %>%
