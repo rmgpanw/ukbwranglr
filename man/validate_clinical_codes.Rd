@@ -4,17 +4,18 @@
 \alias{validate_clinical_codes}
 \title{Validate a clinical codes data frame}
 \usage{
-validate_clinical_codes(
-  clinical_codes,
-  return_diseases_with_non_unique_codes = FALSE
-)
+validate_clinical_codes(clinical_codes, allow_overlapping_categories = FALSE)
 }
 \arguments{
 \item{clinical_codes}{A data frame. See \code{\link{example_clinical_codes}}
 for an example.}
+
+\item{allow_overlapping_categories.}{If \code{TRUE}, will pass with a warning
+if any codes are duplicated between disease categories. If \code{FALSE}, an
+error will be raised. Default value is \code{FALSE}.}
 }
 \value{
-Returns \code{TRUE} if all checks pass.
+Returns invisibly \code{TRUE} if all checks pass.
 }
 \description{
 Checks whether a data frame of clinical codes is correctly formatted for use
@@ -24,8 +25,11 @@ with \code{\link{extract_phenotypes}}.
 Checks that:
 
 \itemize{ \item Expected column names are present \item All columns are of
-type character \item No missing values are present in any column \item All
-diseases (for each \code{author}) contain a unique set of clinical codes}
+type character \item No missing values are present in any column \item No
+disease categories overlap with each other i.e. each disease (for each
+\code{author}) contains a unique set of clinical codes. Overlapping disease
+categories may optionally be permitted by setting
+\code{allow_overlapping_categories} to \code{TRUE}}
 
 Note that currently this does not check whether the clinical codes themselves
 are valid (i.e. whether a clinical code exists for a given coding system).

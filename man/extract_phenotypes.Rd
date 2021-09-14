@@ -7,17 +7,16 @@
 extract_phenotypes(
   clinical_events,
   clinical_codes,
+  data_sources = NULL,
   min_max = "min",
   prefix = NULL,
-  workers = NULL
+  workers = NULL,
+  keep_all = FALSE
 )
 }
 \arguments{
 \item{clinical_codes}{data frame. Must match the format as per
 \code{\link{example_clinical_codes}}.}
-
-\item{min_max}{can be either "min" or "max". Extracts either the earliest or
-latest date that on of the specified \code{codes} appears.}
 
 \item{prefix}{character. Optionally add a prefix to column names.}
 

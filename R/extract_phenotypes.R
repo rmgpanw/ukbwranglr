@@ -307,12 +307,21 @@ tidy_clinical_events <- function(ukb_main,
 ) {
 
   # validate args
-  match.arg(arg = clinical_events,
-            choices = names(CLINICAL_EVENTS_FIELD_IDS),
-            several.ok = TRUE)
-
   assertthat::assert_that(length(clinical_events) == length(unique(clinical_events)),
                           msg = "Error! `clinical_events` contains duplicate values")
+
+  unrecognised_clinical_events <- subset(clinical_events,
+                                         !clinical_events %in% names(CLINICAL_EVENTS_FIELD_IDS))
+
+  assertthat::assert_that(rlang::is_empty(unrecognised_clinical_events),
+                          msg = paste0("Error! `clinical_events` includes unrecognised values: ",
+                                       stringr::str_c(unrecognised_clinical_events,
+                                                      sep = "",
+                                                      collapse = ", "),
+                                       ". Please choose from: ",
+                                       stringr::str_c(names(CLINICAL_EVENTS_FIELD_IDS),
+                                                      sep = "",
+                                                      collapse = ", ")))
 
   # if required field IDs requested
   if (.details_only) {
@@ -393,8 +402,7 @@ tidy_clinical_events <- function(ukb_main,
   # (internal check that all options are covered)
   assertthat::are_equal(
     sort(c(
-      cancer_and_summary_hes,
-      death_icd10,
+      death_cancer_and_summary_hes,
       self_report,
       self_report_non_cancer_icd10
     )),
@@ -529,20 +537,21 @@ tidy_clinical_events_basis <- function(ukb_main,
   # missing 12-0, perhaps because some ppts have left the study and there are
   # therefore no longer any data entries for these columns)
 
-  # ...all code columns should have a corresponding date column though. An error
-  # is therefore raised here if there are 'missing' date columns.
   code_cols_instance_arrays <- colname_to_field_inst_array_df(code_cols)
   date_cols_instance_arrays <- colname_to_field_inst_array_df(date_cols)
 
-  # slightly different approach for death data - primary and secondary causes of
-  # death (and dates) have the same number of instances, but secondary cases
-  # have more arrays. For cases with more than one date of death, this should be
-  # the same for both instances (see
-  # https://biobank.ndph.ox.ac.uk/ukb/ukb/docs/DeathLinkage.pdf), however we
-  # match the date of instance to primary/secondary casuses of death instance
-  # anyway
-  if (all(names(code_col_field_id) == c("primary_death_code_fid",
-                                    "secondary_death_code_fid"))) {
+  # ...all code columns should have a corresponding date column though. An error
+  # is therefore raised here if there are 'missing' date columns. The date
+  # columns should match code columns by instance-array, with the exception of
+  # secondary causes of death (FID 40002).
+
+  # Primary and secondary causes of death (and dates) have the same number of
+  # instances, but secondary cases have more arrays. For cases with more than
+  # one date of death, the date should be the same for both instances (see
+  # https://biobank.ndph.ox.ac.uk/ukb/ukb/docs/DeathLinkage.pdf for why this may
+  # occasionally happen), however we match the date of instance to
+  # primary/secondary causes of death instance anyway
+  if (code_col_field_id == "40002") {
     JOIN_COL <- "instance"
     ARRANGE_COL <- "instance"
     INSTANCE_ARRAY_COL <- "instance_array.code"
@@ -591,7 +600,6 @@ tidy_clinical_events_basis <- function(ukb_main,
     value.name = c("code", "date")
   )
 
-  browser()
   # add instance_array col
   ukb_main$variable <- revalue_vector(
     x = as.integer(ukb_main$variable),
@@ -668,86 +676,6 @@ make_self_report_special_decimal_dates_na <- function(df) {
   )
 
   return(df)
-}
-
-#' Get death data ICD10 diagnoses
-#'
-#' Returns a long format dataframe with all death data ICD10 codes for each UK
-#' Biobank participant.
-#'
-#' Reformats the data for FieldIDs 40001 and 40002 (death register
-#' health-related outcomes - primary and secondary causes of death; see
-#' \href{https://biobank.ndph.ox.ac.uk/showcase/label.cgi?id=100093}{category
-#' 100093}).
-#'
-#' @section Under the hood:
-#'
-#'   Converts the data from FieldIDs 40001 and 40002 to long format separately
-#'   before combining into a single dataframe.
-#'
-#' @inheritParams summarise_rowise
-#' @inheritParams read_pheno
-#'
-#' @return Dataframe
-#' @export
-#' @noRd
-#' @family get all diagnostic codes
-tidy_death_icd10 <- function(ukb_main,
-                             data_dict,
-                             ukb_codings,
-                             code_col_field_id,
-                             date_col_field_id
-) {
-
-  # for required field_ids (see
-  # https://biobank.ndph.ox.ac.uk/showcase/label.cgi?id=100093 )
-
-  # death data does not include dates. This function is a modified version of
-  # `get_diagnosis_basis_fn()`
-  start_time <- proc.time()
-
-  # get lists of required columns
-  code_cols <- filter_data_dict(data_dict = data_dict,
-                                filter_col = "FieldID",
-                                filter_value = code_col_field_id,
-                                return_col = "colheaders_raw",
-                                error_if_missing = TRUE)
-
-  date_cols <- filter_data_dict(data_dict = data_dict,
-                                filter_col = "FieldID",
-                                filter_value = date_col_field_id,
-                                return_col = "colheaders_raw",
-                                error_if_missing = TRUE)
-
-  # melt cols
-  ukb_main <- data.table::melt(
-    ukb_main %>% dplyr::select(tidyselect::all_of(c("eid", code_cols))),
-    measure = code_cols,
-    value.name = "code"
-  )
-
-  ukb_main <- ukb_main[!is.na(ukb_main$code)]
-
-  ukb_main$source <-
-    format_ukb_df_header(as.character(ukb_main$variable),
-                         eid_first = FALSE)
-
-  ukb_main$index <- stringr::str_remove(ukb_main$source,
-                                        "^f[:digit:]+_")
-
-  ukb_main$source <- stringr::str_remove(ukb_main$source,
-                                         "_[:digit:]+_[:digit:]+$")
-
-  # make empty date col
-  ukb_main$date <- as.character(NA)
-
-  # arrange cols
-  ukb_main <- ukb_main %>%
-    dplyr::select(tidyselect::all_of(CLINICAL_EVENTS_COLHEADERS))
-
-  # return result
-  time_taken_message(start_time)
-  return(ukb_main)
 }
 
 # Extract phenotypes helpers --------------------------------

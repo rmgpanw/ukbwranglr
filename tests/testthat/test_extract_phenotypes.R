@@ -56,9 +56,9 @@ dummy_ukb_main_clinical_events <- data.table::data.table(
   date_of_first_in_patient_diagnosis_icd9_f41281_0_0 = c('1917-10-08', '1955-02-11'),
   date_of_first_in_patient_diagnosis_icd9_f41281_0_3 = c('1969-11-23', '1956-09-12'),
   underlying_primary_cause_of_death_icd10_f40001_0_0 = c('X095', 'A162'),
-  underlying_primary_cause_of_death_icd10_f40001_1_3 = c('X095', 'A162'),
+  underlying_primary_cause_of_death_icd10_f40001_1_0 = c('X095', 'A162'),
   contributory_secondary_causes_of_death_icd10_f40002_0_0 = c('P912', 'V374'),
-  contributory_secondary_causes_of_death_icd10_f40002_1_0 = c('X715', NA),
+  contributory_secondary_causes_of_death_icd10_f40002_1_3 = c('X715', NA),
   date_of_death_f40000_0_0 = c('1917-10-08', '1955-02-11'),
   date_of_death_f40000_1_0 = c('1910-02-19', '1965-08-08'),
   date_of_cancer_diagnosis_f40005_0_0 = c('1956-11-24', '1910-10-04'),
@@ -86,7 +86,8 @@ dummy_ukb_main_clinical_events_tidy <- tidy_clinical_events(ukb_main = dummy_ukb
                                                      ukb_data_dict = ukb_data_dict,
                                                      ukb_codings = ukb_codings,
                                                      clinical_events = c(
-                                                       "death_icd10",
+                                                       "primary_death_icd10",
+                                                       "secondary_death_icd10",
                                                        "self_report_non_cancer",
                                                        "self_report_non_cancer_icd10",
                                                        "self_report_cancer",
@@ -223,14 +224,27 @@ test_that(
 # after manually checking they are correct
 
 test_that(
-  "``tidy_clinical_events` returns the expected results for 'death_icd10'", {
-    expect_equivalent(dummy_ukb_main_clinical_events_tidy$death_icd10,
+  "``tidy_clinical_events` returns the expected results for 'primary_death_icd10'", {
+    expect_equivalent(dummy_ukb_main_clinical_events_tidy$primary_death_icd10,
                       tibble::tibble(
-                        eid = c(1, 2, 1, 2, 1),
-                        source = c('f40001', 'f40001', 'f40002', 'f40002', 'f40002'),
-                        index = c('0_0', '0_0', '0_0', '0_0', '0_3'),
-                        code = c('X095', 'A162', 'P912', 'V374', 'X715'),
-                        date = as.character(c(NA, NA, NA, NA, NA)),
+                        eid = c(1, 2, 1, 2),
+                        source = c('f40001', 'f40001', 'f40001', 'f40001'),
+                        index = c('0_0', '0_0', '1_0', '1_0'),
+                        code = c('X095', 'A162', 'X095', 'A162'),
+                        date = c('1917-10-08', '1955-02-11', '1910-02-19', '1965-08-08'),
+                      ))
+  }
+)
+
+test_that(
+  "``tidy_clinical_events` returns the expected results for 'secondary_death_icd10'", {
+    expect_equivalent(dummy_ukb_main_clinical_events_tidy$secondary_death_icd10,
+                      tibble::tibble(
+                        eid = c(1, 2, 1),
+                        source = c('f40002', 'f40002', 'f40002'),
+                        index = c('0_0', '0_0', '1_3'),
+                        code = c('P912', 'V374', 'X715'),
+                        date = c('1917-10-08', '1955-02-11', '1910-02-19')
                       ))
   }
 )
