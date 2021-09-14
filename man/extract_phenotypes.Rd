@@ -2,7 +2,7 @@
 % Please edit documentation in R/extract_phenotypes.R
 \name{extract_phenotypes}
 \alias{extract_phenotypes}
-\title{Get the earliest record date for multiple phenotype categories}
+\title{Extract phenotypes from clinical events data}
 \usage{
 extract_phenotypes(
   clinical_events,
@@ -15,16 +15,27 @@ extract_phenotypes(
 )
 }
 \arguments{
+\item{clinical_events}{A long format data frame created by
+\code{\link{tidy_clinical_events}} or
+\code{\link{tidy_gp_clinical_events}}. This can also be a
+\code{\link[dbplyr]{tbl_dbi}} object.}
+
 \item{clinical_codes}{data frame. Must match the format as per
 \code{\link{example_clinical_codes}}.}
 
-\item{prefix}{character. Optionally add a prefix to column names.}
+\item{data_sources}{A character vector of clinical events sources in
+\code{clinical_events} to extract phenotypes from. Use
+\code{\link{clinical_events_sources}} (\code{source column}) for a list of
+valid values.}
 
-\item{workers}{integer. The number of processes to run in parallel when
-\code{clinical_codes} includes multiple diseases. This is used to set
-the number of workers in \code{\link[future]{plan}} with \code{strategy =
+\item{prefix}{Optionally add a prefix to column names.}
+
+\item{workers}{The number of processes to run in parallel when
+\code{clinical_codes} includes multiple diseases. This is used to set the
+number of workers in \code{\link[future]{plan}} with \code{strategy =
 \link[future]{multisession}}, which is passed on to
-\code{\link[furrr]{future_map}}. Default value is \code{NULL}.}
+\code{\link[furrr]{future_map}}. If \code{NULL}, then no processing is
+performed sequentially. Default value is \code{NULL}.}
 }
 \value{
 A named list of data frames, one for each disease. Each data frame
@@ -33,7 +44,22 @@ A named list of data frames, one for each disease. Each data frame
   \code{clinical_codes} for that disease.
 }
 \description{
-Builds on \code{\link{extract_first_or_last_clinical_event}}, extracting
-either the first or last recorded clinical event for multiple phenotype
-categories.
+Filters a clinical events table created by \code{\link{tidy_clinical_events}}
+for a set or sets of specified clinical codes that represent one or more
+phenotypes. By default, the \emph{earliest} date that any clinical code
+appears in an individual participant's record is extracted. See also the
+\href{https://rmgpanw.github.io/ukbwranglr/articles/ukb_clinical_events.html}{'Clinical
+events'} vignette on the \code{ukbwranglr} package website.
+}
+\examples{
+\dontrun{
+dummy_main_dataset_clinical_events() \%>\%
+  tidy_clinical_events(clinical_events_sources = c("summary_hes_icd10")) \%>\%
+  dplyr::bind_rows() \%>\%
+  extract_phenotypes(
+    clinical_codes = example_clinical_codes(),
+    data_sources = "f41270",
+    min_max = "min"
+  )
+}
 }

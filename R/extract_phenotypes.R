@@ -123,29 +123,49 @@ mutate_age_at_event_cols <- function(ukb_main,
 
 # Extract phenotypes from clinical events -------------------------------------------------------
 
-#' Get the earliest record date for multiple phenotype categories
+#' Extract phenotypes from clinical events data
 #'
-#' Builds on \code{\link{extract_first_or_last_clinical_event}}, extracting
-#' either the first or last recorded clinical event for multiple phenotype
-#' categories.
+#' Filters a clinical events table created by \code{\link{tidy_clinical_events}}
+#' for a set or sets of specified clinical codes that represent one or more
+#' phenotypes. By default, the \emph{earliest} date that any clinical code
+#' appears in an individual participant's record is extracted. See also the
+#' \href{https://rmgpanw.github.io/ukbwranglr/articles/ukb_clinical_events.html}{'Clinical
+#' events'} vignette on the \code{ukbwranglr} package website.
 #'
+#' @param clinical_events A long format data frame created by
+#'   \code{\link{tidy_clinical_events}} or
+#'   \code{\link{tidy_gp_clinical_events}}. This can also be a
+#'   \code{\link[dbplyr]{tbl_dbi}} object.
 #' @param clinical_codes data frame. Must match the format as per
 #'   \code{\link{example_clinical_codes}}.
-#' @param prefix character. Optionally add a prefix to column names.
-#' @param workers integer. The number of processes to run in parallel when
-#'   \code{clinical_codes} includes multiple diseases. This is used to set
-#'   the number of workers in \code{\link[future]{plan}} with \code{strategy =
+#' @param data_sources A character vector of clinical events sources in
+#'   \code{clinical_events} to extract phenotypes from. Use
+#'   \code{\link{clinical_events_sources}} (\code{source column}) for a list of
+#'   valid values.
+#' @param prefix Optionally add a prefix to column names.
+#' @param workers The number of processes to run in parallel when
+#'   \code{clinical_codes} includes multiple diseases. This is used to set the
+#'   number of workers in \code{\link[future]{plan}} with \code{strategy =
 #'   \link[future]{multisession}}, which is passed on to
-#'   \code{\link[furrr]{future_map}}. Default value is \code{NULL}.
-#'
-#' @inheritParams extract_single_diagnostic_code_record_basis
-#' @inheritParams extract_first_or_last_clinical_event
+#'   \code{\link[furrr]{future_map}}. If \code{NULL}, then no processing is
+#'   performed sequentially. Default value is \code{NULL}.
 #'
 #' @return A named list of data frames, one for each disease. Each data frame
 #'   has an "eid" column, and "event_min/max_indicator" and "event_min/max_date"
 #'   columns for each phenotype in the 'category' column of
 #'   \code{clinical_codes} for that disease.
 #' @export
+#' @examples
+#' \dontrun{
+#' dummy_main_dataset_clinical_events() %>%
+#'   tidy_clinical_events(clinical_events_sources = c("summary_hes_icd10")) %>%
+#'   dplyr::bind_rows() %>%
+#'   extract_phenotypes(
+#'     clinical_codes = example_clinical_codes(),
+#'     data_sources = "f41270",
+#'     min_max = "min"
+#'   )
+#' }
 extract_phenotypes <- function(
   clinical_events,
   clinical_codes,
@@ -160,6 +180,19 @@ extract_phenotypes <- function(
   # validate args
   clinical_events_type <- validate_clinical_events_and_check_type(clinical_events)
   validate_clinical_codes(clinical_codes)
+
+  assertthat::assert_that(is.character(data_sources),
+                          msg = "Error! `data_sources` should be a character vector")
+  assertthat::assert_that(length(data_sources) == length(unique(data_sources)),
+                        msg = "Error! `data_sources` contains duplicated values")
+  assertthat::assert_that(sum(is.na(data_sources)) == 0,
+                          msg = "Error! `NA` values are presentin `data_sources`")
+
+  invalid_data_sources <- subset(data_sources, !data_sources %in% CLINICAL_EVENTS_SOURCES$source)
+  if (!rlang::is_empty(invalid_data_sources)) {
+    stop(paste0("Error! The following values in `data_sources` are not valid: ",
+                stringr::str_c(invalid_data_sources, sep = "", collapse = ", ")))
+  }
 
   # set plan if using parallel processing
   if (!is.null(workers)) {
@@ -309,7 +342,7 @@ extract_phenotypes <- function(
 #' \code{\link[dplyr]{bind_rows}}.
 #'
 #' @param ukb_main A UK Biobank main dataset. Must be a \code{\link[data.table]}
-#' @param clinical_events A character vector of clinical events sources to tidy.
+#' @param clinical_events_sources A character vector of clinical events sources to tidy.
 #'   By default, all available options are included.
 #' @param strict If \code{TRUE}, raise an error if required columns for any
 #'   clinical events sources listed in \code{clinical_events} are not present in
@@ -335,7 +368,7 @@ extract_phenotypes <- function(
 tidy_clinical_events <- function(ukb_main,
                                  ukb_data_dict = get_ukb_data_dict(),
                                  ukb_codings = get_ukb_codings(),
-                                 clinical_events = c(
+                                 clinical_events_sources = c(
                                    "primary_death_icd10",
                                    "secondary_death_icd10",
                                    "self_report_non_cancer",
@@ -354,14 +387,14 @@ tidy_clinical_events <- function(ukb_main,
 ) {
 
   # validate args
-  assertthat::assert_that(length(clinical_events) == length(unique(clinical_events)),
-                          msg = "Error! `clinical_events` contains duplicate values")
+  assertthat::assert_that(length(clinical_events_sources) == length(unique(clinical_events_sources)),
+                          msg = "Error! `clinical_events_sources` contains duplicate values")
 
-  unrecognised_clinical_events <- subset(clinical_events,
-                                         !clinical_events %in% names(CLINICAL_EVENTS_FIELD_IDS))
+  unrecognised_clinical_events <- subset(clinical_events_sources,
+                                         !clinical_events_sources %in% names(CLINICAL_EVENTS_FIELD_IDS))
 
   assertthat::assert_that(rlang::is_empty(unrecognised_clinical_events),
-                          msg = paste0("Error! `clinical_events` includes unrecognised values: ",
+                          msg = paste0("Error! `clinical_events_sources` includes unrecognised values: ",
                                        stringr::str_c(unrecognised_clinical_events,
                                                       sep = "",
                                                       collapse = ", "),
@@ -390,7 +423,7 @@ tidy_clinical_events <- function(ukb_main,
   filter_data_dict_safely <- purrr:::safely(filter_data_dict)
 
   clinical_events_with_missing_required_cols <-
-    CLINICAL_EVENTS_FIELD_IDS[clinical_events] %>%
+    CLINICAL_EVENTS_FIELD_IDS[clinical_events_sources] %>%
     purrr::imap(
       ~ filter_data_dict_safely(
         data_dict = data_dict,
@@ -406,7 +439,7 @@ tidy_clinical_events <- function(ukb_main,
   if (!rlang::is_empty(clinical_events_with_missing_required_cols)) {
     missing_required_cols_message <-
       paste0(
-        "Required FieldID columns are missing for the following in `clinical_events`: ",
+        "Required FieldID columns are missing for the following in `clinical_events_sources`: ",
         stringr::str_c(
           clinical_events_with_missing_required_cols,
           sep = "",
@@ -418,15 +451,15 @@ tidy_clinical_events <- function(ukb_main,
     if (strict) {
       stop(paste0("Error! ", missing_required_cols_message, " or try setting `strict = FALSE`"))
     } else {
-      if (all(clinical_events %in% clinical_events_with_missing_required_cols)) {
+      if (all(clinical_events_sources %in% clinical_events_with_missing_required_cols)) {
         stop(
-          "Required FieldID columns are missing for all requested `clinical_events`. Use `.details_only = TRUE` for a list of required Field IDs"
+          "Required FieldID columns are missing for all requested `clinical_events_sources`. Use `.details_only = TRUE` for a list of required Field IDs"
         )
       } else {
         warning(paste0("Warning! ", missing_required_cols_message))
         # subset for available clinical events only
-        clinical_events <- subset(clinical_events,
-                                  subset = !(clinical_events %in% clinical_events_with_missing_required_cols))
+        clinical_events_sources <- subset(clinical_events_sources,
+                                  subset = !(clinical_events_sources %in% clinical_events_with_missing_required_cols))
       }
     }
   }
@@ -456,11 +489,11 @@ tidy_clinical_events <- function(ukb_main,
     sort(names(CLINICAL_EVENTS_FIELD_IDS)))
 
   # make empty list for results
-  result <- vector(mode = "list", length = length(clinical_events))
-  names(result) <- clinical_events
+  result <- vector(mode = "list", length = length(clinical_events_sources))
+  names(result) <- clinical_events_sources
 
-  # loop through clinical_events
-  for (event_type in clinical_events) {
+  # loop through clinical_events_sources
+  for (event_type in clinical_events_sources) {
     message(paste0("Tidying clinical events for ", event_type))
 
     # determine how clinical events will be tidied
@@ -733,6 +766,8 @@ validate_clinical_events_and_check_type <- function(clinical_events) {
     clinical_events_type <- "tbl_dbi"
   } else if (is.data.frame(clinical_events)) {
     clinical_events_type <- "df"
+  } else {
+    clinical_events_type <- "unknown"
   }
 
   assertthat::assert_that(clinical_events_type %in% c("tbl_dbi", "df"),
@@ -777,7 +812,7 @@ validate_clinical_events_and_check_type <- function(clinical_events) {
 #' the earliest record date for multiple phenotype categories within a single
 #' disease
 #'
-#' Builds on \code{\link{extract_first_or_last_clinical_event}}, extracting
+#' Uses \code{\link{extract_first_or_last_clinical_event}}, extracting
 #' either the first or last recorded clinical event for multiple phenotype
 #' categories within a single disease
 #'
@@ -786,8 +821,7 @@ validate_clinical_events_and_check_type <- function(clinical_events) {
 #' @param clinical_codes data frame. Must match the format as per
 #'   \code{\link{example_clinical_codes}}.
 #' @param prefix character. Optionally add a prefix to column names.
-#' @inheritParams extract_single_diagnostic_code_record_basis
-#' @inheritParams extract_first_or_last_clinical_event
+#' @inheritParams extract_phenotypes
 #'
 #' @return Data frame with an "eid" column, and "event_min/max_indicator" and
 #'   "event_min/max_date" columns for each phenotype in the 'category' column of

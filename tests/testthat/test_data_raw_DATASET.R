@@ -7,38 +7,6 @@
 
 # Diagnoses FieldIDs -------------------------------------------------------
 
-DIAGNOSES_FIELD_IDS <- c(
-
-  # Death data ICD10
-  "40001",
-  "40002",
-
-  # NOT IN AK DATASET
-  # # HES ICD9
-  "41271",
-  "41281",
-
-  # # HES ICD10
-  "41270",
-  "41280",
-
-  # self-report non-cancer
-  "20002",
-  "20008",
-
-  # self-report cancer
-  "20001",
-  "20006",
-
-  # cancer ICD9
-  "40013",
-  "40005",
-
-  # cancer ICD10
-  "40006",
-  "40005"
-)
-
 # UKB code mappings constants ---------------------------------------------
 
 # `ukb_code_mappings_sheet_names` and `ukb_code_mappings_code_type --------

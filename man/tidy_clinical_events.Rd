@@ -8,7 +8,7 @@ tidy_clinical_events(
   ukb_main,
   ukb_data_dict = get_ukb_data_dict(),
   ukb_codings = get_ukb_codings(),
-  clinical_events = c("primary_death_icd10", "secondary_death_icd10",
+  clinical_events_sources = c("primary_death_icd10", "secondary_death_icd10",
     "self_report_non_cancer", "self_report_non_cancer_icd10", "self_report_cancer",
     "self_report_operation", "cancer_register_icd9", "cancer_register_icd10",
     "summary_hes_icd9", "summary_hes_icd10", "summary_hes_opcs3", "summary_hes_opcs4"),
@@ -33,7 +33,7 @@ downloaded from the
 \href{https://github.com/rmgpanw/ukbwranglr_resources}{\code{ukbwranglr_resources}}
  github repo.}
 
-\item{clinical_events}{A character vector of clinical events sources to tidy.
+\item{clinical_events_sources}{A character vector of clinical events sources to tidy.
 By default, all available options are included.}
 
 \item{strict}{If \code{TRUE}, raise an error if required columns for any

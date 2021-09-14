@@ -33,3 +33,8 @@ Estimates dates of birth from year and month of birth (Field IDs
 \href{https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=52}{52} respectively) as
 the first date of the month.
 }
+\examples{
+\dontrun{
+ ukb_main$dob <- mutate_dob(ukb_main)
+}
+}
