@@ -30,7 +30,7 @@ Returns all descriptive column names matching one or more FieldIDs.
 }
 \details{
 Use this in functions which manipulate a UKB phenotype dataset processed by
-\code{\link{read_pheno}}. Should the convention for descriptive column names
+\code{\link{read_ukb}}. Should the convention for descriptive column names
 change then so will these functions, however changes would only need to be
 updated at the start of each function.
 }

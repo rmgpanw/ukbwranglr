@@ -17,7 +17,7 @@ tidy_clinical_events(
 )
 }
 \arguments{
-\item{ukb_main}{A UK Biobank main dataset. Must be a \code{\link[data.table]}}
+\item{ukb_main}{A UK Biobank main dataset. Must be a \code{\link[data.table]{data.table}}}
 
 \item{ukb_data_dict}{The UKB data dictionary (available online at the UK
 Biobank

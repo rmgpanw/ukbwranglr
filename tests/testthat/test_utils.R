@@ -176,7 +176,7 @@ test_that("`remove_special_characters_and_make_lower_case()` returns expected re
 
   expect_equal(
     remove_special_characters_and_make_lower_case("Wear duration during 23:00 - 23:59"),
-  "wear_duration_during_2300_to_2359")
+  "wear_duration_during_2300_2359")
 
   expect_equal(
     remove_special_characters_and_make_lower_case("Unique minutes of wear in a 24 hour cycle (scattered over multiple days)"),

@@ -181,17 +181,29 @@ extract_phenotypes <- function(
   clinical_events_type <- validate_clinical_events_and_check_type(clinical_events)
   validate_clinical_codes(clinical_codes)
 
-  assertthat::assert_that(is.character(data_sources),
-                          msg = "Error! `data_sources` should be a character vector")
-  assertthat::assert_that(length(data_sources) == length(unique(data_sources)),
-                        msg = "Error! `data_sources` contains duplicated values")
-  assertthat::assert_that(sum(is.na(data_sources)) == 0,
-                          msg = "Error! `NA` values are presentin `data_sources`")
+  if (!is.null(data_sources)) {
+    assertthat::assert_that(is.character(data_sources),
+                            msg = "Error! `data_sources` should be either `NULL` or a character vector")
+    assertthat::assert_that(length(data_sources) == length(unique(data_sources)),
+                            msg = "Error! `data_sources` contains duplicated values")
+    assertthat::assert_that(sum(is.na(data_sources)) == 0,
+                            msg = "Error! `NA` values are present in `data_sources`")
 
-  invalid_data_sources <- subset(data_sources, !data_sources %in% CLINICAL_EVENTS_SOURCES$source)
-  if (!rlang::is_empty(invalid_data_sources)) {
-    stop(paste0("Error! The following values in `data_sources` are not valid: ",
-                stringr::str_c(invalid_data_sources, sep = "", collapse = ", ")))
+    invalid_data_sources <-
+      subset(data_sources,
+             !data_sources %in% CLINICAL_EVENTS_SOURCES$source)
+    if (!rlang::is_empty(invalid_data_sources)) {
+      stop(
+        paste0(
+          "Error! The following values in `data_sources` are not valid: ",
+          stringr::str_c(
+            invalid_data_sources,
+            sep = "",
+            collapse = ", "
+          )
+        )
+      )
+    }
   }
 
   # set plan if using parallel processing
@@ -341,7 +353,7 @@ extract_phenotypes <- function(
 #' Results may be combined into a single data frame using
 #' \code{\link[dplyr]{bind_rows}}.
 #'
-#' @param ukb_main A UK Biobank main dataset. Must be a \code{\link[data.table]}
+#' @param ukb_main A UK Biobank main dataset. Must be a \code{\link[data.table]{data.table}}
 #' @param clinical_events_sources A character vector of clinical events sources to tidy.
 #'   By default, all available options are included.
 #' @param strict If \code{TRUE}, raise an error if required columns for any
@@ -1257,7 +1269,7 @@ extract_first_or_last_record_mapper <- function(df,
 
 # Mappings - data dictionary/codings/clinical events schema --------------------------------------
 
-#' Helper function for \code{link{extract_single_diagnostic_code_record_basis}}
+#' Helper function for \code{link{filter_clinical_events}}
 #'
 #' For a given clinical code type, returns the data sources that use this.
 #'

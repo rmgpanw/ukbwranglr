@@ -11,7 +11,7 @@ ukb_codings <- get_ukb_codings()
 # tidy dummy clinical events
 dummy_clinical_events_list <-
   tidy_clinical_events(
-    ukb_main = DUMMY_UKB_MAIN_CLINICAL_EVENTS,
+    ukb_main = dummy_main_dataset_clinical_events(),
     ukb_data_dict = ukb_data_dict,
     ukb_codings = ukb_codings,
     clinical_events = c(
@@ -96,7 +96,7 @@ test_that(
   "`tidy_clinical_events()` raises warning message if any clinical event types are missing from ukb_main",
   {
     expect_warning(
-      tidy_clinical_events(ukb_main = dummy_ukb_main_clinical_events %>%
+      tidy_clinical_events(ukb_main = dummy_main_dataset_clinical_events() %>%
                              dplyr::select(-tidyselect::contains("operation")),
                            ukb_data_dict = ukb_data_dict,
                            ukb_codings = ukb_codings,
@@ -123,7 +123,7 @@ test_that(
   "`tidy_clinical_events()` raises error if any clinical event types are missing from ukb_main and strict = TRUE",
   {
     expect_error(
-      tidy_clinical_events(ukb_main = dummy_ukb_main_clinical_events %>%
+      tidy_clinical_events(ukb_main = dummy_main_dataset_clinical_events() %>%
                              dplyr::select(-tidyselect::contains("operation")),
                            ukb_data_dict = ukb_data_dict,
                            ukb_codings = ukb_codings,
@@ -273,7 +273,7 @@ test_that(
                         eid = c(1, 2, 1, 2),
                         source = c('f41270', 'f41270', 'f41270', 'f41270'),
                         index = c('0_0', '0_0', '0_3', '0_3'),
-                        code = c('X715', 'T630', 'D550', 'M0087'),
+                        code = c('X715', 'E11', 'E10', 'M0087'),
                         date = c('1955-11-12', '1939-02-16', '1910-02-19', '1965-08-08'),
                       ))
   }

@@ -14,7 +14,7 @@
 #' Returns all descriptive column names matching one or more FieldIDs.
 #'
 #' Use this in functions which manipulate a UKB phenotype dataset processed by
-#' \code{\link{read_pheno}}. Should the convention for descriptive column names
+#' \code{\link{read_ukb}}. Should the convention for descriptive column names
 #' change then so will these functions, however changes would only need to be
 #' updated at the start of each function.
 #'
@@ -702,7 +702,7 @@ recode_column_coding_meaning_value_mapping_df <- function(field_id,
 #' @param df A dataframe
 #' @param col_to_recode Name of column in \code{df} to be recoded
 #' @param field_id Character. A UK Biobank FieldID
-#' @inheritParams read_pheno
+#' @inheritParams read_ukb
 #' @param mapping_direction Character. Either "meaning_code" (default) or
 #'   "code_meaning"
 #'
@@ -1079,9 +1079,6 @@ remove_special_characters_and_make_lower_case <- function(string) {
 
   # make '<=' 'le'
   string <- stringr::str_replace_all(string, "<=", "_less_or_equal_")
-
-  # make ' - ' '_to_'
-  string <- stringr::str_replace_all(string, "[:digit:]+ - [:digit:]+", "_to_")
 
   # characters to be replaced with "_"
   to_underscore <- c("-",

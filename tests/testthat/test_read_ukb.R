@@ -21,26 +21,14 @@ ukb_main_raw <- read_ukb_raw_basis(path = dummy_ukb_data_filepath,
                                    ukb_codings = ukb_codings,
                                    read_with = "fread")
 
-# read dummy data with `read_pheno()`
-system.time(dummy_ukb_main <-  read_pheno(path = dummy_ukb_data_filepath,
-                                    delim = ",",
-                                    data_dict = data_dict,
-                                    ukb_data_dict = ukb_data_dict,
-                                    ukb_codings = ukb_codings,
-                                    clean_dates = FALSE,
-                                    clean_selected_continuous_and_integers = FALSE,
-                                    data.table = FALSE))
-
-system.time(
-  ukb_main <- read_ukb(
-    path = dummy_ukb_data_filepath,
-    delim = ",",
-    data_dict,
-    ukb_data_dict = ukb_data_dict,
-    ukb_codings = ukb_codings,
-    na.strings = c("", "NA"),
-    n_labels_threshold = 22
-  )
+ukb_main <- read_ukb(
+  path = dummy_ukb_data_filepath,
+  delim = ",",
+  data_dict,
+  ukb_data_dict = ukb_data_dict,
+  ukb_codings = ukb_codings,
+  na.strings = c("", "NA"),
+  n_labels_threshold = 22
 )
 
 example_colheaders_df <-
@@ -65,21 +53,6 @@ test_that("`make_data_dict()` works", {
   expect_equal(names(data_dict)[1:4],
                c("descriptive_colnames", "colheaders_raw", "colheaders_processed", "FieldID"))
 })
-
-# `read_pheno()` ----------------------------------------------------------
-
-test_that("`read_pheno()` correctly reads a file", {
-  expect_equal(names(dummy_ukb_main),
-               data_dict$descriptive_colnames)
-
-  expect_equal(dummy_ukb_main$year_of_birth_f34_0_0[1:6],
-               c(1952, 1946, 1951, 1956, NA, 1948))
-
-  # convert from factor to character for simpler testing
-  expect_equal(as.character(dummy_ukb_main$ethnic_background_f21000_0_0[1:6]),
-               c(NA, "Caribbean", "Asian or Asian British", NA, "Prefer not to answer", "Asian or Asian British"))
-})
-
 
 # `read_ukb()` ------------------------------------------------------------
 

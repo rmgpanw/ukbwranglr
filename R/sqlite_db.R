@@ -151,7 +151,6 @@ file_to_sqlite_db <- function(file,
 #' be created. Returns the database connection object.
 #'
 #' @inheritParams file_to_sqlite_db
-#' @inheritParams extract_single_diagnostic_code_record_basis
 #' @param overwrite Logical. If \code{TRUE}, will overwrite an existing table
 #'   with the same name. Default is \code{FALSE}
 #' @return Returns a database connection object invisibly.
@@ -353,7 +352,7 @@ make_clinical_events_db <- function(ukb_pheno_path,
 
   # read selected diagnoses cols into R
   message("Reading diagnosis columns from UKB main dataset into R")
-  ukb_pheno <- read_pheno(path = ukb_pheno_path,
+  ukb_pheno <- read_ukb(path = ukb_pheno_path,
                           data_dict = data_dict,
                           ukb_data_dict = ukb_data_dict,
                           ukb_codings = ukb_codings,

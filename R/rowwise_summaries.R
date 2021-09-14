@@ -9,17 +9,23 @@
 #' at each assessment visit). Currently available summary options are mean,
 #' minimum, maximum and sum.
 #'
-#' @param summary_function The summary function to be applied. Options are
+#' @param summary_function The summary function to be applied. Options:
 #'   "Mean", "Min", "Max" or "Sum"
 #' @param summarise_by Whether to summarise by "Field" or by "Instance".
-#' @param .drop If \code{TRUE}, removes the numerical variables being summarised
-#'   from the result. Default value is \code{FALSE}
-#' @inheritParams make_data_dict
+#' @param .drop If \code{TRUE}, removes the original numerical variables from
+#'   the result. Default value is \code{FALSE}.
+#' @inheritParams tidy_clinical_events
+#' @inheritParams read_ukb
 #'
 #' @return A data frame
 #' @export
+#' @examples
+#' # get dummy data
+#' dummy_data_path <- system.file("extdata", "dummy_ukb_data.csv", package = "ukbwranglr")
+#' read_ukb(dummy_data_path, delim = ",") %>%
+#'   summarise_numerical_variables()
 summarise_numerical_variables <- function(ukb_main,
-                                          data_dict,
+                                          data_dict = NULL,
                                           summary_function = "Mean",
                                           summarise_by = "Field",
                                           .drop = FALSE) {
@@ -31,6 +37,10 @@ summarise_numerical_variables <- function(ukb_main,
 
   match.arg(summarise_by,
             choices = c("Field", "Instance"))
+
+  if (is.null(data_dict)) {
+    data_dict <- make_data_dict(ukb_main)
+  }
 
   # rowwise summary functions
   function_list <- list(
@@ -108,7 +118,7 @@ summarise_numerical_variables <- function(ukb_main,
                       label = new_col)
 
     # warning if only one column was summarised (this column would equal the summary column if so)
-    if (length(selected_cols == 1)) {
+    if (length(selected_cols) == 1) {
       warning(
         paste0(
           "Warning! Summary column '",
@@ -336,7 +346,7 @@ summarise_rowise <- function(ukb_pheno,
 #' The special date coding-IDs are 1313, 272, 586 and 819. Note: these are also
 #' used in the linked primary care dataset.
 #'
-#' @inheritParams read_pheno
+#' @inheritParams tidy_clinical_events
 #' @param selected_date_cols Character vector of column names
 #' @param new_colname Name of new column to be created
 #' @param min_max Character. Must be either "pmin" or "pmax"
