@@ -13,24 +13,6 @@ data_dict <- make_data_dict(ukb_main = dummy_ukb_data_filepath,
                delim = ",",
                ukb_data_dict = ukb_data_dict)
 
-# read raw dummy data
-ukb_main_raw <- read_ukb_raw_basis(path = dummy_ukb_data_filepath,
-                                   delim = ",",
-                                   data_dict = data_dict,
-                                   ukb_data_dict = ukb_data_dict,
-                                   ukb_codings = ukb_codings,
-                                   read_with = "fread")
-
-ukb_main <- read_ukb(
-  path = dummy_ukb_data_filepath,
-  delim = ",",
-  data_dict,
-  ukb_data_dict = ukb_data_dict,
-  ukb_codings = ukb_codings,
-  na.strings = c("", "NA"),
-  n_labels_threshold = 22
-)
-
 example_colheaders_df <-
   data.frame(
     descriptive_ch = c(
@@ -42,7 +24,8 @@ example_colheaders_df <-
     txt_ch = c("eid", "3-0.0", "40000-0.0"),
     r_ch = c("f.eid", "f.3.0.0", "f.40000.0.0"),
     processed_ch = c("feid", "f3_0_0", "f40000_0_0"),
-    processed_ch_derived = c("feid", "f3_0", "f40000")
+    processed_ch_derived = c("feid", "f3_0", "f40000"),
+    descriptive_ch_derived = c("eid", "n_values_systolic_blood_pressure_automated_reading_1", "n_values_systolic_blood_pressure_automated_reading")
   )
 
 # TESTS -------------------------------------------------------------------
@@ -57,17 +40,18 @@ test_that("`make_data_dict()` works", {
 # `read_ukb()` ------------------------------------------------------------
 
 test_that("`read_ukb()` works", {
+  ukb_main <- read_ukb(
+    path = dummy_ukb_data_filepath,
+    delim = ",",
+    data_dict,
+    ukb_data_dict = ukb_data_dict,
+    ukb_codings = ukb_codings,
+    na.strings = c("", "NA")
+  )
 
+  expect_equal(names(ukb_main),
+               data_dict$descriptive_colnames)
 })
-
-# `label_ukb_main()` --------------------------------------------------------
-
-test_that(
-  "`label_ukb_main()` works for coded continuous variable FID 20006 (interpolated year when cancer first diagnosed)",
-  {
-
-  }
-)
 
 # `mutate_descriptive_columns()` ------------------------------------------
 
@@ -82,7 +66,9 @@ test_that(
         "month_of_birth_f52_0_0",
         "ethnic_background_f21000_0_0",
         "non_cancer_illness_code_self_reported_f20002_0_0",
-        "body_mass_index_bmi_f21001_0_0"
+        "body_mass_index_bmi_f21001_0_0",
+        "body_mass_index_bmi_f21001_1_0",
+        "body_mass_index_bmi_f21001_2_0"
       )
     )
   }
@@ -125,6 +111,13 @@ test_that(
 
     expect_equal(format_ukb_df_header(example_colheaders_df$processed_ch_derived),
                  example_colheaders_df$processed_ch_derived)
+  }
+)
+
+test_that(
+  "`format_ukb_df_header()` does NOT reformat ukb column names already processed by `format_ukb_df_header()`, including derived variables", {
+    expect_equal(format_ukb_df_header(example_colheaders_df$descriptive_ch_derived),
+                 example_colheaders_df$descriptive_ch_derived)
   }
 )
 
