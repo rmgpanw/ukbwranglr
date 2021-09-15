@@ -246,8 +246,14 @@ CLINICAL_EVENTS_SOURCES <- tibble::tribble(
   "f40006", "icd10", "Type of cancer: ICD10", "Cancer register", "ukb_main",
   "f41270", "icd10", "Diagnoses - ICD10", "Summary Diagnoses - Hospital inpatient - Health-related outcomes", "ukb_main",
   "f41271", "icd9", "Diagnoses - ICD9", "Summary Diagnoses - Hospital inpatient - Health-related outcomes", "ukb_main",
-  "gpc_r2", "read2", "`read_2` column", "Primary care", "gp_clinical",
-  "gpc_r3", "read3", "`read_3` column", "Primary care", "gp_clinical",
+  "gpc1_r2", "read2", "`read_2` column, data provider England (Vision)", "Primary care", "gp_clinical",
+  "gpc2_r2", "read2", "`read_2` column, data provider Scotland", "Primary care", "gp_clinical",
+  "gpc3_r2", "read2", "`read_2` column, data provider England (TPP)", "Primary care", "gp_clinical",
+  "gpc4_r2", "read2", "`read_2` column, data provider Wales", "Primary care", "gp_clinical",
+  "gpc1_r3", "read3", "`read_3` column, data provider England (Vision)", "Primary care", "gp_clinical",
+  "gpc2_r3", "read3", "`read_3` column, data provider Scotland", "Primary care", "gp_clinical",
+  "gpc3_r3", "read3", "`read_3` column, data provider England (TPP)", "Primary care", "gp_clinical",
+  "gpc4_r3", "read3", "`read_3` column, data provider Wales", "Primary care", "gp_clinical",
   "f41272", "opcs4", "Operative procedures - OPCS4", "Summary Operations - Hospital inpatient - Health-related outcomes", "ukb_main",
   "f41273", "opcs3", "Operative procedures - OPCS3", "Summary Operations - Hospital inpatient - Health-related outcomes", "ukb_main"
 )

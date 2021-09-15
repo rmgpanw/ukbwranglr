@@ -57,18 +57,18 @@ make_dummy_gp_clinical_df_single_eid <- function(eid = 1,
                      size = n_rows,
                      replace = TRUE)
   }
-  value_1 <- NA
-  value_2 <- NA
-  value_3 <- NA
+  value1 <- "1"
+  value2 <- "2"
+  value3 <- "3"
 
   tibble::tibble(eid = eid,
                  data_provider = data_provider,
                  event_dt = event_dt,
                  read_2 = read_2,
                  read_3 = read_3,
-                 value_1 = value_1,
-                 value_2 = value_2,
-                 value_3 = value_3)
+                 value1 = value1,
+                 value2 = value2,
+                 value3 = value3)
 }
 
 make_dummy_clinical_events_df_single_eid <- function(eid = 1,

@@ -96,7 +96,7 @@ get_child_codes <- function(codes,
   # to append these for 3 character icd10/opcs4 codes (see caliber wraning note
   # here: https://www.caliberresearch.org/portal/show/diabcomp_hes) Ask val, it
   # says 'unless explicitly noted otherwise' - examples of this?
-
+  codes_raw <- codes
   codes <- paste0("^", codes, ".*")
 
   # combine into single string, separated by "|"
@@ -131,7 +131,7 @@ get_child_codes <- function(codes,
 
     if (quiet == FALSE) {
       warning_if_codes_not_found(
-        codes = codes,
+        codes = codes_raw,
         code_type = code_type,
         search_col = ukb_code_mappings[[lkp_sheet]] %>%
           dplyr::collect() %>%

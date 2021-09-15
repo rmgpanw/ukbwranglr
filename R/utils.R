@@ -250,29 +250,44 @@ get_ukb_code_mappings_direct <- function() {
 #'
 #' @param directory_path character. The directory where \code{ukb.db} will be
 #'   downloaded to.
+#' @param overwrite logical. If \code{TRUE} and a file called \code{ukb.db} is
+#'   already present in the directory specified by \code{directory_path}, then
+#'   this will be deleted and replaced. Default value is \code{FALSE}.
 #'
 #' @return Returns path to \code{ukb.db} as a string invisibly
 #' @export
-get_ukb_db <- function(directory_path) {
-  # check ukb.db does not already exist in `directory_path`
-  if (file.exists(file.path(directory_path, "ukb.db"))) {
-    stop(paste0("Error! A file called `ukb.db` already exists in ",
-                directory_path))
-  }
-
+get_ukb_db <- function(directory_path,
+                       overwrite = FALSE) {
   # zipped file download destination in tempdir
   ukb_db_esssentials_zip <- file.path(tmpdir = tempdir(),
-                                     "ukb_db_esssentials_zip")
+                                      "ukb_db_esssentials_zip")
 
+  # check ukb.db does not already exist in `directory_path`
+  if (file.exists(file.path(directory_path, "ukb.db"))) {
+    if (overwrite) {
+      message(paste0("***Removing `ukb.db` from `",
+                      directory_path,
+                      "` and removing `ukb.db.zip` from `tempdir()`***"))
+      file.remove(file.path(directory_path, "ukb.db"))
+      file.remove(ukb_db_esssentials_zip)
+    } else if (!overwrite) {
+      stop(paste0(
+        "Error! A file called `ukb.db` already exists in ",
+        directory_path
+      ))
+    }
+  }
 
   # download from ukbwranglr_resources if not already downloaded
   if(!file.exists(ukb_db_esssentials_zip)) {
+    message("Downloading `ukb.db.zip` to `tempdir()`")
     utils::download.file(url = "https://github.com/rmgpanw/ukbwranglr_resources/raw/main/ukb.db.zip",
                          destfile = ukb_db_esssentials_zip,
                          mode = "wb")
   }
 
   # unzip to requested directory
+  message("Unzipping db file")
   ukb_db_esssentials_unzipped = utils::unzip(ukb_db_esssentials_zip,
                                              exdir = directory_path)
 

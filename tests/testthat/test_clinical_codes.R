@@ -257,7 +257,7 @@ test_that("`reformat_standardised_codelist()` raises error with invalid args", {
       disease_category = "T1DM GP diagnosis",
       author = "test"
     ),
-    regexp = "contains unrecognised code types. Recognised code types: icd10, data_coding_6, data_coding_3, icd9, read2, read3"
+    regexp = "contains unrecognised code types"
   )
 
   expect_error(

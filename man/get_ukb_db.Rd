@@ -4,11 +4,15 @@
 \alias{get_ukb_db}
 \title{Download essential UKB resources as a SQLite database file}
 \usage{
-get_ukb_db(directory_path)
+get_ukb_db(directory_path, overwrite = FALSE)
 }
 \arguments{
 \item{directory_path}{character. The directory where \code{ukb.db} will be
 downloaded to.}
+
+\item{overwrite}{logical. If \code{TRUE} and a file called \code{ukb.db} is
+already present in the directory specified by \code{directory_path}, then
+this will be deleted and replaced. Default value is \code{FALSE}.}
 }
 \value{
 Returns path to \code{ukb.db} as a string invisibly

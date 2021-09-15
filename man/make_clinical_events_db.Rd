@@ -5,14 +5,16 @@
 \title{Create a SQLite database with a \code{clinical_events} table}
 \usage{
 make_clinical_events_db(
-  ukb_pheno_path,
+  ukb_main_path,
+  ukb_main_delim,
   gp_clinical_path,
   ukb_db_dir,
-  allow_missing_fields = FALSE
+  overwrite = FALSE,
+  strict = FALSE
 )
 }
 \arguments{
-\item{ukb_pheno_path}{character. Path to the main UKB dataset file.}
+\item{ukb_main_path}{character. Path to the main UKB dataset file.}
 
 \item{gp_clinical_path}{character. Path to the UKB primary care clinical
 events file (\code{gp_clinical.txt}).}
@@ -20,7 +22,7 @@ events file (\code{gp_clinical.txt}).}
 \item{ukb_db_dir}{character. Directory where \code{ukb.db} should be written
 to. An error is raised if a file called \code{ukb.db} already exists here.}
 
-\item{allow_missing_fields}{logical. If TRUE, create database regardless of
+\item{strict}{logical. If TRUE, create database regardless of
 whether the main UKB dataset file is missing any required clinical events
 fields. Default is \code{FALSE}.}
 }

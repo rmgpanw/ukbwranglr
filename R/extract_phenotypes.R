@@ -344,18 +344,25 @@ extract_phenotypes <- function(
 #' following columns:
 #'
 #' \itemize{ \item \code{eid} - participant identifier \item \code{source} - the
-#' FieldID (prefixed by 'f') where clinical codes were extracted from \item
-#' \code{index} - the corresponding instance and array (e.g. '0-1' means
-#' instance 0 and array 1) \item \code{code} - clinical code. See
-#' \code{\link{clinical_events_sources}} for further details \item \code{date} -
-#' associated date }
+#' FieldID (prefixed by 'f') where clinical codes were extracted from. See
+#' \code{\link{clinical_events_sources}} for further details. \item \code{index}
+#' - the corresponding instance and array (e.g. '0-1' means instance 0 and array
+#' 1) \item \code{code} - clinical code. The type of clinical codings system
+#' used depends on \code{source}. \item \code{date} - associated date. Note that
+#' in cases where participants self-reported a medical condition but recorded
+#' the date as either 'Date uncertain or unknown' or 'Preferred not to answer'
+#' (see \href{https://biobank.ndph.ox.ac.uk/ukb/coding.cgi?id=13}{data coding
+#' 13}) then the date is set to \code{NA}.}
 #'
-#' Results may be combined into a single data frame using
-#' \code{\link[dplyr]{bind_rows}}.
+#' @section Other notes:
 #'
-#' @param ukb_main A UK Biobank main dataset. Must be a \code{\link[data.table]{data.table}}
-#' @param clinical_events_sources A character vector of clinical events sources to tidy.
-#'   By default, all available options are included.
+#'   Results may be combined into a single data frame using
+#'   \code{\link[dplyr]{bind_rows}}.
+#'
+#' @param ukb_main A UK Biobank main dataset. Must be a
+#'   \code{\link[data.table]{data.table}}
+#' @param clinical_events_sources A character vector of clinical events sources
+#'   to tidy. By default, all available options are included.
 #' @param strict If \code{TRUE}, raise an error if required columns for any
 #'   clinical events sources listed in \code{clinical_events} are not present in
 #'   \code{ukb_main}. If \code{FALSE}, then a warning message will be displayed

@@ -17,7 +17,8 @@ tidy_clinical_events(
 )
 }
 \arguments{
-\item{ukb_main}{A UK Biobank main dataset. Must be a \code{\link[data.table]{data.table}}}
+\item{ukb_main}{A UK Biobank main dataset. Must be a
+\code{\link[data.table]{data.table}}}
 
 \item{ukb_data_dict}{The UKB data dictionary (available online at the UK
 Biobank
@@ -33,8 +34,8 @@ downloaded from the
 \href{https://github.com/rmgpanw/ukbwranglr_resources}{\code{ukbwranglr_resources}}
  github repo.}
 
-\item{clinical_events_sources}{A character vector of clinical events sources to tidy.
-By default, all available options are included.}
+\item{clinical_events_sources}{A character vector of clinical events sources
+to tidy. By default, all available options are included.}
 
 \item{strict}{If \code{TRUE}, raise an error if required columns for any
 clinical events sources listed in \code{clinical_events} are not present in
@@ -61,15 +62,23 @@ data sources specified by \code{clinical_events}. Each data frame has the
 following columns:
 
 \itemize{ \item \code{eid} - participant identifier \item \code{source} - the
-FieldID (prefixed by 'f') where clinical codes were extracted from \item
-\code{index} - the corresponding instance and array (e.g. '0-1' means
-instance 0 and array 1) \item \code{code} - clinical code. See
-\code{\link{clinical_events_sources}} for further details \item \code{date} -
-associated date }
-
-Results may be combined into a single data frame using
-\code{\link[dplyr]{bind_rows}}.
+FieldID (prefixed by 'f') where clinical codes were extracted from. See
+\code{\link{clinical_events_sources}} for further details. \item \code{index}
+- the corresponding instance and array (e.g. '0-1' means instance 0 and array
+1) \item \code{code} - clinical code. The type of clinical codings system
+used depends on \code{source}. \item \code{date} - associated date. Note that
+in cases where participants self-reported a medical condition but recorded
+the date as either 'Date uncertain or unknown' or 'Preferred not to answer'
+(see \href{https://biobank.ndph.ox.ac.uk/ukb/coding.cgi?id=13}{data coding
+13}) then the date is set to \code{NA}.}
 }
+\section{Other notes}{
+
+
+  Results may be combined into a single data frame using
+  \code{\link[dplyr]{bind_rows}}.
+}
+
 \examples{
 # tidy clinical events in a UK Biobank main dataset
 tidy_clinical_events(
