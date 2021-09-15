@@ -10,9 +10,22 @@ ukb_codings <- get_ukb_codings()
 
 # make data dictionary
 data_dict <- make_data_dict(ukb_main = dummy_ukb_data_filepath,
-               delim = ",",
-               ukb_data_dict = ukb_data_dict)
+                            delim = ",",
+                            ukb_data_dict = ukb_data_dict)
 
+# make dummy stata file
+dummy_ukb_stata_path <- file.path(tempdir(), "ukb_stata.dta")
+
+read_ukb(dummy_ukb_data_filepath,
+         delim = ",",
+         data_dict = data_dict,
+         labelled = FALSE,
+         descriptive_colnames = FALSE) %>%
+  rename_cols(old_colnames = data_dict$colheaders_raw,
+              new_colnames = data_dict$colheaders_processed) %>%
+  haven::write_dta(dummy_ukb_stata_path)
+
+# df of potential UKB column name formats
 example_colheaders_df <-
   data.frame(
     descriptive_ch = c(
@@ -25,7 +38,9 @@ example_colheaders_df <-
     r_ch = c("f.eid", "f.3.0.0", "f.40000.0.0"),
     processed_ch = c("feid", "f3_0_0", "f40000_0_0"),
     processed_ch_derived = c("feid", "f3_0", "f40000"),
-    descriptive_ch_derived = c("eid", "n_values_systolic_blood_pressure_automated_reading_1", "n_values_systolic_blood_pressure_automated_reading")
+    descriptive_ch_derived = c("eid",
+                               "n_values_systolic_blood_pressure_automated_reading_f4080_0",
+                               "n_values_systolic_blood_pressure_automated_reading_f4080")
   )
 
 # TESTS -------------------------------------------------------------------
@@ -39,7 +54,7 @@ test_that("`make_data_dict()` works", {
 
 # `read_ukb()` ------------------------------------------------------------
 
-test_that("`read_ukb()` works", {
+test_that("`read_ukb()` works with default settings", {
   ukb_main <- read_ukb(
     path = dummy_ukb_data_filepath,
     delim = ",",
@@ -51,6 +66,94 @@ test_that("`read_ukb()` works", {
 
   expect_equal(names(ukb_main),
                data_dict$descriptive_colnames)
+
+  expect_equal(attributes(ukb_main$sex_f31_0_0)$labels,
+               c(Female = 0, Male = 1))
+
+  expect_equal(attributes(ukb_main$sex_f31_0_0)$label,
+               "Sex (f31_0_0)")
+})
+
+test_that("`read_ukb()` works with `labelled` and `descriptive_colnames` set to `FALSE`", {
+  ukb_main <- read_ukb(
+    path = dummy_ukb_data_filepath,
+    delim = ",",
+    data_dict,
+    ukb_data_dict = ukb_data_dict,
+    ukb_codings = ukb_codings,
+    na.strings = c("", "NA"),
+    labelled = FALSE,
+    descriptive_colnames = FALSE
+  )
+
+  expect_equal(names(ukb_main),
+               data_dict$colheaders_raw)
+
+  expect_null(attributes(ukb_main$sex_f31_0_0)$labels)
+
+  expect_null(attributes(ukb_main$sex_f31_0_0)$label)
+})
+
+test_that("`read_ukb()` works with `labelled = TRUE` and `descriptive_colnames = FALSE`", {
+  ukb_main <- read_ukb(
+    path = dummy_ukb_data_filepath,
+    delim = ",",
+    data_dict,
+    ukb_data_dict = ukb_data_dict,
+    ukb_codings = ukb_codings,
+    na.strings = c("", "NA"),
+    labelled = TRUE,
+    descriptive_colnames = FALSE
+  )
+
+  expect_equal(names(ukb_main),
+               data_dict$colheaders_raw)
+
+  expect_equal(attributes(ukb_main$`31-0.0`)$labels,
+              c(Female = 0, Male = 1))
+
+  expect_equal(attributes(ukb_main$`31-0.0`)$label,
+              "Sex (f31_0_0)")
+})
+
+test_that("`read_ukb()` works with `labelled = FALSE` and `descriptive_colnames = TRUE`", {
+  ukb_main <- read_ukb(
+    path = dummy_ukb_data_filepath,
+    delim = ",",
+    data_dict,
+    ukb_data_dict = ukb_data_dict,
+    ukb_codings = ukb_codings,
+    na.strings = c("", "NA"),
+    labelled = FALSE,
+    descriptive_colnames = TRUE
+  )
+
+  expect_equal(names(ukb_main),
+               data_dict$descriptive_colnames)
+
+  expect_null(attributes(ukb_main$sex_f31_0_0)$labels)
+
+  expect_null(attributes(ukb_main$sex_f31_0_0)$label)
+})
+
+test_that("`read_ukb()` works with a stata file", {
+  ukb_main <- read_ukb(
+    path = dummy_ukb_stata_path,
+    delim = ",",
+    data_dict = NULL,
+    ukb_data_dict = ukb_data_dict,
+    ukb_codings = ukb_codings,
+    na.strings = c("", "NA"),
+    labelled = FALSE,
+    descriptive_colnames = TRUE
+  )
+
+  expect_equal(names(ukb_main),
+               data_dict$descriptive_colnames)
+
+  expect_null(attributes(ukb_main$sex_f31_0_0)$labels)
+
+  expect_null(attributes(ukb_main$sex_f31_0_0)$label)
 })
 
 # `mutate_descriptive_columns()` ------------------------------------------
@@ -115,9 +218,11 @@ test_that(
 )
 
 test_that(
-  "`format_ukb_df_header()` does NOT reformat ukb column names already processed by `format_ukb_df_header()`, including derived variables", {
+  "`format_ukb_df_header()` does reformats dervied variable names from `summarise_numerical_variables()`", {
     expect_equal(format_ukb_df_header(example_colheaders_df$descriptive_ch_derived),
-                 example_colheaders_df$descriptive_ch_derived)
+                 c('feid',
+                   'f4080_0',
+                   'f4080'))
   }
 )
 
@@ -172,3 +277,52 @@ test_that(
                  c("eid", "verbal_interview_duration", "date_of_death"))
   }
 )
+
+
+# Dev ---------------------------------------------------------------------
+
+
+# `read_ukb_chunked_to_file()` --------------------------------------------
+
+test_that("`read_ukb_chunked_to_file()` works", {
+  dummy_data_dict_selected <- data_dict[c(1,3,5,6,7), ]
+
+  outfile_list <- list(
+    csv_file = tempfile(fileext = ".csv"),
+    tsv_file = tempfile(fileext = ".tsv"),
+    txt_file = tempfile(fileext = ".txt"),
+    rds_file = tempfile(fileext = ".rds"),
+    dta_file = tempfile(fileext = ".dta")
+  )
+
+  outfile_list %>%
+    purrr::walk(
+      ~
+        read_ukb_chunked_to_file(
+          in_path = dummy_ukb_data_filepath,
+          out_path = .x,
+          data_dict = dummy_data_dict_selected,
+          in_delim = ",",
+          ukb_data_dict = ukb_data_dict,
+          ukb_codings = ukb_codings,
+          max_n_labels = 22,
+          chunk_size = 1,
+          labelled = TRUE,
+          descriptive_colnames = FALSE
+        )
+    )
+
+  outfile_result <- list(
+    csv_file = readr::read_csv(outfile_list$csv_file),
+    tsv_file = readr::read_tsv(outfile_list$tsv_file),
+    txt_file = readr::read_tsv(outfile_list$txt_file),
+    rds_file = readRDS(outfile_list$rds_file),
+    dta_file = haven::read_dta(outfile_list$dta_file)
+  )
+
+  EXPECTED_COLNAMES <- dummy_data_dict_selected$colheaders_processed
+
+  expect_true(outfile_result %>%
+                purrr::map_lgl(~ all(names(.x) == EXPECTED_COLNAMES)) %>%
+                all())
+})

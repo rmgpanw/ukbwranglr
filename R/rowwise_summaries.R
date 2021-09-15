@@ -192,6 +192,7 @@ summarise_numerical_variables <- function(ukb_main,
 #' @param ... arguments to passed on to summary functions listed in
 #'   \code{functions}
 #'
+#' @noRd
 #' @examples
 #' \dontrun{
 #' # make a custom function that counts the number of non-NA values.

@@ -500,9 +500,10 @@ rename_ukb_main <- function(ukb_main,
                             new_colnames_col = "descriptive_colnames") {
 
   message("Renaming columns")
+
   # check that ukb_main and data_dict match
   assertthat::assert_that(all(names(ukb_main) == data_dict[[old_colnames_col]]),
-                          msg = "Error! `names(ukb_main` do not match `data_dict[[old_colnames_col]]`")
+                          msg = "Error! `names(ukb_main)` do not match `data_dict[[old_colnames_col]]`. Check `data_dict`.")
 
   # rename
   names(ukb_main) <- data_dict[[new_colnames_col]]
@@ -516,6 +517,10 @@ label_ukb_main <- function(ukb_main,
                            colnames_col = "descriptive_colnames",
                            max_n_labels = NULL) {
   message("Labelling dataset")
+
+  # check that ukb_main and data_dict match
+  assertthat::assert_that(all(names(ukb_main) == data_dict[[colnames_col]]),
+                          msg = "Error! `names(ukb_main)` do not match `data_dict[[colnames_col]]`. Check `data_dict`.")
 
   # filter ukb_codings for required codings only
   ukb_codings <- ukb_codings %>%
@@ -564,138 +569,6 @@ label_ukb_main <- function(ukb_main,
                      codings_meaning_col = "Meaning",
                      data_dict_coltype_col = "col_types_fread")
 }
-
-read_ukb_chunked_to_file <- function(in_path,
-                                     out_path,
-                                     data_dict,
-                                     in_delim = "\t",
-                                     ukb_data_dict = get_ukb_data_dict(),
-                                     ukb_codings = get_ukb_codings(),
-                                     na.strings = c("", "NA"),
-                                     max_n_labels = 22,
-                                     chunk_size = 10000,
-                                     ...) {
-  start_time <- proc.time()
-
-  # write result to csv/tsv/dta/rds
-  read_ukb_raw_basis(
-    path = in_path,
-    delim = in_delim,
-    data_dict = data_dict,
-    ukb_data_dict = ukb_data_dict,
-    ukb_codings = ukb_codings,
-    na.strings = na.strings,
-    read_with = "read_delim_chunked",
-    chunk_size = chunk_size,
-    callback = readr::SideEffectChunkCallback$new(read_ukb_chunked_callback_write_to_file(out_path = out_path,
-                                                                                          max_n_labels = max_n_labels,
-                                                                                          data_dict = data_dict,
-                                                                                          ukb_codings = ukb_codings,
-                                                                                          start_time = start_time,
-                                                                                          ...)),
-    ...
-  )
-}
-
-read_ukb_chunked_callback_write_to_file <-
-  function(out_path,
-           max_n_labels,
-           data_dict,
-           ukb_codings,
-           start_time,
-           ...) {
-
-    rename_and_label_chunk <- function(x, stata_file = FALSE, ...) {
-      if (stata_file) {
-        # add colheaders that stata will accept
-        data_dict <- data_dict %>%
-          dplyr::mutate("colheaders_stata" = stringr::str_replace_all(.data[["colheaders_processed"]],
-                                                                      "\\.",
-                                                                      "_"))
-
-        x %>%
-          rename_ukb_main(
-            data_dict = data_dict,
-            old_colnames_col = "colheaders_raw",
-            new_colnames_col = "colheaders_stata"
-          ) %>%
-          label_ukb_main(
-            data_dict = data_dict,
-            ukb_codings = ukb_codings,
-            colnames_col = "colheaders_stata",
-            max_n_labels = max_n_labels
-          )
-      } else {
-        x %>%
-          rename_ukb_main(
-            data_dict = data_dict,
-            old_colnames_col = "colheaders_raw",
-            new_colnames_col = "descriptive_colnames"
-          ) %>%
-          label_ukb_main(
-            data_dict = data_dict,
-            ukb_codings = ukb_codings,
-            colnames_col = "descriptive_colnames",
-            max_n_labels = max_n_labels
-          )
-      }
-    }
-
-    progress_update <- function(start_time, pos) {
-      time_taken <- proc.time() - start_time
-
-      message(
-        "Writing from line ",
-        pos,
-        ". Time taken: ",
-        (time_taken[3] %/% 60),
-        " minutes, ",
-        (round(time_taken[3] %% 60)),
-        " seconds"
-      )
-    }
-
-    file_extension <- extract_file_ext(out_path)
-
-    switch(
-      file_extension,
-      dta = function(x, pos) {
-        progress_update(start_time, pos)
-
-        x %>%
-          rename_and_label_chunk(stata_file = TRUE) %>%
-          haven::write_dta(path = out_path, ...)
-      },
-      txt = function(x, pos) {
-        progress_update(start_time, pos)
-
-        x %>%
-          rename_and_label_chunk() %>%
-          readr::write_delim(file = out_path, delim = "\t", ...)
-      },
-      tsv = function(x, pos) {
-        progress_update(start_time, pos)
-
-        x %>%
-          rename_and_label_chunk() %>%
-          readr::write_delim(file = out_path, delim = "\t", ...)
-      },
-      csv = function(x, pos) {
-        progress_update(start_time, pos)
-
-        x %>%
-          rename_and_label_chunk() %>%
-          readr::write_delim(file = out_path, delim = ",", ...)
-      },
-      rds = function(x, pos) {
-        progress_update(start_time, pos)
-
-        x %>%
-          rename_and_label_chunk() %>%
-          saveRDS(file = out_path, ...)
-      }
-    )
-  }
 
 #' Programmatically label variables/values in a data frame
 #'
@@ -860,3 +733,181 @@ update_column_classes <- function(df,
 
   return(df)
 }
+
+
+# Dev ---------------------------------------------------------------------
+
+#' Read a UKB main dataset in chunks, process and write to a file
+#'
+#' @param in_path .
+#' @param out_path .
+#' @param data_dict .
+#' @param in_delim .
+#' @param ukb_data_dict .
+#' @param ukb_codings .
+#' @param max_n_labels .
+#' @param descriptive_colnames .
+#' @param labelled .
+#' @param na.strings .
+#' @param chunk_size .
+#' @param ... additional arguments are passed to
+#'   \code{read_ukb_chunked_callback_write_to_file}
+#'
+#' @return Returns \code{NULL} invisibly.
+#' @noRd
+#'
+#' @examples
+#' \dontrun{
+#' }
+read_ukb_chunked_to_file <- function(in_path,
+                                     out_path,
+                                     data_dict,
+                                     in_delim = "\t",
+                                     ukb_data_dict = get_ukb_data_dict(),
+                                     ukb_codings = get_ukb_codings(),
+                                     max_n_labels = 22,
+                                     descriptive_colnames = FALSE,
+                                     labelled = FALSE,
+                                     na.strings = c("", "NA"),
+                                     chunk_size = 10000,
+                                     ...) {
+  start_time <- proc.time()
+
+  # validate in_path
+  in_path_ext <- extract_file_ext(in_path)
+  out_path_ext <- extract_file_ext(out_path)
+
+  assertthat::assert_that(in_path_ext %in% c("txt", "tsv", "csv", "tab"),
+                          msg = "Error! `in_path` file extension must be one of 'txt', 'tsv', 'csv', 'tab'")
+
+  assertthat::assert_that(out_path_ext %in% c("txt", "tsv", "csv", "dta", "rds"),
+                          msg = "Error! `in_path` file extension must be one of 'txt', 'tsv', 'csv', 'tab'")
+
+  assertthat::assert_that(!((out_path_ext == "dta") &
+                              (descriptive_colnames == TRUE)),
+                          msg = "Error! `descriptive_colnames` cannot be `TRUE` if writing to a STATA file")
+
+  data_dict_full <- make_data_dict(in_path,
+                                   delim = in_delim,
+                                   ukb_data_dict = ukb_data_dict)
+
+  # check that ukb_main and data_dict match
+  assertthat::assert_that(all(data_dict$colheaders_raw %in% data_dict_full$colheaders_raw),
+                          msg = "Error! Values in `data_dict$colheaders_raw` do not match column names for file at `in_path`. Check `data_dict`.")
+
+
+
+  # write result to csv/tsv/dta/rds
+  read_ukb_raw_basis(
+    path = in_path,
+    delim = in_delim,
+    data_dict = data_dict,
+    ukb_data_dict = ukb_data_dict,
+    ukb_codings = ukb_codings,
+    na.strings = na.strings,
+    read_with = "read_delim_chunked",
+    chunk_size = chunk_size,
+    callback = readr::SideEffectChunkCallback$new(read_ukb_chunked_callback_write_to_file(out_path = out_path,
+                                                                                          out_path_ext = out_path_ext,
+                                                                                          max_n_labels = max_n_labels,
+                                                                                          data_dict = data_dict,
+                                                                                          ukb_codings = ukb_codings,
+                                                                                          start_time = start_time,
+                                                                                          descriptive_colnames = descriptive_colnames,
+                                                                                          labelled = labelled,
+                                                                                          ...)),
+    ...
+  )
+
+  invisible(NULL)
+}
+
+read_ukb_chunked_callback_write_to_file <-
+  function(out_path,
+           out_path_ext,
+           max_n_labels,
+           data_dict,
+           ukb_codings,
+           start_time,
+           descriptive_colnames = descriptive_colnames,
+           labelled = labelled,
+           ...) {
+    # a function factory for `read_ukb_chunked_to_file()`
+    progress_update <- function(start_time, pos) {
+      time_taken <- proc.time() - start_time
+
+      message(
+        "Writing from line ",
+        pos,
+        ". Time taken: ",
+        (time_taken[3] %/% 60),
+        " minutes, ",
+        (round(time_taken[3] %% 60)),
+        " seconds"
+      )
+    }
+
+    function(x, pos) {
+      progress_update(start_time, pos)
+
+      # rename columns - either descriptive or processed
+      if (descriptive_colnames) {
+        NEW_COLNAMES_COL <- "descriptive_colnames"
+
+        x <-  rename_ukb_main(
+          ukb_main = x,
+          data_dict = data_dict,
+          old_colnames_col = "colheaders_raw",
+          new_colnames_col = NEW_COLNAMES_COL
+        )
+      } else if (!descriptive_colnames) {
+        NEW_COLNAMES_COL <- "colheaders_processed"
+
+        x <- rename_ukb_main(
+          ukb_main = x,
+          data_dict = data_dict,
+          old_colnames_col = "colheaders_raw",
+          new_colnames_col = NEW_COLNAMES_COL
+        )
+      }
+
+      if (labelled) {
+        x <- label_ukb_main(
+          ukb_main = x,
+          data_dict = data_dict,
+          ukb_codings = ukb_codings,
+          colnames_col = NEW_COLNAMES_COL,
+          max_n_labels = max_n_labels
+        )
+      }
+
+
+      switch(
+        out_path_ext,
+        dta = haven::write_dta(data = x,
+                               path = out_path,
+                               ...),
+        txt = readr::write_delim(
+          x = x,
+          file = out_path,
+          delim = "\t",
+          ...
+        ),
+        tsv = readr::write_delim(
+          x = x,
+          file = out_path,
+          delim = "\t",
+          ...
+        ),
+        csv = readr::write_delim(
+          x = x,
+          file = out_path,
+          delim = ",",
+          ...
+        ),
+        rds = saveRDS(object = x,
+                      file = out_path,
+                      ...)
+      )
+    }
+  }

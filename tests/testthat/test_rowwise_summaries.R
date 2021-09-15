@@ -126,3 +126,29 @@ test_that("`summarise_numerical_variables()` returns the expected results for n 
   )
 
 })
+
+test_that("`summarise_numerical_variables()` raises a warning if there are missing instances/arrays in data_dict", {
+  expect_warning(summarise_numerical_variables(DUMMY_UKB_MAIN_CONTINUOUS,
+                                          data_dict = data_dict %>%
+                                            dplyr::filter(descriptive_colnames == "body_mass_index_bmi_f21001_0_0"),
+                                          summary_function = "n_values",
+                                          summarise_by = "Field"),
+                 "Are there missing instances/arrays in the dataset for this FieldID?")
+
+})
+
+test_that("`summarise_numerical_variables()` drops original summarised columns if requested",
+          {
+            expect_equal(
+              summarise_numerical_variables(
+                DUMMY_UKB_MAIN_CONTINUOUS,
+                data_dict = data_dict,
+                summary_function = "n_values",
+                summarise_by = "Field",
+                .drop = TRUE
+              ) %>%
+                ncol(),
+              3
+            )
+
+          })
