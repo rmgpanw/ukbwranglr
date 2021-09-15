@@ -7,54 +7,78 @@
 
 #' Create a SQLite database with a \code{clinical_events} table
 #'
-#' Creates a SQLite database called \code{ukb.db} containing all tables from
-#' \code{\link{get_ukb_db}}, plus an additional table called
-#' \code{clinical_events}. This is a long format table combining all clinical
-#' events as listed in \code{ukbwranglr:::CLINICAL_EVENTS_SOURCES}.
+#' Adds tables called \code{clinical_events} and \code{gp_clinical_values} to a
+#' SQLite database file. This is a long format table combining all clinical
+#' events data from a UK Biobank main dataset and the UK Biobank primary care
+#' clinical events dataset, as listed by \code{link{clinical_events_sources}}.
+#' Indexes are set on the \code{source}, \code{code} and \code{eid} columns in
+#' the \code{clinical_events} table.
 #'
-#' @param ukb_main_path character. Path to the main UKB dataset file.
-#' @param gp_clinical_path character. Path to the UKB primary care clinical
-#'   events file (\code{gp_clinical.txt}).
-#' @param ukb_db_dir character. Directory where \code{ukb.db} should be written
-#'   to. An error is raised if a file called \code{ukb.db} already exists here.
-#' @param strict logical. If TRUE, create database regardless of
-#'   whether the main UKB dataset file is missing any required clinical events
-#'   fields. Default is \code{FALSE}.
+#' @param ukb_main_path Path to the main UKB dataset file.
+#' @param ukb_main_delim Delimiter for \code{ukb_main_path}.
+#' @param gp_clinical_path Path to the UKB primary care clinical events file
+#'   (\code{gp_clinical.txt}).
+#' @param ukb_db_path Path to the SQLite database file. The file name must end
+#'   with '.db'. If no file with this name exists then one will be created.
+#' @param strict If \code{TRUE}, create database regardless of whether the main
+#'   UKB dataset file is missing any required clinical events fields (see
+#'   \code{\link{tidy_clinical_events}} for further details). Default is
+#'   \code{FALSE}.
+#' @param overwrite If \code{TRUE}, then tables \code{clinical_events} and
+#'   \code{gp_clinical_values} will be overwritten if they already exist in the
+#'   database. Default value is \code{FALSE}.
+#' @param chunk_size The number of rows to include in each chunk when processing
+#'   the primary care dataset.
+#' @inheritParams tidy_clinical_events
 #'
-#' @return NULL
+#' @return Returns \code{NULL} invisibly
 #' @export
+#' @seealso \code{\link{tidy_clinical_events}}, \code{\link{tidy_gp_clinical}}
 make_clinical_events_db <- function(ukb_main_path,
                                     ukb_main_delim,
                                     gp_clinical_path,
-                                    ukb_db_dir,
+                                    ukb_db_path,
+                                    ukb_data_dict = get_ukb_data_dict(),
+                                    ukb_codings = get_ukb_codings(),
                                     overwrite = FALSE,
-                                    strict = FALSE) {
+                                    strict = FALSE,
+                                    chunk_size = 10000) {
   start_time <- proc.time()
 
-  # get ukb.db
-  message("***DOWNLOADING UKB.DB FROM UKBWRANGLR_RESOURCES REPO***")
-  ukb_db_path <- get_ukb_db(ukb_db_dir,
-                            overwrite = overwrite)
+  # validate args
+  ukb_db_ext <- extract_file_ext(ukb_db_path)
+  if (!(ukb_db_ext == "db") | is.na(ukb_db_ext)) {
+    stop("Error! The file name for `ukb_db_path` must end with '.db'")
+  }
 
-  # collect ukb data dict and codings files from db
-  message("***GETTING UKB DATA DICT AND CODINGS***")
   con <- DBI::dbConnect(RSQLite::SQLite(), dbname = ukb_db_path)
   on.exit(DBI::dbDisconnect(con))
-  ukb_db_tbl_list <- db_list_tables(con)
 
-  ukb_data_dict <- ukb_db_tbl_list$ukb_data_dict %>%
-    dplyr::collect()
-  ukb_codings <- ukb_db_tbl_list$ukb_codings %>%
-    dplyr::collect()
+  # Error message if table already exists and append == FALSE
+  tables_to_write <- tidy_gp_clinical_db(.details_only = TRUE)
+  table_already_present_in_db <- subset(tables_to_write,
+                                        tables_to_write %in% DBI::dbListTables(con))
 
-  ukbwranglr:::time_taken_message(start_time)
+  if (!rlang::is_empty(table_already_present_in_db) &
+      !overwrite) {
+    stop(
+      paste0(
+        "Error! The following table(s) already exists in database: ",
+        stringr::str_c(
+          table_already_present_in_db,
+          sep = "",
+          collapse = ", "
+        ),
+        " Specify `overwrite = TRUE` to overwrite these."
+      )
+    )
+  }
 
   # make data dictionary and filter for required FieldIDs
   message("***CREATING DATA DICTIONARY FOR UKB MAIN DATASET***")
   data_dict <- make_data_dict(ukb_main_path,
                               delim = ukb_main_delim,
                               ukb_data_dict = ukb_data_dict)
-  ukbwranglr:::time_taken_message(start_time)
 
   # check that all required cols are present
   assertthat::assert_that("eid" %in% data_dict$FieldID,
@@ -88,8 +112,7 @@ make_clinical_events_db <- function(ukb_main_path,
     }
   }
 
-  # read and tidy ukb_main clinical events ----------------------------------
-
+  # tidy ukb_main clinical events ----------------------------------
 
   # read selected clinical events cols into R
   message("***READING DIAGNOSIS COLUMNS FROM UKB MAIN DATASET INTO R***")
@@ -99,9 +122,9 @@ make_clinical_events_db <- function(ukb_main_path,
     data_dict = data_dict,
     ukb_data_dict = ukb_data_dict,
     ukb_codings = ukb_codings,
-    descriptive_colnames = TRUE
+    descriptive_colnames = FALSE,
+    labelled = FALSE
   )
-  ukbwranglr:::time_taken_message(start_time)
 
   # create long format data frame containing all clinical events codes in main dataset
   message("***TIDYING CLINICAL EVENTS DATA***")
@@ -114,8 +137,6 @@ make_clinical_events_db <- function(ukb_main_path,
     ) %>%
     dplyr::bind_rows()
 
-  time_taken_message(start_time)
-
   # add ukb_main clinical events to database ---------------------------------------------------------------
   message("***WRITING CLINICAL EVENTS FROM MAIN UKB DATASET TO `clinical_events` TABLE IN DATABASE***")
   DBI::dbWriteTable(
@@ -126,10 +147,13 @@ make_clinical_events_db <- function(ukb_main_path,
     append = FALSE
   )
 
-  time_taken_message(start_time)
-
-  # now append (preprocessed) primary care data to 'clinical_events' table, adding value column to a separate `gp_clinical_values` table ---------------------------------------------------------------
+  # append primary care data to 'clinical_events' table, adding value column to a separate `gp_clinical_values` table ---------------------------------------------------------------
   message("***APPENDING UKB PRIMARY CARE CLINICAL EVENTS DATA TO 'clinical_events' TABLE AND WRITING VALUE COLUMNS TO `gp_clinical_values` TABLE***")
+
+  if (overwrite) {
+    DBI::dbRemoveTable(con, "gp_clinical_values")
+  }
+
   file_to_sqlite_db(file = gp_clinical_path,
                     col_types = list(
                       eid = "i",
@@ -142,13 +166,11 @@ make_clinical_events_db <- function(ukb_main_path,
                       value3 = "c"
                     ), # all cols as type character
                     db_path = ukb_db_path,
-                    chunk_size = 500000,
+                    chunk_size = chunk_size,
                     delim = "\t",
                     append = TRUE, # set to `TRUE` as appending to an existing table
                     verbose = TRUE,
-                    callback_function = tidy_gp_clinical)
-
-  time_taken_message(start_time)
+                    callback_function = tidy_gp_clinical_db)
 
   # set index on 'code'/'source'/'eid' columns for faster lookups
   message("***SETTING INDEX ON `source`, `code` AND `eid` COLUMNS IN UKB DATABASE 'clinical_events' TABLE***")
@@ -162,7 +184,11 @@ make_clinical_events_db <- function(ukb_main_path,
   # completion message
   message("SUCCESS! UKB DATABASE SETUP COMPLETE")
   time_taken_message(start_time)
+
+  invisible(NULL)
 }
+
+
 
 # PRIVATE FUNCTIONS -------------------------------------------------------
 
@@ -193,10 +219,11 @@ make_clinical_events_db <- function(ukb_main_path,
 #' @param append Append to table if already exists. Default is \code{FALSE}.
 #' @param callback_function A function to be applied to each chunk before
 #'   writing to database. This must output a named list of data frames. Each
-#'   item will be written to a table with the same name. It should also have a
+#'   item will be written to a table with the same name. It should have a
 #'   \code{.details_only} argument and return a character vector of table names
 #'   if this is \code{TRUE}. This is used to check whether these tables already
-#'   exist in the database before attempting to read \code{file}.
+#'   exist in the database before attempting to read \code{file}. It should also
+#'   have a \code{pos} argument, which is used to add a column of row numbers.
 #' @inheritParams readr::read_delim_chunked
 #' @param ... additional parameters passed on to \code{callback_function}.
 #'
@@ -270,7 +297,7 @@ file_to_sqlite_db <- function(file,
     }
 
     # callback_function must output a named list of data frames
-    x <- callback_function(x, ...)
+    x <- callback_function(x, pos, ...)
 
     # loop through items in x
     for (table_name in names(x)) {
@@ -335,23 +362,29 @@ file_to_sqlite_db <- function(file,
 #' codes/dates in long format and 'value' columns are both returned in a list
 #' under the names 'clinical_events' and 'gp_clinical_values' respectively.
 #'
-#' @section: Other notes
+#' @section Other notes:
 #'
-#' By default, special date values (see
-#' \href{https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=591}{resource 591} for
-#' further details) are set to \code{NA}.
+#'   By default, special date values (see
+#'   \href{https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=591}{resource 591} for
+#'   further details) are set to \code{NA}.
 #'
-#' @param gp_clinical A data frame
+#' @param gp_clinical The UK Biobank primary care clinical events dataset
 #' @param remove_special_dates Logical. Removes special date values if
 #'   requested. Default value is \code{TRUE}.
+#' @param pos integer. Required for \code{\link{file_to_sqlite_db}}
+#' @param .details_only logical. If \code{TRUE}, return a character vector of
+#'   output table names only
 #'
 #' @noRd
 #' @return A named list. Item 'clinical_events' contains the read codes with
 #'   event dates, and item 'gp_clinical_values' contains the 'value' columns.
-#' @seealso tidy_clinical_events
-tidy_gp_clinical <- function(gp_clinical,
-                                      remove_special_dates = TRUE,
-                                      .details_only = FALSE) {
+#' @seealso \code{\link{tidy_clinical_events}},
+#'   \code{\link{make_clinical_events_db}}
+tidy_gp_clinical_db <- function(gp_clinical,
+                                remove_special_dates = TRUE,
+                                pos = NULL,
+                                .details_only = FALSE) {
+
 
   # names of table to be returned
   output_table_names <- c("clinical_events",
@@ -390,7 +423,11 @@ tidy_gp_clinical <- function(gp_clinical,
   ),
   msg = "Error! `gp_clinical` has one or more columns of invalid type. Column `eid` should be type 'numeric' and all other columns should be type 'character'")
 
-  # add index col - 'pos' will be found in the `file_to_sqlite_db environment`
+  # add index col - 'pos' is required for `file_to_sqlite_db environment`
+  if (is.null(pos)) {
+    pos <- 1
+  }
+
   index_col_end <- pos + nrow(gp_clinical) - 1
   gp_clinical$index <- as.character(pos:index_col_end)
 
@@ -427,8 +464,8 @@ tidy_gp_clinical <- function(gp_clinical,
 
   # rename 'event_dt' to 'date'
   gp_clinical_codes <- rename_cols(gp_clinical_codes,
-                    old_colnames = "event_dt",
-                    new_colnames = "date")
+                                   old_colnames = "event_dt",
+                                   new_colnames = "date")
 
   # reformat date
   gp_clinical_codes$date <- gp_clinical_codes$date %>%

@@ -8,27 +8,58 @@ make_clinical_events_db(
   ukb_main_path,
   ukb_main_delim,
   gp_clinical_path,
-  ukb_db_dir,
+  ukb_db_path,
+  ukb_data_dict = get_ukb_data_dict(),
+  ukb_codings = get_ukb_codings(),
   overwrite = FALSE,
   strict = FALSE
 )
 }
 \arguments{
-\item{ukb_main_path}{character. Path to the main UKB dataset file.}
+\item{ukb_main_path}{Path to the main UKB dataset file.}
 
-\item{gp_clinical_path}{character. Path to the UKB primary care clinical
-events file (\code{gp_clinical.txt}).}
+\item{ukb_main_delim}{Delimiter for \code{ukb_main_path}.}
 
-\item{ukb_db_dir}{character. Directory where \code{ukb.db} should be written
-to. An error is raised if a file called \code{ukb.db} already exists here.}
+\item{gp_clinical_path}{Path to the UKB primary care clinical events file
+(\code{gp_clinical.txt}).}
 
-\item{strict}{logical. If TRUE, create database regardless of
-whether the main UKB dataset file is missing any required clinical events
-fields. Default is \code{FALSE}.}
+\item{ukb_db_path}{Path to the SQLite database file. The file name must end
+with '.db'. If no file with this name exists then one will be created.}
+
+\item{ukb_data_dict}{The UKB data dictionary (available online at the UK
+Biobank
+\href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{data
+ showcase}. This should be a data frame where all columns are of type
+\code{character}. By default, this is downloaded from the
+\href{https://github.com/rmgpanw/ukbwranglr_resources}{\code{ukbwranglr_resources}}
+ github repo.}
+
+\item{ukb_codings}{The UKB codings dictionary. This should be a data frame
+where all columns are of type \code{character}. By default, this is
+downloaded from the
+\href{https://github.com/rmgpanw/ukbwranglr_resources}{\code{ukbwranglr_resources}}
+ github repo.}
+
+\item{overwrite}{If \code{TRUE}, then tables \code{clinical_events} and
+\code{gp_clinical_values} will be overwritten if they already exist in the
+database. Default value is \code{FALSE}.}
+
+\item{strict}{If \code{TRUE}, create database regardless of whether the main
+UKB dataset file is missing any required clinical events fields (see
+\code{\link{tidy_clinical_events}} for further details). Default is
+\code{FALSE}.}
+}
+\value{
+Returns \code{NULL} invisibly
 }
 \description{
-Creates a SQLite database called \code{ukb.db} containing all tables from
-\code{\link{get_ukb_db}}, plus an additional table called
-\code{clinical_events}. This is a long format table combining all clinical
-events as listed in \code{ukbwranglr:::CLINICAL_EVENTS_SOURCES}.
+Adds tables called \code{clinical_events} and \code{gp_clinical_values} to a
+SQLite database file. This is a long format table combining all clinical
+events data from a UK Biobank main dataset and the UK Biobank primary care
+clinical events dataset, as listed by \code{link{clinical_events_sources}}.
+Indexes are set on the \code{source}, \code{code} and \code{eid} columns in
+the \code{clinical_events} table.
+}
+\seealso{
+\code{\link{tidy_clinical_events}}, \code{\link{tidy_gp_clinical}}
 }

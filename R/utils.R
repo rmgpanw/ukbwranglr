@@ -542,9 +542,15 @@ mutate_dob <- function(ukb_main,
 #' db_tables$iris_head
 #' db_table$mtcars_head
 db_list_tables <- function(conn) {
-  DBI::dbListTables(conn) %>%
+  result <- DBI::dbListTables(conn) %>%
     purrr::set_names() %>%
     purrr::map(~ dplyr::tbl(conn, .x))
+
+  if (rlang::is_empty(result)) {
+    stop("Error! No tables identified in database")
+  } else {
+    return(result)
+  }
 }
 
 #' Details for UK Biobank clinical events data
