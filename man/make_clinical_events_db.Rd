@@ -12,7 +12,8 @@ make_clinical_events_db(
   ukb_data_dict = get_ukb_data_dict(),
   ukb_codings = get_ukb_codings(),
   overwrite = FALSE,
-  strict = FALSE
+  strict = FALSE,
+  chunk_size = 10000
 )
 }
 \arguments{
@@ -48,6 +49,9 @@ database. Default value is \code{FALSE}.}
 UKB dataset file is missing any required clinical events fields (see
 \code{\link{tidy_clinical_events}} for further details). Default is
 \code{FALSE}.}
+
+\item{chunk_size}{The number of rows to include in each chunk when processing
+the primary care dataset.}
 }
 \value{
 Returns \code{NULL} invisibly

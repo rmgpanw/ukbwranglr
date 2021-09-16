@@ -150,7 +150,8 @@ make_clinical_events_db <- function(ukb_main_path,
   # append primary care data to 'clinical_events' table, adding value column to a separate `gp_clinical_values` table ---------------------------------------------------------------
   message("***APPENDING UKB PRIMARY CARE CLINICAL EVENTS DATA TO 'clinical_events' TABLE AND WRITING VALUE COLUMNS TO `gp_clinical_values` TABLE***")
 
-  if (overwrite) {
+  if (overwrite &
+      ("gp_clinical_values" %in% DBI::dbListTables(con))) {
     DBI::dbRemoveTable(con, "gp_clinical_values")
   }
 
@@ -188,6 +189,47 @@ make_clinical_events_db <- function(ukb_main_path,
   invisible(NULL)
 }
 
+#' Tidy UK Biobank primary care clinical events
+#'
+#' Reformats the UK Biobank primary care clinical events dataset to match the
+#' output format for \code{\link{tidy_clinical_events}}.
+#'
+#' The UK Biobank primary care clinical events data lists read codes in separate
+#' columns, one for Read2 and one for Read3. This function reshapes the data to
+#' long format so that all codes are in a single column. The \code{index} column
+#' values relate to row numbers in the original data.
+#'
+#' The primary care data also contains 3 'value' columns. The clinical
+#' codes/dates in long format and 'value' columns are both returned in a list
+#' under the names 'clinical_events' and 'gp_clinical_values' respectively.
+#'
+#' @section Other notes:
+#'
+#'   By default, special date values (see
+#'   \href{https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=591}{resource 591} for
+#'   further details) are set to \code{NA}.
+#'
+#' @param gp_clinical The UK Biobank primary care clinical events dataset
+#' @param remove_special_dates Logical. Removes special date values if
+#'   requested. Default value is \code{TRUE}.
+#' @param .details_only logical. If \code{TRUE}, return a character vector of
+#'   output table names only
+#'
+#' @export
+#' @return A named list. Item 'clinical_events' contains the read codes with
+#'   event dates, and item 'gp_clinical_values' contains the 'value' columns.
+#' @seealso \code{\link{tidy_clinical_events}},
+#'   \code{\link{make_clinical_events_db}}
+tidy_gp_clinical <- function(gp_clinical,
+                             remove_special_dates = TRUE,
+                             .details_only = FALSE) {
+  tidy_gp_clinical_db(
+    gp_clinical,
+    pos = NULL,
+    remove_special_dates = remove_special_dates,
+    .details_only = .details_only
+  )
+}
 
 
 # PRIVATE FUNCTIONS -------------------------------------------------------
@@ -348,43 +390,13 @@ file_to_sqlite_db <- function(file,
   invisible(NULL)
 }
 
-#' Tidy UK Biobank primary care clinical events
-#'
-#' Reformats the UK Biobank primary care clinical events dataset to match the
-#' output format for \code{\link{tidy_clinical_events}}.
-#'
-#' The UK Biobank primary care clinical events data lists read codes in separate
-#' columns, one for Read2 and one for Read3. This function reshapes the data to
-#' long format so that all codes are in a single column. The \code{index} column
-#' values relate to row numbers in the original data.
-#'
-#' The primary care data also contains 3 'value' columns. The clinical
-#' codes/dates in long format and 'value' columns are both returned in a list
-#' under the names 'clinical_events' and 'gp_clinical_values' respectively.
-#'
-#' @section Other notes:
-#'
-#'   By default, special date values (see
-#'   \href{https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=591}{resource 591} for
-#'   further details) are set to \code{NA}.
-#'
-#' @param gp_clinical The UK Biobank primary care clinical events dataset
-#' @param remove_special_dates Logical. Removes special date values if
-#'   requested. Default value is \code{TRUE}.
-#' @param pos integer. Required for \code{\link{file_to_sqlite_db}}
-#' @param .details_only logical. If \code{TRUE}, return a character vector of
-#'   output table names only
-#'
-#' @noRd
-#' @return A named list. Item 'clinical_events' contains the read codes with
-#'   event dates, and item 'gp_clinical_values' contains the 'value' columns.
-#' @seealso \code{\link{tidy_clinical_events}},
-#'   \code{\link{make_clinical_events_db}}
+
 tidy_gp_clinical_db <- function(gp_clinical,
                                 remove_special_dates = TRUE,
                                 pos = NULL,
                                 .details_only = FALSE) {
-
+ # see documentation for `tidy_gp_clinical`
+ # the `pos` argument is required for use with `file_to_sqlite_db` - adds the row number as an 'index' column
 
   # names of table to be returned
   output_table_names <- c("clinical_events",
@@ -409,9 +421,10 @@ tidy_gp_clinical_db <- function(gp_clinical,
   ),
   msg = "Error! `gp_clinical` has unexpected column names")
 
-  assertthat::assert_that(all(
-    as.character(purrr::map_chr(dummy_gp_clinical, class)) == c(
-      "numeric",
+
+  assertthat::assert_that(
+    all(
+    as.character(purrr::map_chr(gp_clinical[, 2:8], class)) == c(
       "character",
       "character",
       "character",
@@ -420,8 +433,8 @@ tidy_gp_clinical_db <- function(gp_clinical,
       "character",
       "character"
     )
-  ),
-  msg = "Error! `gp_clinical` has one or more columns of invalid type. Column `eid` should be type 'numeric' and all other columns should be type 'character'")
+  ) & is.numeric(gp_clinical$eid),
+  msg = "Error! `gp_clinical` has one or more columns of invalid type. Column `eid` should be type 'integer' and all other columns should be type 'character'")
 
   # add index col - 'pos' is required for `file_to_sqlite_db environment`
   if (is.null(pos)) {

@@ -6,6 +6,7 @@ ukb_codings <- get_ukb_codings()
 # file paths
 dummy_ukb_main_clinical_events_path <- file.path(tempdir(), "DUMMY_UKB_MAIN_CLINICAL_EVENTS.tsv")
 dummy_gp_clinical_path <- file.path(tempdir(), "dummy_gp_clinical_path.tsv")
+dummy_ukb_db_path <- file.path(tempdir(), "ukb.db")
 
 # write dummy clinical events data to file
 readr::write_tsv(DUMMY_UKB_MAIN_CLINICAL_EVENTS,
@@ -15,7 +16,14 @@ readr::write_tsv(DUMMY_UKB_MAIN_CLINICAL_EVENTS,
 dummy_gp_clinical <- tibble::tibble(
   eid = c(1, 1, 1, 3, 4, 8),
   data_provider = c('1', '4', '3', '1', '2', '1'),
-  event_dt = c('03/03/1903', '01/01/1901', '07/07/2037', '07/07/2037', '01/02/1999', '01/02/1999'),
+  event_dt = c(
+    '03/03/1903',
+    '01/01/1901',
+    '07/07/2037',
+    '07/07/2037',
+    '01/02/1999',
+    '01/02/1999'
+  ),
   read_2 = c('C', 'A', 'E', 'E', 'J', NA),
   read_3 = c(NA, NA, NA, NA, NA, 'G'),
   value1 = c('1', '1', '1', '1', '1', '1'),
@@ -27,6 +35,30 @@ dummy_gp_clinical <- tibble::tibble(
 readr::write_tsv(dummy_gp_clinical,
                  file = dummy_gp_clinical_path)
 
+# tidy gp_clinical
+dummy_gp_clinical_special_dates_rm <-
+  tidy_gp_clinical_db(
+    gp_clinical = dummy_gp_clinical,
+    remove_special_dates = TRUE,
+    pos = 2
+  )
+
+# make clinical events db
+suppressWarnings(make_clinical_events_db(
+  ukb_main_path = dummy_ukb_main_clinical_events_path,
+  ukb_main_delim = "\t",
+  gp_clinical_path = dummy_gp_clinical_path,
+  ukb_db_path = dummy_ukb_db_path,
+  ukb_data_dict = ukb_data_dict,
+  ukb_codings = ukb_codings,
+  overwrite = TRUE,
+  strict = TRUE,
+  chunk_size = 2
+))
+
+con <- DBI::dbConnect(RSQLite::SQLite(), dummy_ukb_db_path)
+ukbdb <- db_list_tables(con)
+
 # TESTS -------------------------------------------------------------------
 
 # `tidy_gp_clinical_db()` --------------------------------------------
@@ -35,10 +67,6 @@ readr::write_tsv(dummy_gp_clinical,
 # environment, which would normally be that of `file_to_sqlite_db()`
 test_that(
   "`tidy_gp_clinical_db()` formats dates correctly (and returns expected column names)", {
-    dummy_gp_clinical_special_dates_rm <- tidy_gp_clinical_db(gp_clinical = dummy_gp_clinical,
-                                                                    remove_special_dates = TRUE,
-                                                              pos = 2)
-
     # check colnames
     expect_equal(names(dummy_gp_clinical),
                  c("eid", "data_provider", "event_dt", "read_2", "read_3", "value1", "value2", "value3"))
@@ -101,24 +129,7 @@ test_that("`gp_clinical_to_sqlite_db() returns the expected values in 'source' c
 # `make_clinical_events_db()` ---------------------------------------------
 
 test_that("`make_clinical_events_db()` works", {
-  dummy_ukb_db_path <- file.path(tempdir(), "ukb.db")
-
-  suppressWarnings(make_clinical_events_db(
-    ukb_main_path = dummy_ukb_main_clinical_events_path,
-    ukb_main_delim = "\t",
-    gp_clinical_path = dummy_gp_clinical_path,
-    ukb_db_path = dummy_ukb_db_path,
-    ukb_data_dict = ukb_data_dict,
-    ukb_codings = ukb_codings,
-    overwrite = TRUE,
-    strict = TRUE,
-    chunk_size = 2
-  ))
-
-  con <- DBI::dbConnect(RSQLite::SQLite(), dummy_ukb_db_path)
-  ukbdb <- db_list_tables(con)
-
-  expect_equal(names(ukbdb),
+    expect_equal(names(ukbdb),
                c("clinical_events", "gp_clinical_values"))
 
   expect_error(
