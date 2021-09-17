@@ -15,7 +15,8 @@
 #' the \code{clinical_events} table.
 #'
 #' @param ukb_main_path Path to the main UKB dataset file.
-#' @param ukb_main_delim Delimiter for \code{ukb_main_path}.
+#' @param ukb_main_delim Delimiter for \code{ukb_main_path}. Default value is
+#'   \code{"\\t"}.
 #' @param gp_clinical_path Path to the UKB primary care clinical events file
 #'   (\code{gp_clinical.txt}).
 #' @param ukb_db_path Path to the SQLite database file. The file name must end
@@ -35,9 +36,10 @@
 #' @export
 #' @seealso \code{\link{tidy_clinical_events}}, \code{\link{tidy_gp_clinical}}
 make_clinical_events_db <- function(ukb_main_path,
-                                    ukb_main_delim,
                                     gp_clinical_path,
+                                    gp_scripts_path,
                                     ukb_db_path,
+                                    ukb_main_delim = "\t",
                                     ukb_data_dict = get_ukb_data_dict(),
                                     ukb_codings = get_ukb_codings(),
                                     overwrite = FALSE,
@@ -46,6 +48,15 @@ make_clinical_events_db <- function(ukb_main_path,
   start_time <- proc.time()
 
   # validate args
+  assertthat::assert_that(!rlang::is_missing(ukb_main_path),
+                          msg = "Error! argument 'ukb_main_path' is missing, with no default")
+  assertthat::assert_that(!rlang::is_missing(gp_clinical_path),
+                          msg = "Error! argument 'gp_clinical_path' is missing, with no default")
+  assertthat::assert_that(!rlang::is_missing(gp_scripts_path),
+                          msg = "Error! argument 'gp_scripts_path' is missing, with no default")
+  assertthat::assert_that(!rlang::is_missing(ukb_db_path),
+                          msg = "Error! argument 'ukb_db_path' is missing, with no default")
+
   ukb_db_ext <- extract_file_ext(ukb_db_path)
   if (!(ukb_db_ext == "db") | is.na(ukb_db_ext)) {
     stop("Error! The file name for `ukb_db_path` must end with '.db'")
@@ -55,7 +66,10 @@ make_clinical_events_db <- function(ukb_main_path,
   on.exit(DBI::dbDisconnect(con))
 
   # Error message if table already exists and append == FALSE
-  tables_to_write <- tidy_gp_clinical_db(.details_only = TRUE)
+  tables_to_write <- c(tidy_gp_data_db(gp_df_type = "gp_clinical",
+                                       .details_only = TRUE),
+                       tidy_gp_data_db(gp_df_type = "gp_scripts",
+                                       .details_only = TRUE))
   table_already_present_in_db <- subset(tables_to_write,
                                         tables_to_write %in% DBI::dbListTables(con))
 
@@ -147,7 +161,7 @@ make_clinical_events_db <- function(ukb_main_path,
     append = FALSE
   )
 
-  # append primary care data to 'clinical_events' table, adding value column to a separate `gp_clinical_values` table ---------------------------------------------------------------
+  # append primary care data codes/dates to 'clinical_events' table, adding other columns to separate tables ---------------------------------------------------------------
   message("***APPENDING UKB PRIMARY CARE CLINICAL EVENTS DATA TO 'clinical_events' TABLE AND WRITING VALUE COLUMNS TO `gp_clinical_values` TABLE***")
 
   if (overwrite &
@@ -171,7 +185,38 @@ make_clinical_events_db <- function(ukb_main_path,
                     delim = "\t",
                     append = TRUE, # set to `TRUE` as appending to an existing table
                     verbose = TRUE,
-                    callback_function = tidy_gp_clinical_db)
+                    callback_function = purrr::partial(tidy_gp_data_db,
+                                                       gp_df_type = "gp_clinical"))
+
+  message("***APPENDING UKB PRIMARY CARE PRESCRIPTION DATA TO 'clinical_events' TABLE AND WRITING DRUG NAME AND QUANTITY COLUMNS TO `gp_scripts_names_and_quantities` TABLE***")
+
+  if (overwrite &
+      ("gp_scripts_names_and_quantities" %in% DBI::dbListTables(con))) {
+    DBI::dbRemoveTable(con, "gp_scripts_names_and_quantities")
+  }
+
+  file_to_sqlite_db(file = gp_scripts_path,
+                    col_types = list(
+                      eid = "i",
+                      data_provider = "c",
+                      issue_date = "c",
+                      read_2 = "c",
+                      bnf_code = "c",
+                      dmd_code = "c",
+                      drug_name = "c",
+                      quantity = "c"
+                    ), # all cols as type character
+                    db_path = ukb_db_path,
+                    chunk_size = chunk_size,
+                    delim = "\t",
+                    append = TRUE, # set to `TRUE` as appending to an existing table
+                    verbose = TRUE,
+                    callback_function = purrr::partial(tidy_gp_data_db,
+                                                       gp_df_type = "gp_scripts"))
+
+
+  # set sql indexes ---------------------------------------------------------
+
 
   # set index on 'code'/'source'/'eid' columns for faster lookups
   message("***SETTING INDEX ON `source`, `code` AND `eid` COLUMNS IN UKB DATABASE 'clinical_events' TABLE***")
@@ -223,8 +268,9 @@ make_clinical_events_db <- function(ukb_main_path,
 tidy_gp_clinical <- function(gp_clinical,
                              remove_special_dates = TRUE,
                              .details_only = FALSE) {
-  tidy_gp_clinical_db(
-    gp_clinical,
+  tidy_gp_data_db(
+    gp_df = gp_clinical,
+    gp_df_type = "gp_clinical",
     pos = NULL,
     remove_special_dates = remove_special_dates,
     .details_only = .details_only
@@ -391,103 +437,288 @@ file_to_sqlite_db <- function(file,
 }
 
 
-tidy_gp_clinical_db <- function(gp_clinical,
-                                remove_special_dates = TRUE,
-                                pos = NULL,
-                                .details_only = FALSE) {
- # see documentation for `tidy_gp_clinical`
- # the `pos` argument is required for use with `file_to_sqlite_db` - adds the row number as an 'index' column
+# tidy_gp_clinical_db <- function(gp_clinical,
+#                                 remove_special_dates = TRUE,
+#                                 pos = NULL,
+#                                 .details_only = FALSE) {
+#  # see documentation for `tidy_gp_clinical`
+#  # the `pos` argument is required for use with `file_to_sqlite_db` - adds the row number as an 'index' column
+#
+#   # names of table to be returned
+#   output_table_names <- c("clinical_events",
+#                           "gp_clinical_values")
+#
+#   if (.details_only) {
+#     return(output_table_names)
+#   }
+#
+#   # validate args
+#   assertthat::assert_that(all(
+#     names(gp_clinical) == c(
+#       "eid",
+#       "data_provider",
+#       "event_dt",
+#       "read_2",
+#       "read_3",
+#       "value1",
+#       "value2",
+#       "value3"
+#     )
+#   ),
+#   msg = "Error! `gp_clinical` has unexpected column names")
+#
+#
+#   assertthat::assert_that(
+#     all(
+#     as.character(purrr::map_chr(gp_clinical[, 2:8], class)) == c(
+#       "character",
+#       "character",
+#       "character",
+#       "character",
+#       "character",
+#       "character",
+#       "character"
+#     )
+#   ) & is.numeric(gp_clinical$eid),
+#   msg = "Error! `gp_clinical` has one or more columns of invalid type. Column `eid` should be type 'integer' and all other columns should be type 'character'")
+#
+#   # add index col - 'pos' is required for `file_to_sqlite_db environment`
+#   if (is.null(pos)) {
+#     pos <- 1
+#   }
+#
+#   index_col_end <- pos + nrow(gp_clinical) - 1
+#   gp_clinical$index <- as.character(pos:index_col_end)
+#
+#   # tidy clinical codes/dates
+#   gp_clinical_codes <- gp_clinical %>%
+#     dplyr::select(
+#       .data[["eid"]],
+#       .data[["index"]],
+#       .data[["data_provider"]],
+#       .data[["event_dt"]],
+#       .data[["read_2"]],
+#       .data[["read_3"]]
+#     ) %>% # remove 3 'value' cols
+#     tidyr::pivot_longer(
+#       cols = c("read_2", "read_3"),
+#       names_to = "source",
+#       values_to = "code"
+#     ) %>%
+#     # remove redundant rows (original data has no rows with a value in bot read2/3 cols)
+#     dplyr::filter(!is.na(.data[["code"]]))
+#
+#   # relabel 'read_2' and 'read_3' to 'gpc_r2' and 'gpc_r3'
+#   gp_clinical_codes$source <- dplyr::case_when(
+#     gp_clinical_codes$source == "read_2" ~ paste0("gpc",
+#                                                   gp_clinical_codes[["data_provider"]],
+#                                                   "_",
+#                                                   "r2"),
+#     gp_clinical_codes$source == "read_3" ~ paste0("gpc",
+#                                                   gp_clinical_codes[["data_provider"]],
+#                                                   "_",
+#                                                   "r3"),
+#     TRUE ~ "gpc_unknown_coding"
+#   )
+#
+#   # rename 'event_dt' to 'date'
+#   gp_clinical_codes <- rename_cols(gp_clinical_codes,
+#                                    old_colnames = "event_dt",
+#                                    new_colnames = "date")
+#
+#   # reformat date
+#   gp_clinical_codes$date <- gp_clinical_codes$date %>%
+#     lubridate::dmy() %>%
+#     as.character()
+#
+#   # remove special dates if requested (default is to remove)
+#   if (remove_special_dates == TRUE) {
+#
+#     # primary care dates to remove
+#     # see https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=591
+#     primary_care_special_dates_to_remove <- c("01/01/1901",
+#                                               "02/02/1902",
+#                                               "03/03/1903",
+#                                               "07/07/2037") %>%
+#       lubridate::dmy() %>%
+#       as.character()
+#
+#     gp_clinical_codes$date <- ifelse(
+#       test = gp_clinical_codes$date %in% primary_care_special_dates_to_remove,
+#       yes = NA,
+#       no = gp_clinical_codes$date
+#     )
+#   }
+#
+#   result <- list(clinical_events = gp_clinical_codes[c("eid",
+#                                                        "source",
+#                                                        "index",
+#                                                        "code",
+#                                                        "date")],
+#                  gp_clinical_values = gp_clinical[c("index",
+#                                                     "value1",
+#                                                     "value2",
+#                                                     "value3")])
+#
+#   # check that items in `result` match those returned when `.details_only = TRUE`
+#   assertthat::assert_that(all(names(result) == output_table_names))
+#
+#   return(result)
+# }
 
-  # names of table to be returned
-  output_table_names <- c("clinical_events",
-                          "gp_clinical_values")
+tidy_gp_data_db <- function(gp_df,
+                            gp_df_type,
+                            remove_special_dates = TRUE,
+                            pos = NULL,
+                            .details_only = FALSE) {
+  # see documentation for `tidy_gp_clinical`/`tidy_gp_scripts`
+  # the `pos` argument is required for use with `file_to_sqlite_db` - adds the row number as an 'index' column
+
+  match.arg(gp_df_type,
+            choices = c("gp_clinical", "gp_scripts"))
+
+  gp_df_details <- switch(
+    gp_df_type,
+    gp_clinical = list(
+      output_table_names = c("clinical_events",
+                             "gp_clinical_values"),
+      input_col_names = c(
+        "eid",
+        "data_provider",
+        "event_dt",
+        "read_2",
+        "read_3",
+        "value1",
+        "value2",
+        "value3"
+      ),
+      clinical_events_cols = c("eid",
+                               "index",
+                               "data_provider",
+                               "event_dt",
+                               "read_2",
+                               "read_3"),
+      code_cols = c("read_2",
+                    "read_3"),
+      date_col = "event_dt",
+      other_cols = c("value1",
+                     "value2",
+                     "value3"),
+      source_acronym = "gpc"
+    ),
+    gp_scripts = list(
+      output_table_names = c("clinical_events",
+                             "gp_scripts_names_and_quantities"),
+      input_col_names = c(
+        "eid",
+        "data_provider",
+        "issue_date",
+        "read_2",
+        "bnf_code",
+        "dmd_code",
+        "drug_name",
+        "quantity"
+      ),
+      clinical_events_cols = c( "eid",
+                                "index",
+                                "data_provider",
+                                "issue_date",
+                                "read_2",
+                                "bnf_code",
+                                "dmd_code"),
+      code_cols = c("read_2",
+                    "bnf_code",
+                    "dmd_code"),
+      date_col = "issue_date",
+      other_cols = c("drug_name",
+                     "quantity"),
+      source_acronym = "gps"
+    ),
+  )
 
   if (.details_only) {
-    return(output_table_names)
+    # names of table to be returned
+    return(gp_df_details$output_table_names)
   }
 
   # validate args
-  assertthat::assert_that(all(
-    names(gp_clinical) == c(
-      "eid",
-      "data_provider",
-      "event_dt",
-      "read_2",
-      "read_3",
-      "value1",
-      "value2",
-      "value3"
-    )
-  ),
-  msg = "Error! `gp_clinical` has unexpected column names")
-
+  assertthat::assert_that(
+    all(names(gp_df) == gp_df_details$input_col_names),
+    msg = paste0("Error! `",
+                 gp_df_type,
+                 "` has unexpected column names")
+  )
 
   assertthat::assert_that(
-    all(
-    as.character(purrr::map_chr(gp_clinical[, 2:8], class)) == c(
-      "character",
-      "character",
-      "character",
-      "character",
-      "character",
-      "character",
-      "character"
+    all(as.character(purrr::map_chr(gp_df[, 2:ncol(gp_df)], class)) == rep("character", ncol(gp_df) - 1)) &
+      is.numeric(gp_df$eid),
+    msg = paste0(
+      "Error! `",
+      gp_df_type,
+      "` has one or more columns of invalid type. Column `eid` should be type 'integer' and all other columns should be type 'character'"
     )
-  ) & is.numeric(gp_clinical$eid),
-  msg = "Error! `gp_clinical` has one or more columns of invalid type. Column `eid` should be type 'integer' and all other columns should be type 'character'")
+  )
 
   # add index col - 'pos' is required for `file_to_sqlite_db environment`
   if (is.null(pos)) {
     pos <- 1
   }
 
-  index_col_end <- pos + nrow(gp_clinical) - 1
-  gp_clinical$index <- as.character(pos:index_col_end)
+  index_col_end <- pos + nrow(gp_df) - 1
+  gp_df$index <- as.character(pos:index_col_end)
 
   # tidy clinical codes/dates
-  gp_clinical_codes <- gp_clinical %>%
-    dplyr::select(
-      .data[["eid"]],
-      .data[["index"]],
-      .data[["data_provider"]],
-      .data[["event_dt"]],
-      .data[["read_2"]],
-      .data[["read_3"]]
-    ) %>% # remove 3 'value' cols
-    tidyr::pivot_longer(
-      cols = c("read_2", "read_3"),
-      names_to = "source",
-      values_to = "code"
-    ) %>%
-    # remove redundant rows (original data has no rows with a value in bot read2/3 cols)
+  gp_df_codes <- gp_df %>%
+    dplyr::select(tidyselect::all_of(gp_df_details$clinical_events_cols)) %>%
+    tidyr::pivot_longer(cols = gp_df_details$code_cols,
+                        names_to = "source",
+                        values_to = "code") %>%
+    # remove redundant rows
     dplyr::filter(!is.na(.data[["code"]]))
 
-  # relabel 'read_2' and 'read_3' to 'gpc_r2' and 'gpc_r3'
-  gp_clinical_codes$source <- dplyr::case_when(
-    gp_clinical_codes$source == "read_2" ~ paste0("gpc",
-                                                  gp_clinical_codes[["data_provider"]],
-                                                  "_",
-                                                  "r2"),
-    gp_clinical_codes$source == "read_3" ~ paste0("gpc",
-                                                  gp_clinical_codes[["data_provider"]],
-                                                  "_",
-                                                  "r3"),
-    TRUE ~ "gpc_unknown_coding"
-  )
+  # relabel `source` col - combine 'gpc'/'gps' with data provider and code type
+  if (gp_df_type == "gp_clinical") {
+    gp_df_codes$source <- dplyr::case_when(
+      gp_df_codes$source == "read_2" ~ paste0(gp_df_details$source_acronym,
+                                              gp_df_codes[["data_provider"]],
+                                              "_",
+                                              "r2"),
+      gp_df_codes$source == "read_3" ~ paste0(gp_df_details$source_acronym,
+                                              gp_df_codes[["data_provider"]],
+                                              "_",
+                                              "r3"),
+      TRUE ~ "gpc_unknown_coding"
+    )
+  } else if (gp_df_type == "gp_scripts") {
+    gp_df_codes$source <- dplyr::case_when(
+      gp_df_codes$source == "read_2" ~ paste0(gp_df_details$source_acronym,
+                                              gp_df_codes[["data_provider"]],
+                                              "_",
+                                              "r2"),
+      gp_df_codes$source == "bnf_code" ~ paste0(gp_df_details$source_acronym,
+                                                gp_df_codes[["data_provider"]],
+                                                "_",
+                                                "bnf"),
+      gp_df_codes$source == "dmd_code" ~ paste0(gp_df_details$source_acronym,
+                                                gp_df_codes[["data_provider"]],
+                                                "_",
+                                                "dmd"),
+      TRUE ~ "gpc_unknown_coding"
+    )
+  }
 
-  # rename 'event_dt' to 'date'
-  gp_clinical_codes <- rename_cols(gp_clinical_codes,
-                                   old_colnames = "event_dt",
-                                   new_colnames = "date")
+  # rename 'event_dt'/`issue_date` to 'date'
+  gp_df_codes <- rename_cols(gp_df_codes,
+                             old_colnames = gp_df_details$date_col,
+                             new_colnames = "date")
 
   # reformat date
-  gp_clinical_codes$date <- gp_clinical_codes$date %>%
+  gp_df_codes$date <- gp_df_codes$date %>%
     lubridate::dmy() %>%
     as.character()
 
   # remove special dates if requested (default is to remove)
   if (remove_special_dates == TRUE) {
-
     # primary care dates to remove
     # see https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=591
     primary_care_special_dates_to_remove <- c("01/01/1901",
@@ -497,25 +728,22 @@ tidy_gp_clinical_db <- function(gp_clinical,
       lubridate::dmy() %>%
       as.character()
 
-    gp_clinical_codes$date <- ifelse(
-      test = gp_clinical_codes$date %in% primary_care_special_dates_to_remove,
+    gp_df_codes$date <- ifelse(
+      test = gp_df_codes$date %in% primary_care_special_dates_to_remove,
       yes = NA,
-      no = gp_clinical_codes$date
+      no = gp_df_codes$date
     )
   }
 
-  result <- list(clinical_events = gp_clinical_codes[c("eid",
-                                                       "source",
-                                                       "index",
-                                                       "code",
-                                                       "date")],
-                 gp_clinical_values = gp_clinical[c("index",
-                                                    "value1",
-                                                    "value2",
-                                                    "value3")])
+  result <- list(events = gp_df_codes[c("eid",
+                                        "source",
+                                        "index",
+                                        "code",
+                                        "date")],
+                 other = gp_df[c("index",
+                                 gp_df_details$other_cols)])
 
-  # check that items in `result` match those returned when `.details_only = TRUE`
-  assertthat::assert_that(all(names(result) == output_table_names))
+  names(result) <- gp_df_details$output_table_names
 
   return(result)
 }
