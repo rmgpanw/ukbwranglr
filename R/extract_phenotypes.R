@@ -1,33 +1,18 @@
 # NOTES -------------------------------------------------------------------
 
-# Section 'Get all diagnostic codes' - functions to generate long format dataframes
-# with standardised formats, listing all diagnostic codes for each eid. Separate
-# functions created for each data source (i.e. self-report, HES, primary care
-# etc)
+# Steps to append additional `clinical_events_sources` for `tidy_clinical_events()`:
 
-# Section 'Extract specific diagnostic codes' - for a set of
-# specific diagnostic codes, extract a list of eid's with these codes and the
-# earliest recorded date. Depends on output from the 'get all diagnostic codes'
-# functions
+# 1. Update `CLINICAL_EVENTS_FIELD_IDS` and `CLINICAL_EVENTS_SOURCES` in `DATASET.R`
 
-#TODO
+# 2. Update relevant details in `tidy_clinical_events()`
 
-# optimise field_id_pivot_longer_multi() - set an 'index' column and filter this for
-#non-na values before performing inner_join() e.g. for self-reported non-cancer
-#diagnoses, fieldid 20002 would be the index col: if there is no self-reported
-#diagnosis, then the associated date and age at diagnosis columns will also be
-#empty.
+# 3. Add dummy data fields to `DUMMY_UKB_MAIN_CLINICAL_EVENTS` in `DATASET.R`
 
-# For 'get all diagnostic codes' functions, each starts with the required
-# fieldids. Recode the remainder of the functions to use this so any changes
-# only need to be made at the start (maybe separate into 'code_fid' and 'date_fid' variables?)
+# 4. Update end of `filter_clinical_events()` (from comment '***Update this section ...)
 
-# Add check - UKB dataset should have all the required columns for these
-# functions i.e. all instances/arrays (as per the complete UKB data dictionary)
-# for all required FIDs. Raise error if not
+# 5. Add tests to `test_extract_phenotypes.R` under `tidy_clinical_events()` section
 
-# Remove special values e.g. -3 and -1 for self-reported years of diagnosis
-# (https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=20008); coding 13)
+# 6. Run tests in `test_extract_phenotypes.R` and fix as necessary
 
 
 # CONSTANTS ---------------------------------------------------------------
@@ -390,6 +375,7 @@ tidy_clinical_events <- function(ukb_main,
                                  clinical_events_sources = c(
                                    "primary_death_icd10",
                                    "secondary_death_icd10",
+                                   "self_report_medication",
                                    "self_report_non_cancer",
                                    "self_report_non_cancer_icd10",
                                    "self_report_cancer",
@@ -484,14 +470,15 @@ tidy_clinical_events <- function(ukb_main,
   }
 
   # To use in loop below - determine how event_type should be processed
-  death_cancer_and_summary_hes <- c("cancer_register_icd9",
+  death_cancer_summary_hes_self_report_meds <- c("cancer_register_icd9",
                               "cancer_register_icd10",
                               "summary_hes_icd9",
                               "summary_hes_icd10",
                               "summary_hes_opcs3",
                               "summary_hes_opcs4",
                               "primary_death_icd10",
-                              "secondary_death_icd10")
+                              "secondary_death_icd10",
+                              "self_report_medication")
 
   self_report <- c("self_report_non_cancer",
                    "self_report_cancer",
@@ -501,7 +488,7 @@ tidy_clinical_events <- function(ukb_main,
   # (internal check that all options are covered)
   assertthat::are_equal(
     sort(c(
-      death_cancer_and_summary_hes,
+      death_cancer_summary_hes_self_report_meds,
       self_report,
       self_report_non_cancer_icd10
     )),
@@ -519,7 +506,7 @@ tidy_clinical_events <- function(ukb_main,
     tidying_option <- dplyr::case_when(
       event_type %in% self_report ~ "self_report",
       event_type == self_report_non_cancer_icd10 ~ "self_report_non_cancer_icd10",
-      event_type %in% death_cancer_and_summary_hes ~ "death_cancer_and_summary_hes"
+      event_type %in% death_cancer_summary_hes_self_report_meds ~ "death_cancer_summary_hes_self_report_meds"
     )
 
     # tidy clinical events
@@ -554,7 +541,7 @@ tidy_clinical_events <- function(ukb_main,
         recode_self_report_non_cancer_diagnoses_to_icd10(data_dict = data_dict,
                                                          ukb_codings = ukb_codings),
 
-      death_cancer_and_summary_hes = tidy_clinical_events_basis(ukb_main = ukb_main,
+      death_cancer_summary_hes_self_report_meds = tidy_clinical_events_basis(ukb_main = ukb_main,
                                                           data_dict = data_dict,
                                                           ukb_codings = ukb_codings,
                                                           data_dict_colname_col = "colheaders_raw",
@@ -576,7 +563,8 @@ tidy_clinical_events <- function(ukb_main,
 #' For most clinical events variables in the UKB main dataset there is a
 #' diagnostic code variable and an associated date of event variable. There are
 #' spread over several instances/arrays. This function melts these to long
-#' format.
+#' format. Note that dates are handled differently for death data and
+#' self-reported medications.
 #'
 #' @inheritParams read_ukb
 #' @param data_dict_colname_col character. The column in \code{data_dict} with
@@ -650,7 +638,11 @@ tidy_clinical_events_basis <- function(ukb_main,
   # https://biobank.ndph.ox.ac.uk/ukb/ukb/docs/DeathLinkage.pdf for why this may
   # occasionally happen), however we match the date of instance to
   # primary/secondary causes of death instance anyway
-  if (code_col_field_id == "40002") {
+
+  # similarly, there is no associated start date for self-reported medications.
+  # These codes are therefore matched by instance with the date of attending the
+  # UK Biobank assessment centre
+  if (code_col_field_id %in% c("40002", "20003")) {
     JOIN_COL <- "instance"
     ARRANGE_COL <- "instance"
     INSTANCE_ARRAY_COL <- "instance_array.code"
@@ -1176,12 +1168,14 @@ filter_clinical_events <- function(clinical_events,
 
   # filter for selected codes
 
-  # ***A reminder to amend this section if new types of
-  # data_coding are added to
+  # ***Update this section if new types of data_coding are added to
   # CLINICAL_EVENTS_SOURCES$data_coding***
   assertthat::assert_that(all(
     unique(sort(CLINICAL_EVENTS_SOURCES$data_coding)) == sort(c(
+      'bnf',
+      'dmd',
       'data_coding_3',
+      'data_coding_4',
       'data_coding_6',
       'data_coding_5',
       'icd10',
@@ -1198,6 +1192,7 @@ filter_clinical_events <- function(clinical_events,
   # below. It will silently return an error result
 
   data_coding_3_sources <- get_sources_for_code_type("data_coding_3")
+  data_coding_4_sources <- get_sources_for_code_type("data_coding_4")
   data_coding_6_sources <- get_sources_for_code_type("data_coding_6")
   data_coding_5_sources <- get_sources_for_code_type("data_coding_5")
   icd10_sources <- get_sources_for_code_type("icd10")
@@ -1206,8 +1201,11 @@ filter_clinical_events <- function(clinical_events,
   opcs4_sources <- get_sources_for_code_type("opcs4")
   read2_sources <- get_sources_for_code_type("read2")
   read3_sources <- get_sources_for_code_type("read3")
+  bnf_sources <- get_sources_for_code_type("bnf")
+  dmd_sources <- get_sources_for_code_type("dmd")
 
   data_coding_3_codes <- clinical_codes_list$data_coding_3
+  data_coding_4_codes <- clinical_codes_list$data_coding_4
   data_coding_6_codes <- clinical_codes_list$data_coding_6
   data_coding_5_codes <- clinical_codes_list$data_coding_5
   icd10_codes <- clinical_codes_list$icd10
@@ -1216,6 +1214,8 @@ filter_clinical_events <- function(clinical_events,
   opcs4_codes <- clinical_codes_list$opcs4
   read2_codes <- clinical_codes_list$read2
   read3_codes <- clinical_codes_list$read3
+  bnf_codes <- clinical_codes_list$bnf
+  dmd_codes <- clinical_codes_list$dmd
 
   clinical_events <- clinical_events %>%
     dplyr::filter(
@@ -1223,6 +1223,8 @@ filter_clinical_events <- function(clinical_events,
          .data[["code"]] %in% data_coding_3_codes) |
         (.data[["source"]] %in% data_coding_6_sources &
            .data[["code"]] %in% data_coding_6_codes) |
+        (.data[["source"]] %in% data_coding_4_sources &
+           .data[["code"]] %in% data_coding_4_codes) |
         (.data[["source"]] %in% data_coding_5_sources &
            .data[["code"]] %in% data_coding_5_codes) |
         (.data[["source"]] %in% icd9_sources &
@@ -1236,7 +1238,11 @@ filter_clinical_events <- function(clinical_events,
         (.data[["source"]] %in% read2_sources &
            .data[["code"]] %in% read2_codes) |
         (.data[["source"]] %in% read3_sources &
-           .data[["code"]] %in% read3_codes)
+           .data[["code"]] %in% read3_codes) |
+        (.data[["source"]] %in% bnf_sources &
+           .data[["code"]] %in% bnf_codes) |
+        (.data[["source"]] %in% dmd_sources &
+           .data[["code"]] %in% dmd_codes)
     ) %>%
     dplyr::collect()
 

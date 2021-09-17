@@ -14,37 +14,30 @@ dummy_clinical_events_list <-
     ukb_main = dummy_main_dataset_clinical_events(),
     ukb_data_dict = ukb_data_dict,
     ukb_codings = ukb_codings,
-    clinical_events = c(
-      "primary_death_icd10",
-      "secondary_death_icd10",
-      "self_report_non_cancer",
-      "self_report_non_cancer_icd10",
-      "self_report_cancer",
-      "self_report_operation",
-      "cancer_register_icd9",
-      "cancer_register_icd10",
-      "summary_hes_icd9",
-      "summary_hes_icd10",
-      "summary_hes_opcs3",
-      "summary_hes_opcs4"
-    ),
+    clinical_events = names(CLINICAL_EVENTS_FIELD_IDS),
     strict = TRUE,
     .details_only = FALSE
   )
 
 # add some dummy GP data
+dummy_gp_clinical_events <- tibble::tribble(
+  ~ eid, ~ source, ~ index, ~ code, ~ date,
+  1, "gpc1_r2", "5", "C108.", "1990-10-01",
+  2, "gpc2_r2", "6", "C109.", "1990-10-02",
+  1, "gpc3_r3", "7", "X40J4", "1990-10-03",
+  2, "gpc4_r3", "8", "X40J5", "1990-10-04",
+  1, "gpc1_r3", "9", "C108.", "1990-10-03",
+  2, "gpc2_r3", "10", "C109.", "1990-10-04"
+)
+
+assertthat::assert_that(all(dummy_gp_clinical_events$source %in% CLINICAL_EVENTS_SOURCES$source),
+                        msg = "Error! check `source` column in `dummy_gp_clinical_events")
+
 dummy_clinical_events <- dummy_clinical_events_list %>%
   dplyr::bind_rows() %>%
   dplyr::bind_rows(
-  tibble::tribble(
-    ~ eid, ~ source, ~ index, ~ code, ~ date,
-    1, "gpc_r2", "5", "C108.", "1990-10-01",
-    2, "gpc_r2", "6", "C109.", "1990-10-02",
-    1, "gpc_r3", "7", "X40J4", "1990-10-03",
-    2, "gpc_r3", "8", "X40J5", "1990-10-04",
-    1, "gpc_r3", "9", "C108.", "1990-10-03",
-    2, "gpc_r3", "10", "C109.", "1990-10-04"
-  ))
+    dummy_gp_clinical_events
+  )
 
 # dummy_clinical_events as sqlite db
 # Create an ephemeral in-memory RSQLite database
@@ -87,8 +80,8 @@ test_that(
   "output from `tidy_clinical_events()` contains all expected source types", {
     # won't contain gp read codes
     expect_equal(sort(unique(dplyr::bind_rows(dummy_clinical_events_list)$source)),
-                 sort(subset(CLINICAL_EVENTS_SOURCES$source, !CLINICAL_EVENTS_SOURCES$source %in% c("gpc_r2",
-                                                                                                    "gpc_r3"))))
+                 sort(subset(CLINICAL_EVENTS_SOURCES$source, !stringr::str_detect(CLINICAL_EVENTS_SOURCES$source,
+                                                                                  pattern = "^gp"))))
   }
 )
 
@@ -171,6 +164,19 @@ test_that(
                         index = c('0_0', '0_0', '1_3'),
                         code = c('W192', 'V374', 'X715'),
                         date = c('1917-10-08', '1955-02-11', '1910-02-19')
+                      ))
+  }
+)
+
+test_that(
+  "`tidy_clinical_events` returns the expected results for 'self_report_medication'", {
+    expect_equivalent(dummy_clinical_events_list$self_report_medication,
+                      tibble::tibble(
+                        eid = c(1, 2, 1, 2, 1, 2),
+                        source = c('f20003', 'f20003', 'f20003', 'f20003', 'f20003', 'f20003'),
+                        index = c('0_0', '0_0', '2_0', '2_0', '2_3', '2_3'),
+                        code = c('1140861958', '1141146234', '1141146188', '1141184722', '1141184722', '1140861958'),
+                        date = c('1955-02-11', '1965-08-08', '1910-02-19', '1915-03-18', '1910-02-19', '1915-03-18')
                       ))
   }
 )
@@ -546,14 +552,14 @@ test_that("`filter_clinical_events()` returns the expected 'sources' for each da
               filter_clinical_events(dummy_clinical_events,
                                      clinical_codes_list = list("read2" = "C108."))$source
             )),
-            expected = sort(get_sources_for_code_type("read2")))
+            expected = "gpc1_r2")
 
             # read3
             expect_equal(sort(unique(
               filter_clinical_events(dummy_clinical_events,
                                      clinical_codes_list = list("read3" = "C108."))$source
             )),
-            expected = sort(get_sources_for_code_type("read3")))
+            expected = "gpc1_r3")
 
             # icd9
             expect_equal(sort(unique(
@@ -595,6 +601,15 @@ test_that("`filter_clinical_events()` returns the expected 'sources' for each da
               )$source
             )),
             expected = sort(get_sources_for_code_type("data_coding_5")))
+
+            # data_coding_4
+            expect_equal(sort(unique(
+              filter_clinical_events(
+                dummy_clinical_events,
+                clinical_codes_list = list("data_coding_4" = "1140861958")
+              )$source
+            )),
+            expected = sort(get_sources_for_code_type("data_coding_4")))
           })
 
 test_that(
@@ -608,7 +623,7 @@ test_that(
                                                         "read3" = "C108.")),
     expected = tibble::tibble(
       eid = c(1, 2, 1, 1),
-      source = c("f40002", "f40006", "gpc_r2", "gpc_r3"),
+      source = c("f40002", "f40006", "gpc1_r2", "gpc1_r3"),
       index = c("0_0", "2_0", "5", "9"),
       code = c("W192", "W192", "C108.", "C108."),
       date = c("1917-10-08", NA, "1990-10-01", "1990-10-03")
