@@ -1,9 +1,6 @@
 
-# CONSTANTS ---------------------------------------------------------------
-
 
 # TESTS -------------------------------------------------------------------
-
 
 # Diagnoses FieldIDs -------------------------------------------------------
 
@@ -94,26 +91,3 @@ test_that("`code_type_to_lkp_sheet_map_df` only contains values in `ukb_code_map
   )
 })
 
-# `clinical_events_sources` -----------------------------------------------
-
-test_that("`clinical_events_sources$data_coding` contains the following:
-          'icd10',
-          'data_coding_6',
-          'data_coding_3',
-          'icd9',
-          'read2',
-          'read3'.
-          IF NOT: AMEND `extract_single_diagnostic_code_record_basis()` FILTER STATEMENT and tests for `filter_clinical_events_for_list_of_codes()`", {
-  expect_equal(unique(sort(ukbwranglr:::clinical_events_sources$data_coding)),
-               sort(c(
-                 'icd10',
-                 'data_coding_6',
-                 'data_coding_3',
-                 'icd9',
-                 'read2',
-                 'read3',
-                 'opcs3',
-                 'opcs4'
-               )))
-
-})
