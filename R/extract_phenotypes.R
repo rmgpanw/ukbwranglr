@@ -303,7 +303,7 @@ extract_phenotypes <- function(
         ))
 
     } else {
-    stop("Unexpected error! Please raise an issue at https://github.com/rmgpanw/ukbwranglr/issues to get this function fixed")
+    stop("Unexpected error! Please raise an issue at https://github.com/rmgpanw/ukbwranglr/issues")
   }
 
   # return result
@@ -885,34 +885,34 @@ extract_phenotypes_single_disease <-
     # clinical_codes$category: remove special characters and convert to lower
     # case. This will be used to label the columns with
     # `extract_first_or_last_clinical_event()`
-    clinical_codes$phenotype_name <-
+    clinical_codes$phenotype_colname <-
       remove_special_characters_and_make_lower_case(clinical_codes$category)
 
-    clinical_codes$phenotype_name <-
-      paste0(clinical_codes$phenotype_name,
+    clinical_codes$phenotype_colname <-
+      paste0(clinical_codes$phenotype_colname,
              "_",
              clinical_codes$author)
 
-    clinical_codes$phenotype_name <-
+    clinical_codes$phenotype_colname <-
       ifelse(
         clinical_codes$category == clinical_codes$disease,
-        toupper(clinical_codes$phenotype_name),
-        clinical_codes$phenotype_name
+        toupper(clinical_codes$phenotype_colname),
+        clinical_codes$phenotype_colname
       )
 
     # add prefix if specified
     if (!is.null(prefix)) {
-      clinical_codes$phenotype_name <-
-        paste0(prefix, clinical_codes$phenotype_name)
+      clinical_codes$phenotype_colname <-
+        paste0(prefix, clinical_codes$phenotype_colname)
     }
 
     # make 2 named lists of code lists for each phenotype: 1 will contain code
     # lists, the other will contain the results from
     # `extract_first_or_last_clinical_event()`
     list_of_phenotype_codelists <- vector(mode = "list",
-                                          length = length(unique(clinical_codes$phenotype_name)))
+                                          length = length(unique(clinical_codes$phenotype_colname)))
     names(list_of_phenotype_codelists) <-
-      sort(unique(clinical_codes$phenotype_name))
+      sort(unique(clinical_codes$phenotype_colname))
 
     list_of_phenotype_results <- list_of_phenotype_codelists
 
@@ -926,7 +926,7 @@ extract_phenotypes_single_disease <-
     for (phenotype in names(list_of_phenotype_codelists)) {
       # filter codes clinical_events for phenotype category
       single_phenotype_df <- clinical_codes %>%
-        dplyr::filter(.data[["phenotype_name"]] == phenotype)
+        dplyr::filter(.data[["phenotype_colname"]] == phenotype)
 
       # loop through code_types to populate code lists for phenotype category
       for (code_type in single_phenotype_df$code_type) {
@@ -969,11 +969,18 @@ extract_phenotypes_single_disease <-
     message("EXTRACTING EVENT DATES FOR PHENOTYPES")
     n_phenotypes <- length(names(list_of_phenotype_results))
     i <- 1
-    for (phenotype in names(list_of_phenotype_results)) {
+    # this is used in the loop to get the label for a `phenotype_colname`
+    phenotype_colname_to_phenotype <- clinical_codes %>%
+      dplyr::distinct(phenotype_colname,
+                      .keep_all = TRUE) %>%
+      split(.$phenotype_colname) %>%
+      purrr::map_chr(~ .x[["category"]])
+
+    for (phenotype_colname in names(list_of_phenotype_results)) {
       message(
         paste0(
           "Extracting event dates for ",
-          phenotype,
+          phenotype_colname,
           " (Phenotype ",
           i,
           " of ",
@@ -984,8 +991,9 @@ extract_phenotypes_single_disease <-
 
        result <- extract_clinical_events(
           clinical_events = clinical_events,
-          clinical_codes_list = list_of_phenotype_codelists[[phenotype]],
-          phenotype_name = phenotype,
+          clinical_codes_list = list_of_phenotype_codelists[[phenotype_colname]],
+          phenotype_colname = phenotype_colname,
+          phenotype = as.character(phenotype_colname_to_phenotype[phenotype_colname]),
           min_max = min_max,
           keep_all = keep_all
         )
@@ -995,9 +1003,9 @@ extract_phenotypes_single_disease <-
        # from the list. See this stackoverflow post:
        # https://stackoverflow.com/a/7945259
        if (is.null(result)) {
-         list_of_phenotype_results[phenotype] <- list(NULL)
+         list_of_phenotype_results[phenotype_colname] <- list(NULL)
        } else {
-         list_of_phenotype_results[[phenotype]] <- result
+         list_of_phenotype_results[[phenotype_colname]] <- result
        }
 
       i <- i + 1
@@ -1032,18 +1040,20 @@ extract_phenotypes_single_disease <-
 #'
 #' @param min_max can be either "min" or "max". Extracts either the earliest or
 #'   latest date that on of the specified \code{codes} appears.
-#' @param phenotype_name character. Name
+#' @param phenotype_colname character. Column name for phenotype
+#' @param phenotype character. Phenotype
 #' @inheritParams extract_phenotypes_single_disease
 #'
 #' @return Data frame with columns "eid", "event_min/max_indicator" and
 #'   "event_min/max_date". "Event" is replaced with the string supplied to the
-#'   \code{phenotype_name} argument. Retain a "data" column of nested data
+#'   \code{phenotype_colname} argument. Retain a "data" column of nested data
 #'   frames containing all clinical events if
 #' @noRd
 extract_clinical_events <- function(clinical_events,
                                     clinical_codes_list,
                                     min_max,
-                                    phenotype_name,
+                                    phenotype_colname,
+                                    phenotype,
                                     keep_all) {
 
   # extract earliest date
@@ -1072,14 +1082,33 @@ extract_clinical_events <- function(clinical_events,
 
   # create indicator column - in some cases there may a diagnosis, even if the
   # date is unknown
-  clinical_events[[paste0(phenotype_name, "_indicator")]] <- TRUE
+  indicator_colname <- paste0(phenotype_colname, "_indicator")
 
-  # rename date col to `phenotype_name`
+  clinical_events[[indicator_colname]] <- 1
+
+  # rename date col to `phenotype_colname`
+  date_colname <- paste0(phenotype_colname, "_", min_max, "_date")
+
   clinical_events <- clinical_events %>%
     rename_cols(old_colnames = "date",
-                new_colnames = paste0(phenotype_name, "_", min_max, "_date"))
+                new_colnames = date_colname)
 
-  # create indicator column
+  # add labels
+  indicator_labels <- setNames(c(1, 0),
+                               nm = c(phenotype, paste0("No ", phenotype)))
+
+  clinical_events[[indicator_colname]] <- haven::labelled(
+    x = clinical_events[[indicator_colname]],
+    labels = indicator_labels,
+    label = phenotype
+  )
+
+  clinical_events[[date_colname]] <- haven::labelled(
+    x = clinical_events[[date_colname]],
+    labels = NULL,
+    label = paste0(phenotype, " date (", min_max, ")")
+  )
+
   return(clinical_events)
 }
 

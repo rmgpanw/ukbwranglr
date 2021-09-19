@@ -84,7 +84,6 @@ test_that(
                                                                                   pattern = "^gp"))))
   }
 )
-
 test_that(
   "`tidy_clinical_events()` raises warning message if any clinical event types are missing from ukb_main",
   {
@@ -414,56 +413,62 @@ test_that("`extract_phenotypes()` returns expected results", {
                                prefix = "test_")
 
   expect_equivalent(
-    result$Disease1$test_a_test,
+    result$Disease1$test_a_test %>%
+      haven::zap_labels(),
     tibble::tibble(
       eid = c(1, 2),
       test_a_test_min_date = c("1910-02-19", NA),
-      test_a_test_indicator = c(TRUE, TRUE)
+      test_a_test_indicator = c(1, 1)
     )
   )
 
   expect_equivalent(
-    result$Disease1$test_b_test,
+    result$Disease1$test_b_test %>%
+      haven::zap_labels(),
     tibble::tibble(
       eid = c(1, 2),
       test_b_test_min_date = c("1956-11-24", "1990-10-04"),
-      test_b_test_indicator = c(TRUE, TRUE)
+      test_b_test_indicator = c(1, 1)
     )
   )
 
   expect_equivalent(
-    result$Disease1$test_DISEASE1_TEST,
+    result$Disease1$test_DISEASE1_TEST %>%
+      haven::zap_labels(),
     tibble::tibble(
       eid = c(1, 2),
       test_DISEASE1_TEST_min_date = c("1910-02-19", "1990-10-04"),
-      test_DISEASE1_TEST_indicator = c(TRUE, TRUE)
+      test_DISEASE1_TEST_indicator = c(1, 1)
     )
   )
 
   expect_equivalent(
-    result$Disease2$test_c_test,
+    result$Disease2$test_c_test %>%
+      haven::zap_labels(),
     tibble::tibble(
       eid = 1,
       test_c_test_min_date = "1998-12-24",
-      test_c_test_indicator = TRUE
+      test_c_test_indicator = 1
     )
   )
 
   expect_equivalent(
-    result$Disease2$test_d_test,
+    result$Disease2$test_d_test %>%
+      haven::zap_labels(),
     tibble::tibble(
       eid = 1,
       test_d_test_min_date = "1956-11-24",
-      test_d_test_indicator = TRUE
+      test_d_test_indicator = 1
     )
   )
 
   expect_equivalent(
-    result$Disease2$test_DISEASE2_TEST,
+    result$Disease2$test_DISEASE2_TEST %>%
+      haven::zap_labels(),
     tibble::tibble(
       eid = 1,
       test_a_test_min_date = "1956-11-24",
-      test_a_test_indicator = TRUE
+      test_a_test_indicator = 1
     )
   )
 })
@@ -489,11 +494,12 @@ test_that(
     )
 
     expect_equivalent(
-      result$Disease1$cancer_icd10_a_test,
+      result$Disease1$cancer_icd10_a_test %>%
+        haven::zap_labels(),
       tibble::tibble(
         eid = 2,
         cancer_icd10_a_test_min_date = as.character(NA),
-        cancer_icd10_a_test_indicator = TRUE
+        cancer_icd10_a_test_indicator = 1
       )
     )
 
