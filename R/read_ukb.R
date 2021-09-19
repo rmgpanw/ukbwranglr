@@ -56,7 +56,7 @@ make_data_dict <- function(ukb_main,
         names()
     }
 
-  } else if ("data.frame" %in% class(ukb_main)) {
+  } else if (is.data.frame(ukb_main)) {
     colheaders_raw <- names(ukb_main)
   } else {
     stop("Error! `ukb_main` must be either a string specifying the filepath for a UKB main dataset, or a UKb dataset loaded into R as a data frame")
@@ -115,7 +115,12 @@ make_data_dict <- function(ukb_main,
                                 yes = "Integer",
                                 no = data_dict$ValueType)
 
-  ## return data_dict
+  # update 'Field' to 'Participant identifier' for 'eid'
+  data_dict$Field <- ifelse(data_dict$FieldID == "eid",
+                            yes = "Participant identifier ('eid')",
+                            no = data_dict$Field)
+
+  # return data_dict
   return(data_dict)
 }
 

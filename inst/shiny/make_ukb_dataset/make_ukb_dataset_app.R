@@ -12,7 +12,6 @@ library(shinyFiles)
 library(tidyverse)
 library(reactable)
 library(ukbwranglr)
-library(crosstalk)
 
 options(shiny.maxRequestSize = 1000000 * 1024^2)
 
@@ -21,25 +20,30 @@ ukb_data_dict <- read_tsv("/Users/alasdair/Documents/Data/UKB/ukb_backup_files/D
 
 test <- make_data_dict("/Users/alasdair/Documents/Data/UKB/AK/raw/ukb29900.tab", delim = "\t", ukb_data_dict = ukb_data_dict)
 
-selected_data_dict_cols <- c("Field",
-                             "FieldID",
-                             "instance",
-                             "array",
-                             "Path",
-                             "Category",
-                             "Participants",
-                             "Items",
-                             "Stability",
-                             "ValueType",
-                             "Units",
-                             "ItemType",
-                             "Strata",
-                             "Sexed",
-                             "Instances",
-                             "Array",
-                             "Coding",
-                             "Notes",
-                             "Link")
+selected_data_dict_cols <- c(
+    "descriptive_colnames",
+    "colheaders_raw",
+    "colheaders_processed",
+    "Field",
+    "FieldID",
+    "instance",
+    "array",
+    "Path",
+    "Category",
+    "Participants",
+    "Items",
+    "Stability",
+    "ValueType",
+    "Units",
+    "ItemType",
+    "Strata",
+    "Sexed",
+    "Instances",
+    "Array",
+    "Coding",
+    "Notes",
+    "Link"
+)
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
@@ -47,19 +51,24 @@ ui <- fluidPage(
     # Application title
     titlePanel("UKB data dictionary"),
 
-    # Sidebar with a slider input for number of bins
+    # Sidebar
     sidebarLayout(
         sidebarPanel(
-            downloadButton("download"),
-            width = 3,
+            width = 2,
+            h5("UKB file paths"),
             shinyFilesButton("ukb_file",
-                             label = "Select UKB file",
+                             label = "UKB main dataset",
                              title = "Please select a file",
                              multiple = FALSE,
-                             viewtype = "detail")
+                             viewtype = "detail"),
+            h5("Download data dictionary"),
+            downloadButton("download_data_dict_full",
+                           label = "All variables"),
+            downloadButton("download_data_dict_selected",
+                           label = "Selected variables"),
         ),
 
-        # Show a plot of the generated distribution
+        # Show the data dictionary
         mainPanel(
             verbatimTextOutput("filepaths"),
            reactableOutput("data_dict"),
@@ -85,7 +94,7 @@ server <- function(input, output, session) {
     ## print file selection to browser
     output$filepaths <- renderPrint({
         if (is.integer(input$ukb_file)) {
-            cat("No files have been selected (shinyFileChoose)")
+            cat("Please select a UKB main dataset")
         } else {
             parseFilePaths(volumes, input$ukb_file)$datapath %>%
                 str_split(" • ") %>%
@@ -120,7 +129,11 @@ server <- function(input, output, session) {
                 select(all_of(selected_data_dict_cols)),
             tsv = make_data_dict(ukb_file(), delim = "\t", ukb_data_dict = ukb_data_dict) %>%
                 select(all_of(selected_data_dict_cols)),
-            validate("Invalid file; Please upload a .csv or .tsv file")
+            txt = make_data_dict(ukb_file(), delim = "\t", ukb_data_dict = ukb_data_dict) %>%
+                select(all_of(selected_data_dict_cols)),
+            tab = make_data_dict(ukb_file(), delim = "\t", ukb_data_dict = ukb_data_dict) %>%
+                select(all_of(selected_data_dict_cols)),
+            validate("Invalid file extension; Please upload a comma (.csv) or tab delimited (.tsv/.txt/.tab) file")
         )
     })
 
@@ -130,15 +143,6 @@ server <- function(input, output, session) {
         reactable(
             # data,
             data_dict(),
-            # TRY UPDATING SHINY TO USE STICKY COLS
-            # columns = list(
-            #     Field = colDef(
-            #         sticky = "left",
-            #         # Add a right border style to visually distinguish the sticky column
-            #         style = list(borderRight = "1px solid #eee"),
-            #         headerStyle = list(borderRight = "1px solid #eee")
-            #     )
-            # ),
             filterable = TRUE,
             searchable = TRUE,
             showPageSizeOptions = TRUE,
@@ -146,7 +150,7 @@ server <- function(input, output, session) {
             groupBy = "Field",
             selection = "multiple",
             onClick = "select",
-            defaultSelected = c(1, 2),
+            defaultSelected = 1,
             theme = reactableTheme(
                 rowSelectedStyle = list(backgroundColor = "#eee", boxShadow = "inset 2px 0 0 0 #ffa62d")
             ))
@@ -166,13 +170,23 @@ server <- function(input, output, session) {
         print(data_dict()[selected(), ])
     })
 
-    # download selected rows
-    output$download <- downloadHandler(
+    # download full data dictionary
+    output$download_data_dict_full <- downloadHandler(
         filename = function() {
-            paste0(input$download_file_name, ".csv")
+            paste0(input$download_file_name, "data_dict_full.csv")
         },
         content = function(file) {
-            write_csv(data_dict()[selected(), ], file)
+            write_csv(data_dict(), file, na = "")
+        }
+    )
+
+    # download data dictionary of selected rows only
+    output$download_data_dict_selected <- downloadHandler(
+        filename = function() {
+            paste0(input$download_file_name, "data_dict_selected.csv")
+        },
+        content = function(file) {
+            write_csv(data_dict()[selected(), ], file, na = "")
         }
     )
 }

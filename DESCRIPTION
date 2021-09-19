@@ -12,12 +12,10 @@ LazyData: true
 RoxygenNote: 7.1.1
 Suggests: 
     covr,
-    haven,
     knitr,
     rmarkdown,
     rsconnect,
-    testthat,
-    learnr
+    testthat
 VignetteBuilder: knitr
 Imports:
     assertthat,
@@ -27,6 +25,7 @@ Imports:
     dplyr,
     furrr,
     future,
+    haven,
     lubridate,
     magrittr,
     progress,
