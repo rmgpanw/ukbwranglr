@@ -4,7 +4,7 @@ Title: Exploring UKB data
 Version: 0.0.0.9000
 Authors@R: 
   person("Alasdair", "Warwick", email = "alasdair.warwick06@gmail.com", role = c("aut", "cre"))
-Description: Tools to load, pre-process and summarise raw UKB phenotype data.
+Description: Tools to load, pre-process and summarise UK Biobank data.
 License: MIT + file LICENSE
 URL: https://github.com/rmgpanw/ukbwranglr
 Encoding: UTF-8

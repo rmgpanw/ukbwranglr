@@ -88,6 +88,7 @@ tidy_clinical_events(
   ukb_codings = get_ukb_codings()
 )
 
-# use .details_only = TRUE to return details of required Field IDs for specific clinical_events sources
+# use .details_only = TRUE to return details of required Field IDs for
+# specific clinical_events sources
 tidy_clinical_events(.details_only = TRUE)
 }

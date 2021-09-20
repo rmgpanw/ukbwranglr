@@ -28,7 +28,11 @@ created by \code{\link{make_data_dict}}.}
 the result. Default value is \code{FALSE}.}
 }
 \value{
-A data frame
+A data frame with new columns summarising numerical variables. The
+  names for these new columns are prefixed by the value for
+  \code{summary_function} and end with 'x', FieldID +/- instance being
+  summarised e.g. if summarising FieldID 4080 instance 0, the new column
+  would be named 'mean_systolic_blood_pressure_automated_reading_x4080_0'.
 }
 \description{
 Summarises numerical variables with repeated measurements either by field
@@ -37,14 +41,28 @@ at each assessment visit). Currently available summary options are mean,
 minimum, maximum, sum and number of non-missing values.
 }
 \details{
-Note that when\code{summary_function = "sum"}, missing values are converted
+Note that when \code{summary_function = "sum"}, missing values are converted
 to zero. Therefore if a set of values are \emph{all} missing then the sum
 will summarised as \code{0}. See the documentation for
 \code{\link[base]{rowSums}} for further details.
 }
 \examples{
-# get dummy data
-dummy_data_path <- system.file("extdata", "dummy_ukb_data.csv", package = "ukbwranglr")
-read_ukb(dummy_data_path, delim = ",") \%>\%
-  summarise_numerical_variables()
+# make dummy data
+dummy_ukb_data <- tibble::tibble(
+  f.eid = c(1, 2, 3, 4, 5, 6),
+  f.31.0.0 = c(0, 0, 1, 0, NA, 1),
+  f.34.0.0 = c(1952, 1946, 1951, 1956, NA, 1948),
+  f.52.0.0 = c(8, 3, 4, 9, 4, 2),
+  f.21000.0.0 = c(NA, 4001, 3, NA, -3, 3),
+  f.20002.0.0 = c(1665, 1383, 1197, 1441, 1429, 1513),
+  f.21001.0.0 = c(20.1115, 30.1536, 22.8495, 23.4904, 29.2752, 28.2567),
+  f.21001.1.0 = c(20.864, 20.2309, 26.7929, 25.6826, 19.7576, 30.286),
+  f.21001.2.0 = c(NA, 27.4936, 27.6286, 37.2294, 14.6641, 27.3534),
+)
+
+# summarise, keep original variables
+summarise_numerical_variables(dummy_ukb_data)
+
+# summarise, drop original variables
+summarise_numerical_variables(dummy_ukb_data, .drop = TRUE)
 }

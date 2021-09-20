@@ -31,16 +31,42 @@
 #'   would be named 'mean_systolic_blood_pressure_automated_reading_x4080_0'.
 #' @export
 #' @examples
-#' # get dummy data
-#' dummy_data_path <- system.file("extdata", "dummy_ukb_data.csv", package = "ukbwranglr")
-#' read_ukb(dummy_data_path, delim = ",") %>%
-#'   summarise_numerical_variables()
+#' # make dummy data
+#' dummy_ukb_data <- tibble::tibble(
+#'   f.eid = c(1, 2, 3, 4, 5, 6),
+#'   f.31.0.0 = c(0, 0, 1, 0, NA, 1),
+#'   f.34.0.0 = c(1952, 1946, 1951, 1956, NA, 1948),
+#'   f.52.0.0 = c(8, 3, 4, 9, 4, 2),
+#'   f.21000.0.0 = c(NA, 4001, 3, NA, -3, 3),
+#'   f.20002.0.0 = c(1665, 1383, 1197, 1441, 1429, 1513),
+#'   f.21001.0.0 = c(20.1115, 30.1536, 22.8495, 23.4904, 29.2752, 28.2567),
+#'   f.21001.1.0 = c(20.864, 20.2309, 26.7929, 25.6826, 19.7576, 30.286),
+#'   f.21001.2.0 = c(NA, 27.4936, 27.6286, 37.2294, 14.6641, 27.3534),
+#' )
+#'
+#' # summarise, keep original variables
+#' summarise_numerical_variables(dummy_ukb_data)
+#'
+#' # summarise, drop original variables
+#' summarise_numerical_variables(dummy_ukb_data, .drop = TRUE)
 summarise_numerical_variables <- function(ukb_main,
                                           data_dict = NULL,
                                           summary_function = "mean",
                                           summarise_by = "Field",
                                           .drop = FALSE) {
   start_time <- proc.time()
+
+  dummy_ukb_data <- tibble::tibble(
+    f.eid = c(1, 2, 3, 4, 5, 6),
+    f.31.0.0 = c(0, 0, 1, 0, NA, 1),
+    f.34.0.0 = c(1952, 1946, 1951, 1956, NA, 1948),
+    f.52.0.0 = c(8, 3, 4, 9, 4, 2),
+    f.21000.0.0 = c(NA, 4001, 3, NA, -3, 3),
+    f.20002.0.0 = c(1665, 1383, 1197, 1441, 1429, 1513),
+    f.21001.0.0 = c(20.1115, 30.1536, 22.8495, 23.4904, 29.2752, 28.2567),
+    f.21001.1.0 = c(20.864, 20.2309, 26.7929, 25.6826, 19.7576, 30.286),
+    f.21001.2.0 = c(NA, 27.4936, 27.6286, 37.2294, 14.6641, 27.3534),
+  )
 
   # validate args
   match.arg(summary_function,
@@ -52,8 +78,8 @@ summarise_numerical_variables <- function(ukb_main,
   if (is.null(data_dict)) {
     data_dict <- make_data_dict(ukb_main)
   } else if (!is.null(data_dict)) {
-    assertthat::assert_that(all(data_dict$descriptive_colnames %in% names(ukb_main)),
-                            msg = "Error! `data_dict` does not match `ukb_main`. ")
+    assertthat::assert_that(all(data_dict$colheaders_raw %in% names(ukb_main)),
+                            msg = "Error! `data_dict` does not match `ukb_main`. All values in `colheaders_raw` should be present in `names(ukb_main`. Try making a new data dictionary with `make_data_dict()`?")
   }
 
   # rowwise summary functions
@@ -124,7 +150,7 @@ summarise_numerical_variables <- function(ukb_main,
       remove_special_characters_and_make_lower_case(new_col)
 
     selected_cols <-
-      numerical_vars_to_summarise[[new_col]][["descriptive_colnames"]]
+      numerical_vars_to_summarise[[new_col]][["colheaders_raw"]]
 
     # summarise - different approaches required for pmin/pmax vs rowMeans/rowSums
     if (summary_function %in% c("min", "max")) {
@@ -233,6 +259,8 @@ summarise_rowwise <- function(ukb_main,
                              grouping_col = "Field_FieldID",
                              prefix = NULL,
                              ...) {
+
+  start_time <- proc.time()
 
   # validate args
   assertthat::is.string(grouping_col)

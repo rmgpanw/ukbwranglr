@@ -23,6 +23,9 @@ make_clinical_events_db(
 \item{gp_clinical_path}{Path to the UKB primary care clinical events file
 (\code{gp_clinical.txt}).}
 
+\item{gp_scripts_path}{Path to the UKB primary care prescriptions file
+(\code{gp_scripts.txt}).}
+
 \item{ukb_db_path}{Path to the SQLite database file. The file name must end
 with '.db'. If no file with this name exists then one will be created.}
 

@@ -3,14 +3,21 @@
 \docType{package}
 \name{ukbwranglr}
 \alias{ukbwranglr}
-\title{ukbwranglr: a package for exploring UK Biobank data}
+\title{ukbwranglr: a package for UK Biobank data wrangling}
 \description{
-This package provides three categories of important functions:
+This package provides three categories of helpful functions:
 }
 \details{
 \enumerate{
-\item Reading UK Biobank data into R
-\item Identifying participants with certain disease outcomes
-\item Identifying participants taking certain medications
+
+\item Reading UK Biobank data into R - \code{\link{make_data_dict}} and
+\code{\link{read_ukb}}
+
+\item Summarising numerical variables -
+\code{\link{summarise_numerical_variables}}
+
+\item Identifying phenotypic outcomes - \code{\link{tidy_clinical_events}},
+\code{\link{make_clinical_events_db}} and \code{\link{extract_phenotypes}}
+
 }
 }

@@ -10,7 +10,7 @@ validate_clinical_codes(clinical_codes, allow_overlapping_categories = FALSE)
 \item{clinical_codes}{A data frame. See \code{\link{example_clinical_codes}}
 for an example.}
 
-\item{allow_overlapping_categories.}{If \code{TRUE}, will pass with a warning
+\item{allow_overlapping_categories}{If \code{TRUE}, will pass with a warning
 if any codes are duplicated between disease categories. If \code{FALSE}, an
 error will be raised. Default value is \code{FALSE}.}
 }

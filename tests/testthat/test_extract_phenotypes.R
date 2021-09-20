@@ -1,6 +1,9 @@
 
 # SETUP -------------------------------------------------------------------
 
+CLINICAL_EVENTS_FIELD_IDS <- ukbwranglr:::CLINICAL_EVENTS_FIELD_IDS
+CLINICAL_EVENTS_SOURCES <- ukbwranglr:::CLINICAL_EVENTS_SOURCES
+
 # Make dummy data ---------------------------------------------------------
 
 # get ukb data dict and codings
@@ -71,34 +74,6 @@ dummy_clinical_codes <- tibble::tribble(
 )
 
 stopifnot(validate_clinical_codes(dummy_clinical_codes))
-
-# temporary - to delete
-# validate_clinical_codes(cy_comorbidities_clinical_codes %>%
-#                           dplyr::mutate(code_type = tolower(code_type)))
-#
-# cy_comorbidities_clinical_codes_valid <-
-#   cy_comorbidities_clinical_codes %>%
-#   dplyr::mutate(code_type = tolower(code_type))
-#
-# result <-
-#   extract_phenotypes_single_disease(
-#     disease = "Hyperlipidaemia",
-#     clinical_events = dummy_clinical_events %>%
-#       dplyr::bind_rows(
-#         tibble::tibble(eid = 1,
-#                        source = "f41270",
-#                        index = "0_0",
-#                        code = "E782",
-#                        date = NA)
-#       ),
-#     clinical_codes = cy_comorbidities_clinical_codes_valid,
-#     min_max = "min",
-#     prefix = "test_",
-#     data_sources = NULL,
-#     keep_all = FALSE
-#   )
-
-# temporary end
 
 # TESTS -------------------------------------------------------------------
 
@@ -354,21 +329,21 @@ test_that(
       )
 
     expect_equal(
-      names(result),
-      c(
+      sort(names(result)),
+      sort(c(
         "test_a_test",
         "test_b_test",
         "test_DISEASE1_TEST"
-      )
+      ))
     )
 
     expect_equal(
-      names(result[[1]]),
-      c(
+      sort(names(result[["test_a_test"]])),
+      sort(c(
         "eid",
         "test_a_test_min_date",
         "test_a_test_indicator"
-      )
+      ))
     )
   }
 )
@@ -383,12 +358,12 @@ test_that(
                                                prefix = "test_")
 
     expect_equal(
-      names(result[["Disease2"]]),
-      c(
+      sort(names(result[["Disease2"]])),
+      sort(c(
         "test_c_test",
         "test_d_test",
         "test_DISEASE2_TEST"
-      )
+      ))
     )
   }
 )
@@ -402,12 +377,12 @@ test_that(
                                  prefix = "test_")
 
     expect_equal(
-      names(result[["Disease2"]]),
-      c(
+      sort(names(result[["Disease2"]])),
+      sort(c(
         "test_c_test",
         "test_d_test",
         "test_DISEASE2_TEST"
-      )
+      ))
     )
   }
 )
@@ -425,12 +400,12 @@ test_that(# need to rebuild package to include any changes when running this tes
       )
 
     expect_equal(
-      names(result[["Disease2"]]),
-      c(
+      sort(names(result[["Disease2"]])),
+      sort(c(
         "test_c_test",
         "test_d_test",
         "test_DISEASE2_TEST"
-      )
+      ))
     )
   })
 

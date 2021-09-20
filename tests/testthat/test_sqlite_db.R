@@ -92,7 +92,7 @@ suppressWarnings(make_clinical_events_db(
 ))
 
 con <- DBI::dbConnect(RSQLite::SQLite(), dummy_ukb_db_path)
-ukbdb <- db_list_tables(con)
+ukbdb <- db_tables_to_list(con)
 
 # TESTS -------------------------------------------------------------------
 

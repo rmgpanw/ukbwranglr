@@ -294,7 +294,7 @@ download_dummy_ukb_data_to_tempdir <- function() {
 #'
 #' @param clinical_codes A data frame. See \code{\link{example_clinical_codes}}
 #'   for an example.
-#' @param allow_overlapping_categories. If \code{TRUE}, will pass with a warning
+#' @param allow_overlapping_categories If \code{TRUE}, will pass with a warning
 #'   if any codes are duplicated between disease categories. If \code{FALSE}, an
 #'   error will be raised. Default value is \code{FALSE}.
 #'
@@ -405,10 +405,10 @@ validate_clinical_codes <- function(clinical_codes,
 #' con <- DBI::dbConnect(RSQLite::SQLite(), dbname = ":memory:")
 #' dplyr::copy_to(con, head(iris), "iris_head")
 #' dplyr::copy_to(con, head(mtcars), "mtcars_head")
-#' db_tables <- make_list_of_tbls_from_db(con)
+#' db_tables <- db_tables_to_list(con)
 #' db_tables$iris_head
-#' db_table$mtcars_head
-db_list_tables <- function(conn) {
+#' db_tables$mtcars_head
+db_tables_to_list <- function(conn) {
   result <- DBI::dbListTables(conn) %>%
     purrr::set_names() %>%
     purrr::map(~ dplyr::tbl(conn, .x))
@@ -569,7 +569,7 @@ filter_data_dict <- function(data_dict,
 #' Get UKB codings for one or more FieldIDs
 #'
 #' General helper function - filters
-#' \href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{`ukb_codings`}
+#' \href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{ukb_codings}
 #' for the codings associated with one or more FieldIDs.
 #'
 #' @param field_ids Character. One or more UKB FieldIDs
@@ -609,7 +609,7 @@ recode_column_coding_meaning_value_mapping_df <- function(field_id,
 
   # get coding/meaning for the specified field_id
   ukb_codings <- extract_codings_for_fieldids(
-    field_id = field_id,
+    field_ids = field_id,
     ukb_data_dict = ukb_data_dict,
     ukb_codings = ukb_codings
   )
@@ -892,7 +892,7 @@ identify_overlapping_disease_categories <- function(clinical_codes) {
     dplyr::group_by(.data[["disease_author"]],
                     .data[["code_code_type"]]) %>%
     dplyr::mutate(n = dplyr::n()) %>%
-    dplyr::filter(n > 1) %>%
+    dplyr::filter(.data[["n"]] > 1) %>%
     dplyr::ungroup()
 
   # if any are identified, filter clinical_codes for the relevant rows

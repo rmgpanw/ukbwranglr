@@ -148,9 +148,14 @@ make_data_dict <- function(ukb_main,
 #'   downloaded from the
 #'   \href{https://github.com/rmgpanw/ukbwranglr_resources}{\code{ukbwranglr_resources}}
 #'    github repo.
+#' @param descriptive_colnames If \code{TRUE}, rename columns with longer
+#'   descriptive names derived from the UK Biobank's data dictionary 'Field'
+#'   column.
+#' @param labelled If \code{TRUE}, apply variable and value labels using
+#'   \code{\link[haven]{labelled}}.
 #' @param max_n_labels Coded variables with associated value labels up to (and
 #'   equal to) this threshold will be labelled using
-#'   \code{\link[haven]{labelled}} if \code{labelled} is \code{TRUE}
+#'   \code{\link[haven]{labelled}} if \code{labelled} is \code{TRUE}.
 #' @param ... Additional parameters are passed on to either
 #'   \code{\link[data.table]{fread}} or \code{\link[haven]{read_dta}}
 #' @inheritParams make_data_dict
@@ -164,9 +169,9 @@ read_ukb <- function(path,
                      data_dict = NULL,
                      ukb_data_dict = get_ukb_data_dict(),
                      ukb_codings = get_ukb_codings(),
-                     max_n_labels = 22,
                      descriptive_colnames = TRUE,
                      labelled = TRUE,
+                     max_n_labels = 30,
                      na.strings = c("", "NA"),
                      nrows = Inf,
                      ...) {
@@ -359,9 +364,9 @@ mutate_descriptive_columns <- function(data_dict) {
   # check for duplicate names - set to 'colheaders raw' if this is unique
   duplicated_descriptive_colnames <- data_dict %>%
     dplyr::group_by(.data[["descriptive_colnames"]]) %>%
-    dplyr::mutate(n = dplyr::n()) %>%
+    dplyr::mutate("n" = dplyr::n()) %>%
     dplyr::ungroup() %>%
-    dplyr::filter(n > 1)
+    dplyr::filter(.data[["n"]] > 1)
 
   if (nrow(duplicated_descriptive_colnames) > 0) {
 

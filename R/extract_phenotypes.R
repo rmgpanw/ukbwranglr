@@ -118,15 +118,17 @@ mutate_age_at_event_cols <- function(ukb_main,
 #' events'} vignette on the \code{ukbwranglr} package website.
 #'
 #' @param clinical_events A long format data frame created by
-#'   \code{\link{tidy_clinical_events}} or
-#'   \code{\link{tidy_gp_clinical_events}}. This can also be a
-#'   \code{\link[dbplyr]{tbl_dbi}} object.
+#'   \code{\link{tidy_clinical_events}}, \code{\link{tidy_gp_clinical}},
+#'   \code{\link{tidy_gp_scripts}} or \code{\link{make_clinical_events_db}}.
+#'   This can also be a \code{\link[dbplyr]{tbl_dbi}} object.
 #' @param clinical_codes data frame. Must match the format as per
 #'   \code{\link{example_clinical_codes}}.
 #' @param data_sources A character vector of clinical events sources in
 #'   \code{clinical_events} to extract phenotypes from. Use
 #'   \code{\link{clinical_events_sources}} (\code{source column}) for a list of
 #'   valid values.
+#' @param min_max Choose either "min" or "max" to extract either the earliest or
+#'   latest date that one of the codes appears in \code{clinical_codes} appears.
 #' @param prefix Optionally add a prefix to column names.
 #' @param workers The number of processes to run in parallel when
 #'   \code{clinical_codes} includes multiple diseases. This is used to set the
@@ -134,11 +136,14 @@ mutate_age_at_event_cols <- function(ukb_main,
 #'   \link[future]{multisession}}, which is passed on to
 #'   \code{\link[furrr]{future_map}}. If \code{NULL}, then no processing is
 #'   performed sequentially. Default value is \code{NULL}.
+#' @param keep_all If \code{TRUE}, keep all matching codes for each eid in a
+#'   nested data frame column named 'data'.
 #'
 #' @return A named list of data frames, one for each disease. Each data frame
 #'   has an "eid" column, and "event_min/max_indicator" and "event_min/max_date"
 #'   columns for each phenotype in the 'category' column of
-#'   \code{clinical_codes} for that disease.
+#'   \code{clinical_codes} for that disease. If \code{keep_all} is \code{TRUE},
+#'   then there will also be additional nested data frame column called 'data'.
 #' @export
 #' @examples
 #' \dontrun{
@@ -367,7 +372,8 @@ extract_phenotypes <- function(
 #'   ukb_codings = get_ukb_codings()
 #' )
 #'
-#' # use .details_only = TRUE to return details of required Field IDs for specific clinical_events sources
+#' # use .details_only = TRUE to return details of required Field IDs for
+#' # specific clinical_events sources
 #' tidy_clinical_events(.details_only = TRUE)
 tidy_clinical_events <- function(ukb_main,
                                  ukb_data_dict = get_ukb_data_dict(),
@@ -425,7 +431,7 @@ tidy_clinical_events <- function(ukb_main,
                               ukb_data_dict = ukb_data_dict)
 
   # check if required columns are present
-  filter_data_dict_safely <- purrr:::safely(filter_data_dict)
+  filter_data_dict_safely <- purrr::safely(filter_data_dict)
 
   clinical_events_with_missing_required_cols <-
     CLINICAL_EVENTS_FIELD_IDS[clinical_events_sources] %>%
@@ -552,6 +558,37 @@ tidy_clinical_events <- function(ukb_main,
 
   return(result)
 }
+
+# Clinical code lists -----------------------------------------------------
+
+#' Generate an example data frame of clinical codes for diabetes
+#'
+#' Data frames of this format may be used with \code{\link{extract_phenotypes}}.
+#' Use \code{\link{validate_clinical_codes}} to check whether a clinical codes
+#' data frame meets all requirements.
+#'
+#' Note: this example is not an exhaustive list of codes for diabetes.
+#'
+#' @return A data frame of selected clinical codes for diabetes.
+#' @export
+#' @seealso \code{\link{validate_clinical_codes}}
+#'
+#' @examples
+#' example_clinical_codes()
+example_clinical_codes <- function() {
+  tibble::tribble(
+    ~ disease, ~ description, ~ category, ~ code_type, ~ code, ~ author,
+    "Diabetes", "diabetes", "Diabetes unspecified", "data_coding_6", "1220", "ukbwr",
+    "Diabetes", "gestational diabetes", "Gestational diabetes", "data_coding_6", "1221", "ukbwr",
+    "Diabetes", "type 1 diabetes", "Type 1 DM", "data_coding_6", "1222", "ukbwr",
+    "Diabetes", "type 2 diabetes", "Type 2 DM", "data_coding_6", "1223", "ukbwr",
+    "Diabetes", "Type 1 diabetes mellitus", "Type 1 DM", "icd10", "E10", "ukbwr",
+    "Diabetes", "Type 2 diabetes mellitus", "Type 2 DM", "icd10", "E11", "ukbwr",
+    "Diabetes", "Insulin dependent diabetes mellitus", "Type 1 DM", "read2", "C108.", "ukbwr",
+    "Diabetes", "Non-insulin dependent diabetes mellitus", "Type 2 DM", "read2", "C109.", "ukbwr",
+  )
+}
+
 
 # PRIVATE FUNCTIONS -------------------------------------------------------
 
@@ -799,7 +836,7 @@ validate_clinical_events_and_check_type <- function(clinical_events) {
 
   # check coltypes
   clinical_events_column_types <- clinical_events %>%
-    head(1) %>%
+    utils::head(1) %>%
     dplyr::collect() %>%
     purrr::map_chr(class)
 
@@ -1094,7 +1131,7 @@ extract_clinical_events <- function(clinical_events,
                 new_colnames = date_colname)
 
   # add labels
-  indicator_labels <- setNames(c(1, 0),
+  indicator_labels <- stats::setNames(c(1, 0),
                                nm = c(phenotype, paste0("No ", phenotype)))
 
   clinical_events[[indicator_colname]] <- haven::labelled(
@@ -1329,18 +1366,3 @@ get_sources_for_code_type <- function(code_type) {
     dplyr::filter(.data[["data_coding"]] == code_type) %>%
     .$source
 }
-
-
-# TODO ------
-
-# Start with filter_clinical_events_for_list_of_codes() and filter_clinical_events_for_codes()
-
-# Remove option to filter for character vector of codes
-
-# simplify if else to switch: write validation functions and use switch statement
-
-# add arg to filter on source column too (?date range, at some point? maybe not...)
-
-# add option to extract_phenotypes() to jsut extract all codes per eid: for each
-# disease in result list, there should be a list for each disease subcategory
-# (rather than a single data frame)

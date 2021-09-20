@@ -19,6 +19,8 @@
 #'   \code{"\\t"}.
 #' @param gp_clinical_path Path to the UKB primary care clinical events file
 #'   (\code{gp_clinical.txt}).
+#' @param gp_scripts_path Path to the UKB primary care prescriptions file
+#'   (\code{gp_scripts.txt}).
 #' @param ukb_db_path Path to the SQLite database file. The file name must end
 #'   with '.db'. If no file with this name exists then one will be created.
 #' @param strict If \code{TRUE}, create database regardless of whether the main
@@ -271,6 +273,51 @@ tidy_gp_clinical <- function(gp_clinical,
   tidy_gp_data_db(
     gp_df = gp_clinical,
     gp_df_type = "gp_clinical",
+    pos = NULL,
+    remove_special_dates = remove_special_dates,
+    .details_only = .details_only
+  )
+}
+
+#' Tidy UK Biobank primary care prescriptions data
+#'
+#' Reformats the UK Biobank primary care prescriptions dataset to match the
+#' output format for \code{\link{tidy_clinical_events}}.
+#'
+#' The UK Biobank primary care prescriptions data has multiple code columns
+#' (Read, BNF and DMD codes). This function reshapes the data to long format so
+#' that all codes are in a single column. The \code{index} column values relate
+#' to row numbers in the original data.
+#'
+#' The primary care data also contains drug name and quantities columns. The
+#' clinical codes/dates in long format and drug name/quantity columns are both
+#' returned in a list under the names 'clinical_events' and
+#' 'gp_scripts_names_and_quantities' respectively.
+#'
+#' @section Other notes:
+#'
+#'   By default, special date values (see
+#'   \href{https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=591}{resource 591} for
+#'   further details) are set to \code{NA}.
+#'
+#' @param gp_scripts The UK Biobank primary care prescriptions dataset
+#' @param remove_special_dates Logical. Removes special date values if
+#'   requested. Default value is \code{TRUE}.
+#' @param .details_only logical. If \code{TRUE}, return a character vector of
+#'   output table names only
+#'
+#' @export
+#' @return A named list. Item 'clinical_events' contains the read codes with
+#'   event dates, and item 'gp_scripts_names_and_quantities' contains the drug
+#'   names/quantities columns.
+#' @seealso \code{\link{tidy_clinical_events}},
+#'   \code{\link{make_clinical_events_db}}
+tidy_gp_scripts <- function(gp_scripts,
+                            remove_special_dates = TRUE,
+                            .details_only = FALSE) {
+  tidy_gp_data_db(
+    gp_df = gp_scripts,
+    gp_df_type = "gp_scripts",
     pos = NULL,
     remove_special_dates = remove_special_dates,
     .details_only = .details_only

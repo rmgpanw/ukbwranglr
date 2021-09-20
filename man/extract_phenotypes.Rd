@@ -16,9 +16,9 @@ extract_phenotypes(
 }
 \arguments{
 \item{clinical_events}{A long format data frame created by
-\code{\link{tidy_clinical_events}} or
-\code{\link{tidy_gp_clinical_events}}. This can also be a
-\code{\link[dbplyr]{tbl_dbi}} object.}
+\code{\link{tidy_clinical_events}}, \code{\link{tidy_gp_clinical}},
+\code{\link{tidy_gp_scripts}} or \code{\link{make_clinical_events_db}}.
+This can also be a \code{\link[dbplyr]{tbl_dbi}} object.}
 
 \item{clinical_codes}{data frame. Must match the format as per
 \code{\link{example_clinical_codes}}.}
@@ -28,6 +28,9 @@ extract_phenotypes(
 \code{\link{clinical_events_sources}} (\code{source column}) for a list of
 valid values.}
 
+\item{min_max}{Choose either "min" or "max" to extract either the earliest or
+latest date that one of the codes appears in \code{clinical_codes} appears.}
+
 \item{prefix}{Optionally add a prefix to column names.}
 
 \item{workers}{The number of processes to run in parallel when
@@ -36,12 +39,16 @@ number of workers in \code{\link[future]{plan}} with \code{strategy =
 \link[future]{multisession}}, which is passed on to
 \code{\link[furrr]{future_map}}. If \code{NULL}, then no processing is
 performed sequentially. Default value is \code{NULL}.}
+
+\item{keep_all}{If \code{TRUE}, keep all matching codes for each eid in a
+nested data frame column named 'data'.}
 }
 \value{
 A named list of data frames, one for each disease. Each data frame
   has an "eid" column, and "event_min/max_indicator" and "event_min/max_date"
   columns for each phenotype in the 'category' column of
-  \code{clinical_codes} for that disease.
+  \code{clinical_codes} for that disease. If \code{keep_all} is \code{TRUE},
+  then there will also be additional nested data frame column called 'data'.
 }
 \description{
 Filters a clinical events table created by \code{\link{tidy_clinical_events}}

@@ -10,9 +10,9 @@ read_ukb(
   data_dict = NULL,
   ukb_data_dict = get_ukb_data_dict(),
   ukb_codings = get_ukb_codings(),
-  max_n_labels = 22,
   descriptive_colnames = TRUE,
   labelled = TRUE,
+  max_n_labels = 30,
   na.strings = c("", "NA"),
   nrows = Inf,
   ...
@@ -43,9 +43,16 @@ downloaded from the
 \href{https://github.com/rmgpanw/ukbwranglr_resources}{\code{ukbwranglr_resources}}
  github repo.}
 
+\item{descriptive_colnames}{If \code{TRUE}, rename columns with longer
+descriptive names derived from the UK Biobank's data dictionary 'Field'
+column.}
+
+\item{labelled}{If \code{TRUE}, apply variable and value labels using
+\code{\link[haven]{labelled}}.}
+
 \item{max_n_labels}{Coded variables with associated value labels up to (and
 equal to) this threshold will be labelled using
-\code{\link[haven]{labelled}} if \code{labelled} is \code{TRUE}}
+\code{\link[haven]{labelled}} if \code{labelled} is \code{TRUE}.}
 
 \item{na.strings}{ A character vector of strings which are to be interpreted as \code{NA} values. By default, \code{",,"} for columns of all types, including type \code{character} is read as \code{NA} for consistency. \code{,"",} is unambiguous and read as an empty string. To read \code{,NA,} as \code{NA}, set \code{na.strings="NA"}. To read \code{,,} as blank string \code{""}, set \code{na.strings=NULL}. When they occur in the file, the strings in \code{na.strings} should not appear quoted since that is how the string literal \code{,"NA",} is distinguished from \code{,NA,}, for example, when \code{na.strings="NA"}. }
 

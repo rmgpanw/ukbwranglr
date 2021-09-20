@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get UK Biobank clinical code mappings file directly from UKB website — get_ukb_code_mappings_direct • ukbwranglr</title>
+<title>Validate a clinical codes data frame — validate_clinical_codes • ukbwranglr</title>
 
 
 <!-- jquery -->
@@ -39,12 +39,9 @@
 
 
 
-<meta property="og:title" content="Get UK Biobank clinical code mappings file directly from UKB website — get_ukb_code_mappings_direct" />
-<meta property="og:description" content="Downloads the UK Biobank code mappings file (all_lkps_maps_v2.xlsx,
-resource 592)
-directly from the UKB website to a temporary directory at
-tempdir. This is then read into R as a named list of data
-frames, one for each sheet in the original file." />
+<meta property="og:title" content="Validate a clinical codes data frame — validate_clinical_codes" />
+<meta property="og:description" content="Checks whether a data frame of clinical codes is correctly formatted for use
+with extract_phenotypes." />
 
 
 
@@ -112,32 +109,58 @@ frames, one for each sheet in the original file." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get UK Biobank clinical code mappings file directly from UKB website</h1>
+    <h1>Validate a clinical codes data frame</h1>
     <small class="dont-index">Source: <a href='https://github.com/rmgpanw/ukbwranglr/blob/master/R/utils.R'><code>R/utils.R</code></a></small>
-    <div class="hidden name"><code>get_ukb_code_mappings_direct.Rd</code></div>
+    <div class="hidden name"><code>validate_clinical_codes.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Downloads the UK Biobank code mappings file (<code>all_lkps_maps_v2.xlsx</code>,
-<a href='https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592'>resource 592</a>)
-directly from the UKB website to a temporary directory at
-<code><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></code>. This is then read into R as a named list of data
-frames, one for each sheet in the original file.</p>
+    <p>Checks whether a data frame of clinical codes is correctly formatted for use
+with <code><a href='extract_phenotypes.html'>extract_phenotypes</a></code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_ukb_code_mappings_direct</span><span class='op'>(</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>validate_clinical_codes</span><span class='op'>(</span><span class='va'>clinical_codes</span>, allow_overlapping_categories <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
 
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>clinical_codes</th>
+      <td><p>A data frame. See <code><a href='example_clinical_codes.html'>example_clinical_codes</a></code>
+for an example.</p></td>
+    </tr>
+    <tr>
+      <th>allow_overlapping_categories</th>
+      <td><p>If <code>TRUE</code>, will pass with a warning
+if any codes are duplicated between disease categories. If <code>FALSE</code>, an
+error will be raised. Default value is <code>FALSE</code>.</p></td>
+    </tr>
+    </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A named list.</p>
+    <p>Returns invisibly <code>TRUE</code> if all checks pass.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p><strong>Note:</strong> This is a large object (&gt;450 MB)</p>
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+    <p>Checks that:</p>
+<ul>
+<li><p>Expected column names are present</p></li>
+<li><p>All columns are of
+type character</p></li>
+<li><p>No missing values are present in any column</p></li>
+<li><p>No
+disease categories overlap with each other i.e. each disease (for each
+<code>author</code>) contains a unique set of clinical codes. Overlapping disease
+categories may optionally be permitted by setting
+<code>allow_overlapping_categories</code> to <code>TRUE</code></p></li>
+</ul>
 
-    <div class='dont-index'><p><code><a href='get_ukb_code_mappings.html'>get_ukb_code_mappings</a></code></p></div>
+<p>Note that currently this does not check whether the clinical codes themselves
+are valid (i.e. whether a clinical code exists for a given coding system).</p>
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='fu'>validate_clinical_codes</span><span class='op'>(</span><span class='fu'><a href='example_clinical_codes.html'>example_clinical_codes</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
