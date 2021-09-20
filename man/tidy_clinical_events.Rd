@@ -9,9 +9,10 @@ tidy_clinical_events(
   ukb_data_dict = get_ukb_data_dict(),
   ukb_codings = get_ukb_codings(),
   clinical_events_sources = c("primary_death_icd10", "secondary_death_icd10",
-    "self_report_non_cancer", "self_report_non_cancer_icd10", "self_report_cancer",
-    "self_report_operation", "cancer_register_icd9", "cancer_register_icd10",
-    "summary_hes_icd9", "summary_hes_icd10", "summary_hes_opcs3", "summary_hes_opcs4"),
+    "self_report_medication", "self_report_non_cancer", "self_report_non_cancer_icd10",
+    "self_report_cancer", "self_report_operation", "cancer_register_icd9",
+    "cancer_register_icd10", "summary_hes_icd9", "summary_hes_icd10",
+    "summary_hes_opcs3", "summary_hes_opcs4"),
   strict = TRUE,
   .details_only = FALSE
 )

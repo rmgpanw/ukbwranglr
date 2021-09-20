@@ -1,5 +1,5 @@
 
-# CONSTANTS ---------------------------------------------------------------
+# SETUP ---------------------------------------------------------------
 
 ukb_data_dict <- get_ukb_data_dict()
 ukb_codings <- get_ukb_codings()
@@ -88,34 +88,6 @@ test_that("`assert_all_df_cols_are_type_character()` raises error appropriately"
 
   expect_true(assert_all_df_cols_are_type_character(acceptable_df, "acceptable_df"))
 })
-
-# `mutate_dob` ------------------------------------------------------------
-
-test_that("`mutate_dob()` returns the expected dates", {
-  # warnings generated for any missing yob/mob values in the dummy data - can suppress these
-  result <- head(
-    suppressWarnings(mutate_dob(ukb_main = dummy_ukb_data, ukb_data_dict = ukb_data_dict))
-    )
-  expect_equal(result,
-               as.Date(c("1952-08-01", "1946-03-01", "1951-04-01", "1956-09-01", NA, "1948-02-01")))
-})
-
-test_that(
-  "`mutate_dob()` returns the same dates when yob/mob are either type integer or type factor",
-  {
-    expect_equal(head(suppressWarnings(
-      mutate_dob(ukb_main = dummy_ukb_data,
-                 ukb_data_dict = ukb_data_dict)
-    )),
-    head(suppressWarnings(
-      mutate_dob(
-        ukb_main = dummy_ukb_data %>%
-          haven::as_factor(),
-        ukb_data_dict = ukb_data_dict
-      )
-    )))
-  }
-)
 
 # `revalue_vector()` -----------------------------------------------------------
 

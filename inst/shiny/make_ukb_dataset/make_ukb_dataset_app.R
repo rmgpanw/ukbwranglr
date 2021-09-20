@@ -1,11 +1,5 @@
-#
-# This is a Shiny web application. You can run the application by clicking
-# the 'Run App' button above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    http://shiny.rstudio.com/
-#
+
+# SETUP -------------------------------------------------------------------
 
 library(shiny)
 library(shinyFiles)
@@ -15,10 +9,11 @@ library(ukbwranglr)
 
 options(shiny.maxRequestSize = 1000000 * 1024^2)
 
-ukb_data_dict <- read_tsv("/Users/alasdair/Documents/Data/UKB/ukb_backup_files/Data_Dictionary_Showcase.tsv") %>%
-    mutate(across(everything(), as.character))
+# ukb_data_dict <- read_tsv("/Users/alasdair/Documents/Data/UKB/ukb_backup_files/Data_Dictionary_Showcase.tsv") %>%
+#     mutate(across(everything(), as.character))
 
-test <- make_data_dict("/Users/alasdair/Documents/Data/UKB/AK/raw/ukb29900.tab", delim = "\t", ukb_data_dict = ukb_data_dict)
+ukb_data_dict <- ukbwranglr::get_ukb_data_dict()
+ukb_codings <- ukbwranglr::get_ukb_codings()
 
 selected_data_dict_cols <- c(
     "Field",
@@ -49,17 +44,61 @@ selected_data_dict_cols <- c(
 # UI ----------------------------------------------------------------------
 
 
-# Define UI for application that draws a histogram
+# Conditional UI elements -------------------------------------------------
+
+download_data_dict_tabs <- tabsetPanel(
+    id = "download_data_dict_inputs",
+    type = "hidden",
+    tabPanel("empty"),
+    tabPanel("download_data_dict_inputs",
+        tags$hr(),
+        h4("Download data dictionary"),
+        downloadButton("download_data_dict_full",
+                       label = "All variables"),
+        downloadButton("download_data_dict_selected",
+                       label = "Selected variables")
+    )
+)
+
+make_dataset_tabs <- tabsetPanel(
+    id = "make_dataset_inputs",
+    type = "hidden",
+    tabPanel("empty"),
+    tabPanel(
+        "make_dataset_inputs",
+        tags$hr(),
+        h4("Create dataset"),
+        numericInput(
+            "nrows",
+            "N rows to include",
+            value = 510000,
+            min = 0,
+            max = 510000
+        ),
+        checkboxInput("descriptive_colnames", "Descriptive column names", value = TRUE),
+        checkboxInput("labelled", "Labelled", value = TRUE),
+        textInput(
+            "ukb_dataset_outname",
+            "Dataset file name",
+            value = paste0("my_ukb_dataset_", Sys.Date(), ".rds")
+        ),
+        downloadButton("ukb_dataset",
+                       label = "Make dataset"),
+    )
+)
+
+# Main UI -----------------------------------------------------------------
+
 ui <- fluidPage(
 
     # Application title
-    titlePanel("UKB data dictionary"),
+    titlePanel("Make a UK Biobank dataset"),
 
     # Sidebar
     sidebarLayout(
         sidebarPanel(
             width = 2,
-            h5("UKB file paths"),
+            h4("Input file paths"),
             shinyFilesButton("ukb_main_dataset_filepath",
                              label = "UKB main dataset",
                              title = "Please select a UK Biobank main dataset file",
@@ -70,11 +109,8 @@ ui <- fluidPage(
                              title = "Please select a UK Biobank main dataset data dictionary file",
                              multiple = FALSE,
                              viewtype = "detail"),
-            h5("Download data dictionary"),
-            downloadButton("download_data_dict_full",
-                           label = "All variables"),
-            downloadButton("download_data_dict_selected",
-                           label = "Selected variables"),
+            download_data_dict_tabs,
+            make_dataset_tabs
         ),
 
         # Show the data dictionary
@@ -82,7 +118,7 @@ ui <- fluidPage(
             verbatimTextOutput("ukb_main_dataset_filepath"),
             verbatimTextOutput("data_dict_preselected_filepath"),
            reactableOutput("data_dict"),
-           verbatimTextOutput("selected"),
+           verbatimTextOutput("selected variable indices"),
            width = 9
         )
     )
@@ -173,18 +209,27 @@ server <- function(input, output, session) {
         }
     })
 
-
-
-# Data dictionary reactable table -----------------------------------------
+# DATA DICTIONARY REACTABLE TABLE -----------------------------------------
 
     # create data dict
-    data_dict <- reactive({
+    ukb_main_dataset_filepath_ext <- reactive({
         req(ukb_main_dataset_filepath())
 
         ext <- tools::file_ext(ukb_main_dataset_filepath())
 
+        if (!ext %in% c("csv", "tsv", "txt", "tab", "dta")) {
+            validate("Invalid file extension for main dataset; Please upload a comma (.csv), tab delimited (.tsv/.txt/.tab) or STATA (.dta) file")
+        }
+
+        ext
+    })
+
+    data_dict <- reactive({
+        req(ukb_main_dataset_filepath(),
+            ukb_main_dataset_filepath_ext())
+
         switch(
-            ext,
+            ukb_main_dataset_filepath_ext(),
             csv = make_data_dict(ukb_main_dataset_filepath(), delim = ",", ukb_data_dict = ukb_data_dict) %>%
                 select(all_of(selected_data_dict_cols)),
             tsv = make_data_dict(ukb_main_dataset_filepath(), delim = "\t", ukb_data_dict = ukb_data_dict) %>%
@@ -193,7 +238,8 @@ server <- function(input, output, session) {
                 select(all_of(selected_data_dict_cols)),
             tab = make_data_dict(ukb_main_dataset_filepath(), delim = "\t", ukb_data_dict = ukb_data_dict) %>%
                 select(all_of(selected_data_dict_cols)),
-            validate("Invalid file extension for main dataset; Please upload a comma (.csv) or tab delimited (.tsv/.txt/.tab) file")
+            dta = make_data_dict(ukb_main_dataset_filepath(), delim = "\t", ukb_data_dict = ukb_data_dict) %>%
+                select(all_of(selected_data_dict_cols))
         )
     })
 
@@ -263,29 +309,103 @@ server <- function(input, output, session) {
     })
 
 
-# Downloads ---------------------------------------------------------------
+# DYNAMIC UI ELEMENTS -----------------------------------------------------
 
+    observeEvent(data_dict(), {
+        if (!is.null(data_dict())) {
+            updateTabsetPanel(inputId = "download_data_dict_inputs", selected = "download_data_dict_inputs")
+            updateTabsetPanel(inputId = "make_dataset_inputs", selected = "make_dataset_inputs")
+        } else {
+            updateTabsetPanel(inputId = "download_data_dict_inputs", selected = "empty")
+            updateTabsetPanel(inputId = "make_dataset_inputs", selected = "empty")
+        }
+    })
 
-    # download full data dictionary
+# DOWNLOADS ---------------------------------------------------------------
+
+# Data dictionary - full --------------------------------------------------
     output$download_data_dict_full <- downloadHandler(
         filename = function() {
-            paste0(input$download_file_name, "data_dict_full.csv")
+            ("data_dict_full.csv")
         },
         content = function(file) {
             write_csv(data_dict(), file, na = "")
         }
     )
 
-    # download data dictionary of selected rows only
+
+# Data dictionary - selected rows only ------------------------------------
     output$download_data_dict_selected <- downloadHandler(
         filename = function() {
-            paste0(input$download_file_name, "data_dict_selected.csv")
+            ("data_dict_selected.csv")
         },
         content = function(file) {
             write_csv(data_dict()[selected(), ], file, na = "")
         }
     )
+
+
+# UKB dataset -------------------------------------------------------------
+    output$ukb_dataset <- downloadHandler(
+        filename = function() {
+            input$ukb_dataset_outname
+        },
+        content = function(file) {
+            # setup
+            ext <- tools::file_ext(file)
+
+            if (!ext %in% c("rds", "dta", "csv", "tsv")) {
+                showNotification("Invalid file type. File extensionn must be one of '.rds', '.dta', '.csv' or '.tsv'. Please click 'cancel' in dialog box",
+                                 type = "error")
+                stop("Invalid file type. File extensionn must be one of '.rds', '.dta', '.csv' or '.tsv'")
+            }
+
+            req(data_dict())
+
+            delim <- switch(ukb_main_dataset_filepath_ext(),
+                            csv = ",",
+                            tsv = "\t",
+                            txt = "\t",
+                            tab = "\t",
+                            dta = "")
+
+            # read selected variables
+            notify <- function(msg, id = NULL) {
+                showNotification(msg, id = id, duration = NULL, closeButton = FALSE)
+            }
+
+            message("Reading UKB data")
+            id <- notify("Reading data...")
+            on.exit(removeNotification(id), add = TRUE)
+
+            ukb_main <- ukbwranglr::read_ukb(path = ukb_main_dataset_filepath(),
+                                             delim = delim,
+                                             ukb_data_dict = ukb_data_dict,
+                                             ukb_codings = ukb_codings,
+                                             data_dict = data_dict()[selected(), ],
+                                             descriptive_colnames = input$descriptive_colnames,
+                                             labelled = input$labelled,
+                                             nrows = input$nrows)
+
+            # write dataset
+            message("Writing data\n")
+            notify("Writing data...", id = id)
+
+            switch(
+                ext,
+                rds = saveRDS(ukb_main, file = file),
+                dta = haven::write_dta(ukb_main, path = file),
+                csv = readr::write_csv(ukb_main, file = file, na = ""),
+                tsv = readr::write_tsv(ukb_main, file = file, na = "")
+                )
+
+            message("Finished writing data")
+            showNotification("Dataset succesfully created!")
+        }
+    )
+
+
+# RUN APPLICATION ---------------------------------------------------------
 }
 
-# Run the application
 shinyApp(ui = ui, server = server)

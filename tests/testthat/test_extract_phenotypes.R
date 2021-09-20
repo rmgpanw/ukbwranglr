@@ -72,6 +72,34 @@ dummy_clinical_codes <- tibble::tribble(
 
 stopifnot(validate_clinical_codes(dummy_clinical_codes))
 
+# temporary - to delete
+# validate_clinical_codes(cy_comorbidities_clinical_codes %>%
+#                           dplyr::mutate(code_type = tolower(code_type)))
+#
+# cy_comorbidities_clinical_codes_valid <-
+#   cy_comorbidities_clinical_codes %>%
+#   dplyr::mutate(code_type = tolower(code_type))
+#
+# result <-
+#   extract_phenotypes_single_disease(
+#     disease = "Hyperlipidaemia",
+#     clinical_events = dummy_clinical_events %>%
+#       dplyr::bind_rows(
+#         tibble::tibble(eid = 1,
+#                        source = "f41270",
+#                        index = "0_0",
+#                        code = "E782",
+#                        date = NA)
+#       ),
+#     clinical_codes = cy_comorbidities_clinical_codes_valid,
+#     min_max = "min",
+#     prefix = "test_",
+#     data_sources = NULL,
+#     keep_all = FALSE
+#   )
+
+# temporary end
+
 # TESTS -------------------------------------------------------------------
 
 # `tidy_clinical_events()`  -----------------------------------------

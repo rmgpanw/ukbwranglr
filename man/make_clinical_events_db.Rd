@@ -6,9 +6,10 @@
 \usage{
 make_clinical_events_db(
   ukb_main_path,
-  ukb_main_delim,
   gp_clinical_path,
+  gp_scripts_path,
   ukb_db_path,
+  ukb_main_delim = "\\t",
   ukb_data_dict = get_ukb_data_dict(),
   ukb_codings = get_ukb_codings(),
   overwrite = FALSE,
@@ -19,13 +20,14 @@ make_clinical_events_db(
 \arguments{
 \item{ukb_main_path}{Path to the main UKB dataset file.}
 
-\item{ukb_main_delim}{Delimiter for \code{ukb_main_path}.}
-
 \item{gp_clinical_path}{Path to the UKB primary care clinical events file
 (\code{gp_clinical.txt}).}
 
 \item{ukb_db_path}{Path to the SQLite database file. The file name must end
 with '.db'. If no file with this name exists then one will be created.}
+
+\item{ukb_main_delim}{Delimiter for \code{ukb_main_path}. Default value is
+\code{"\\t"}.}
 
 \item{ukb_data_dict}{The UKB data dictionary (available online at the UK
 Biobank

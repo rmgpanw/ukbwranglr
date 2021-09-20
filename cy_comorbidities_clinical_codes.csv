@@ -1,0 +1,23 @@
+disease,description,category,code_type,code,author
+Hyperlipidaemia,Mixed hyperlipidaemia,"Hyperlipidaemia, any",ICD10,E782,cy
+Hyperlipidaemia,Other hyperlipidaemia,"Hyperlipidaemia, any",ICD10,E784,cy
+Hyperlipidaemia,"Hyperlipidaemia, unspecified","Hyperlipidaemia, any",ICD10,E785,cy
+Hyperlipidaemia,OTHER AND UNSPECIFIED HYPERLIPIDAEMIA,"Hyperlipidaemia, any",ICD9,2724,cy
+Hyperlipidaemia,MIXED HYPERLIPIDAEMIA,"Hyperlipidaemia, any",ICD9,2722,cy
+Hypercholesterolaemia,Pure hypercholesterolaemia,"Hypercholesterolaemia, any",ICD10,E780,cy
+Hypercholesterolaemia,Pure hypercholesterolaemia,"Hypercholesterolaemia, any",ICD9,2720,cy
+Hypertriglyceridaemia,Hypertriglyceridaemia,"Hypertriglyceridaemia, unspecified",read2,C3210,cy
+Hypertriglyceridaemia,Serum triglycerides raised,"Hypertriglyceridaemia, unspecified",read2,44Q3.,cy
+Hypertriglyceridaemia,Hypertriglyceridaemia,"Hypertriglyceridaemia, unspecified",read3,Xa9At,cy
+Hypertriglyceridaemia,Serum triglycerides raised,"Hypertriglyceridaemia, unspecified",read3,44Q3.,cy
+Hypertriglyceridaemia,Primary hypertriglyceridaemia,"Hypertriglyceridaemia, primary",read3,X40X7,cy
+Hypertriglyceridaemia,Secondary hypertriglyceridaemia,"Hypertriglyceridaemia, secondary",read3,X40XH,cy
+Hypertriglyceridaemia,Familial hypertriglyceridaemia,"Hypertriglyceridaemia, familial",read3,X40Vo,cy
+Acne keloidalis nuchae,Acne keloid,"Acne keloidalis nuchae, any",read2,M25y6,cy
+Acne keloidalis nuchae,Acne keloid,"Acne keloidalis nuchae, any",read2,M261H,cy
+Acne keloidalis nuchae,Acne keloidalis,"Acne keloidalis nuchae, any",read2,M261K,cy
+Acne keloidalis nuchae,Acne keloid,"Acne keloidalis nuchae, any",read3,X50AC,cy
+Acne keloidalis nuchae,Acne keloidalis,"Acne keloidalis nuchae, any",read3,X50A3,cy
+Acne keloidalis nuchae,Keloidalis nuchae,"Acne keloidalis nuchae, any",read3,X50Eq,cy
+Acne keloidalis nuchae,Folliculitis keloidalis nuchae,"Acne keloidalis nuchae, any",read3,X500x,cy
+Acne keloidalis nuchae,Acne keloid,"Acne keloidalis nuchae, any",ICD10,L73.0,cy
