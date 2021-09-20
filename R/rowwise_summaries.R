@@ -24,7 +24,11 @@
 #' @param .drop If \code{TRUE}, removes the original numerical variables from
 #'   the result. Default value is \code{FALSE}.
 #'
-#' @return A data frame
+#' @return A data frame with new columns summarising numerical variables. The
+#'   names for these new columns are prefixed by the value for
+#'   \code{summary_function} and end with 'x', FieldID +/- instance being
+#'   summarised e.g. if summarising FieldID 4080 instance 0, the new column
+#'   would be named 'mean_systolic_blood_pressure_automated_reading_x4080_0'.
 #' @export
 #' @examples
 #' # get dummy data
@@ -76,7 +80,7 @@ summarise_numerical_variables <- function(ukb_main,
                                                                    " "),
                                              " ",
                                              .data[["Field"]],
-                                             " (f",
+                                             " (x",
                                              .data[["FieldID"]],
                                              ")"))
   } else if (summarise_by == "Instance") {
@@ -87,7 +91,7 @@ summarise_numerical_variables <- function(ukb_main,
                                                                    " "),
                                              " ",
                                              .data[["Field"]],
-                                             " (f",
+                                             " (x",
                                              .data[["FieldID"]],
                                              " ",
                                              .data[["instance"]],

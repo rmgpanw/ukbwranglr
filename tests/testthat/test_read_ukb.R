@@ -274,7 +274,7 @@ test_that(
 )
 
 test_that(
-  "`format_ukb_df_header()` does reformats dervied variable names from `summarise_numerical_variables()`", {
+  "`format_ukb_df_header()` does reformat dervied variable names from `summarise_numerical_variables()`", {
     expect_equal(format_ukb_df_header(example_colheaders_df$descriptive_ch_derived),
                  c('feid',
                    'f4080_0',
@@ -382,3 +382,4 @@ test_that("`read_ukb_chunked_to_file()` works", {
                 purrr::map_lgl(~ all(names(.x) == EXPECTED_COLNAMES)) %>%
                 all())
 })
+

@@ -408,6 +408,9 @@ mutate_descriptive_columns <- function(data_dict) {
                                            yes = data_dict$colheaders_raw,
                                            no = data_dict$descriptive_colnames)
 
+  # remove Field_FieldID column
+  data_dict$Field_FieldID <- NULL
+
   return(data_dict)
 }
 
