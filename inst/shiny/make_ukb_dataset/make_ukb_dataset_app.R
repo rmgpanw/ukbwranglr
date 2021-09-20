@@ -21,9 +21,6 @@ ukb_data_dict <- read_tsv("/Users/alasdair/Documents/Data/UKB/ukb_backup_files/D
 test <- make_data_dict("/Users/alasdair/Documents/Data/UKB/AK/raw/ukb29900.tab", delim = "\t", ukb_data_dict = ukb_data_dict)
 
 selected_data_dict_cols <- c(
-    "descriptive_colnames",
-    "colheaders_raw",
-    "colheaders_processed",
     "Field",
     "FieldID",
     "instance",
@@ -42,8 +39,15 @@ selected_data_dict_cols <- c(
     "Array",
     "Coding",
     "Notes",
-    "Link"
+    "Link",
+    "descriptive_colnames",
+    "colheaders_raw",
+    "colheaders_processed"
 )
+
+
+# UI ----------------------------------------------------------------------
+
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
@@ -56,9 +60,14 @@ ui <- fluidPage(
         sidebarPanel(
             width = 2,
             h5("UKB file paths"),
-            shinyFilesButton("ukb_file",
+            shinyFilesButton("ukb_main_dataset_filepath",
                              label = "UKB main dataset",
-                             title = "Please select a file",
+                             title = "Please select a UK Biobank main dataset file",
+                             multiple = FALSE,
+                             viewtype = "detail"),
+            shinyFilesButton("data_dict_preselected",
+                             label = "Data dictionary",
+                             title = "Please select a UK Biobank main dataset data dictionary file",
                              multiple = FALSE,
                              viewtype = "detail"),
             h5("Download data dictionary"),
@@ -70,7 +79,8 @@ ui <- fluidPage(
 
         # Show the data dictionary
         mainPanel(
-            verbatimTextOutput("filepaths"),
+            verbatimTextOutput("ukb_main_dataset_filepath"),
+            verbatimTextOutput("data_dict_preselected_filepath"),
            reactableOutput("data_dict"),
            verbatimTextOutput("selected"),
            width = 9
@@ -78,25 +88,33 @@ ui <- fluidPage(
     )
 )
 
-# Define server logic required to draw a histogram
+
+# SERVER ------------------------------------------------------------------
+
 server <- function(input, output, session) {
 
-    # setup for shinyFiles
-    volumes <- c(Home = fs::path_home(), "R Installation" = R.home(), getVolumes()())
-    shinyFileChoose(input, "ukb_file", roots = volumes, session = session)
 
-    # print file selection to console
+# SHINYFILES SETUP --------------------------------------------------------
+
+    volumes <- c(Home = fs::path_home(), "R Installation" = R.home(), getVolumes()())
+
+# Main dataset ------------------------------------------------------------
+
+    # main dataset file
+    shinyFileChoose(input, "ukb_main_dataset_filepath", roots = volumes, session = session)
+
+    # print UKB main dataset file selection to console
     observe({
-        cat("\ninput$ukb_file value:\n\n")
-        print(input$ukb_file)
+        cat("\ninput$ukb_main_dataset_filepath value:\n\n")
+        print(input$ukb_main_dataset_filepath)
     })
 
-    ## print file selection to browser
-    output$filepaths <- renderPrint({
-        if (is.integer(input$ukb_file)) {
+    # print file selection to browser
+    output$ukb_main_dataset_filepath <- renderPrint({
+        if (is.integer(input$ukb_main_dataset_filepath)) {
             cat("Please select a UKB main dataset")
         } else {
-            parseFilePaths(volumes, input$ukb_file)$datapath %>%
+            parseFilePaths(volumes, input$ukb_main_dataset_filepath)$datapath %>%
                 str_split(" • ") %>%
                 .[[1]] %>%
                 as.list() %>%
@@ -104,41 +122,97 @@ server <- function(input, output, session) {
         }
     })
 
-    ## get filepath to selected UKB file
-    ukb_file <- reactive({
-        if (is.integer(input$ukb_file)) {
+    # get filepath to main dataset
+    ukb_main_dataset_filepath <- reactive({
+        if (is.integer(input$ukb_main_dataset_filepath)) {
             cat("No files have been selected (shinyFileChoose)")
         } else {
-            parseFilePaths(volumes, input$ukb_file)$datapath %>%
+            parseFilePaths(volumes, input$ukb_main_dataset_filepath)$datapath %>%
                 str_split(" • ") %>%
                 .[[1]] %>%
                 as.list() %>%
                 do.call(file.path, .)
         }
     })
+
+
+# Data dictionary (pre-selected) ------------------------------------------
+
+    # pre-selected data dictionary
+    shinyFileChoose(input, "data_dict_preselected", roots = volumes, session = session)
+
+    # print selection to console
+    observe({
+        cat("\ninput$data_dict_preselected value:\n\n")
+        print(input$data_dict_preselected)
+    })
+
+    # print file selection to browser
+    output$data_dict_preselected_filepath <- renderPrint({
+        if (is.integer(input$data_dict_preselected)) {
+            cat("Please select a data dictionary (optional)")
+        } else {
+            parseFilePaths(volumes, input$data_dict_preselected)$datapath %>%
+                str_split(" • ") %>%
+                .[[1]] %>%
+                as.list() %>%
+                do.call(file.path, .)
+        }
+    })
+
+    # get filepath to selected UKB data dictionary file (of pre-selected variables)
+    data_dict_preselected_filepath <- reactive({
+        if (is.integer(input$data_dict_preselected)) {
+            cat("No files have been selected (shinyFileChoose)")
+        } else {
+            parseFilePaths(volumes, input$data_dict_preselected)$datapath %>%
+                str_split(" • ") %>%
+                .[[1]] %>%
+                as.list() %>%
+                do.call(file.path, .)
+        }
+    })
+
+
+
+# Data dictionary reactable table -----------------------------------------
 
     # create data dict
     data_dict <- reactive({
-        req(ukb_file())
+        req(ukb_main_dataset_filepath())
 
-        ext <- tools::file_ext(ukb_file())
+        ext <- tools::file_ext(ukb_main_dataset_filepath())
 
         switch(
             ext,
-            csv = make_data_dict(ukb_file(), delim = ",", ukb_data_dict = ukb_data_dict) %>%
+            csv = make_data_dict(ukb_main_dataset_filepath(), delim = ",", ukb_data_dict = ukb_data_dict) %>%
                 select(all_of(selected_data_dict_cols)),
-            tsv = make_data_dict(ukb_file(), delim = "\t", ukb_data_dict = ukb_data_dict) %>%
+            tsv = make_data_dict(ukb_main_dataset_filepath(), delim = "\t", ukb_data_dict = ukb_data_dict) %>%
                 select(all_of(selected_data_dict_cols)),
-            txt = make_data_dict(ukb_file(), delim = "\t", ukb_data_dict = ukb_data_dict) %>%
+            txt = make_data_dict(ukb_main_dataset_filepath(), delim = "\t", ukb_data_dict = ukb_data_dict) %>%
                 select(all_of(selected_data_dict_cols)),
-            tab = make_data_dict(ukb_file(), delim = "\t", ukb_data_dict = ukb_data_dict) %>%
+            tab = make_data_dict(ukb_main_dataset_filepath(), delim = "\t", ukb_data_dict = ukb_data_dict) %>%
                 select(all_of(selected_data_dict_cols)),
-            validate("Invalid file extension; Please upload a comma (.csv) or tab delimited (.tsv/.txt/.tab) file")
+            validate("Invalid file extension for main dataset; Please upload a comma (.csv) or tab delimited (.tsv/.txt/.tab) file")
         )
+    })
+
+    # read data dictionary of pre-selected variables (optional)
+    data_dict_preselected <- reactive({
+        req(data_dict_preselected_filepath())
+
+        ext <- tools::file_ext(data_dict_preselected_filepath())
+
+        if (ext != "csv") {
+            validate("Invalid file extension for data dicionary, must be a csv file")
+        }
+
+        readr::read_csv(data_dict_preselected_filepath())
     })
 
     # display data dictionary for selected UKB file
     output$data_dict <- renderReactable({
+        req(data_dict())
 
         reactable(
             # data,
@@ -160,6 +234,24 @@ server <- function(input, output, session) {
     # selected rows
     selected <- reactive(getReactableState("data_dict", "selected"))
 
+    # update selected rows to include those in data_dict_preselected
+    observeEvent(data_dict_preselected(), {
+        # currently selected
+        currently_selected_rowids <- getReactableState("data_dict", "selected")
+
+        # get row indices to update
+        preselected_rowids <- data_dict() %>%
+            tibble::rowid_to_column() %>%
+            dplyr::filter(colheaders_raw %in% data_dict_preselected()$colheaders_raw) %>%
+            dplyr::pull(rowid)
+
+        # union
+        updated_selection_rowids <- unique(c(currently_selected_rowids, preselected_rowids))
+
+        # update
+        updateReactable("data_dict", selected = updated_selection_rowids)
+    })
+
     # print selected rows to app
     output$selected <- renderPrint({
         print(selected())
@@ -169,6 +261,10 @@ server <- function(input, output, session) {
     observe({
         print(data_dict()[selected(), ])
     })
+
+
+# Downloads ---------------------------------------------------------------
+
 
     # download full data dictionary
     output$download_data_dict_full <- downloadHandler(
