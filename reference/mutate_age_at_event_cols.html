@@ -88,21 +88,6 @@ match the regex supplied to date_col_regex." />
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-    <li>
-      <a href="../articles/clinical_codes.html">Clinical codes - lookups and mappings</a>
-    </li>
-    <li>
-      <a href="../articles/ukb_clinical_events.html">Clinical events</a>
-    </li>
-  </ul>
-</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
@@ -135,7 +120,7 @@ match the regex supplied to <code>date_col_regex</code>.</p>
     </div>
 
     <pre class="usage"><span class='fu'>mutate_age_at_event_cols</span><span class='op'>(</span>
-  <span class='va'>ukb_pheno</span>,
+  <span class='va'>ukb_main</span>,
   dob_col <span class='op'>=</span> <span class='st'>"dob"</span>,
   date_col_regex <span class='op'>=</span> <span class='st'>"_date$"</span>,
   date_col_regex_replacement <span class='op'>=</span> <span class='st'>"_age"</span>
@@ -145,20 +130,20 @@ match the regex supplied to <code>date_col_regex</code>.</p>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>ukb_pheno</th>
-      <td><p>a UK Biobank phenotype data frame containing "eid" and date
-of birth columns, as well as date columns matching the regex supplied to
+      <th>ukb_main</th>
+      <td><p>a UKB main dataset (data frame) containing a column named "eid" and a date
+of birth column, as well as date columns matching the regex supplied to
 the <code>date_col_regex</code> argument.</p></td>
     </tr>
     <tr>
       <th>dob_col</th>
       <td><p>character. The name of the date of birth column in
-<code>ukb_pheno</code>.</p></td>
+<code>ukb_main</code>.</p></td>
     </tr>
     <tr>
       <th>date_col_regex</th>
       <td><p>character. A regular expression that matches the date
-columns to be processed in <code>ukb_pheno</code>.</p></td>
+columns to be processed in <code>ukb_main</code>.</p></td>
     </tr>
     <tr>
       <th>date_col_regex_replacement</th>
@@ -170,25 +155,25 @@ supplied to <code>date_col_regex</code> with this string.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A dataframe with additional "age-at-event" columns</p>
+    <p>A data frame with additional "age at event" columns</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># dummy data</span>
-<span class='va'>dummy_ukb_pheno</span> <span class='op'>&lt;-</span> <span class='fu'>tibble</span><span class='fu'>::</span><span class='fu'><a href='https://tibble.tidyverse.org/reference/tribble.html'>tribble</a></span><span class='op'>(</span>
+<span class='va'>dummy_ukb_main</span> <span class='op'>&lt;-</span> <span class='fu'>tibble</span><span class='fu'>::</span><span class='fu'><a href='https://tibble.tidyverse.org/reference/tribble.html'>tribble</a></span><span class='op'>(</span>
 <span class='op'>~</span> <span class='va'>eid</span>, <span class='op'>~</span> <span class='va'>dob</span>, <span class='op'>~</span> <span class='va'>event_date</span>,
-<span class='fl'>1</span>, <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span><span class='op'>(</span><span class='st'>"2000-01-01"</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span><span class='op'>(</span><span class='st'>"2010-01-01"</span><span class='op'>)</span>
+<span class='fl'>1</span>, <span class='st'>"2000-01-01"</span>, <span class='st'>"2010-01-01"</span>
 <span class='op'>)</span>
 
 <span class='co'># mutate age at event col</span>
 <span class='fu'>mutate_age_at_event_cols</span><span class='op'>(</span>
-  <span class='va'>dummy_ukb_pheno</span>,
+  <span class='va'>dummy_ukb_main</span>,
   dob_col <span class='op'>=</span> <span class='st'>"dob"</span>,
   date_col_regex <span class='op'>=</span> <span class='st'>"_date$"</span>,
   date_col_regex_replacement <span class='op'>=</span> <span class='st'>"_age"</span>
 <span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='message'>Calculating age at event for event_date. New colname: event_age</span></div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 1 × 4</span>
 #&gt;     eid dob        event_date event_age
-#&gt;   <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;date&gt;</span>     <span style='color: #949494; font-style: italic;'>&lt;date&gt;</span>         <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>
+#&gt;   <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span>      <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span>          <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>
 #&gt; <span style='color: #BCBCBC;'>1</span>     1 2000-01-01 2010-01-01      10.0</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

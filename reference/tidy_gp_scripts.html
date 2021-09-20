@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get UK Biobank clinical code mappings file directly from UKB website — get_ukb_code_mappings_direct • ukbwranglr</title>
+<title>Tidy UK Biobank primary care prescriptions data — tidy_gp_scripts • ukbwranglr</title>
 
 
 <!-- jquery -->
@@ -39,12 +39,9 @@
 
 
 
-<meta property="og:title" content="Get UK Biobank clinical code mappings file directly from UKB website — get_ukb_code_mappings_direct" />
-<meta property="og:description" content="Downloads the UK Biobank code mappings file (all_lkps_maps_v2.xlsx,
-resource 592)
-directly from the UKB website to a temporary directory at
-tempdir. This is then read into R as a named list of data
-frames, one for each sheet in the original file." />
+<meta property="og:title" content="Tidy UK Biobank primary care prescriptions data — tidy_gp_scripts" />
+<meta property="og:description" content="Reformats the UK Biobank primary care prescriptions dataset to match the
+output format for tidy_clinical_events." />
 
 
 
@@ -112,31 +109,64 @@ frames, one for each sheet in the original file." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get UK Biobank clinical code mappings file directly from UKB website</h1>
-    <small class="dont-index">Source: <a href='https://github.com/rmgpanw/ukbwranglr/blob/master/R/utils.R'><code>R/utils.R</code></a></small>
-    <div class="hidden name"><code>get_ukb_code_mappings_direct.Rd</code></div>
+    <h1>Tidy UK Biobank primary care prescriptions data</h1>
+    <small class="dont-index">Source: <a href='https://github.com/rmgpanw/ukbwranglr/blob/master/R/sqlite_db.R'><code>R/sqlite_db.R</code></a></small>
+    <div class="hidden name"><code>tidy_gp_scripts.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Downloads the UK Biobank code mappings file (<code>all_lkps_maps_v2.xlsx</code>,
-<a href='https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592'>resource 592</a>)
-directly from the UKB website to a temporary directory at
-<code><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></code>. This is then read into R as a named list of data
-frames, one for each sheet in the original file.</p>
+    <p>Reformats the UK Biobank primary care prescriptions dataset to match the
+output format for <code><a href='tidy_clinical_events.html'>tidy_clinical_events</a></code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_ukb_code_mappings_direct</span><span class='op'>(</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>tidy_gp_scripts</span><span class='op'>(</span><span class='va'>gp_scripts</span>, remove_special_dates <span class='op'>=</span> <span class='cn'>TRUE</span>, .details_only <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
 
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>gp_scripts</th>
+      <td><p>The UK Biobank primary care prescriptions dataset</p></td>
+    </tr>
+    <tr>
+      <th>remove_special_dates</th>
+      <td><p>Logical. Removes special date values if
+requested. Default value is <code>TRUE</code>.</p></td>
+    </tr>
+    <tr>
+      <th>.details_only</th>
+      <td><p>logical. If <code>TRUE</code>, return a character vector of
+output table names only</p></td>
+    </tr>
+    </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A named list.</p>
+    <p>A named list. Item 'clinical_events' contains the read codes with
+  event dates, and item 'gp_scripts_names_and_quantities' contains the drug
+  names/quantities columns.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p><strong>Note:</strong> This is a large object (&gt;450 MB)</p>
+    <p>The UK Biobank primary care prescriptions data has multiple code columns
+(Read, BNF and DMD codes). This function reshapes the data to long format so
+that all codes are in a single column. The <code>index</code> column values relate
+to row numbers in the original data.</p>
+<p>The primary care data also contains drug name and quantities columns. The
+clinical codes/dates in long format and drug name/quantity columns are both
+returned in a list under the names 'clinical_events' and
+'gp_scripts_names_and_quantities' respectively.</p>
+    <h2 class="hasAnchor" id="other-notes"><a class="anchor" href="#other-notes"></a>Other notes</h2>
+
+    
+
+
+<p>By default, special date values (see
+  <a href='https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=591'>resource 591</a> for
+  further details) are set to <code>NA</code>.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='get_ukb_code_mappings.html'>get_ukb_code_mappings</a></code></p></div>
+    <div class='dont-index'><p><code><a href='tidy_clinical_events.html'>tidy_clinical_events</a></code>,
+  <code><a href='make_clinical_events_db.html'>make_clinical_events_db</a></code></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

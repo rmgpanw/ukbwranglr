@@ -95,21 +95,6 @@ CALIBER repo." />
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-    <li>
-      <a href="../articles/clinical_codes.html">Clinical codes - lookups and mappings</a>
-    </li>
-    <li>
-      <a href="../articles/ukb_clinical_events.html">Clinical events</a>
-    </li>
-  </ul>
-</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
@@ -148,7 +133,7 @@ clinical code lists from the
 <a href='https://github.com/spiros/chronological-map-phenotypes'>CALIBER repo</a>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_ukb_db</span><span class='op'>(</span><span class='va'>directory_path</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>get_ukb_db</span><span class='op'>(</span><span class='va'>directory_path</span>, overwrite <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -157,6 +142,12 @@ clinical code lists from the
       <th>directory_path</th>
       <td><p>character. The directory where <code>ukb.db</code> will be
 downloaded to.</p></td>
+    </tr>
+    <tr>
+      <th>overwrite</th>
+      <td><p>logical. If <code>TRUE</code> and a file called <code>ukb.db</code> is
+already present in the directory specified by <code>directory_path</code>, then
+this will be deleted and replaced. Default value is <code>FALSE</code>.</p></td>
     </tr>
     </table>
 

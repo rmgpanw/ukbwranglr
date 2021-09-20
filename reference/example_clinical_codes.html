@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get UK Biobank clinical code mappings file directly from UKB website — get_ukb_code_mappings_direct • ukbwranglr</title>
+<title>Generate an example data frame of clinical codes for diabetes — example_clinical_codes • ukbwranglr</title>
 
 
 <!-- jquery -->
@@ -39,12 +39,10 @@
 
 
 
-<meta property="og:title" content="Get UK Biobank clinical code mappings file directly from UKB website — get_ukb_code_mappings_direct" />
-<meta property="og:description" content="Downloads the UK Biobank code mappings file (all_lkps_maps_v2.xlsx,
-resource 592)
-directly from the UKB website to a temporary directory at
-tempdir. This is then read into R as a named list of data
-frames, one for each sheet in the original file." />
+<meta property="og:title" content="Generate an example data frame of clinical codes for diabetes — example_clinical_codes" />
+<meta property="og:description" content="Data frames of this format may be used with extract_phenotypes.
+Use validate_clinical_codes to check whether a clinical codes
+data frame meets all requirements." />
 
 
 
@@ -112,32 +110,43 @@ frames, one for each sheet in the original file." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get UK Biobank clinical code mappings file directly from UKB website</h1>
-    <small class="dont-index">Source: <a href='https://github.com/rmgpanw/ukbwranglr/blob/master/R/utils.R'><code>R/utils.R</code></a></small>
-    <div class="hidden name"><code>get_ukb_code_mappings_direct.Rd</code></div>
+    <h1>Generate an example data frame of clinical codes for diabetes</h1>
+    <small class="dont-index">Source: <a href='https://github.com/rmgpanw/ukbwranglr/blob/master/R/extract_phenotypes.R'><code>R/extract_phenotypes.R</code></a></small>
+    <div class="hidden name"><code>example_clinical_codes.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Downloads the UK Biobank code mappings file (<code>all_lkps_maps_v2.xlsx</code>,
-<a href='https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592'>resource 592</a>)
-directly from the UKB website to a temporary directory at
-<code><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></code>. This is then read into R as a named list of data
-frames, one for each sheet in the original file.</p>
+    <p>Data frames of this format may be used with <code><a href='extract_phenotypes.html'>extract_phenotypes</a></code>.
+Use <code><a href='validate_clinical_codes.html'>validate_clinical_codes</a></code> to check whether a clinical codes
+data frame meets all requirements.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_ukb_code_mappings_direct</span><span class='op'>(</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>example_clinical_codes</span><span class='op'>(</span><span class='op'>)</span></pre>
 
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A named list.</p>
+    <p>A data frame of selected clinical codes for diabetes.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p><strong>Note:</strong> This is a large object (&gt;450 MB)</p>
+    <p>Note: this example is not an exhaustive list of codes for diabetes.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='get_ukb_code_mappings.html'>get_ukb_code_mappings</a></code></p></div>
+    <div class='dont-index'><p><code><a href='validate_clinical_codes.html'>validate_clinical_codes</a></code></p></div>
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='fu'>example_clinical_codes</span><span class='op'>(</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 8 × 6</span>
+#&gt;   disease  description                  category        code_type   code  author
+#&gt;   <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span>    <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span>                        <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span>           <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span>       <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span> 
+#&gt; <span style='color: #BCBCBC;'>1</span> Diabetes diabetes                     Diabetes unspe… data_codin… 1220  ukbwr 
+#&gt; <span style='color: #BCBCBC;'>2</span> Diabetes gestational diabetes         Gestational di… data_codin… 1221  ukbwr 
+#&gt; <span style='color: #BCBCBC;'>3</span> Diabetes type 1 diabetes              Type 1 DM       data_codin… 1222  ukbwr 
+#&gt; <span style='color: #BCBCBC;'>4</span> Diabetes type 2 diabetes              Type 2 DM       data_codin… 1223  ukbwr 
+#&gt; <span style='color: #BCBCBC;'>5</span> Diabetes Type 1 diabetes mellitus     Type 1 DM       icd10       E10   ukbwr 
+#&gt; <span style='color: #BCBCBC;'>6</span> Diabetes Type 2 diabetes mellitus     Type 2 DM       icd10       E11   ukbwr 
+#&gt; <span style='color: #BCBCBC;'>7</span> Diabetes Insulin dependent diabetes … Type 1 DM       read2       C108. ukbwr 
+#&gt; <span style='color: #BCBCBC;'>8</span> Diabetes Non-insulin dependent diabe… Type 2 DM       read2       C109. ukbwr </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

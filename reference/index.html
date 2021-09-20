@@ -86,21 +86,6 @@
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-    <li>
-      <a href="../articles/clinical_codes.html">Clinical codes - lookups and mappings</a>
-    </li>
-    <li>
-      <a href="../articles/ukb_clinical_events.html">Clinical events</a>
-    </li>
-  </ul>
-</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
@@ -150,19 +135,19 @@
         <td>
           <p><code><a href="make_data_dict.html">make_data_dict()</a></code> </p>
         </td>
-        <td><p>Generate a data dictionary from a raw UK Biobank phenotype file</p></td>
+        <td><p>Generate a UK Biobank data dictionary</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="read_pheno.html">read_pheno()</a></code> </p>
+          <p><code><a href="read_ukb.html">read_ukb()</a></code> </p>
         </td>
-        <td><p>Read a UK Biobank phenotype file</p></td>
+        <td><p>Read a UK Biobank main dataset file</p></td>
       </tr>
     </tbody><tbody>
       <tr>
         <th colspan="2">
-          <h2 id="section-extract-clinical-events-data" class="hasAnchor"><a href="#section-extract-clinical-events-data" class="anchor"></a>Extract clinical events data</h2>
-          <p class="section-desc"><p>Reformat diagnoses/operations data fields to aid phenotyping</p></p>
+          <h2 id="section-tidy-clinical-events-data" class="hasAnchor"><a href="#section-tidy-clinical-events-data" class="anchor"></a>Tidy clinical events data</h2>
+          <p class="section-desc"><p>Convert clinical events data from multiple sources to a standardised long format table</p></p>
         </th>
       </tr>
       
@@ -173,131 +158,39 @@
       <tr>
         
         <td>
-          <p><code><a href="get_death_data_icd10_diagnoses.html">get_death_data_icd10_diagnoses()</a></code> </p>
+          <p><code><a href="tidy_clinical_events.html">tidy_clinical_events()</a></code> </p>
         </td>
-        <td><p>Get death data ICD10 diagnoses</p></td>
+        <td><p>Tidy clinical events data from a UK Biobank main dataset</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="get_self_report_cancer_diagnoses.html">get_self_report_cancer_diagnoses()</a></code> </p>
+          <p><code><a href="tidy_gp_clinical.html">tidy_gp_clinical()</a></code> </p>
         </td>
-        <td><p>Get self-reported cancer diagnoses</p></td>
+        <td><p>Tidy UK Biobank primary care clinical events</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="get_self_report_non_cancer_diagnoses.html">get_self_report_non_cancer_diagnoses()</a></code> </p>
+          <p><code><a href="tidy_gp_scripts.html">tidy_gp_scripts()</a></code> </p>
         </td>
-        <td><p>Get self-reported non-cancer diagnoses</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="get_self_report_non_cancer_diagnoses_icd10.html">get_self_report_non_cancer_diagnoses_icd10()</a></code> </p>
-        </td>
-        <td><p>Get self-reported non-cancer diagnoses (ICD10)</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="get_hes_icd9_diagnoses.html">get_hes_icd9_diagnoses()</a></code> </p>
-        </td>
-        <td><p>Get hospital inpatient ICD9 diagnoses</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="get_hes_icd10_diagnoses.html">get_hes_icd10_diagnoses()</a></code> </p>
-        </td>
-        <td><p>Get hospital inpatient ICD10 diagnoses</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="get_hes_opcs3_operations.html">get_hes_opcs3_operations()</a></code> </p>
-        </td>
-        <td><p>Get hospital inpatient OPCS3 operative procedures</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="get_hes_opcs4_operations.html">get_hes_opcs4_operations()</a></code> </p>
-        </td>
-        <td><p>Get hospital inpatient OPCS4 operative procedures</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="get_cancer_register_icd9_diagnoses.html">get_cancer_register_icd9_diagnoses()</a></code> </p>
-        </td>
-        <td><p>Get cancer register ICD9 diagnoses</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="get_cancer_register_icd10_diagnoses.html">get_cancer_register_icd10_diagnoses()</a></code> </p>
-        </td>
-        <td><p>Get cancer register ICD10 diagnoses</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="get_all_diagnostic_codes_multi.html">get_all_diagnostic_codes_multi()</a></code> </p>
-        </td>
-        <td><p>Get all diagnostic codes from multiple data sources</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="extract_first_or_last_clinical_event.html">extract_first_or_last_clinical_event()</a></code> </p>
-        </td>
-        <td><p>Get the earliest record date for a set of diagnostic codes</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="extract_first_or_last_clinical_event_multi.html">extract_first_or_last_clinical_event_multi()</a></code> </p>
-        </td>
-        <td><p>Get the earliest record date for multiple phenotype categories</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="mutate_age_at_event_cols.html">mutate_age_at_event_cols()</a></code> </p>
-        </td>
-        <td><p>Mutate age at event columns</p></td>
-      </tr>
-    </tbody><tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-create-local-data-base" class="hasAnchor"><a href="#section-create-local-data-base" class="anchor"></a>Create local data base</h2>
-          <p class="section-desc"><p>Store processed data as a local database</p></p>
-        </th>
-      </tr>
-      
-      
-    </tbody><tbody>
-      
-      
-      <tr>
-        
-        <td>
-          <p><code><a href="main_dataset_diagnoses_to_sqlite_db.html">main_dataset_diagnoses_to_sqlite_db()</a></code> </p>
-        </td>
-        <td><p>Write diagnoses to a SQLite database</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="file_to_sqlite_db.html">file_to_sqlite_db()</a></code> </p>
-        </td>
-        <td><p>Write a file to a database</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="gp_clinical_to_sqlite_db.html">gp_clinical_to_sqlite_db()</a></code> </p>
-        </td>
-        <td><p>Pre-processing function - reformat UK Biobank primary care clinical events
-data</p></td>
+        <td><p>Tidy UK Biobank primary care prescriptions data</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="make_clinical_events_db.html">make_clinical_events_db()</a></code> </p>
         </td>
         <td><p>Create a SQLite database with a <code>clinical_events</code> table</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="clinical_events_sources.html">clinical_events_sources()</a></code> </p>
+        </td>
+        <td><p>Details for UK Biobank clinical events data</p></td>
       </tr>
     </tbody><tbody>
       <tr>
         <th colspan="2">
-          <h2 id="section-clinical-codes" class="hasAnchor"><a href="#section-clinical-codes" class="anchor"></a>Clinical codes</h2>
-          <p class="section-desc"><p>Explore and map between clinical coding systems</p></p>
+          <h2 id="section-extract-phenotypes" class="hasAnchor"><a href="#section-extract-phenotypes" class="anchor"></a>Extract phenotypes</h2>
+          <p class="section-desc"><p>Identify individuals with certain phenotypes based on clinical codes</p></p>
         </th>
       </tr>
       
@@ -308,46 +201,27 @@ data</p></td>
       <tr>
         
         <td>
-          <p><code><a href="lookup_codes.html">lookup_codes()</a></code> </p>
+          <p><code><a href="extract_phenotypes.html">extract_phenotypes()</a></code> </p>
         </td>
-        <td><p>Look up descriptions for clinical codes</p></td>
+        <td><p>Extract phenotypes from clinical events data</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="search_codes_by_description.html">search_codes_by_description()</a></code> </p>
+          <p><code><a href="example_clinical_codes.html">example_clinical_codes()</a></code> </p>
         </td>
-        <td><p>Search for codes that match a description</p></td>
+        <td><p>Generate an example data frame of clinical codes for diabetes</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="get_child_codes.html">get_child_codes()</a></code> </p>
+          <p><code><a href="validate_clinical_codes.html">validate_clinical_codes()</a></code> </p>
         </td>
-        <td><p>Get child codes for a clinical code type</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="map_codes.html">map_codes()</a></code> </p>
-        </td>
-        <td><p>Map clinical codes from one coding system to another</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="reformat_standardised_codelist.html">reformat_standardised_codelist()</a></code> </p>
-        </td>
-        <td><p>Reformat a dataframe of clinical codes to work with
-<code>extract_first_or_last_clinical_event_multi</code></p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="reformat_icd10_codes.html">reformat_icd10_codes()</a></code> </p>
-        </td>
-        <td><p>Reformat ICD-10 codes</p></td>
+        <td><p>Validate a clinical codes data frame</p></td>
       </tr>
     </tbody><tbody>
       <tr>
         <th colspan="2">
-          <h2 id="section-phenotype-clinical-code-lists" class="hasAnchor"><a href="#section-phenotype-clinical-code-lists" class="anchor"></a>Phenotype clinical code lists</h2>
-          <p class="section-desc"><p>Code lists for use identifying phenotypes</p></p>
+          <h2 id="section-summarise-numerical-variables" class="hasAnchor"><a href="#section-summarise-numerical-variables" class="anchor"></a>Summarise numerical variables</h2>
+          <p class="section-desc"><p>Summarise all or a selection of continuous variables</p></p>
         </th>
       </tr>
       
@@ -358,16 +232,15 @@ data</p></td>
       <tr>
         
         <td>
-          <p><code><a href="generate_self_reported_diabetes_codes_df.html">generate_self_reported_diabetes_codes_df()</a></code> </p>
+          <p><code><a href="summarise_numerical_variables.html">summarise_numerical_variables()</a></code> </p>
         </td>
-        <td><p>Generate a data frame of clinical codes for self-reported diabetes in the UK
-Biobank</p></td>
+        <td><p>Summarise numerical variables</p></td>
       </tr>
     </tbody><tbody>
       <tr>
         <th colspan="2">
-          <h2 id="section-phenotype-algorithms" class="hasAnchor"><a href="#section-phenotype-algorithms" class="anchor"></a>Phenotype algorithms</h2>
-          <p class="section-desc"><p>Identify phenotypes as per definitions in this package</p></p>
+          <h2 id="section-derived-variables" class="hasAnchor"><a href="#section-derived-variables" class="anchor"></a>Derived variables</h2>
+          <p class="section-desc"><p>Commonly required derived variables</p></p>
         </th>
       </tr>
       
@@ -378,58 +251,9 @@ Biobank</p></td>
       <tr>
         
         <td>
-          <p><code><a href="diabetes_type_first_occurrence.html">diabetes_type_first_occurrence()</a></code> </p>
+          <p><code><a href="derive_dob.html">derive_dob()</a></code> </p>
         </td>
-        <td><p>Ascertain diabetes type from first occurrence fields</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="diabetes_diagnosis_date_first_occurrence.html">diabetes_diagnosis_date_first_occurrence()</a></code> </p>
-        </td>
-        <td><p>Get date of diabetes diagnosis based on first occurrence fields</p></td>
-      </tr>
-    </tbody><tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-summarise-row-wise" class="hasAnchor"><a href="#section-summarise-row-wise" class="anchor"></a>Summarise row wise</h2>
-          <p class="section-desc"><p>Mainly for summarising continuous variables</p></p>
-        </th>
-      </tr>
-      
-      
-    </tbody><tbody>
-      
-      
-      <tr>
-        
-        <td>
-          <p><code><a href="ukb_mutate_numerical_means.html">ukb_mutate_numerical_means()</a></code> </p>
-        </td>
-        <td><p>Mutate mean values across instances for numerical UKB fields</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="summarise_rowise.html">summarise_rowise()</a></code> </p>
-        </td>
-        <td><p>Summarise a UK Biobank phenotype dataset row-wise</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="summarise_rowise_numerical_mean_min_max.html">summarise_rowise_numerical_mean_min_max()</a></code> </p>
-        </td>
-        <td><p>Mutate mean/min/max values across instances for numerical UKB fields</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="rowise_min_max_date.html">rowise_min_max_date()</a></code> </p>
-        </td>
-        <td><p>Get rowise min/max date from UKB dataset</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="rowise_summary.html">rowise_summary()</a></code> </p>
-        </td>
-        <td><p>Summarise a group of columns row-wise</p></td>
+        <td><p>Derive an estimated participant date of birth</p></td>
       </tr>
     </tbody><tbody>
       <tr>
@@ -446,30 +270,6 @@ Biobank</p></td>
       <tr>
         
         <td>
-          <p><code><a href="my_skim.html">my_skim()</a></code> </p>
-        </td>
-        <td><p>Quickly summarise a dataframe</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="mutate_dob.html">mutate_dob()</a></code> </p>
-        </td>
-        <td><p>Estimate participant date of birth</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="get_colnames_for_fieldids.html">get_colnames_for_fieldids()</a></code> </p>
-        </td>
-        <td><p>Get descriptive colnames associated with one or more FieldIDs</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="extract_codings_for_fieldids.html">extract_codings_for_fieldids()</a></code> </p>
-        </td>
-        <td><p>Get UKB codings for one or more FieldIDs</p></td>
-      </tr><tr>
-        
-        <td>
           <p><code><a href="get_ukb_data_dict.html">get_ukb_data_dict()</a></code> </p>
         </td>
         <td><p>Get UKB data dictionary</p></td>
@@ -479,6 +279,12 @@ Biobank</p></td>
           <p><code><a href="get_ukb_codings.html">get_ukb_codings()</a></code> </p>
         </td>
         <td><p>Get UKB codings file</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="get_ukb_code_mappings.html">get_ukb_code_mappings()</a></code> </p>
+        </td>
+        <td><p>Get UK Biobank clinical code mappings file</p></td>
       </tr><tr>
         
         <td>
@@ -494,12 +300,6 @@ Biobank</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="get_ukb_code_mappings.html">get_ukb_code_mappings()</a></code> </p>
-        </td>
-        <td><p>Get UK Biobank clinical code mappings file</p></td>
-      </tr><tr>
-        
-        <td>
           <p><code><a href="get_ukb_code_mappings_direct.html">get_ukb_code_mappings_direct()</a></code> </p>
         </td>
         <td><p>Get UK Biobank clinical code mappings file directly from UKB website</p></td>
@@ -512,27 +312,16 @@ Biobank</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="make_empty_clinical_codes_list.html">make_empty_clinical_codes_list()</a></code> </p>
+          <p><code><a href="db_tables_to_list.html">db_tables_to_list()</a></code> </p>
         </td>
-        <td><p>Create an empty list to be populated with diagnostic codes</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="time_taken_message.html">time_taken_message()</a></code> </p>
-        </td>
-        <td><p>Display time taken message</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="list_tbls_from_dbconn.html">list_tbls_from_dbconn()</a></code> </p>
-        </td>
-        <td><p>Make a named list of <code>tbl</code> objects from a <code>DBIConnection</code> object</p></td>
+        <td><p>Make a named list of <code>tbl_dbi</code> objects from a <code>DBIConnection</code>
+object</p></td>
       </tr>
     </tbody><tbody>
       <tr>
         <th colspan="2">
           <h2 id="section-dummy-data" class="hasAnchor"><a href="#section-dummy-data" class="anchor"></a>Dummy data</h2>
-          <p class="section-desc"><p>Functions to generate dummy UKB data</p></p>
+          <p class="section-desc"><p>Functions to create dummy UKB data</p></p>
         </th>
       </tr>
       
@@ -546,45 +335,6 @@ Biobank</p></td>
           <p><code><a href="download_dummy_ukb_data_to_tempdir.html">download_dummy_ukb_data_to_tempdir()</a></code> </p>
         </td>
         <td><p>Download dummy UK Biobank data</p></td>
-      </tr>
-    </tbody><tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-private-functions" class="hasAnchor"><a href="#section-private-functions" class="anchor"></a>Private functions</h2>
-          <p class="section-desc"><p>Helpers</p></p>
-        </th>
-      </tr>
-      
-      
-    </tbody><tbody>
-      
-      
-      <tr>
-        
-        <td>
-          <p><code><a href="extract_single_diagnostic_code_record_basis.html">extract_single_diagnostic_code_record_basis()</a></code> </p>
-        </td>
-        <td><p>Extract a single record from a dataframe generated by one of the
-<code>get_XXX_diagnoses</code> functions (generic)</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="field_id_pivot_longer.html">field_id_pivot_longer()</a></code> </p>
-        </td>
-        <td><p>Convert column for a FieldID to long format</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="get_diagnoses_set_index_code_date_cols.html">get_diagnoses_set_index_code_date_cols()</a></code> </p>
-        </td>
-        <td><p>Standardise a long format diagnoses dataframe</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="gp_clinical_to_sqlite_db.html">gp_clinical_to_sqlite_db()</a></code> </p>
-        </td>
-        <td><p>Pre-processing function - reformat UK Biobank primary care clinical events
-data</p></td>
       </tr>
     </tbody><tbody>
       <tr>
@@ -603,7 +353,7 @@ data</p></td>
         <td>
           <p><code><a href="ukbwranglr.html">ukbwranglr</a></code> </p>
         </td>
-        <td><p>ukbwranglr: a package for exploring UK Biobank data</p></td>
+        <td><p>ukbwranglr: a package for UK Biobank data wrangling</p></td>
       </tr>
     </tbody>
     </table>

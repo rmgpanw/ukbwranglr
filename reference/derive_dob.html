@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get UK Biobank clinical code mappings file directly from UKB website — get_ukb_code_mappings_direct • ukbwranglr</title>
+<title>Derive an estimated participant date of birth — derive_dob • ukbwranglr</title>
 
 
 <!-- jquery -->
@@ -39,12 +39,11 @@
 
 
 
-<meta property="og:title" content="Get UK Biobank clinical code mappings file directly from UKB website — get_ukb_code_mappings_direct" />
-<meta property="og:description" content="Downloads the UK Biobank code mappings file (all_lkps_maps_v2.xlsx,
-resource 592)
-directly from the UKB website to a temporary directory at
-tempdir. This is then read into R as a named list of data
-frames, one for each sheet in the original file." />
+<meta property="og:title" content="Derive an estimated participant date of birth — derive_dob" />
+<meta property="og:description" content="Estimates dates of birth from year and month of birth (Field IDs
+34 and
+52 respectively) as
+the first date of the month." />
 
 
 
@@ -112,32 +111,70 @@ frames, one for each sheet in the original file." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get UK Biobank clinical code mappings file directly from UKB website</h1>
-    <small class="dont-index">Source: <a href='https://github.com/rmgpanw/ukbwranglr/blob/master/R/utils.R'><code>R/utils.R</code></a></small>
-    <div class="hidden name"><code>get_ukb_code_mappings_direct.Rd</code></div>
+    <h1>Derive an estimated participant date of birth</h1>
+    <small class="dont-index">Source: <a href='https://github.com/rmgpanw/ukbwranglr/blob/master/R/derived_variables.R'><code>R/derived_variables.R</code></a></small>
+    <div class="hidden name"><code>derive_dob.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Downloads the UK Biobank code mappings file (<code>all_lkps_maps_v2.xlsx</code>,
-<a href='https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592'>resource 592</a>)
-directly from the UKB website to a temporary directory at
-<code><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></code>. This is then read into R as a named list of data
-frames, one for each sheet in the original file.</p>
+    <p>Estimates dates of birth from year and month of birth (Field IDs
+<a href='https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=34'>34</a> and
+<a href='https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=52'>52</a> respectively) as
+the first date of the month.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_ukb_code_mappings_direct</span><span class='op'>(</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>derive_dob</span><span class='op'>(</span>
+  <span class='va'>ukb_main</span>,
+  ukb_data_dict <span class='op'>=</span> <span class='fu'><a href='get_ukb_data_dict.html'>get_ukb_data_dict</a></span><span class='op'>(</span><span class='op'>)</span>,
+  .drop <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  .details_only <span class='op'>=</span> <span class='cn'>FALSE</span>
+<span class='op'>)</span></pre>
 
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>ukb_main</th>
+      <td><p>A UK Biobank main dataset.</p></td>
+    </tr>
+    <tr>
+      <th>ukb_data_dict</th>
+      <td><p>The UKB data dictionary (available online at the UK
+Biobank
+<a href='https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide'>data
+ showcase</a>. This should be a data frame where all columns are of type
+<code>character</code>. By default, this is downloaded from the
+<a href='https://github.com/rmgpanw/ukbwranglr_resources'><code>ukbwranglr_resources</code></a>
+ github repo.</p></td>
+    </tr>
+    <tr>
+      <th>.drop</th>
+      <td><p>If <code>TRUE</code>, remove the required input columns from the
+result</p></td>
+    </tr>
+    <tr>
+      <th>.details_only</th>
+      <td><p>If <code>TRUE</code>, return a list containing details of
+required input variables (Field IDs) and derived variables (new column
+name, label and values/value labels).</p></td>
+    </tr>
+    </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A named list.</p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+    <p>A data frame with a column called <code>dob_derived</code> (type
+  character).</p>
 
-    <p><strong>Note:</strong> This is a large object (&gt;450 MB)</p>
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
-
-    <div class='dont-index'><p><code><a href='get_ukb_code_mappings.html'>get_ukb_code_mappings</a></code></p></div>
-
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='va'>ukb_main</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>eid <span class='op'>=</span> <span class='fl'>1</span>, f34_0_0 <span class='op'>=</span> <span class='fl'>1990</span>, f52_0_0 <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
+ <span class='co'># keep input year/month of birth columns</span>
+ <span class='fu'>derive_dob</span><span class='op'>(</span><span class='va'>ukb_main</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;   eid f34_0_0 f52_0_0 dob_derived
+#&gt; 1   1    1990       1  1990-01-01</div><div class='input'>
+ <span class='co'># remove input year/month of birth columns</span>
+ <span class='fu'>derive_dob</span><span class='op'>(</span><span class='va'>ukb_main</span>, .drop <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;   eid dob_derived
+#&gt; 1   1  1990-01-01</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
