@@ -7,7 +7,7 @@ library(tidyverse)
 library(reactable)
 library(ukbwranglr)
 
-options(shiny.maxRequestSize = 1000000 * 1024^2)
+# options(shiny.maxRequestSize = 1000000 * 1024^2)
 
 # ukb_data_dict <- read_tsv("/Users/alasdair/Documents/Data/UKB/ukb_backup_files/Data_Dictionary_Showcase.tsv") %>%
 #     mutate(across(everything(), as.character))
@@ -40,6 +40,21 @@ selected_data_dict_cols <- c(
     "colheaders_processed"
 )
 
+derived_variables_list <- list(
+    "Date of birth" = list(
+        derive_function = derive_dob,
+        required_fids = derive_dob(.details_only = TRUE)$required_field_ids
+    )
+)
+
+derived_variables_required_fids_df <- derived_variables_list %>%
+    purrr::map("required_fids") %>%
+    purrr::map(toString) %>%
+    tibble::as_tibble() %>%
+    t() %>%
+    as.data.frame() %>%
+    tibble::rownames_to_column(var = "Derived variable") %>%
+    dplyr::rename(`Required FieldIDs` = V1)
 
 # UI ----------------------------------------------------------------------
 
@@ -77,6 +92,11 @@ make_dataset_tabs <- tabsetPanel(
         ),
         checkboxInput("descriptive_colnames", "Descriptive column names", value = TRUE),
         checkboxInput("labelled", "Labelled", value = TRUE),
+        uiOutput("derived_variables_input"),
+        shiny::selectInput(inputId = "summarise_numerical_variables",
+                           "Summarise numerical variables",
+                           choices = c("mean", "min", "max", "sum", "n_values"),
+                           multiple = TRUE),
         textInput(
             "ukb_dataset_outname",
             "Dataset file name",
@@ -105,7 +125,7 @@ ui <- fluidPage(
                              multiple = FALSE,
                              viewtype = "detail"),
             shinyFilesButton("data_dict_preselected",
-                             label = "Data dictionary",
+                             label = "Data dictionary (pre-selected)",
                              title = "Please select a UK Biobank main dataset data dictionary file",
                              multiple = FALSE,
                              viewtype = "detail"),
@@ -114,13 +134,29 @@ ui <- fluidPage(
         ),
 
         # Show the data dictionary
-        mainPanel(
-            verbatimTextOutput("ukb_main_dataset_filepath"),
-            verbatimTextOutput("data_dict_preselected_filepath"),
-           reactableOutput("data_dict"),
-           verbatimTextOutput("selected variable indices"),
-           width = 9
-        )
+        mainPanel(tabsetPanel(
+            type = "pills",
+            tabPanel(
+                "Interactive data dictionary",
+                reactableOutput("data_dict")
+            ),
+            tabPanel(
+                "Selected variables",
+                reactableOutput("data_dict_selected")
+            ),
+            tabPanel(
+                "Selected input filepaths",
+                h4("UKB main dataset"),
+                verbatimTextOutput("ukb_main_dataset_filepath"),
+                h4("Data dictionary (pre-selected)"),
+                verbatimTextOutput("data_dict_preselected_filepath"),
+            ),
+            tabPanel(
+                "Required FieldIDs for derived variables",
+                reactableOutput("derived_variables_required_fids")
+            )
+        ),
+        width = 9)
     )
 )
 
@@ -129,6 +165,16 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
 
+
+# DERIVED VARIABLE REQUIRED FIDS REACTABLE --------------------------------
+
+output$derived_variables_required_fids <- renderReactable(
+    reactable::reactable(derived_variables_required_fids_df,
+                         filterable = TRUE,
+                         showPageSizeOptions = TRUE,
+                         pageSizeOptions = c(10, 25, 50, 100, 200),
+                         paginationType = "jump")
+)
 
 # SHINYFILES SETUP --------------------------------------------------------
 
@@ -211,6 +257,10 @@ server <- function(input, output, session) {
 
 # DATA DICTIONARY REACTABLE TABLE -----------------------------------------
 
+
+# Full data dictionary reactable ------------------------------------------
+
+
     # create data dict
     ukb_main_dataset_filepath_ext <- reactive({
         req(ukb_main_dataset_filepath())
@@ -271,6 +321,7 @@ server <- function(input, output, session) {
             selection = "multiple",
             onClick = "select",
             defaultSelected = 1,
+            paginationType = "jump",
             theme = reactableTheme(
                 rowSelectedStyle = list(backgroundColor = "#eee", boxShadow = "inset 2px 0 0 0 #ffa62d")
             ))
@@ -279,6 +330,9 @@ server <- function(input, output, session) {
 
     # selected rows
     selected <- reactive(getReactableState("data_dict", "selected"))
+
+
+# Update selected variables from pre-selected data dict upload ------------
 
     # update selected rows to include those in data_dict_preselected
     observeEvent(data_dict_preselected(), {
@@ -298,9 +352,25 @@ server <- function(input, output, session) {
         updateReactable("data_dict", selected = updated_selection_rowids)
     })
 
-    # print selected rows to app
-    output$selected <- renderPrint({
-        print(selected())
+
+# Selected variables reactable --------------------------------------------
+
+    # print selected variables as reactable
+    output$data_dict_selected <- renderReactable({
+        req(data_dict())
+        req(selected())
+
+        reactable(
+            # data,
+            data_dict()[selected(), ],
+            filterable = TRUE,
+            searchable = TRUE,
+            showPageSizeOptions = TRUE,
+            pageSizeOptions = c(10, 25, 50, 100, 200),
+            groupBy = "Field",
+            paginationType = "jump"
+            )
+
     })
 
     # print selected rows in console
@@ -311,6 +381,8 @@ server <- function(input, output, session) {
 
 # DYNAMIC UI ELEMENTS -----------------------------------------------------
 
+# Download and make dataset tabs ------------------------------------------
+
     observeEvent(data_dict(), {
         if (!is.null(data_dict())) {
             updateTabsetPanel(inputId = "download_data_dict_inputs", selected = "download_data_dict_inputs")
@@ -319,6 +391,25 @@ server <- function(input, output, session) {
             updateTabsetPanel(inputId = "download_data_dict_inputs", selected = "empty")
             updateTabsetPanel(inputId = "make_dataset_inputs", selected = "empty")
         }
+    })
+
+# Derived variables -------------------------------------------------------
+
+    derived_variables_list_available <- reactive({
+        req(selected())
+        selected_fieldids <- data_dict()[selected(), ]$FieldID
+
+        derived_variables_list %>%
+            purrr::keep(~ all(.x$required_fids %in% selected_fieldids))
+    })
+
+    output$derived_variables_input <- renderUI({
+        selectInput(
+            inputId = "derived_variables_input",
+            label = "Select variables to derive",
+            multiple = TRUE,
+            choices = names(derived_variables_list_available())
+        )
     })
 
 # DOWNLOADS ---------------------------------------------------------------
@@ -387,6 +478,23 @@ server <- function(input, output, session) {
                                              labelled = input$labelled,
                                              nrows = input$nrows)
 
+            # derive variables
+            if (length(input$derived_variables_input > 0)) {
+                notify("Deriving variables...", id = id)
+                for (variable in names(derived_variables_list_available())) {
+                ukb_main <- derived_variables_list_available()[[variable]]$derive_function(ukb_main)
+                }
+            }
+
+            # summarise numerical variables
+            if (length(input$summarise_numerical_variables > 0)) {
+                notify("Summarising numerical variables...", id = id)
+                for (summary_function in input$summarise_numerical_variables) {
+                    ukb_main <- summarise_numerical_variables(ukb_main = ukb_main,
+                                                              summary_function = summary_function)
+                }
+            }
+
             # write dataset
             message("Writing data\n")
             notify("Writing data...", id = id)
@@ -400,7 +508,7 @@ server <- function(input, output, session) {
                 )
 
             message("Finished writing data")
-            showNotification("Dataset succesfully created!")
+            showNotification("Dataset succesfully created!", duration = 10)
         }
     )
 

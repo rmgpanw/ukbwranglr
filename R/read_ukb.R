@@ -400,6 +400,14 @@ mutate_descriptive_columns <- function(data_dict) {
                                            yes = data_dict$colheaders_raw,
                                            no = data_dict$descriptive_colnames)
 
+  # make `descriptive_colnames` = `colheaders_raw` if fields/instance/array are
+  # all `NA`
+  data_dict$descriptive_colnames <- ifelse((is.na(data_dict$FieldID)) &
+                                             (is.na(data_dict$instance) &
+                                                is.na(data_dict$array)),
+                                           yes = data_dict$colheaders_raw,
+                                           no = data_dict$descriptive_colnames)
+
   return(data_dict)
 }
 

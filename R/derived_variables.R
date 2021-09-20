@@ -55,8 +55,12 @@ derive_dob <- function(ukb_main,
   list_of_details <- list(
     required_field_ids = c(yob = "34", mob = "52"),
     new_columns = list(dob_derived = list(
-      label = "Date of birth",
-      value_labels = NULL
+      label = "Date of birth (estimated)",
+      value_labels = NA,
+      FieldID = NA,
+      instance = NA,
+      array = NA,
+      ValueType = "Date"
     ))
   )
 
@@ -110,3 +114,40 @@ derive_dob <- function(ukb_main,
 
   return(ukb_main)
 }
+
+
+# PRIVATE FUNCTIONS -------------------------------------------------------
+
+
+# DEV ---------------------------------------------------------------------
+
+named_vector_to_string <- function(x) {
+  stopifnot(!is.null(names(x)))
+  x %>%
+    as.list() %>%
+    purrr::imap_chr( ~ paste(.y, "=", .x)) %>%
+    stringr::str_c(sep = "", collapse = "; ")
+}
+
+derived_var_details_to_data_dict <- function(derived_var_details) {
+  # `derived_var_details` should be a list created by one of the `derive_` functions
+  derived_var_details$new_columns %>%
+    # loop through new columns
+  purrr::map( ~ {
+    # convert value labels (codings) to a single string
+    if (any(!is.na(derived_var_details$new_columns$dob_derived$value_labels))) {
+      derived_var_details$new_columns$dob_derived$value_labels <- named_vector_to_string(derived_var_details$new_columns$dob_derived$value_labels)
+    }
+
+    # convert details to a data frame
+    as.data.frame(derived_var_details$new_columns$dob_derived) %>%
+      dplyr::rename(Field = label,
+                    Coding = value_labels)
+  }) %>%
+    dplyr::bind_rows(.id = "colheaders_raw") %>%
+    dplyr::mutate("Notes" = paste0("Required FieldIDs: ",
+                                   toString(derived_var_details$required_field_ids)))
+}
+
+# DERIVED VARIABLES DATA DICTIONARY ---------------------------------------
+

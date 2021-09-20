@@ -9,7 +9,7 @@
 #' at each assessment visit). Currently available summary options are mean,
 #' minimum, maximum, sum and number of non-missing values.
 #'
-#' Note that when\code{summary_function = "sum"}, missing values are converted
+#' Note that when \code{summary_function = "sum"}, missing values are converted
 #' to zero. Therefore if a set of values are \emph{all} missing then the sum
 #' will summarised as \code{0}. See the documentation for
 #' \code{\link[base]{rowSums}} for further details.
