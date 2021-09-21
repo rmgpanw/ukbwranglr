@@ -260,10 +260,10 @@ test_that("`make_clinical_events_db()` works", {
     ukbdb$gp_clinical_values %>%
       dplyr::collect(),
     tibble::tibble(
-      index = as.character(1:nrow(dummy_gp_clinical)),
-      value1 = dummy_gp_clinical$value1,
-      value2 = dummy_gp_clinical$value2,
-      value3 = dummy_gp_clinical$value3
+      index = c('1', '2', '3', '4', '5', '6'),
+      value1 = c('1', '1', '1', '1', '1', '1'),
+      value2 = c('2', '2', '2', '2', '2', '2'),
+      value3 = c('3', '3', '3', '3', '3', '3')
     )
   )
 
