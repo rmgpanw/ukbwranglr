@@ -260,10 +260,10 @@ test_that("`make_clinical_events_db()` works", {
     ukbdb$gp_clinical_values %>%
       dplyr::collect(),
     tibble::tibble(
-      as.character(1:nrow(dummy_gp_clinical)),
-      dummy_gp_clinical$value1,
-      dummy_gp_clinical$value2,
-      dummy_gp_clinical$value3
+      index = as.character(1:nrow(dummy_gp_clinical)),
+      value1 = dummy_gp_clinical$value1,
+      value2 = dummy_gp_clinical$value2,
+      value3 = dummy_gp_clinical$value3
     )
   )
 
@@ -278,7 +278,11 @@ test_that("`make_clinical_events_db()` works", {
       'gps4_r2'
     )) %>%
     dplyr::collect() %>%
-    dplyr::arrange(index)
+    dplyr::arrange(index,
+                   eid,
+                   source,
+                   code,
+                   date)
 
   expect_equivalent(
     gp_scripts_events,
@@ -295,9 +299,10 @@ test_that("`make_clinical_events_db()` works", {
     ukbdb$gp_scripts_names_and_quantities %>%
       dplyr::collect(),
     tibble::tibble(
-      as.character(1:nrow(dummy_gp_scripts)),
-      dummy_gp_scripts$drug_name,
-      dummy_gp_scripts$quantity
+      index = as.character(1:nrow(dummy_gp_scripts)),
+      drug_name = dummy_gp_scripts$drug_name,
+      quantity = dummy_gp_scripts$quantity
     )
   )
 })
+
