@@ -23,10 +23,10 @@
 #'   (\code{gp_scripts.txt}).
 #' @param ukb_db_path Path to the SQLite database file. The file name must end
 #'   with '.db'. If no file with this name exists then one will be created.
-#' @param strict If \code{TRUE}, create database regardless of whether the main
+#' @param strict If \code{FALSE}, create database regardless of whether the main
 #'   UKB dataset file is missing any required clinical events fields (see
 #'   \code{\link{tidy_clinical_events}} for further details). Default is
-#'   \code{FALSE}.
+#'   \code{TRUE}.
 #' @param overwrite If \code{TRUE}, then tables \code{clinical_events} and
 #'   \code{gp_clinical_values} will be overwritten if they already exist in the
 #'   database. Default value is \code{FALSE}.
@@ -45,7 +45,7 @@ make_clinical_events_db <- function(ukb_main_path,
                                     ukb_data_dict = get_ukb_data_dict(),
                                     ukb_codings = get_ukb_codings(),
                                     overwrite = FALSE,
-                                    strict = FALSE,
+                                    strict = TRUE,
                                     chunk_size = 10000) {
   start_time <- proc.time()
 
@@ -109,14 +109,14 @@ make_clinical_events_db <- function(ukb_main_path,
   missing_fields <- subset(required_fields,
                            !(required_fields %in% data_dict$FieldID))
 
-  if (!strict) {
+  if (strict) {
     assertthat::assert_that(
       length(missing_fields) == 0,
       msg = paste0(
         "Error! Some required field IDs are missing from the main UKB dataset: ",
       stringr::str_c(missing_fields, sep = "", collapse = ", "))
     )
-  } else if (strict) {
+  } else if (!strict) {
     if (length(missing_fields) > 0) {
       warning(
         paste0("Some required field IDs are missing from the main UKB dataset: ",
@@ -618,8 +618,12 @@ tidy_gp_data_db <- function(gp_df,
                             pos,
                             remove_special_dates = TRUE,
                             .details_only = FALSE) {
-  # see documentation for `tidy_gp_clinical`/`tidy_gp_scripts`
-  # the `pos` argument is required for use with `file_to_sqlite_db` - adds the row number as an 'index' column
+  # see documentation for `tidy_gp_clinical`/`tidy_gp_scripts` the `pos`
+  # argument is required for use with `file_to_sqlite_db` - adds the row number
+  # as an 'index' column
+
+  # ***Note: `pos` must be an unnamed argument - when setting `pos = NULL`, the
+  # tests would pass locally but not with github actions***
 
   match.arg(gp_df_type,
             choices = c("gp_clinical", "gp_scripts"))
