@@ -245,16 +245,41 @@ test_that("`make_clinical_events_db()` works", {
     dplyr::collect() %>%
     dplyr::arrange(index)
 
-  expect_equivalent(
-    gp_clinical_events,
-    tibble::tibble(
-      eid = c(1, 1, 1, 3, 4, 8),
-      source = c('gpc1_r2', 'gpc4_r2', 'gpc3_r2', 'gpc1_r2', 'gpc2_r2', 'gpc1_r3'),
-      index = c('1', '2', '3', '4', '5', '6'),
-      code = c('C', 'A', 'E', 'E', 'J', 'G'),
-      date = c(NA, NA, NA, NA, '1999-02-01', '1999-02-01'),
-    )
+  expect_equal(
+    gp_clinical_events$eid,
+    c(1, 1, 1, 3, 4, 8)
   )
+
+  expect_equal(
+    gp_clinical_events$source,
+    c('gpc1_r2', 'gpc4_r2', 'gpc3_r2', 'gpc1_r2', 'gpc2_r2', 'gpc1_r3')
+  )
+
+  expect_equal(
+    gp_clinical_events$index,
+    c('1', '2', '3', '4', '5', '6')
+  )
+
+  expect_equal(
+    gp_clinical_events$code,
+    cc('C', 'A', 'E', 'E', 'J', 'G'),
+  )
+
+  expect_equal(
+    gp_clinical_events$date,
+    c(NA, NA, NA, NA, '1999-02-01', '1999-02-01'),
+  )
+
+  # expect_equivalent(
+  #   gp_clinical_events,
+  #   tibble::tibble(
+  #     eid = c(1, 1, 1, 3, 4, 8),
+  #     source = c('gpc1_r2', 'gpc4_r2', 'gpc3_r2', 'gpc1_r2', 'gpc2_r2', 'gpc1_r3'),
+  #     index = c('1', '2', '3', '4', '5', '6'),
+  #     code = c('C', 'A', 'E', 'E', 'J', 'G'),
+  #     date = c(NA, NA, NA, NA, '1999-02-01', '1999-02-01'),
+  #   )
+  # )
 
   expect_equivalent(
     ukbdb$gp_clinical_values %>%
