@@ -615,8 +615,8 @@ file_to_sqlite_db <- function(file,
 
 tidy_gp_data_db <- function(gp_df,
                             gp_df_type,
+                            pos,
                             remove_special_dates = TRUE,
-                            pos = NULL,
                             .details_only = FALSE) {
   # see documentation for `tidy_gp_clinical`/`tidy_gp_scripts`
   # the `pos` argument is required for use with `file_to_sqlite_db` - adds the row number as an 'index' column
