@@ -216,20 +216,6 @@ test_that("`make_clinical_events_db()` works", {
     expect_equal(names(ukbdb),
                c("clinical_events", "gp_clinical_values", "gp_scripts_names_and_quantities"))
 
-  expect_error(
-    make_clinical_events_db(
-    ukb_main_path = dummy_ukb_main_clinical_events_path,
-    ukb_main_delim = "\t",
-    gp_clinical_path = dummy_gp_clinical_path,
-    gp_scripts_path = dummy_gp_scripts_path,
-    ukb_db_path = dummy_ukb_db_path,
-    ukb_data_dict = ukb_data_dict,
-    ukb_codings = ukb_codings,
-    overwrite = FALSE,
-    strict = TRUE
-  ),
-  "Error! The following table")
-
   # gp_clinical clinical_events
   gp_clinical_events <- ukbdb$clinical_events %>%
     dplyr::filter(source %in% c(
@@ -262,7 +248,7 @@ test_that("`make_clinical_events_db()` works", {
 
   expect_equal(
     gp_clinical_events$code,
-    cc('C', 'A', 'E', 'E', 'J', 'G'),
+    c('C', 'A', 'E', 'E', 'J', 'G'),
   )
 
   expect_equal(
@@ -331,3 +317,18 @@ test_that("`make_clinical_events_db()` works", {
   )
 })
 
+test_that("`make_clinical_events_db()` raises an error if table already exist", {
+  expect_error(
+    make_clinical_events_db(
+      ukb_main_path = dummy_ukb_main_clinical_events_path,
+      ukb_main_delim = "\t",
+      gp_clinical_path = dummy_gp_clinical_path,
+      gp_scripts_path = dummy_gp_scripts_path,
+      ukb_db_path = dummy_ukb_db_path,
+      ukb_data_dict = ukb_data_dict,
+      ukb_codings = ukb_codings,
+      overwrite = FALSE,
+      strict = TRUE
+    ),
+    "Error! The following table")
+})
