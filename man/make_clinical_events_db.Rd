@@ -13,7 +13,7 @@ make_clinical_events_db(
   ukb_data_dict = get_ukb_data_dict(),
   ukb_codings = get_ukb_codings(),
   overwrite = FALSE,
-  strict = FALSE,
+  strict = TRUE,
   chunk_size = 10000
 )
 }
@@ -50,10 +50,10 @@ downloaded from the
 \code{gp_clinical_values} will be overwritten if they already exist in the
 database. Default value is \code{FALSE}.}
 
-\item{strict}{If \code{TRUE}, create database regardless of whether the main
+\item{strict}{If \code{FALSE}, create database regardless of whether the main
 UKB dataset file is missing any required clinical events fields (see
 \code{\link{tidy_clinical_events}} for further details). Default is
-\code{FALSE}.}
+\code{TRUE}.}
 
 \item{chunk_size}{The number of rows to include in each chunk when processing
 the primary care dataset.}
