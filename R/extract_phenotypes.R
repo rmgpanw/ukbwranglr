@@ -423,7 +423,12 @@ tidy_clinical_events <- function(ukb_main,
 
   assertthat::assert_that(
     data.table::is.data.table(ukb_main),
-    msg = "Error! ukb_main must be a data table (try 'data.table::as.data.table(ukb_main)')"
+    msg = "Error! `ukb_main` must be a data table (try `data.table::as.data.table(ukb_main)`)"
+  )
+
+  assertthat::assert_that(
+    "eid" %in% names(ukb_main),
+    msg = "Error! `ukb_main` must contain a column called `eid`"
   )
 
   # make data dictionary

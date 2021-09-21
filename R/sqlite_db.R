@@ -138,7 +138,7 @@ make_clinical_events_db <- function(ukb_main_path,
     data_dict = data_dict,
     ukb_data_dict = ukb_data_dict,
     ukb_codings = ukb_codings,
-    descriptive_colnames = FALSE,
+    descriptive_colnames = TRUE,
     labelled = FALSE
   )
 
