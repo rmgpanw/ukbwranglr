@@ -193,10 +193,8 @@ get_ukb_db <- function(directory_path,
   if (file.exists(file.path(directory_path, "ukb.db"))) {
     if (overwrite) {
       message(paste0("***Removing `ukb.db` from `",
-                      directory_path,
-                      "` and removing `ukb.db.zip` from `tempdir()`***"))
+                      directory_path))
       file.remove(file.path(directory_path, "ukb.db"))
-      file.remove(ukb_db_esssentials_zip)
     } else if (!overwrite) {
       stop(paste0(
         "Error! A file called `ukb.db` already exists in ",
