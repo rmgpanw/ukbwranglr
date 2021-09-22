@@ -99,7 +99,14 @@ mutate_age_at_event_cols <- function(ukb_main,
       new_colname
     ))
     ukb_main[[new_colname]] <-
-      lubridate::time_length(as.Date(ukb_main[[column]]) - as.Date(ukb_main[[dob_col]]), unit = 'year')
+      lubridate::time_length(as.Date(haven::zap_labels(ukb_main[[column]])) - as.Date(haven::zap_labels(ukb_main[[dob_col]])), unit = 'year')
+
+    new_colname_label <- stringr::str_replace(attributes(ukb_main[[column]])$label,
+                                              pattern = "date (.+)$",
+                                              replacement = "age")
+    ukb_main[[new_colname]] <- haven::labelled(ukb_main[[new_colname]],
+                                               labels = NULL,
+                                               label = new_colname_label)
   }
 
   # return ukb_main with additional age at event cols

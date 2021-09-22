@@ -666,6 +666,10 @@ test_that(
       1, "2000-01-01", "2010-01-01"
     )
 
+    dummy_ukb$event_date <- haven::labelled(dummy_ukb$event_date,
+                                            labels = NULL,
+                                            label = "Event date (min)")
+
     result <- mutate_age_at_event_cols(dummy_ukb,
                                        dob_col = "dob",
                                        date_col_regex = "_date$",
@@ -679,6 +683,11 @@ test_that(
     expect_equal(
       as.integer(result$event_age),
       10
+    )
+
+    expect_equal(
+      attributes(result$event_age),
+      "Event age"
     )
   }
 )
