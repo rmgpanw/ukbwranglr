@@ -680,10 +680,9 @@ test_that(
       "event_age"
     )
 
-    expect_equal(
-      as.integer(result$event_age),
-      10
-    )
+    expect_equal(as.numeric(result$event_age),
+                 10,
+                 tolerance = 1)
 
     expect_equal(
       attributes(result$event_age),

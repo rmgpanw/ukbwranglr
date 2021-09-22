@@ -104,9 +104,12 @@ mutate_age_at_event_cols <- function(ukb_main,
     new_colname_label <- stringr::str_replace(attributes(ukb_main[[column]])$label,
                                               pattern = "date (.+)$",
                                               replacement = "age")
-    ukb_main[[new_colname]] <- haven::labelled(ukb_main[[new_colname]],
-                                               labels = NULL,
-                                               label = new_colname_label)
+
+    if (!rlang::is_empty(new_colname_label)) {
+      ukb_main[[new_colname]] <- haven::labelled(ukb_main[[new_colname]],
+                                                 labels = NULL,
+                                                 label = new_colname_label)
+    }
   }
 
   # return ukb_main with additional age at event cols
