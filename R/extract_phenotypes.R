@@ -845,6 +845,10 @@ validate_clinical_events_and_check_type <- function(clinical_events) {
     dplyr::collect() %>%
     purrr::map_chr(class)
 
+  clinical_events_column_types[1] <- ifelse(clinical_events_column_types[1] == "integer",
+                                            yes = "numeric",
+                                            no = clinical_events_column_types[1])
+
   assertthat::assert_that(
     all(CLINICAL_EVENTS_COLTYPES == clinical_events_column_types),
     msg = paste0(

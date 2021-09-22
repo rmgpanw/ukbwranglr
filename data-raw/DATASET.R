@@ -217,9 +217,9 @@ DUMMY_UKB_MAIN_CLINICAL_EVENTS <- data.table::data.table(
   date_of_death_f40000_0_0 = c('1917-10-08', '1955-02-11'),
   date_of_death_f40000_1_0 = c('1910-02-19', '1965-08-08'),
 
-  treatment_medication_code_f20003_0_0 = c('1140861958', '1141146234'),
-  treatment_medication_code_f20003_2_0 = c('1141146188', '1141184722'),
-  treatment_medication_code_f20003_2_3 = c('1141184722', '1140861958'),
+  treatment_medication_code_f20003_0_0 = c(1140861958, 1141146234),
+  treatment_medication_code_f20003_2_0 = c(1141146188, 1141184722),
+  treatment_medication_code_f20003_2_3 = c(1141184722, 1140861958),
   date_of_attending_assessment_centre_f53_0_0 = c('1955-02-11', '1965-08-08'),
   date_of_attending_assessment_centre_f53_2_0 = c('1910-02-19', '1915-03-18'),
 

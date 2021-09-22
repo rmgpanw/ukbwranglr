@@ -355,6 +355,27 @@ test_that(
 )
 
 
+
+# `label_ukb_main()` ------------------------------------------------------
+
+test_that("`label_ukb_main()` excludes duplicated labels e.g. coding 3 (for FID 20001, self-reported
+  # cancers) has multiple meanings for value '-1'", {
+    dummy_fid_20001_data <- data.frame(
+      eid = c(1, 2),
+      cancer_code_self_reported_f20001_0_0 = c(-1, 1005)
+    )
+
+    result <- label_ukb_main(ukb_main = dummy_fid_20001_data,
+                             make_data_dict(dummy_fid_20001_data),
+                             max_n_labels = NULL) %>%
+      haven::as_factor()
+
+    expect_equal(
+      as.character(result$cancer_code_self_reported_f20001_0_0),
+      c("-1", "salivary gland cancer")
+    )
+  })
+
 # Dev ---------------------------------------------------------------------
 
 

@@ -2,10 +2,11 @@ destination: docs
 
 reference:
 - title: Loading UK Biobank data
-  desc: Make a data dictionary and optionally select columns to read into R
+  desc: Make a data dictionary and optionally select columns to read into R +/- labels.
 - contents:
   - make_data_dict
   - read_ukb
+  - label_ukb_main
 
 - title: Tidy clinical events data
   desc:  Convert clinical events data from multiple sources to a standardised long format table

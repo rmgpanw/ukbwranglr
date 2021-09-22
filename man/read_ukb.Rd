@@ -51,7 +51,8 @@ column.}
 \code{\link[haven]{labelled}}.}
 
 \item{max_n_labels}{Coded variables with associated value labels up to (and
-equal to) this threshold will be labelled using
+equal to) this threshold will be labelled using. If \code{NULL}, then all
+value labels will be applied. Default value is 30.
 \code{\link[haven]{labelled}} if \code{labelled} is \code{TRUE}.}
 
 \item{na.strings}{ A character vector of strings which are to be interpreted as \code{NA} values. By default, \code{",,"} for columns of all types, including type \code{character} is read as \code{NA} for consistency. \code{,"",} is unambiguous and read as an empty string. To read \code{,NA,} as \code{NA}, set \code{na.strings="NA"}. To read \code{,,} as blank string \code{""}, set \code{na.strings=NULL}. When they occur in the file, the strings in \code{na.strings} should not appear quoted since that is how the string literal \code{,"NA",} is distinguished from \code{,NA,}, for example, when \code{na.strings="NA"}. }
