@@ -685,7 +685,7 @@ test_that(
                  tolerance = 1)
 
     expect_equal(
-      attributes(result$event_age),
+      attributes(result$event_age)$label,
       "Event age"
     )
   }
