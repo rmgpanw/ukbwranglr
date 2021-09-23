@@ -160,6 +160,14 @@ get_ukb_code_mappings_direct <- function() {
         col_types = "text")
 }
 
+runMakeDataset <- function() {
+  appDir <- system.file("shiny", "make_ukb_dataset", package = "ukbwranglr")
+  if (appDir == "") {
+    stop("Could not find example directory. Try re-installing `ukbwranglr`.", call. = FALSE)
+  }
+
+  shiny::runApp(appDir, display.mode = "normal", launch.browser = TRUE)
+}
 
 # Download sqlite db containing ukb data dictionary/codings/code mappings --------
 
