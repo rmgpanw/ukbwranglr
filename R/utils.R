@@ -1305,6 +1305,16 @@ time_taken_message <- function(start_time) {
 
 # Shiny app ---------------------------------------------------------------
 
+#' Launch a shiny app to interactively create a UK Biobank dataset
+#'
+#' Launches a shiny app
+#'
+#' @return NULL
+#'
+#' @examples
+#' \dontrun{
+#'   runMakeDataset()
+#' }
 runMakeDataset <- function() {
   appDir <- system.file("shiny", "make_ukb_dataset", package = "ukbwranglr")
   if (appDir == "") {

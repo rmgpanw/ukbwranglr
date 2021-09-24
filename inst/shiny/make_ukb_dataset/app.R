@@ -168,7 +168,7 @@ server <- function(input, output, session) {
 
 # DERIVED VARIABLE REQUIRED FIDS REACTABLE --------------------------------
 
-output$derived_variables_required_fids <- renderReactable(
+output$derived_variables_required_fids <- reactable::renderReactable(
     reactable::reactable(derived_variables_required_fids_df,
                          filterable = TRUE,
                          showPageSizeOptions = TRUE,
@@ -307,10 +307,10 @@ output$derived_variables_required_fids <- renderReactable(
     })
 
     # display data dictionary for selected UKB file
-    output$data_dict <- renderReactable({
+    output$data_dict <- reactable::renderReactable({
         req(data_dict())
 
-        reactable(
+        reactable::reactable(
             # data,
             data_dict(),
             filterable = TRUE,
@@ -329,7 +329,7 @@ output$derived_variables_required_fids <- renderReactable(
     })
 
     # selected rows
-    selected <- reactive(getReactableState("data_dict", "selected"))
+    selected <- reactive(reactable::getReactableState("data_dict", "selected"))
 
 
 # Update selected variables from pre-selected data dict upload ------------
@@ -337,7 +337,7 @@ output$derived_variables_required_fids <- renderReactable(
     # update selected rows to include those in data_dict_preselected
     observeEvent(data_dict_preselected(), {
         # currently selected
-        currently_selected_rowids <- getReactableState("data_dict", "selected")
+        currently_selected_rowids <- reactable::getReactableState("data_dict", "selected")
 
         # get row indices to update
         preselected_rowids <- data_dict() %>%
@@ -349,18 +349,18 @@ output$derived_variables_required_fids <- renderReactable(
         updated_selection_rowids <- unique(c(currently_selected_rowids, preselected_rowids))
 
         # update
-        updateReactable("data_dict", selected = updated_selection_rowids)
+        reactable::updateReactable("data_dict", selected = updated_selection_rowids)
     })
 
 
 # Selected variables reactable --------------------------------------------
 
     # print selected variables as reactable
-    output$data_dict_selected <- renderReactable({
+    output$data_dict_selected <- reactable::renderReactable({
         req(data_dict())
         req(selected())
 
-        reactable(
+        reactable::reactable(
             # data,
             data_dict()[selected(), ],
             filterable = TRUE,
@@ -420,7 +420,7 @@ output$derived_variables_required_fids <- renderReactable(
             ("data_dict_full.csv")
         },
         content = function(file) {
-            write_csv(data_dict(), file, na = "")
+            readr::write_csv(data_dict(), file, na = "")
         }
     )
 
@@ -431,7 +431,7 @@ output$derived_variables_required_fids <- renderReactable(
             ("data_dict_selected.csv")
         },
         content = function(file) {
-            write_csv(data_dict()[selected(), ], file, na = "")
+            readr::write_csv(data_dict()[selected(), ], file, na = "")
         }
     )
 

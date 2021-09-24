@@ -953,7 +953,7 @@ extract_phenotypes_single_disease <-
       ifelse(
         clinical_codes$category == clinical_codes$disease,
         toupper(clinical_codes$phenotype_colname),
-        clinical_codes$phenotype_colname
+        tolower(clinical_codes$phenotype_colname)
       )
 
     # add prefix if specified
