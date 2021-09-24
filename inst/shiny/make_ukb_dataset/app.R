@@ -469,7 +469,6 @@ output$derived_variables_required_fids <- reactable::renderReactable(
             id <- notify("Reading data...")
             on.exit(removeNotification(id), add = TRUE)
 
-            browser()
             ukb_main <- ukbwranglr::read_ukb(path = ukb_main_dataset_filepath(),
                                              delim = delim,
                                              ukb_data_dict = ukb_data_dict,
