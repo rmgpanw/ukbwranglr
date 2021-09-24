@@ -93,7 +93,7 @@ make_dataset_tabs <- tabsetPanel(
         checkboxInput("descriptive_colnames", "Descriptive column names", value = TRUE),
         checkboxInput("labelled", "Labelled", value = TRUE),
         uiOutput("derived_variables_input"),
-        shiny::selectInput(inputId = "summarise_numerical_variables",
+        selectInput(inputId = "summarise_numerical_variables",
                            "Summarise numerical variables",
                            choices = c("mean", "min", "max", "sum", "n_values"),
                            multiple = TRUE),

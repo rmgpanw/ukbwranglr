@@ -15,6 +15,7 @@ Suggests:
     knitr,
     rmarkdown,
     rsconnect,
+    shiny,
     testthat
 VignetteBuilder: knitr
 Imports:

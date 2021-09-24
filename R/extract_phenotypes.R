@@ -1151,7 +1151,7 @@ extract_clinical_events <- function(clinical_events,
 
   # add labels
   indicator_labels <- stats::setNames(c(1, 0),
-                               nm = c(phenotype, paste0("No ", phenotype)))
+                               nm = c("Yes", "No"))
 
   clinical_events[[indicator_colname]] <- haven::labelled(
     x = clinical_events[[indicator_colname]],
@@ -1384,4 +1384,33 @@ get_sources_for_code_type <- function(code_type) {
   CLINICAL_EVENTS_SOURCES %>%
     dplyr::filter(.data[["data_coding"]] == code_type) %>%
     .$source
+}
+
+# DEV ---------------------------------------------------------------------
+
+
+# Process output from `extract_phenotypes` --------------------------------
+
+
+na_to_labelled_no <- function(x) {
+  label <- attributes(x)$label
+
+  x <- ifelse(is.na(x),
+              yes = 0,
+              no = x)
+
+  haven::labelled(x,
+                  label = label,
+                  labels = c(Yes = 1, No = 0))
+}
+
+merge_phenotype_dfs <- function(phenotypes) {
+  phenotypes <- purrr::reduce(phenotypes,
+                              dplyr::full_join,
+                              by = "eid")
+
+
+  dplyr::mutate(phenotypes,
+                dplyr::across(tidyselect::ends_with("_indicator"),
+                              na_to_labelled_no))
 }
