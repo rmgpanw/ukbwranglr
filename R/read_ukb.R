@@ -299,6 +299,17 @@ label_ukb_main <- function(ukb_main,
   assertthat::assert_that(all(data_dict[[colnames_col]] %in% names(ukb_main)),
                           msg = "Error! There are values in `data_dict[[colnames_col]]` that do not match `names(ukb_main)`. Check `data_dict`.")
 
+  # warning if any fields in `data_dict` do not have a FieldID
+  data_dict_fields_with_no_fid <- data_dict[is.na(data_dict$FieldID), ]$FieldID
+  if (!rlang::is_empty(data_dict_fields_with_no_fid)) {
+    warning(paste0("Warning! The following items in `data_dict` could not be matched to a FieldID: ",
+                   stringr::str_c(data_dict_fields_with_no_fid,
+                                  sep = "",
+                                  collapse = ", ")))
+    # remove these items from data_dict
+    data_dict <- data_dict[!is.na(data_dict$FieldID), ]$FieldID
+  }
+
   # identify codings to be converted to integer type
   data_dict <- indicate_coltype_in_data_dict(data_dict = data_dict,
                                              ukb_codings = ukb_codings)
@@ -365,7 +376,8 @@ label_ukb_main <- function(ukb_main,
                         no = .x))
 
   ukb_main_cols_unexpected_type <- ukb_main %>%
-    purrr::map(class) %>%
+    purrr::map(typeof) %>%
+    .[data_dict[[colnames_col]]] %>%
     purrr::map(~ ifelse(.x %in% c("integer", "double"),
                         yes = "numeric",
                         no = .x)) %>%

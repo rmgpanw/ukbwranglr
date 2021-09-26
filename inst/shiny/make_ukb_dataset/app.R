@@ -499,7 +499,9 @@ output$derived_variables_required_fids <- reactable::renderReactable(
                 # STATA colheaders cannot contain '.' and must not be too long
                 message("STATA output: renaming columns...\n")
                 notify("STATA output: renaming columns...", id = id)
-                names(ukb_main) <- data_dict()[selected(), ]$colheaders_processed
+                names(ukb_main) <- make_data_dict(ukb_main,
+                                                  ukb_data_dict = ukb_data_dict)$colheaders_processed
+                # names(ukb_main) <- data_dict()[selected(), ]$colheaders_processed
             }
 
             # write dataset
