@@ -1149,9 +1149,10 @@ extract_clinical_events <- function(clinical_events,
     rename_cols(old_colnames = "date",
                 new_colnames = date_colname)
 
-  # add labels
-  indicator_labels <- stats::setNames(c(1, 0),
-                               nm = c("Yes", "No"))
+  # add labels - N.B. order is important, the first item will become the
+  # baseline level when converting to a factor e.g. with labelled::unlabelled()
+  indicator_labels <- stats::setNames(c(1, 2),
+                               nm = c("No", "Yes"))
 
   clinical_events[[indicator_colname]] <- haven::labelled(
     x = clinical_events[[indicator_colname]],
