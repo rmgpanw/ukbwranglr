@@ -1397,12 +1397,12 @@ na_to_labelled_no <- function(x) {
   label <- attributes(x)$label
 
   x <- ifelse(is.na(x),
-              yes = 0,
+              yes = 1,
               no = x)
 
   haven::labelled(x,
                   label = label,
-                  labels = c(Yes = 1, No = 0))
+                  labels = c(No = 1, Yes = 2))
 }
 
 merge_phenotype_dfs <- function(phenotypes) {
