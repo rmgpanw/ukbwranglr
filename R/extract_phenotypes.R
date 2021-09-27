@@ -1140,7 +1140,7 @@ extract_clinical_events <- function(clinical_events,
   # date is unknown
   indicator_colname <- paste0(phenotype_colname, "_indicator")
 
-  clinical_events[[indicator_colname]] <- 1
+  clinical_events[[indicator_colname]] <- 2
 
   # rename date col to `phenotype_colname`
   date_colname <- paste0(phenotype_colname, "_", min_max, "_date")
