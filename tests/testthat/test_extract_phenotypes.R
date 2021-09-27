@@ -421,7 +421,7 @@ test_that("`extract_phenotypes()` returns expected results", {
     tibble::tibble(
       eid = c(1, 2),
       test_a_test_min_date = c("1910-02-19", NA),
-      test_a_test_indicator = c(1, 1)
+      test_a_test_indicator = c(2, 2)
     )
   )
 
@@ -431,7 +431,7 @@ test_that("`extract_phenotypes()` returns expected results", {
     tibble::tibble(
       eid = c(1, 2),
       test_b_test_min_date = c("1956-11-24", "1990-10-04"),
-      test_b_test_indicator = c(1, 1)
+      test_b_test_indicator = c(2, 2)
     )
   )
 
@@ -441,7 +441,7 @@ test_that("`extract_phenotypes()` returns expected results", {
     tibble::tibble(
       eid = c(1, 2),
       test_DISEASE1_TEST_min_date = c("1910-02-19", "1990-10-04"),
-      test_DISEASE1_TEST_indicator = c(1, 1)
+      test_DISEASE1_TEST_indicator = c(2, 2)
     )
   )
 
@@ -451,7 +451,7 @@ test_that("`extract_phenotypes()` returns expected results", {
     tibble::tibble(
       eid = 1,
       test_c_test_min_date = "1998-12-24",
-      test_c_test_indicator = 1
+      test_c_test_indicator = 2
     )
   )
 
@@ -461,7 +461,7 @@ test_that("`extract_phenotypes()` returns expected results", {
     tibble::tibble(
       eid = 1,
       test_d_test_min_date = "1956-11-24",
-      test_d_test_indicator = 1
+      test_d_test_indicator = 2
     )
   )
 
@@ -471,7 +471,7 @@ test_that("`extract_phenotypes()` returns expected results", {
     tibble::tibble(
       eid = 1,
       test_a_test_min_date = "1956-11-24",
-      test_a_test_indicator = 1
+      test_a_test_indicator = 2
     )
   )
 })
@@ -502,7 +502,7 @@ test_that(
       tibble::tibble(
         eid = 2,
         cancer_icd10_a_test_min_date = as.character(NA),
-        cancer_icd10_a_test_indicator = 1
+        cancer_icd10_a_test_indicator = 2
       )
     )
 
