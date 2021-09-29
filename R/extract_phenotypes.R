@@ -1269,7 +1269,8 @@ filter_clinical_events <- function(clinical_events,
       'opcs3',
       'opcs4',
       'read2',
-      'read3'
+      'read3',
+      'read2_drugs'
     ))),
     msg = "Error! check code for `CLINICAL_EVENTS_SOURCES$data_coding` and amend the filter statement in this function to address all possible code types")
 
@@ -1289,6 +1290,7 @@ filter_clinical_events <- function(clinical_events,
   read3_sources <- get_sources_for_code_type("read3")
   bnf_sources <- get_sources_for_code_type("bnf")
   dmd_sources <- get_sources_for_code_type("dmd")
+  read2_drugs_sources <- get_sources_for_code_type("read2_drugs")
 
   data_coding_3_codes <- clinical_codes_list$data_coding_3
   data_coding_4_codes <- clinical_codes_list$data_coding_4
@@ -1302,6 +1304,7 @@ filter_clinical_events <- function(clinical_events,
   read3_codes <- clinical_codes_list$read3
   bnf_codes <- clinical_codes_list$bnf
   dmd_codes <- clinical_codes_list$dmd
+  read2_drugs_codes <- clinical_codes_list$read2_drugs
 
   clinical_events <- clinical_events %>%
     dplyr::filter(
@@ -1328,7 +1331,9 @@ filter_clinical_events <- function(clinical_events,
         (.data[["source"]] %in% bnf_sources &
            .data[["code"]] %in% bnf_codes) |
         (.data[["source"]] %in% dmd_sources &
-           .data[["code"]] %in% dmd_codes)
+           .data[["code"]] %in% dmd_codes) |
+        (.data[["source"]] %in% read2_drugs_sources &
+           .data[["code"]] %in% read2_drugs_codes)
     ) %>%
     dplyr::collect()
 

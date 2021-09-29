@@ -1,9 +1,5 @@
 library(magrittr)
 
-# SETUP -------------------------------------------------------------------
-
-ukb_code_mappings <- ukbwranglr::get_ukb_code_mappings()
-
 # CLINICAL_EVENTS_FIELD_IDS ---------------------------------------------------------
 
 CLINICAL_EVENTS_FIELD_IDS <- list(
@@ -187,12 +183,12 @@ CLINICAL_EVENTS_SOURCES <- tibble::tribble(
   "gpc3_r3", "read3", "`read_3` column, data provider England (TPP)", "Primary care", "gp_clinical",
   "gpc4_r3", "read3", "`read_3` column, data provider Wales", "Primary care", "gp_clinical",
 
-  "gps1_r2", "read2", "`read_2` column, data provider England (Vision)", "Primary care", "gp_scripts",
+  "gps1_r2", "read2_drugs", "`read_2` column, data provider England (Vision)", "Primary care", "gp_scripts",
   "gps1_dmd", "dmd", "`dmd_code` column, data provider England (Vision)", "Primary care", "gp_scripts",
-  "gps2_r2", "read2", "`read_2` column, data provider Scotland", "Primary care", "gp_scripts",
+  "gps2_r2", "read2_drugs", "`read_2` column, data provider Scotland", "Primary care", "gp_scripts",
   "gps2_bnf", "bnf", "`bnf_code` column, data provider Scotland", "Primary care", "gp_scripts",
   "gps3_bnf", "bnf", "`bnf_code` column, data provider England (TPP)", "Primary care", "gp_scripts",
-  "gps4_r2", "read2", "`read_2` column, data provider Wales", "Primary care", "gp_scripts"
+  "gps4_r2", "read2_drugs", "`read_2` column, data provider Wales", "Primary care", "gp_scripts"
 )
 
 # SAVE AS R/sysdata.rda -------------------------------------------------------
