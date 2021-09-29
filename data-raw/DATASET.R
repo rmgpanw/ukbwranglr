@@ -59,101 +59,6 @@ NONSENSE_DATES$MAIN_DATASET <- c(
   '1903-03-03',
   '2037-07-07')
 
-# UKB CODE MAPPINGS -------------------------------------------------------
-
-# used by functions in code_mappings.R
-
-# NOTES: if editing this, always refer to `ukb_code_mappings_sheet_names` and
-# `ukb_code_mappings_code_types` first - these should contain all possible code
-# types and sheets from the UKB excel file (resource 592). Tests in
-# test_data_raw_constants.R reply on the accuracy of these.
-
-# names of excel spreadsheets in ukb_code_mappings (UKB resource 592) -----
-
-# I generated this by manually copying `names(get_ukb_code_mappings())`
-ukb_code_mappings_sheet_names <- c(
-  "bnf_lkp",
-  "dmd_lkp",
-  "icd9_lkp",
-  "icd10_lkp",
-  "icd9_icd10",
-  "read_v2_lkp",
-  "read_v2_drugs_lkp",
-  "read_v2_drugs_bnf",
-  "read_v2_icd9",
-  "read_v2_icd10",
-  "read_v2_opcs4",
-  "read_v2_read_ctv3",
-  "read_ctv3_lkp",
-  "read_ctv3_icd9",
-  "read_ctv3_icd10",
-  "read_ctv3_opcs4",
-  "read_ctv3_read_v2"
-)
-
-assertthat::assert_that(
-  all(sort(ukb_code_mappings_sheet_names) == sort(names(ukb_code_mappings))),
-  msg = "`ukb_code_mappings_sheet_names` does not match the sheet names in resource 592 (fetched with `get_ukb_code_mappings`"
-)
-
-
-# colnames for each excel spreadsheet in resource 592 ---------------------
-colnames_for_ukb_code_mappings_sheet_names <- ukb_code_mappings_sheet_names %>%
-  purrr::set_names() %>%
-  purrr::map(~ names(ukb_code_mappings[[.x]]))
-
-
-# clinical codes types ----------------------------------------------------
-# my labels for clinical codes types, used in the constants below
-ukb_code_mappings_code_types <- c(
-  "bnf",
-  "dmd",
-  "icd9",
-  "icd10",
-  "read2",
-  "read2_drugs",
-  "read3",
-  "opcs4"
-)
-
-# clinical code system to lookup sheet map --------------------------------
-# mappings note, BNF - 'description_col' is for chemical substances only (TODO
-# amend this?)
-code_type_to_lkp_sheet_map_df <- tibble::tribble(
-  ~ code, ~ lkp_sheet, ~ code_col, ~ description_col, ~ preferred_synonym_col, ~ preferred_code,
-  "bnf", "bnf_lkp", "BNF_Presentation_Code", "BNF_Chemical_Substance", NA, NA,
-  "dmd", "dmd_lkp", "concept_id", "term", NA, NA,
-  "icd9", "icd9_lkp", "ICD9", "DESCRIPTION_ICD9", NA, NA,
-  "icd10", "icd10_lkp", "ICD10_CODE", "DESCRIPTION", NA, NA,
-  "read2", "read_v2_lkp", "read_code", "term_description", "term_code", "00",
-  "read2_drugs", "read_v2_drugs_lkp", "read_code", "term_description", NA, NA,
-  "read3", "read_ctv3_lkp", "read_code", "term_description", "description_type", "P"
-)
-
-# clinical code mappings map ----------------------------------------------
-
-# used by `map_codes()`
-# 'from' and 'to' cols: possible mapping combinations
-# 'mapping_sheet': the appropriate mapping sheet to use for a 'from'/'to' combination
-# 'from_col' and 'to_col': the columns to use when mapping
-# Note, `preferred_synonym_col` and `preferred_code` refer to `to_col`
-CLINICAL_CODE_MAPPINGS_MAP <- tibble::tribble(
-  ~ from, ~ to, ~ mapping_sheet, ~ from_col, ~ to_col, ~ preferred_synonym_col, ~ preferred_code,
-  "icd9", "icd10", "icd9_icd10", "ICD9", "ICD10", NA, NA,
-  "read2_drugs", "bnf", "read_v2_drugs_bnf", "read_code", "bnf_code", NA, NA,
-  "read2", "icd9", "read_v2_icd9", "read_code", "icd9_code", NA, NA,
-  "read2", "icd10", "read_v2_icd10", "read_code", "icd10_code", NA, NA,
-  "read2", "opcs4", "read_v2_opcs4", "read_code", "opcs_4.2_code", NA, NA,
-  "read2", "read3", "read_v2_read_ctv3", "READV2_CODE", "READV3_CODE", "TERMV3_TYPE", "P",
-  "read3", "icd9", "read_ctv3_icd9", "read_code", "icd9_code", NA, NA,
-  "read3", "icd10", "read_ctv3_icd10", "read_code", "icd10_code", NA, NA,
-  "read3", "opcs4", "read_ctv3_opcs4", "read_code", "opcs4_code", NA, NA,
-  "read3", "read2", "read_ctv3_read_v2", "READV3_CODE", "READV2_CODE", "TERMV2_TYPE", "P"
-)
-
-# see `test_data_raw_DATASET.R` for tests (check nothing misspelled etc)
-
-
 # DUMMY CLINICAL EVENTS DATA ----------------------------------------------
 
 # This is now replaced with `dummy_ukb_main_clinical_events` below
@@ -302,14 +207,6 @@ usethis::use_data(
 
   # nonsense dates
   NONSENSE_DATES,
-
-  # ukb_code_mappings
-  ukb_code_mappings_sheet_names,
-  ukb_code_mappings_code_types,
-  colnames_for_ukb_code_mappings_sheet_names,
-
-  code_type_to_lkp_sheet_map_df,
-  CLINICAL_CODE_MAPPINGS_MAP,
 
   # clinical events schema
   CLINICAL_EVENTS_SOURCES,

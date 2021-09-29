@@ -181,7 +181,7 @@ make_clinical_events_db <- function(ukb_main_path,
                       value1 = "c",
                       value2 = "c",
                       value3 = "c"
-                    ), # all cols as type character
+                    ),
                     db_path = ukb_db_path,
                     chunk_size = chunk_size,
                     delim = "\t",
@@ -207,7 +207,7 @@ make_clinical_events_db <- function(ukb_main_path,
                       dmd_code = "c",
                       drug_name = "c",
                       quantity = "c"
-                    ), # all cols as type character
+                    ),
                     db_path = ukb_db_path,
                     chunk_size = chunk_size,
                     delim = "\t",
@@ -323,7 +323,6 @@ tidy_gp_scripts <- function(gp_scripts,
     .details_only = .details_only
   )
 }
-
 
 # PRIVATE FUNCTIONS -------------------------------------------------------
 
@@ -483,136 +482,6 @@ file_to_sqlite_db <- function(file,
   invisible(NULL)
 }
 
-
-# tidy_gp_clinical_db <- function(gp_clinical,
-#                                 remove_special_dates = TRUE,
-#                                 pos = NULL,
-#                                 .details_only = FALSE) {
-#  # see documentation for `tidy_gp_clinical`
-#  # the `pos` argument is required for use with `file_to_sqlite_db` - adds the row number as an 'index' column
-#
-#   # names of table to be returned
-#   output_table_names <- c("clinical_events",
-#                           "gp_clinical_values")
-#
-#   if (.details_only) {
-#     return(output_table_names)
-#   }
-#
-#   # validate args
-#   assertthat::assert_that(all(
-#     names(gp_clinical) == c(
-#       "eid",
-#       "data_provider",
-#       "event_dt",
-#       "read_2",
-#       "read_3",
-#       "value1",
-#       "value2",
-#       "value3"
-#     )
-#   ),
-#   msg = "Error! `gp_clinical` has unexpected column names")
-#
-#
-#   assertthat::assert_that(
-#     all(
-#     as.character(purrr::map_chr(gp_clinical[, 2:8], class)) == c(
-#       "character",
-#       "character",
-#       "character",
-#       "character",
-#       "character",
-#       "character",
-#       "character"
-#     )
-#   ) & is.numeric(gp_clinical$eid),
-#   msg = "Error! `gp_clinical` has one or more columns of invalid type. Column `eid` should be type 'integer' and all other columns should be type 'character'")
-#
-#   # add index col - 'pos' is required for `file_to_sqlite_db environment`
-#   if (is.null(pos)) {
-#     pos <- 1
-#   }
-#
-#   index_col_end <- pos + nrow(gp_clinical) - 1
-#   gp_clinical$index <- as.character(pos:index_col_end)
-#
-#   # tidy clinical codes/dates
-#   gp_clinical_codes <- gp_clinical %>%
-#     dplyr::select(
-#       .data[["eid"]],
-#       .data[["index"]],
-#       .data[["data_provider"]],
-#       .data[["event_dt"]],
-#       .data[["read_2"]],
-#       .data[["read_3"]]
-#     ) %>% # remove 3 'value' cols
-#     tidyr::pivot_longer(
-#       cols = c("read_2", "read_3"),
-#       names_to = "source",
-#       values_to = "code"
-#     ) %>%
-#     # remove redundant rows (original data has no rows with a value in bot read2/3 cols)
-#     dplyr::filter(!is.na(.data[["code"]]))
-#
-#   # relabel 'read_2' and 'read_3' to 'gpc_r2' and 'gpc_r3'
-#   gp_clinical_codes$source <- dplyr::case_when(
-#     gp_clinical_codes$source == "read_2" ~ paste0("gpc",
-#                                                   gp_clinical_codes[["data_provider"]],
-#                                                   "_",
-#                                                   "r2"),
-#     gp_clinical_codes$source == "read_3" ~ paste0("gpc",
-#                                                   gp_clinical_codes[["data_provider"]],
-#                                                   "_",
-#                                                   "r3"),
-#     TRUE ~ "gpc_unknown_coding"
-#   )
-#
-#   # rename 'event_dt' to 'date'
-#   gp_clinical_codes <- rename_cols(gp_clinical_codes,
-#                                    old_colnames = "event_dt",
-#                                    new_colnames = "date")
-#
-#   # reformat date
-#   gp_clinical_codes$date <- gp_clinical_codes$date %>%
-#     lubridate::dmy() %>%
-#     as.character()
-#
-#   # remove special dates if requested (default is to remove)
-#   if (remove_special_dates == TRUE) {
-#
-#     # primary care dates to remove
-#     # see https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=591
-#     primary_care_special_dates_to_remove <- c("01/01/1901",
-#                                               "02/02/1902",
-#                                               "03/03/1903",
-#                                               "07/07/2037") %>%
-#       lubridate::dmy() %>%
-#       as.character()
-#
-#     gp_clinical_codes$date <- ifelse(
-#       test = gp_clinical_codes$date %in% primary_care_special_dates_to_remove,
-#       yes = NA,
-#       no = gp_clinical_codes$date
-#     )
-#   }
-#
-#   result <- list(clinical_events = gp_clinical_codes[c("eid",
-#                                                        "source",
-#                                                        "index",
-#                                                        "code",
-#                                                        "date")],
-#                  gp_clinical_values = gp_clinical[c("index",
-#                                                     "value1",
-#                                                     "value2",
-#                                                     "value3")])
-#
-#   # check that items in `result` match those returned when `.details_only = TRUE`
-#   assertthat::assert_that(all(names(result) == output_table_names))
-#
-#   return(result)
-# }
-
 tidy_gp_data_db <- function(gp_df,
                             gp_df_type,
                             pos,
@@ -622,8 +491,8 @@ tidy_gp_data_db <- function(gp_df,
   # argument is required for use with `file_to_sqlite_db` - adds the row number
   # as an 'index' column
 
-  # ***Note: `pos` must be an unnamed argument - when setting `pos = NULL`, the
-  # tests would pass locally but not with github actions***
+  # ***Note: `pos` must be an unnamed argument - when setting `pos = NULL`,
+  # tests pass locally but not with github actions***
 
   match.arg(gp_df_type,
             choices = c("gp_clinical", "gp_scripts"))
