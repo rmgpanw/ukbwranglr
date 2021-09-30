@@ -18,42 +18,76 @@ Cloud](https://img.shields.io/badge/RStudio-Cloud-blue)](https://rstudio.cloud/p
 
 # Overview
 
-The goal of `ukbwranglr` is to facilitate exploratory analyses with UK
-Biobank phenotype data. A selection of columns from a raw UK Biobank
-phenotype file can be loaded into R with human-readable labels:
+The goal of `ukbwranglr` is to facilitate analysing UK Biobank data.
+This includes:
+
+1.  Reading a selection of variables
+2.  Summarising continuous variables
+3.  Identifying phenotypes from clinical events data (e.g. self-reported
+    medical conditions and linked hospital data)
+
+# Reading a selection of variables into R
+
+A UK Biobank main dataset file is often too large to fit into memory on
+a personal computer. However, often only a subset of the data is
+required.
 
 *Raw data appearance:*
 
-    #>      eid 31-0.0 34-0.0 21000-0.0 20002-0.0 21001-0.0
-    #> 1: fake1      0   1952        NA      1665   20.1115
-    #> 2: fake2      0   1946      4001      1383   30.1536
-    #> 3: fake3      1   1951         3      1197   22.8495
-    #> 4: fake4      0   1956        NA      1441   23.4904
-    #> 5: fake5     NA     NA        -3      1429   29.2752
+``` r
+library(dplyr)
+#> 
+#> Attaching package: 'dplyr'
+#> The following objects are masked from 'package:stats':
+#> 
+#>     filter, lag
+#> The following objects are masked from 'package:base':
+#> 
+#>     intersect, setdiff, setequal, union
+library(ukbwranglr)
 
-*Appearance when loaded using `ukbwranglr::read_pheno()`:*
+# path to dummy data
+DUMMY_DATA_PATH <- system.file("extdata", "dummy_ukb_data.csv", package = "ukbwranglr")
 
-    #>      eid sex_f31_0_0 year_of_birth_f34_0_0 ethnic_background_f21000_0_0
-    #> 1: fake1      Female                  1952                         <NA>
-    #> 2: fake2      Female                  1946                    Caribbean
-    #> 3: fake3        Male                  1951       Asian or Asian British
-    #> 4: fake4      Female                  1956                         <NA>
-    #> 5: fake5        <NA>                    NA         Prefer not to answer
-    #> 6: fake6        Male                  1948       Asian or Asian British
-    #>    noncancer_illness_code_selfreported_f20002_0_0
-    #> 1:                menopausal symptoms / menopause
-    #> 2:                            dermatopolymyositis
-    #> 3:        kidney stone/ureter stone/bladder stone
-    #> 4:                                        malaria
-    #> 5:                                     acromegaly
-    #> 6:                                inguinal hernia
-    #>    body_mass_index_bmi_f21001_0_0
-    #> 1:                        20.1115
-    #> 2:                        30.1536
-    #> 3:                        22.8495
-    #> 4:                        23.4904
-    #> 5:                        29.2752
-    #> 6:                        28.2567
+# appearance of raw data
+data.table::fread(DUMMY_DATA_PATH) %>% 
+  select(eid, 
+         `31-0.0`, 
+         `34-0.0`,
+         `21000-0.0`, 
+         `20002-0.0`, 
+         `21001-0.0`) %>% 
+  head(n = 5)
+#>    eid 31-0.0 34-0.0 21000-0.0 20002-0.0 21001-0.0
+#> 1:   1      0   1952        NA      1665   20.1115
+#> 2:   2      0   1946      4001      1383   30.1536
+#> 3:   3      1   1951         3      1197   22.8495
+#> 4:   4      0   1956        NA      1441   23.4904
+#> 5:   5     NA     NA        -3      1429   29.2752
+```
+
+*Appearance when loaded using `ukbwranglr::read_ukb()`:*
+
+``` r
+data_dict <- ukbwranglr::make_data_dict(DUMMY_DATA_PATH, delim = ",")
+ukbwranglr_data <- ukbwranglr::read_ukb(DUMMY_DATA_PATH, data_dict, delim = ",") 
+#> STEP 1 of 3
+#> Reading data into R
+#> STEP 2 of 3
+#> Renaming columns
+#> STEP 3 of 3
+#> Labelling dataset
+#> Time taken: 0 minutes, 4 seconds.
+
+# ukbwranglr_data_selected_cols <- ukbwranglr_data %>% 
+#   select(eid, 
+#          sex_f31_0_0, 
+#          year_of_birth_f34_0_0, 
+#          ethnic_background_f21000_0_0,
+#          noncancer_illness_code_selfreported_f20002_0_0,
+#          body_mass_index_bmi_f21001_0_0,
+#          )
+```
 
 `ukbwranglr` can also help to:
 
@@ -70,8 +104,7 @@ details.
 
 ## Installation
 
-You can install the development version of ukbwranglr from
-[GitHub](https://github.com/rmgpanw/ukbwranglr/tree/dtable) with:
+You can install the development version of `ukbwranglr` with:
 
 ``` r
 # install.packages("devtools")

@@ -30,7 +30,7 @@ required input variables (Field IDs) and derived variables (new column
 name, label and values/value labels).}
 }
 \value{
-A data frame with a column called \code{dob_derived} (type
+A data frame with a column called \code{dob} (type
   character).
 }
 \description{

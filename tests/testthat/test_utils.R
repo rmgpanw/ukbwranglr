@@ -279,3 +279,31 @@ test_that(
     )
   }
 )
+
+
+# `summarise_first_non_na` ----------------------------------------------------------
+
+test_that("`summarise_first_non_na()` returns expected results", {
+  df <- tibble::tribble(
+    ~x, ~y, ~z,
+    1, NA, 2,
+    NA, 2, 3,
+    NA, NA, 3,
+    4, NA, 1
+  )
+
+  expect_equal(summarise_first_non_na(df,
+                         columns = c("x", "y", "z"),
+                         new_col = "new_col")$new_col,
+               c(1, 2, 3, 4))
+
+  expect_equal(summarise_first_non_na(df,
+                                      columns = c("x", "z", "y"),
+                                      new_col = "new_col")$new_col,
+               c(1, 3, 3, 4))
+
+  expect_equal(summarise_first_non_na(df,
+                                      columns = c("z", "y", "x"),
+                                      new_col = "new_col")$new_col,
+               c(2, 3, 3, 1))
+})

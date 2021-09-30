@@ -15,6 +15,7 @@ Suggests:
     knitr,
     rmarkdown,
     rsconnect,
+    shiny,
     testthat
 VignetteBuilder: knitr
 Imports:
@@ -34,7 +35,6 @@ Imports:
     readxl,
     rlang,
     RSQLite,
-    shiny,
     stats,
     stringr,
     tibble,

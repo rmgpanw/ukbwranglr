@@ -38,7 +38,7 @@
 #'   name, label and values/value labels).
 #' @inheritParams read_ukb
 #'
-#' @return A data frame with a column called \code{dob_derived} (type
+#' @return A data frame with a column called \code{dob} (type
 #'   character).
 #' @export
 #' @examples
@@ -54,7 +54,7 @@ derive_dob <- function(ukb_main,
                        .details_only = FALSE) {
   list_of_details <- list(
     required_field_ids = c(yob = "34", mob = "52"),
-    new_columns = list(dob_derived = list(
+    new_columns = list(dob = list(
       label = "Date of birth (estimated)",
       value_labels = NA,
       FieldID = NA,
@@ -104,8 +104,11 @@ derive_dob <- function(ukb_main,
                                 sep = '-')
 
   suppressWarnings(
-    ukb_main[[new_dob_col]] <- as.character(lubridate::ymd(ukb_main$dob_derived))
+    ukb_main[[new_dob_col]] <- as.character(lubridate::ymd(ukb_main$dob))
   )
+
+  # label
+  attributes(ukb_main[[new_dob_col]])$label <- list_of_details$new_columns$dob$label
 
   # drop input cols if requested
   if (.drop) {
@@ -116,8 +119,234 @@ derive_dob <- function(ukb_main,
 }
 
 
+#' Derive simplified ethnic background
+#'
+#' Simplifies ethnic background in a UK Biobank main dataset to the main
+#' categories for
+#' \href{https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=21000}{Field ID 21000}.
+#'
+#' Categories "Do not know" and "Prefer not to answer" are converted to
+#' \code{NA}. A new column called \code{ethnic_background_simplified} of type
+#' factor is appended to the input data frame. By default, "White" ethnicity is
+#' set to the baseline level as this is the largest category. Levels can be
+#' explicitly specified using the \code{ethnicity_levels} argument.
+#'
+#' @param ethnicity_levels The factor level order for the appended
+#'   \code{ethnic_background_simplified} column. By default, the baseline level
+#'   is set to "White" ethnicity.
+#' @inheritParams derive_dob
+#'
+#' @return A data frame with a column called \code{ethnic_background_simplified}
+#'   (type factor).
+#' @export
+#'
+#' @examples
+#' dummy_ukb_data <- data.frame(
+#'   eid = c(1, 2, 3),
+#'   f.21000.0.0 = factor(c("White", "White and Black Caribbean", NA)),
+#'   f.21000.1.0 = factor(c("British", "Caribbean", NA)),
+#'   f.21000.2.0 = factor(c("Irish", NA, "Any other Asian background"))
+#' )
+#'
+#' derive_ethnic_background_simplified(
+#'   ukb_main = dummy_ukb_data,
+#'   ukb_data_dict = get_ukb_data_dict()
+#' )
+#'
+derive_ethnic_background_simplified <- function(ukb_main,
+                                                ukb_data_dict,
+                                                ethnicity_levels = c(
+                                                  "White",
+                                                  "Mixed",
+                                                  "Asian or Asian British",
+                                                  "Black or Black British",
+                                                  "Chinese",
+                                                  "Other ethnic group"
+                                                ),
+                                                .drop = FALSE,
+                                                .details_only = FALSE) {
+  list_of_details <- list(
+    required_field_ids = c(ethnic_background = "21000"),
+    new_columns = list(ethnic_background_simplified = list(
+      label = "Ethnic background (simplified)",
+      value_labels = NA,
+      FieldID = "21000",
+      instance = NA,
+      array = NA,
+      ValueType = "Categorical single"
+    ))
+  )
+
+  # if required field IDs only requested
+  if (.details_only) {
+    return(list_of_details)
+  }
+
+  # validate args
+  assertthat::assert_that(!names(list_of_details$new_columns) %in% names(ukb_main),
+                          msg = paste0("Error! `ukb_main` already has a column named ",
+                                       names(list_of_details$new_columns)))
+
+  # get required cols
+  data_dict <- make_data_dict(ukb_main,
+                              ukb_data_dict = ukb_data_dict)
+
+  ethnic_background_cols <- get_colnames_for_fieldids(
+    field_ids = list_of_details$required_field_ids['ethnic_background'],
+    data_dict = data_dict,
+    scalar_output = FALSE,
+    error_if_missing = TRUE,
+    colname_col = "colheaders_raw"
+  )
+
+  # sort - sets earliest record to 'baseline'
+  ethnic_background_cols <- sort(ethnic_background_cols)
+
+  # loop through input ethnicity cols to simplify
+  params <- data.frame(old_ethnic_background_col = ethnic_background_cols)
+  params$new_ethnic_background_col <- paste0(params$old_ethnic_background_col, "_simplified")
+
+  for (i in 1:nrow(params)) {
+    old_ethnic_background_col <- params[i, ][["old_ethnic_background_col"]]
+    new_ethnic_background_col <- params[i, ][["new_ethnic_background_col"]]
+
+    ukb_main <- derive_ethnic_background_simplified_single(ukb_main = ukb_main,
+                                               old_ethnic_background_col = old_ethnic_background_col,
+                                               new_ethnic_background_col = new_ethnic_background_col,
+                                               ethnicity_levels = ethnicity_levels,
+                                               .details_only = FALSE)
+  }
+
+  # create single summary col - take the first non-missing value
+  ukb_main <- summarise_first_non_na(df = ukb_main,
+                                     columns = params$new_ethnic_background_col,
+                                     new_col = names(list_of_details$new_columns))
+
+  # drop individual simplified ethnicity columns
+  ukb_main <- ukb_main %>%
+    dplyr::select(-tidyselect::all_of(params$new_ethnic_background_col))
+
+  # reorder factor
+  ukb_main[[names(list_of_details$new_columns)]] <-
+    factor(ukb_main[[names(list_of_details$new_columns)]],
+           levels = ethnicity_levels)
+
+  # label
+  attributes(ukb_main[[names(list_of_details$new_columns)]])$label <- list_of_details$new_columns$ethnic_background_simplified$label
+
+  # drop original cols
+  if (.drop) {
+    ukb_main <- ukb_main %>%
+      dplyr::select(-tidyselect::all_of(params$old_ethnic_background_col))
+  }
+
+  # return result
+  return(ukb_main)
+}
+
+
+
 # PRIVATE FUNCTIONS -------------------------------------------------------
 
+derive_ethnic_background_simplified_single <- function(ukb_main,
+                                                       old_ethnic_background_col,
+                                                       new_ethnic_background_col,
+                                                       ethnicity_levels = c(
+                                                         "White",
+                                                         "Mixed",
+                                                         "Asian or Asian British",
+                                                         "Black or Black British",
+                                                         "Chinese",
+                                                         "Other ethnic group"
+                                                       ),
+                                                       .details_only = FALSE)
+{
+  all_ethnicity_categories <- list(
+    White = c("White",
+              "British",
+              "Irish",
+              "Any other white background"),
+    Mixed = c(
+      "Mixed",
+      "White and Black Caribbean",
+      "White and Black African",
+      "White and Asian",
+      "Any other mixed background"
+    ),
+    `Asian or Asian British` = c(
+      "Asian or Asian British",
+      "Indian",
+      "Pakistani",
+      "Bangladeshi",
+      "Any other Asian background"
+    ),
+    `Black or Black British` = c(
+      "Caribbean",
+      "Black or Black British",
+      "African",
+      "Any other Black background"
+    ),
+    Chinese = c("Chinese"),
+    `Other ethnic group` = c("Other ethnic group"),
+    Do_not_know_Prefer_not_to_answer = c("Do not know",
+                                         "Prefer not to answer")
+  )
+
+  if (.details_only) {
+    return(all_ethnicity_categories)
+  }
+
+  all_ethnicity_categories_vector <- purrr::reduce(all_ethnicity_categories, c)
+
+  # validate args
+  assertthat::assert_that(is.factor(ukb_main[[old_ethnic_background_col]]),
+                          msg = paste0("Error! ",
+                                       old_ethnic_background_col,
+                                       " must be a factor"))
+
+  ethnic_background_col_unique_values <- unique(as.character(ukb_main[[old_ethnic_background_col]]))
+  unrecognised_ethnicity_values <- subset(ethnic_background_col_unique_values,
+                                          (!ethnic_background_col_unique_values %in% all_ethnicity_categories_vector) &
+                                            (!is.na(ethnic_background_col_unique_values)))
+
+  assertthat::assert_that(rlang::is_empty(unrecognised_ethnicity_values),
+                          msg = paste0("Error! Column ",
+                                       old_ethnic_background_col,
+                                       " contains values that are not listed in UKB data coding 1001: ",
+                                       stringr::str_c(unrecognised_ethnicity_values,
+                                                      sep = "",
+                                                      collapse = ", ")))
+
+  assertthat::assert_that(length(unique(ethnicity_levels)) == length(ethnicity_levels),
+                          msg = "Error! `ethnicity_levels` contains duplicate values")
+
+  assertthat::assert_that(
+    all(ethnicity_levels %in% c(
+      "White",
+      "Mixed",
+      "Asian or Asian British",
+      "Black or Black British",
+      "Chinese",
+      "Other ethnic group"
+    )),
+    msg = "Error! `ethnicity_levels` contains unrecognised values"
+  )
+
+  # simplify ethnicity
+  ukb_main[[new_ethnic_background_col]] <-  dplyr::case_when(
+    ukb_main[[old_ethnic_background_col]] %in% all_ethnicity_categories$White ~ "White",
+    ukb_main[[old_ethnic_background_col]] %in% all_ethnicity_categories$Mixed ~ "Mixed",
+    ukb_main[[old_ethnic_background_col]] %in% all_ethnicity_categories$`Asian or Asian British` ~ "Asian or Asian British",
+    ukb_main[[old_ethnic_background_col]] %in% all_ethnicity_categories$`Black or Black British` ~ "Black or Black British",
+    ukb_main[[old_ethnic_background_col]] %in% all_ethnicity_categories$Chinese ~ "Chinese",
+    ukb_main[[old_ethnic_background_col]] %in% all_ethnicity_categories$`Other ethnic group` ~ "Other ethnic group",
+    (ukb_main[[old_ethnic_background_col]] %in% all_ethnicity_categories$Do_not_know_Prefer_not_to_answer) |
+      is.na(ukb_main[[old_ethnic_background_col]]) ~ as.character(NA),
+    TRUE ~ "error"
+  )
+
+  return(ukb_main)
+}
 
 # DEV ---------------------------------------------------------------------
 

@@ -528,7 +528,7 @@ filter_data_dict <- function(data_dict,
   if (rlang::is_empty(result)) {
     stop(
       paste0(
-        "Error! The data dictionary does not contain any of the required values in column ",
+        "Error! Data dictionary does not contain any of the required values in column ",
         filter_col,
         ": ",
         stringr::str_c(filter_value, sep = "", collapse = ", ")
@@ -1303,6 +1303,26 @@ time_taken_message <- function(start_time) {
           " seconds.")
 }
 
+summarise_first_non_na <- function(df,
+                                   columns,
+                                   new_col) {
+  # appends a new col composed of the first non-NA value across `columns`
+  # (determined by the order of the `columns` vector)
+  if (any(purrr::map_lgl(dplyr::select(df, tidyselect::all_of(columns)), is.factor))) {
+    stop("Error! `columns` cannot be type factor")
+  }
+
+  df[[new_col]] <- NA
+
+  for (i in columns) {
+    df[[new_col]] <- ifelse(is.na(df[[new_col]]),
+                              yes = df[[i]],
+                              no = df[[new_col]])
+  }
+
+  return(df)
+}
+
 # Shiny app ---------------------------------------------------------------
 
 #' Launch a shiny app to interactively create a UK Biobank dataset
@@ -1316,9 +1336,11 @@ time_taken_message <- function(start_time) {
 #'   runMakeDataset()
 #' }
 runMakeDataset <- function() {
-  appDir <- system.file("shiny", "make_ukb_dataset", package = "ukbwranglr")
+  appDir <-
+    system.file("shiny", "make_ukb_dataset", package = "ukbwranglr")
   if (appDir == "") {
-    stop("Could not find example directory. Try re-installing `ukbwranglr`.", call. = FALSE)
+    stop("Could not find example directory. Try re-installing `ukbwranglr`.",
+         call. = FALSE)
   }
 
   shiny::runApp(appDir, display.mode = "normal", launch.browser = TRUE)
