@@ -229,11 +229,10 @@ read_ukb <- function(path,
     STEP <- STEP + 1
     message(paste0("STEP ", STEP, " of ", N_STEPS))
 
-    result <-  rename_ukb_main(
-      ukb_main = result,
-      data_dict = data_dict,
-      old_colnames_col = "colheaders_raw",
-      new_colnames_col = "descriptive_colnames"
+    result <-  rename_cols(
+      df = result,
+      old_colnames = data_dict[["colheaders_raw"]],
+      new_colnames = data_dict[["descriptive_colnames"]]
     )
   }
 
@@ -690,23 +689,6 @@ read_ukb_raw_basis <- function(path,
   )
 }
 
-rename_ukb_main <- function(ukb_main,
-                            data_dict,
-                            old_colnames_col = "colheaders_raw",
-                            new_colnames_col = "descriptive_colnames") {
-
-  message("Renaming columns")
-
-  # check that ukb_main and data_dict match
-  assertthat::assert_that(all(names(ukb_main) == data_dict[[old_colnames_col]]),
-                          msg = "Error! `names(ukb_main)` do not match `data_dict[[old_colnames_col]]`. Check `data_dict`.")
-
-  # rename
-  names(ukb_main) <- data_dict[[new_colnames_col]]
-
-  return(ukb_main)
-}
-
 #' Programmatically label variables/values in a data frame
 #'
 #' Low level helper function. Uses the \code{haven} package.
@@ -992,20 +974,18 @@ read_ukb_chunked_callback_write_to_file <-
       if (descriptive_colnames) {
         NEW_COLNAMES_COL <- "descriptive_colnames"
 
-        x <-  rename_ukb_main(
-          ukb_main = x,
-          data_dict = data_dict,
-          old_colnames_col = "colheaders_raw",
-          new_colnames_col = NEW_COLNAMES_COL
+        x <-  rename_cols(
+          df = x,
+          old_colnames = data_dict[["colheaders_raw"]],
+          new_colnames = data_dict[[NEW_COLNAMES_COL]]
         )
       } else if (!descriptive_colnames) {
         NEW_COLNAMES_COL <- "colheaders_processed"
 
-        x <- rename_ukb_main(
-          ukb_main = x,
-          data_dict = data_dict,
-          old_colnames_col = "colheaders_raw",
-          new_colnames_col = NEW_COLNAMES_COL
+        x <- rename_cols(
+          df = x,
+          old_colnames = data_dict[["colheaders_raw"]],
+          new_colnames = data_dict[[NEW_COLNAMES_COL]]
         )
       }
 
