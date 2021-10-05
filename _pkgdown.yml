@@ -33,6 +33,7 @@ reference:
   desc: Commonly required derived variables
 - contents:
   - derive_dob
+  - derive_ethnic_background_simplified
 
 - title: Utilites
   desc: Miscellaneous general utility functions

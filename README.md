@@ -21,7 +21,7 @@ Cloud](https://img.shields.io/badge/RStudio-Cloud-blue)](https://rstudio.cloud/p
 The goal of `ukbwranglr` is to facilitate analysing UK Biobank data.
 This includes:
 
-1.  Reading a selection of variables
+1.  Reading UK Biobank data into R
 2.  Summarising continuous variables
 3.  Identifying phenotypes from clinical events data (e.g. self-reported
     medical conditions and linked hospital data)
@@ -29,7 +29,7 @@ This includes:
 # Reading a selection of variables into R
 
 A UK Biobank main dataset file is often too large to fit into memory on
-a personal computer. However, often only a subset of the data is
+a personal computer. Often however, only a subset of the data is
 required.
 
 *Raw data appearance:*
