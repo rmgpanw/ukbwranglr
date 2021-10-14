@@ -44,6 +44,10 @@ derived_variables_list <- list(
     "Date of birth" = list(
         derive_function = derive_dob,
         required_fids = derive_dob(.details_only = TRUE)$required_field_ids
+    ),
+    "Ethnicity, simplified" = list(
+        derive_function = derive_ethnic_background_simplified,
+        required_fids = derive_ethnic_background_simplified(.details_only = TRUE)$required_field_ids
     )
 )
 
