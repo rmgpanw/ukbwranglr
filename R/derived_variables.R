@@ -154,7 +154,7 @@ derive_dob <- function(ukb_main,
 #' )
 #'
 derive_ethnic_background_simplified <- function(ukb_main,
-                                                ukb_data_dict,
+                                                ukb_data_dict = get_ukb_data_dict(),
                                                 ethnicity_levels = c(
                                                   "White",
                                                   "Mixed",

@@ -1277,26 +1277,3 @@ summarise_first_non_na <- function(df,
 
   return(df)
 }
-
-# Shiny app ---------------------------------------------------------------
-
-#' Launch a shiny app to interactively create a UK Biobank dataset
-#'
-#' Launches a shiny app
-#'
-#' @return NULL
-#'
-#' @examples
-#' \dontrun{
-#'   runMakeDataset()
-#' }
-runMakeDataset <- function() {
-  appDir <-
-    system.file("shiny", "make_ukb_dataset", package = "ukbwranglr")
-  if (appDir == "") {
-    stop("Could not find example directory. Try re-installing `ukbwranglr`.",
-         call. = FALSE)
-  }
-
-  shiny::runApp(appDir, display.mode = "normal", launch.browser = TRUE)
-}

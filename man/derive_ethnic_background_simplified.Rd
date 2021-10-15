@@ -6,7 +6,7 @@
 \usage{
 derive_ethnic_background_simplified(
   ukb_main,
-  ukb_data_dict,
+  ukb_data_dict = get_ukb_data_dict(),
   ethnicity_levels = c("White", "Mixed", "Asian or Asian British",
     "Black or Black British", "Chinese", "Other ethnic group"),
   .drop = FALSE,
