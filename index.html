@@ -80,15 +80,15 @@
 <a href="#overview" class="anchor"></a>Overview</h1>
 <p>The goal of <code>ukbwranglr</code> is to facilitate analysing UK Biobank data. This includes:</p>
 <ol>
-<li>Reading UK Biobank data into R</li>
+<li>Reading selected UK Biobank variables into R</li>
 <li>Summarising continuous variables</li>
-<li>Identifying phenotypes from clinical events data (e.g. self-reported medical conditions and linked hospital data)</li>
+<li>Identifying phenotypic outcomes from clinical events data (e.g. self-reported medical conditions and linked health records data)</li>
 </ol>
 </div>
 <div id="reading-a-selection-of-variables-into-r" class="section level1">
 <h1 class="hasAnchor">
 <a href="#reading-a-selection-of-variables-into-r" class="anchor"></a>Reading a selection of variables into R</h1>
-<p>A UK Biobank main dataset file is often too large to fit into memory on a personal computer. Often however, only a subset of the data is required.</p>
+<p>A UK Biobank main dataset file is typically too large to fit into memory on a personal computer. Often however, only a subset of the data is required.</p>
 <p><em>Raw data appearance:</em></p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
@@ -123,23 +123,50 @@
 <p><em>Appearance when loaded using <code><a href="reference/read_ukb.html">ukbwranglr::read_ukb()</a></code>:</em></p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">data_dict</span> <span class="op">&lt;-</span> <span class="fu">ukbwranglr</span><span class="fu">::</span><span class="fu"><a href="reference/make_data_dict.html">make_data_dict</a></span><span class="op">(</span><span class="va">DUMMY_DATA_PATH</span>, delim <span class="op">=</span> <span class="st">","</span><span class="op">)</span>
-<span class="va">ukbwranglr_data</span> <span class="op">&lt;-</span> <span class="fu">ukbwranglr</span><span class="fu">::</span><span class="fu"><a href="reference/read_ukb.html">read_ukb</a></span><span class="op">(</span><span class="va">DUMMY_DATA_PATH</span>, <span class="va">data_dict</span>, delim <span class="op">=</span> <span class="st">","</span><span class="op">)</span> 
+<span class="fu">ukbwranglr</span><span class="fu">::</span><span class="fu"><a href="reference/read_ukb.html">read_ukb</a></span><span class="op">(</span><span class="va">DUMMY_DATA_PATH</span>, <span class="va">data_dict</span>, delim <span class="op">=</span> <span class="st">","</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu">labelled</span><span class="fu">::</span><span class="fu">unlabelled</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; STEP 1 of 3</span>
 <span class="co">#&gt; Reading data into R</span>
 <span class="co">#&gt; STEP 2 of 3</span>
-<span class="co">#&gt; Renaming columns</span>
 <span class="co">#&gt; STEP 3 of 3</span>
 <span class="co">#&gt; Labelling dataset</span>
-<span class="co">#&gt; Time taken: 0 minutes, 4 seconds.</span>
-
-<span class="co"># ukbwranglr_data_selected_cols &lt;- ukbwranglr_data %&gt;% </span>
-<span class="co">#   select(eid, </span>
-<span class="co">#          sex_f31_0_0, </span>
-<span class="co">#          year_of_birth_f34_0_0, </span>
-<span class="co">#          ethnic_background_f21000_0_0,</span>
-<span class="co">#          noncancer_illness_code_selfreported_f20002_0_0,</span>
-<span class="co">#          body_mass_index_bmi_f21001_0_0,</span>
-<span class="co">#          )</span></code></pre></div>
+<span class="co">#&gt; Time taken: 0 minutes, 5 seconds.</span>
+<span class="co">#&gt;    eid sex_f31_0_0 year_of_birth_f34_0_0 month_of_birth_f52_0_0</span>
+<span class="co">#&gt; 1:   1      Female                  1952                 August</span>
+<span class="co">#&gt; 2:   2      Female                  1946                  March</span>
+<span class="co">#&gt; 3:   3        Male                  1951                  April</span>
+<span class="co">#&gt; 4:   4      Female                  1956              September</span>
+<span class="co">#&gt; 5:   5        &lt;NA&gt;                    NA                  April</span>
+<span class="co">#&gt; 6:   6        Male                  1948               February</span>
+<span class="co">#&gt;    ethnic_background_f21000_0_0</span>
+<span class="co">#&gt; 1:                         &lt;NA&gt;</span>
+<span class="co">#&gt; 2:                    Caribbean</span>
+<span class="co">#&gt; 3:       Asian or Asian British</span>
+<span class="co">#&gt; 4:                         &lt;NA&gt;</span>
+<span class="co">#&gt; 5:         Prefer not to answer</span>
+<span class="co">#&gt; 6:       Asian or Asian British</span>
+<span class="co">#&gt;    non_cancer_illness_code_self_reported_f20002_0_0</span>
+<span class="co">#&gt; 1:                                             1665</span>
+<span class="co">#&gt; 2:                                             1383</span>
+<span class="co">#&gt; 3:                                             1197</span>
+<span class="co">#&gt; 4:                                             1441</span>
+<span class="co">#&gt; 5:                                             1429</span>
+<span class="co">#&gt; 6:                                             1513</span>
+<span class="co">#&gt;    body_mass_index_bmi_f21001_0_0 body_mass_index_bmi_f21001_1_0</span>
+<span class="co">#&gt; 1:                        20.1115                        20.8640</span>
+<span class="co">#&gt; 2:                        30.1536                        20.2309</span>
+<span class="co">#&gt; 3:                        22.8495                        26.7929</span>
+<span class="co">#&gt; 4:                        23.4904                        25.6826</span>
+<span class="co">#&gt; 5:                        29.2752                        19.7576</span>
+<span class="co">#&gt; 6:                        28.2567                        30.2860</span>
+<span class="co">#&gt;    body_mass_index_bmi_f21001_2_0</span>
+<span class="co">#&gt; 1:                             NA</span>
+<span class="co">#&gt; 2:                        27.4936</span>
+<span class="co">#&gt; 3:                        27.6286</span>
+<span class="co">#&gt; 4:                        37.2294</span>
+<span class="co">#&gt; 5:                        14.6641</span>
+<span class="co">#&gt; 6:                        27.3534</span></code></pre></div>
 <p><code>ukbwranglr</code> can also help to:</p>
 <ul>
 <li>Identify participants with certain health conditions or taking certain medications (with dates)</li>
@@ -180,17 +207,16 @@
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Filter for sex, year of birth, BMI and self-reported noncancer-illness fields</span>
 <span class="va">data_dict</span> <span class="op">&lt;-</span> <span class="va">data_dict</span> <span class="op">%&gt;%</span>
-  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">FieldID</span> <span class="op">%in%</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">31</span>,
-                               <span class="fl">34</span>,
-                               <span class="fl">21001</span>,
-                               <span class="fl">20002</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">FieldID</span> <span class="op">%in%</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"31"</span>,
+                               <span class="st">"34"</span>,
+                               <span class="st">"21001"</span>,
+                               <span class="st">"20002"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="3-read-selected-columns-into-r" class="section level4">
 <h4 class="hasAnchor">
 <a href="#3-read-selected-columns-into-r" class="anchor"></a>3. Read selected columns into R</h4>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">ukb_pheno</span> <span class="op">&lt;-</span> <span class="fu">read_pheno</span><span class="op">(</span>path <span class="op">=</span> <span class="st">"MY_UKB_FILE.tab"</span>, 
-                        pheno_data_dict <span class="op">=</span> <span class="va">data_dict</span><span class="op">)</span></code></pre></div>
+<pre class="re"><code><a href="reference/read_ukb.html">read_ukb(path = "MY_UKB_FILE.tab", 
+                        pheno_data_dict = data_dict)</a></code></pre>
 </div>
 </div>
 </div>
