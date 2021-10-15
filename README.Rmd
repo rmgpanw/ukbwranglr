@@ -30,13 +30,13 @@ knitr::opts_chunk$set(
 
 The goal of `ukbwranglr` is to facilitate analysing UK Biobank data. This includes:
 
-1. Reading UK Biobank data into R
+1. Reading selected UK Biobank variables into R
 2. Summarising continuous variables
-3. Identifying phenotypes from clinical events data (e.g. self-reported medical conditions and linked hospital data)
+3. Identifying phenotypic outcomes from clinical events data (e.g. self-reported medical conditions and linked health records data)
 
 # Reading a selection of variables into R
 
-A UK Biobank main dataset file is often too large to fit into memory on a personal computer. Often however, only a subset of the data is required.
+A UK Biobank main dataset file is typically too large to fit into memory on a personal computer. Often however, only a subset of the data is required.
 
 *Raw data appearance:*
 
@@ -62,21 +62,9 @@ data.table::fread(DUMMY_DATA_PATH) %>%
 
 ```{r}
 data_dict <- ukbwranglr::make_data_dict(DUMMY_DATA_PATH, delim = ",")
-ukbwranglr_data <- ukbwranglr::read_ukb(DUMMY_DATA_PATH, data_dict, delim = ",") 
-
-# ukbwranglr_data_selected_cols <- ukbwranglr_data %>% 
-#   select(eid, 
-#          sex_f31_0_0, 
-#          year_of_birth_f34_0_0, 
-#          ethnic_background_f21000_0_0,
-#          noncancer_illness_code_selfreported_f20002_0_0,
-#          body_mass_index_bmi_f21001_0_0,
-#          )
-```
-
-```{r echo=FALSE}
-# ukbwranglr_data_selected_cols %>% 
-#   head()
+ukbwranglr::read_ukb(DUMMY_DATA_PATH, data_dict, delim = ",") %>% 
+  labelled::unlabelled() %>% 
+  head()
 ```
 
 `ukbwranglr` can also help to:
@@ -120,15 +108,15 @@ data_dict <- make_data_dict("MY_UKB_FILE.tab")
 ```{r eval=FALSE}
 # Filter for sex, year of birth, BMI and self-reported noncancer-illness fields
 data_dict <- data_dict %>%
-  dplyr::filter(FieldID %in% c(31,
-                               34,
-                               21001,
-                               20002))
+  dplyr::filter(FieldID %in% c("31",
+                               "34",
+                               "21001",
+                               "20002"))
 ```
 
 #### 3. Read selected columns into R
 
-```{r eval=FALSE}
-ukb_pheno <- read_pheno(path = "MY_UKB_FILE.tab", 
+```{re val=FALSE}
+read_ukb(path = "MY_UKB_FILE.tab", 
                         pheno_data_dict = data_dict)
 ```
