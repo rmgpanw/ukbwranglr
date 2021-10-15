@@ -299,7 +299,8 @@ derive_ethnic_background_simplified_single <- function(ukb_main,
   all_ethnicity_categories_vector <- purrr::reduce(all_ethnicity_categories, c)
 
   # validate args
-  assertthat::assert_that(is.factor(ukb_main[[old_ethnic_background_col]]),
+  assertthat::assert_that(is.factor(ukb_main[[old_ethnic_background_col]]) |
+                            is.character(ukb_main[[old_ethnic_background_col]]),
                           msg = paste0("Error! ",
                                        old_ethnic_background_col,
                                        " must be a factor"))
