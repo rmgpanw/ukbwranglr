@@ -9,7 +9,8 @@ extract_phenotypes(
   clinical_codes,
   data_sources = NULL,
   min_max = "min",
-  prefix = NULL,
+  colnames_prefix = NULL,
+  labels_prefix = NULL,
   workers = NULL,
   keep_all = FALSE
 )
@@ -31,7 +32,9 @@ valid values.}
 \item{min_max}{Choose either "min" or "max" to extract either the earliest or
 latest date that one of the codes appears in \code{clinical_codes} appears.}
 
-\item{prefix}{Optionally add a prefix to column names.}
+\item{colnames_prefix}{Optionally add a prefix to column names.}
+
+\item{labels_prefix}{Optionally add a prefix to variable labels.}
 
 \item{workers}{The number of processes to run in parallel when
 \code{clinical_codes} includes multiple diseases. This is used to set the

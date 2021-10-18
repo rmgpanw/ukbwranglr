@@ -139,7 +139,8 @@ mutate_age_at_event_cols <- function(ukb_main,
 #'   valid values.
 #' @param min_max Choose either "min" or "max" to extract either the earliest or
 #'   latest date that one of the codes appears in \code{clinical_codes} appears.
-#' @param prefix Optionally add a prefix to column names.
+#' @param colnames_prefix Optionally add a prefix to column names.
+#' @param labels_prefix Optionally add a prefix to variable labels.
 #' @param workers The number of processes to run in parallel when
 #'   \code{clinical_codes} includes multiple diseases. This is used to set the
 #'   number of workers in \code{\link[future]{plan}} with \code{strategy =
@@ -171,7 +172,8 @@ extract_phenotypes <- function(
   clinical_codes,
   data_sources = NULL,
   min_max = "min",
-  prefix = NULL,
+  colnames_prefix = NULL,
+  labels_prefix = NULL,
   workers = NULL,
   keep_all = FALSE
 ) {
@@ -219,7 +221,8 @@ extract_phenotypes <- function(
                         clinical_codes,
                         data_sources,
                         min_max,
-                        prefix,
+                        colnames_prefix,
+                        labels_prefix,
                         db_path = NULL,
                         table_name = NULL,
                         keep_all) {
@@ -242,7 +245,8 @@ extract_phenotypes <- function(
       clinical_codes = clinical_codes,
       data_sources = data_sources,
       min_max = min_max,
-      prefix = prefix,
+      colnames_prefix = colnames_prefix,
+      labels_prefix = labels_prefix,
       keep_all = keep_all
     )
   }
@@ -279,7 +283,8 @@ extract_phenotypes <- function(
                                     clinical_codes = clinical_codes,
                                     data_sources = data_sources,
                                     min_max = min_max,
-                                    prefix = prefix,
+                                    colnames_prefix = colnames_prefix,
+                                    labels_prefix = labels_prefix,
                                     keep_all = keep_all),
                         .progress = TRUE,
                         seed = TRUE)
@@ -296,7 +301,8 @@ extract_phenotypes <- function(
       clinical_codes = clinical_codes,
       data_sources = data_sources,
       min_max = min_max,
-      prefix = prefix,
+      colnames_prefix = colnames_prefix,
+      labels_prefix = labels_prefix,
       keep_all = keep_all
     ),
     .progress = TRUE,
@@ -313,7 +319,8 @@ extract_phenotypes <- function(
           clinical_codes = clinical_codes,
           data_sources = data_sources,
           min_max = min_max,
-          prefix = prefix,
+          colnames_prefix = colnames_prefix,
+          labels_prefix = labels_prefix,
           keep_all = keep_all
         ))
 
@@ -887,7 +894,8 @@ validate_clinical_events_and_check_type <- function(clinical_events) {
 #'   for this value in the 'disease' column.
 #' @param clinical_codes data frame. Must match the format as per
 #'   \code{\link{example_clinical_codes}}.
-#' @param prefix character. Optionally add a prefix to column names.
+#' @param colnames_prefix character. Optionally add a prefix to column names.
+#' @param labels_prefix character. Optionally add a prefix to variable labels.
 #' @inheritParams extract_phenotypes
 #'
 #' @return Data frame with an "eid" column, and "event_min/max_indicator" and
@@ -902,7 +910,8 @@ extract_phenotypes_single_disease <-
            clinical_codes,
            data_sources,
            min_max,
-           prefix,
+           colnames_prefix,
+           labels_prefix,
            keep_all) {
 
     start_time <- proc.time()
@@ -956,10 +965,10 @@ extract_phenotypes_single_disease <-
         tolower(clinical_codes$phenotype_colname)
       )
 
-    # add prefix if specified
-    if (!is.null(prefix)) {
+    # add colnames_prefix if specified
+    if (!is.null(colnames_prefix)) {
       clinical_codes$phenotype_colname <-
-        paste0(prefix, clinical_codes$phenotype_colname)
+        paste0(colnames_prefix, clinical_codes$phenotype_colname)
     }
 
     # make 2 named lists of code lists for each phenotype: 1 will contain code
@@ -1045,11 +1054,20 @@ extract_phenotypes_single_disease <-
         )
       )
 
+      # phenotype - used for variable label
+      variable_label <- as.character(phenotype_colname_to_phenotype[phenotype_colname])
+
+      # add prefix to varable label, if specified
+      if (!is.null(labels_prefix)) {
+        variable_label <- paste0(labels_prefix, variable_label)
+      }
+
+      # get result
        result <- extract_clinical_events(
           clinical_events = clinical_events,
           clinical_codes_list = list_of_phenotype_codelists[[phenotype_colname]],
           phenotype_colname = phenotype_colname,
-          phenotype = as.character(phenotype_colname_to_phenotype[phenotype_colname]),
+          phenotype = variable_label,
           min_max = min_max,
           keep_all = keep_all
         )
@@ -1090,7 +1108,7 @@ extract_phenotypes_single_disease <-
 #' @section Under the hood:
 #'
 #'   Filters a long format data frame of clinical codes generated by
-#'   \code{\link{tidy_clinical_events}}), filters this for the codes in
+#'   \code{\link{tidy_clinical_events}}) for the codes in
 #'   \code{clinical_codes_list} then groups by eid. For each eid the earliest or
 #'   latest date is then retrieved, as specified by \code{min_max}.
 #'

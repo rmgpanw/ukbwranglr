@@ -323,7 +323,8 @@ test_that(
         clinical_events = dummy_clinical_events,
         clinical_codes = dummy_clinical_codes,
         min_max = "min",
-        prefix = "test_",
+        colnames_prefix = "test_",
+        labels_prefix = "Test! ",
         data_sources = NULL,
         keep_all = FALSE
       )
@@ -350,42 +351,57 @@ test_that(
 
 # `extract_phenotypes()` --------------------------
 
-test_that(
-  "`extract_phenotypes()` returns the expected column names", {
-    result <- extract_phenotypes(clinical_events = dummy_clinical_events,
-                                               clinical_codes = dummy_clinical_codes,
-                                               min_max = "min",
-                                               prefix = "test_")
-
-    expect_equal(
-      sort(names(result[["Disease2"]])),
-      sort(c(
-        "test_c_test",
-        "test_d_test",
-        "test_DISEASE2_TEST"
-      ))
+test_that("`extract_phenotypes()` returns the expected column names", {
+  result <-
+    extract_phenotypes(
+      clinical_events = dummy_clinical_events,
+      clinical_codes = dummy_clinical_codes,
+      min_max = "min",
+      colnames_prefix = "test_",
+      labels_prefix = "Test! "
     )
-  }
-)
+
+  expect_equal(sort(names(result[["Disease2"]])),
+               sort(c(
+                 "test_c_test",
+                 "test_d_test",
+                 "test_DISEASE2_TEST"
+               )))
+
+  # test variable labels are prefixed
+  expect_equal(attributes(result[["Disease2"]]$test_c_test$test_c_test_indicator)$label,
+               "Test! C")
+
+  expect_equal(attributes(result[["Disease2"]]$test_c_test$test_c_test_min_date)$label,
+               "Test! C date (min)")
+})
 
 # Note can test dummy_clinical_events_db locally but not with R CMD check
-test_that(
-  "`extract_phenotypes()` returns the expected column names with tbl_dbi object", {
-    result <- extract_phenotypes(clinical_events = dummy_clinical_events_db,
-                                 clinical_codes = dummy_clinical_codes,
-                                 min_max = "min",
-                                 prefix = "test_")
+test_that("`extract_phenotypes()` returns the expected column names with tbl_dbi object",
+          {
+            result <-
+              extract_phenotypes(
+                clinical_events = dummy_clinical_events_db,
+                clinical_codes = dummy_clinical_codes,
+                min_max = "min",
+                colnames_prefix = "test_",
+                labels_prefix = "Test! "
+              )
 
-    expect_equal(
-      sort(names(result[["Disease2"]])),
-      sort(c(
-        "test_c_test",
-        "test_d_test",
-        "test_DISEASE2_TEST"
-      ))
-    )
-  }
-)
+            expect_equal(sort(names(result[["Disease2"]])),
+                         sort(c(
+                           "test_c_test",
+                           "test_d_test",
+                           "test_DISEASE2_TEST"
+                         )))
+
+            # test variable labels are prefixed
+            expect_equal(attributes(result[["Disease2"]]$test_c_test$test_c_test_indicator)$label,
+                         "Test! C")
+
+            expect_equal(attributes(result[["Disease2"]]$test_c_test$test_c_test_min_date)$label,
+                         "Test! C date (min)")
+          })
 
 test_that(# need to rebuild package to include any changes when running this test
   "`extract_phenotypes()` works with parallel processing, data frame clinical events",
@@ -395,7 +411,7 @@ test_that(# need to rebuild package to include any changes when running this tes
         clinical_events = dummy_clinical_events,
         clinical_codes = dummy_clinical_codes,
         min_max = "min",
-        prefix = "test_",
+        colnames_prefix = "test_",
         workers = 2
       )
 
@@ -413,7 +429,7 @@ test_that("`extract_phenotypes()` returns expected results", {
   result <- extract_phenotypes(clinical_events = dummy_clinical_events,
                                clinical_codes = dummy_clinical_codes,
                                min_max = "min",
-                               prefix = "test_")
+                               colnames_prefix = "test_")
 
   expect_equivalent(
     result$Disease1$test_a_test %>%
@@ -486,7 +502,7 @@ test_that(
           clinical_events = dummy_clinical_events,
           clinical_codes = dummy_clinical_codes,
           min_max = "min",
-          prefix = "cancer_icd10_",
+          colnames_prefix = "cancer_icd10_",
           data_sources = c("f40006")
         )
       )
@@ -523,7 +539,7 @@ test_that(
           clinical_events = dummy_clinical_events,
           clinical_codes = dummy_clinical_codes,
           min_max = "min",
-          prefix = "test_",
+          colnames_prefix = "test_",
           data_sources = c("f40006")
         )
       )
