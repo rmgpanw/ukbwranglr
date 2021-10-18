@@ -132,7 +132,8 @@ events'</a> vignette on the <code>ukbwranglr</code> package website.</p>
   <span class='va'>clinical_codes</span>,
   data_sources <span class='op'>=</span> <span class='cn'>NULL</span>,
   min_max <span class='op'>=</span> <span class='st'>"min"</span>,
-  prefix <span class='op'>=</span> <span class='cn'>NULL</span>,
+  colnames_prefix <span class='op'>=</span> <span class='cn'>NULL</span>,
+  labels_prefix <span class='op'>=</span> <span class='cn'>NULL</span>,
   workers <span class='op'>=</span> <span class='cn'>NULL</span>,
   keep_all <span class='op'>=</span> <span class='cn'>FALSE</span>
 <span class='op'>)</span></pre>
@@ -165,8 +166,12 @@ valid values.</p></td>
 latest date that one of the codes appears in <code>clinical_codes</code> appears.</p></td>
     </tr>
     <tr>
-      <th>prefix</th>
+      <th>colnames_prefix</th>
       <td><p>Optionally add a prefix to column names.</p></td>
+    </tr>
+    <tr>
+      <th>labels_prefix</th>
+      <td><p>Optionally add a prefix to variable labels.</p></td>
     </tr>
     <tr>
       <th>workers</th>
