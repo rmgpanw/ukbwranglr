@@ -983,6 +983,9 @@ remove_special_characters_and_make_lower_case <- function(string) {
   # make '<=' 'le'
   string <- stringr::str_replace_all(string, "<=", "_less_or_equal_")
 
+  # make '&' 'and
+  string <- stringr::str_replace_all(string, "&", "_and_")
+
   # characters to be replaced with "_"
   to_underscore <- c("-",
                      "\\s",

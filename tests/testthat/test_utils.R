@@ -194,6 +194,11 @@ test_that("`remove_special_characters_and_make_lower_case()` returns expected re
     remove_special_characters_and_make_lower_case("FI1 : numeric addition test"),
     "fi1_numeric_addition_test"
   )
+
+  expect_equal(
+    remove_special_characters_and_make_lower_case("Enthesopathies & synovial disorders"),
+    "enthesopathies_and_synovial_disorders"
+  )
 })
 
 # `validate_clinical_codes()` ---------------------------------------------
