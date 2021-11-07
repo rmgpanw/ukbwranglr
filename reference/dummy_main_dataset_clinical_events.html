@@ -128,133 +128,134 @@
     <div class='dont-index'><p><code><a href='tidy_clinical_events.html'>tidy_clinical_events</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>dummy_main_dataset_clinical_events</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;    eid cancer_code_self_reported_f20001_0_0
-#&gt; 1:   1                                 1048
-#&gt; 2:   2                                 1046
-#&gt;    cancer_code_self_reported_f20001_0_3 cancer_code_self_reported_f20001_2_0
-#&gt; 1:                                 1005                                 1045
-#&gt; 2:                                 1003                                 1028
-#&gt;    cancer_code_self_reported_f20001_2_3
-#&gt; 1:                                 1017
-#&gt; 2:                                 1039
-#&gt;    non_cancer_illness_code_self_reported_f20002_0_0
-#&gt; 1:                                             1665
-#&gt; 2:                                             1383
-#&gt;    non_cancer_illness_code_self_reported_f20002_0_3
-#&gt; 1:                                             1223
-#&gt; 2:                                             1352
-#&gt;    non_cancer_illness_code_self_reported_f20002_2_0
-#&gt; 1:                                             1514
-#&gt; 2:                                             1447
-#&gt;    non_cancer_illness_code_self_reported_f20002_2_3
-#&gt; 1:                                               NA
-#&gt; 2:                                             1165
-#&gt;    interpolated_year_when_cancer_first_diagnosed_f20006_0_0
-#&gt; 1:                                                 2012.817
-#&gt; 2:                                                 2016.064
-#&gt;    interpolated_year_when_cancer_first_diagnosed_f20006_0_3
-#&gt; 1:                                                 2007.087
-#&gt; 2:                                                 2023.164
-#&gt;    interpolated_year_when_cancer_first_diagnosed_f20006_2_0
-#&gt; 1:                                                 2023.205
-#&gt; 2:                                                 2024.036
-#&gt;    interpolated_year_when_cancer_first_diagnosed_f20006_2_3
-#&gt; 1:                                                 2014.737
-#&gt; 2:                                                 2013.204
-#&gt;    interpolated_year_when_non_cancer_illness_first_diagnosed_f20008_0_0
-#&gt; 1:                                                             1998.978
-#&gt; 2:                                                             2011.012
-#&gt;    interpolated_year_when_non_cancer_illness_first_diagnosed_f20008_0_3
-#&gt; 1:                                                             2003.153
-#&gt; 2:                                                             2020.502
-#&gt;    interpolated_year_when_non_cancer_illness_first_diagnosed_f20008_2_0
-#&gt; 1:                                                             2011.264
-#&gt; 2:                                                             1981.163
-#&gt;    interpolated_year_when_non_cancer_illness_first_diagnosed_f20008_2_3
-#&gt; 1:                                                             2018.786
-#&gt; 2:                                                             1983.006
-#&gt;    diagnoses_icd10_f41270_0_0 diagnoses_icd10_f41270_0_3
-#&gt; 1:                       X715                        E10
-#&gt; 2:                        E11                      M0087
-#&gt;    diagnoses_icd9_f41271_0_0 diagnoses_icd9_f41271_0_3
-#&gt; 1:                    E89115                      &lt;NA&gt;
-#&gt; 2:                     E8326                     75513
-#&gt;    date_of_first_in_patient_diagnosis_icd10_f41280_0_0
-#&gt; 1:                                          1955-11-12
-#&gt; 2:                                          1939-02-16
-#&gt;    date_of_first_in_patient_diagnosis_icd10_f41280_0_3
-#&gt; 1:                                          1910-02-19
-#&gt; 2:                                          1965-08-08
-#&gt;    date_of_first_in_patient_diagnosis_icd9_f41281_0_0
-#&gt; 1:                                         1917-10-08
-#&gt; 2:                                         1955-02-11
-#&gt;    date_of_first_in_patient_diagnosis_icd9_f41281_0_3
-#&gt; 1:                                         1969-11-23
-#&gt; 2:                                         1956-09-12
-#&gt;    underlying_primary_cause_of_death_icd10_f40001_0_0
-#&gt; 1:                                               X095
-#&gt; 2:                                               A162
-#&gt;    underlying_primary_cause_of_death_icd10_f40001_1_0
-#&gt; 1:                                               X095
-#&gt; 2:                                               A162
-#&gt;    contributory_secondary_causes_of_death_icd10_f40002_0_0
-#&gt; 1:                                                    W192
-#&gt; 2:                                                    V374
-#&gt;    contributory_secondary_causes_of_death_icd10_f40002_1_3
-#&gt; 1:                                                    X715
-#&gt; 2:                                                    &lt;NA&gt;
-#&gt;    date_of_death_f40000_0_0 date_of_death_f40000_1_0
-#&gt; 1:               1917-10-08               1910-02-19
-#&gt; 2:               1955-02-11               1965-08-08
-#&gt;    treatment_medication_code_f20003_0_0 treatment_medication_code_f20003_2_0
-#&gt; 1:                           1140861958                           1141146188
-#&gt; 2:                           1141146234                           1141184722
-#&gt;    treatment_medication_code_f20003_2_3
-#&gt; 1:                           1141184722
-#&gt; 2:                           1140861958
-#&gt;    date_of_attending_assessment_centre_f53_0_0
-#&gt; 1:                                  1955-02-11
-#&gt; 2:                                  1965-08-08
-#&gt;    date_of_attending_assessment_centre_f53_2_0
-#&gt; 1:                                  1910-02-19
-#&gt; 2:                                  1915-03-18
-#&gt;    date_of_cancer_diagnosis_f40005_0_0 date_of_cancer_diagnosis_f40005_2_0
-#&gt; 1:                          1956-11-24                          1962-09-04
-#&gt; 2:                          1910-10-04                                &lt;NA&gt;
-#&gt;    type_of_cancer_icd10_f40006_0_0 type_of_cancer_icd10_f40006_2_0
-#&gt; 1:                           M4815                            C850
-#&gt; 2:                            &lt;NA&gt;                            W192
-#&gt;    type_of_cancer_icd9_f40013_0_0 type_of_cancer_icd9_f40013_2_0
-#&gt; 1:                          27134                           2042
-#&gt; 2:                           9626                         E90200
-#&gt;    operative_procedures_opcs4_f41272_0_0 operative_procedures_opcs4_f41272_0_3
-#&gt; 1:                                   A01                                  A018
-#&gt; 2:                                  A023                                   A02
-#&gt;    date_of_first_operative_procedure_opcs4_f41282_0_0
-#&gt; 1:                                         1956-11-24
-#&gt; 2:                                         1910-10-04
-#&gt;    date_of_first_operative_procedure_opcs4_f41282_0_3
-#&gt; 1:                                         1969-11-23
-#&gt; 2:                                         1956-09-12
-#&gt;    operative_procedures_opcs3_f41273_0_0 operative_procedures_opcs3_f41273_0_3
-#&gt; 1:                                   001                                  0081
-#&gt; 2:                                  0011                                  0071
-#&gt;    date_of_first_operative_procedure_opcs3_f41283_0_0
-#&gt; 1:                                         1969-11-23
-#&gt; 2:                                         1956-09-12
-#&gt;    date_of_first_operative_procedure_opcs3_f41283_0_3 operation_code_f20004_0_0
-#&gt; 1:                                         1955-11-12                      1102
-#&gt; 2:                                         1939-02-16                      1105
-#&gt;    operation_code_f20004_0_3
-#&gt; 1:                      1108
-#&gt; 2:                      1109
-#&gt;    interpolated_year_when_operation_took_place_f20010_0_0
-#&gt; 1:                                               2012.817
-#&gt; 2:                                               2016.064
-#&gt;    interpolated_year_when_operation_took_place_f20010_0_3
-#&gt; 1:                                               2008.234
-#&gt; 2:                                                     NA</div></pre>
+    <pre class="examples"><span class='r-in'><span class='fu'>dummy_main_dataset_clinical_events</span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    eid cancer_code_self_reported_f20001_0_0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:   1                                 1048</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:   2                                 1046</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    cancer_code_self_reported_f20001_0_3 cancer_code_self_reported_f20001_2_0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:                                 1005                                 1045</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:                                 1003                                 1028</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    cancer_code_self_reported_f20001_2_3</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:                                 1017</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:                                 1039</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    non_cancer_illness_code_self_reported_f20002_0_0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:                                             1665</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:                                             1383</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    non_cancer_illness_code_self_reported_f20002_0_3</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:                                             1223</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:                                             1352</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    non_cancer_illness_code_self_reported_f20002_2_0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:                                             1514</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:                                             1447</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    non_cancer_illness_code_self_reported_f20002_2_3</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:                                               NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:                                             1165</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    interpolated_year_when_cancer_first_diagnosed_f20006_0_0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:                                                 2012.817</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:                                                 2016.064</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    interpolated_year_when_cancer_first_diagnosed_f20006_0_3</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:                                                 2007.087</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:                                                 2023.164</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    interpolated_year_when_cancer_first_diagnosed_f20006_2_0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:                                                 2023.205</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:                                                 2024.036</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    interpolated_year_when_cancer_first_diagnosed_f20006_2_3</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:                                                 2014.737</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:                                                 2013.204</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    interpolated_year_when_non_cancer_illness_first_diagnosed_f20008_0_0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:                                                             1998.978</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:                                                             2011.012</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    interpolated_year_when_non_cancer_illness_first_diagnosed_f20008_0_3</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:                                                             2003.153</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:                                                             2020.502</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    interpolated_year_when_non_cancer_illness_first_diagnosed_f20008_2_0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:                                                             2011.264</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:                                                             1981.163</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    interpolated_year_when_non_cancer_illness_first_diagnosed_f20008_2_3</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:                                                             2018.786</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:                                                             1983.006</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    diagnoses_icd10_f41270_0_0 diagnoses_icd10_f41270_0_3</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:                       X715                        E10</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:                        E11                      M0087</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    diagnoses_icd9_f41271_0_0 diagnoses_icd9_f41271_0_3</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:                    E89115                      &lt;NA&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:                     E8326                     75513</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    date_of_first_in_patient_diagnosis_icd10_f41280_0_0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:                                          1955-11-12</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:                                          1939-02-16</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    date_of_first_in_patient_diagnosis_icd10_f41280_0_3</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:                                          1910-02-19</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:                                          1965-08-08</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    date_of_first_in_patient_diagnosis_icd9_f41281_0_0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:                                         1917-10-08</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:                                         1955-02-11</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    date_of_first_in_patient_diagnosis_icd9_f41281_0_3</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:                                         1969-11-23</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:                                         1956-09-12</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    underlying_primary_cause_of_death_icd10_f40001_0_0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:                                               X095</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:                                               A162</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    underlying_primary_cause_of_death_icd10_f40001_1_0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:                                               X095</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:                                               A162</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    contributory_secondary_causes_of_death_icd10_f40002_0_0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:                                                    W192</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:                                                    V374</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    contributory_secondary_causes_of_death_icd10_f40002_1_3</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:                                                    X715</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:                                                    &lt;NA&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    date_of_death_f40000_0_0 date_of_death_f40000_1_0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:               1917-10-08               1910-02-19</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:               1955-02-11               1965-08-08</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    treatment_medication_code_f20003_0_0 treatment_medication_code_f20003_2_0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:                           1140861958                           1141146188</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:                           1141146234                           1141184722</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    treatment_medication_code_f20003_2_3</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:                           1141184722</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:                           1140861958</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    date_of_attending_assessment_centre_f53_0_0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:                                  1955-02-11</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:                                  1965-08-08</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    date_of_attending_assessment_centre_f53_2_0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:                                  1910-02-19</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:                                  1915-03-18</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    date_of_cancer_diagnosis_f40005_0_0 date_of_cancer_diagnosis_f40005_2_0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:                          1956-11-24                          1962-09-04</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:                          1910-10-04                                &lt;NA&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    type_of_cancer_icd10_f40006_0_0 type_of_cancer_icd10_f40006_2_0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:                           M4815                            C850</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:                            &lt;NA&gt;                            W192</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    type_of_cancer_icd9_f40013_0_0 type_of_cancer_icd9_f40013_2_0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:                          27134                           2042</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:                           9626                         E90200</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    operative_procedures_opcs4_f41272_0_0 operative_procedures_opcs4_f41272_0_3</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:                                   A01                                  A018</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:                                  A023                                   A02</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    date_of_first_operative_procedure_opcs4_f41282_0_0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:                                         1956-11-24</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:                                         1910-10-04</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    date_of_first_operative_procedure_opcs4_f41282_0_3</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:                                         1969-11-23</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:                                         1956-09-12</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    operative_procedures_opcs3_f41273_0_0 operative_procedures_opcs3_f41273_0_3</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:                                   001                                  0081</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:                                  0011                                  0071</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    date_of_first_operative_procedure_opcs3_f41283_0_0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:                                         1969-11-23</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:                                         1956-09-12</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    date_of_first_operative_procedure_opcs3_f41283_0_3 operation_code_f20004_0_0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:                                         1955-11-12                      1102</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:                                         1939-02-16                      1105</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    operation_code_f20004_0_3</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:                      1108</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:                      1109</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    interpolated_year_when_operation_took_place_f20010_0_0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:                                               2012.817</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:                                               2016.064</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    interpolated_year_when_operation_took_place_f20010_0_3</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1:                                               2008.234</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2:                                                     NA</span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

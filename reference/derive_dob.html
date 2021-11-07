@@ -166,15 +166,17 @@ name, label and values/value labels).</p></td>
   character).</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='va'>ukb_main</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>eid <span class='op'>=</span> <span class='fl'>1</span>, f34_0_0 <span class='op'>=</span> <span class='fl'>1990</span>, f52_0_0 <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
- <span class='co'># keep input year/month of birth columns</span>
- <span class='fu'>derive_dob</span><span class='op'>(</span><span class='va'>ukb_main</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;   eid f34_0_0 f52_0_0        dob
-#&gt; 1   1    1990       1 1990-01-01</div><div class='input'>
- <span class='co'># remove input year/month of birth columns</span>
- <span class='fu'>derive_dob</span><span class='op'>(</span><span class='va'>ukb_main</span>, .drop <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;   eid        dob
-#&gt; 1   1 1990-01-01</div></pre>
+    <pre class="examples"><span class='r-in'><span class='va'>ukb_main</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>eid <span class='op'>=</span> <span class='fl'>1</span>, f34_0_0 <span class='op'>=</span> <span class='fl'>1990</span>, f52_0_0 <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span></span>
+<span class='r-in'> <span class='co'># keep input year/month of birth columns</span></span>
+<span class='r-in'> <span class='fu'>derive_dob</span><span class='op'>(</span><span class='va'>ukb_main</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   eid f34_0_0 f52_0_0        dob</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1   1    1990       1 1990-01-01</span>
+<span class='r-in'></span>
+<span class='r-in'> <span class='co'># remove input year/month of birth columns</span></span>
+<span class='r-in'> <span class='fu'>derive_dob</span><span class='op'>(</span><span class='va'>ukb_main</span>, .drop <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   eid        dob</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1   1 1990-01-01</span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

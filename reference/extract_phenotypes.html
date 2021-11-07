@@ -198,17 +198,17 @@ nested data frame column named 'data'.</p></td>
   then there will also be additional nested data frame column called 'data'.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
-<span class='fu'><a href='dummy_main_dataset_clinical_events.html'>dummy_main_dataset_clinical_events</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
-  <span class='fu'><a href='tidy_clinical_events.html'>tidy_clinical_events</a></span><span class='op'>(</span>clinical_events_sources <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"summary_hes_icd10"</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
-  <span class='fu'>dplyr</span><span class='fu'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/bind.html'>bind_rows</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
-  <span class='fu'>extract_phenotypes</span><span class='op'>(</span>
-    clinical_codes <span class='op'>=</span> <span class='fu'><a href='example_clinical_codes.html'>example_clinical_codes</a></span><span class='op'>(</span><span class='op'>)</span>,
-    data_sources <span class='op'>=</span> <span class='st'>"f41270"</span>,
-    min_max <span class='op'>=</span> <span class='st'>"min"</span>
-  <span class='op'>)</span>
-<span class='op'>}</span>
-</div></pre>
+    <pre class="examples"><span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'><span class='fu'><a href='dummy_main_dataset_clinical_events.html'>dummy_main_dataset_clinical_events</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span></span>
+<span class='r-in'>  <span class='fu'><a href='tidy_clinical_events.html'>tidy_clinical_events</a></span><span class='op'>(</span>clinical_events_sources <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"summary_hes_icd10"</span><span class='op'>)</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span></span>
+<span class='r-in'>  <span class='fu'>dplyr</span><span class='fu'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/bind.html'>bind_rows</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span></span>
+<span class='r-in'>  <span class='fu'>extract_phenotypes</span><span class='op'>(</span></span>
+<span class='r-in'>    clinical_codes <span class='op'>=</span> <span class='fu'><a href='example_clinical_codes.html'>example_clinical_codes</a></span><span class='op'>(</span><span class='op'>)</span>,</span>
+<span class='r-in'>    data_sources <span class='op'>=</span> <span class='st'>"f41270"</span>,</span>
+<span class='r-in'>    min_max <span class='op'>=</span> <span class='st'>"min"</span></span>
+<span class='r-in'>  <span class='op'>)</span></span>
+<span class='r-in'><span class='op'>}</span></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

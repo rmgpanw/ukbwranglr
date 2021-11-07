@@ -158,23 +158,25 @@ supplied to <code>date_col_regex</code> with this string.</p></td>
     <p>A data frame with additional "age at event" columns</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># dummy data</span>
-<span class='va'>dummy_ukb_main</span> <span class='op'>&lt;-</span> <span class='fu'>tibble</span><span class='fu'>::</span><span class='fu'><a href='https://tibble.tidyverse.org/reference/tribble.html'>tribble</a></span><span class='op'>(</span>
-<span class='op'>~</span> <span class='va'>eid</span>, <span class='op'>~</span> <span class='va'>dob</span>, <span class='op'>~</span> <span class='va'>event_date</span>,
-<span class='fl'>1</span>, <span class='st'>"2000-01-01"</span>, <span class='st'>"2010-01-01"</span>
-<span class='op'>)</span>
-
-<span class='co'># mutate age at event col</span>
-<span class='fu'>mutate_age_at_event_cols</span><span class='op'>(</span>
-  <span class='va'>dummy_ukb_main</span>,
-  dob_col <span class='op'>=</span> <span class='st'>"dob"</span>,
-  date_col_regex <span class='op'>=</span> <span class='st'>"_date$"</span>,
-  date_col_regex_replacement <span class='op'>=</span> <span class='st'>"_age"</span>
-<span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>Calculating age at event for event_date. New colname: event_age</span></div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 1 × 4</span>
-#&gt;     eid dob        event_date event_age
-#&gt;   <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span>      <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span>          <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>
-#&gt; <span style='color: #BCBCBC;'>1</span>     1 2000-01-01 2010-01-01      10.0</div></pre>
+    <pre class="examples"><span class='r-in'><span class='co'># dummy data</span></span>
+<span class='r-in'><span class='va'>dummy_ukb_main</span> <span class='op'>&lt;-</span> <span class='fu'>tibble</span><span class='fu'>::</span><span class='fu'><a href='https://tibble.tidyverse.org/reference/tribble.html'>tribble</a></span><span class='op'>(</span></span>
+<span class='r-in'><span class='op'>~</span> <span class='va'>eid</span>, <span class='op'>~</span> <span class='va'>dob</span>, <span class='op'>~</span> <span class='va'>event_date</span>,</span>
+<span class='r-in'><span class='fl'>1</span>, <span class='st'>"2000-01-01"</span>, <span class='st'>"2010-01-01"</span></span>
+<span class='r-in'><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># mutate age at event col</span></span>
+<span class='r-in'><span class='fu'>mutate_age_at_event_cols</span><span class='op'>(</span></span>
+<span class='r-in'>  <span class='va'>dummy_ukb_main</span>,</span>
+<span class='r-in'>  dob_col <span class='op'>=</span> <span class='st'>"dob"</span>,</span>
+<span class='r-in'>  date_col_regex <span class='op'>=</span> <span class='st'>"_date$"</span>,</span>
+<span class='r-in'>  date_col_regex_replacement <span class='op'>=</span> <span class='st'>"_age"</span></span>
+<span class='r-in'><span class='op'>)</span></span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> Calculating age at event for event_date. New colname: event_age</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># A tibble: 1 × 4</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>     eid dob        event_date event_age</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span>      <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span>          <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>1</span>     1 2000-01-01 2010-01-01      10.0</span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
