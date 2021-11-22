@@ -909,7 +909,10 @@ check_required_cols_exist <- function(df,
     # make print-friendly version of required cols
     # paste(required_cols, collapse = "\n\n")
 
-    stop("Required columns not present in data")
+    stop(paste0("Required columns not present in data. Required cols: ",
+                stringr::str_c(required_cols,
+                               sep = "",
+                               collapse = ", ")))
   }
 }
 
