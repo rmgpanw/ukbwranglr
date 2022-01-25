@@ -8,3 +8,4 @@ ukbwranglr.Rcheck/
 ukbwranglr*.tar.gz
 ukbwranglr*.tgz
 tests.Rmd
+docs/*
