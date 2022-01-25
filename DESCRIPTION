@@ -9,7 +9,7 @@ License: MIT + file LICENSE
 URL: https://github.com/rmgpanw/ukbwranglr
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 Suggests: 
     covr,
     knitr,
