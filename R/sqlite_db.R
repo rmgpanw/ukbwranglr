@@ -109,7 +109,7 @@ make_clinical_events_db <- function(ukb_main_path,
     unique()
 
   # error if no clinical events fields present
-  if (length(least) == 0) {
+  if (length(available_clinical_events_fields) == 0) {
     stop("No clinical events fields identified in main UKB dataset. Use `ukbwranglr::clinical_events_sources()` for a list of valid clinical events Field IDs.")
   }
 
