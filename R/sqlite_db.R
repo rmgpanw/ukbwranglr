@@ -117,11 +117,11 @@ make_clinical_events_db <- function(ukb_main_path,
   missing_clinical_events_fields <-
     subset(available_clinical_events_fields, !(available_clinical_events_fields %in% data_dict$FieldID))
 
-    if (length(missing_fields) > 0) {
+    if (length(missing_clinical_events_fields) > 0) {
       warning(
         paste0(
           "The following clinical events field IDs are missing from the main UKB dataset: ",
-          stringr::str_c(missing_fields, sep = "", collapse = ", ")
+          stringr::str_c(missing_clinical_events_fields, sep = "", collapse = ", ")
         )
       )
     }
