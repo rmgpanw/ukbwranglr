@@ -10,11 +10,11 @@
 #' Creates a data dictionary from either a raw UK Biobank main dataset file or a
 #' data frame if this has already been loaded into R.
 #'
-#' @param ukb_main Either the path to a UK Biobank main dataset file (character string)
-#'   or a data frame.
-#' @param delim Delimiter for the UKB main dataset file. Default is "\\t".
-#'   Ignored if the file name ends with \code{.dta} (i.e. is a \code{STATA}
-#'   file) or if \code{ukb_main} is a data frame.
+#' @param ukb_main Either the path to a UK Biobank main dataset file (character
+#'   string) or a data frame.
+#' @param delim Delimiter for the UKB main dataset file. Default is "auto" (see
+#'   [data.table::fread]). Ignored if the file name ends with \code{.dta} (i.e.
+#'   is a \code{STATA} file) or if \code{ukb_main} is a data frame.
 #' @param ukb_data_dict The UKB data dictionary (available online at the UK
 #'   Biobank
 #'   \href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{data
@@ -28,7 +28,7 @@
 #'   the current column names ("colheaders_raw").
 #' @export
 make_data_dict <- function(ukb_main,
-                           delim = "\t",
+                           delim = "auto",
                            ukb_data_dict = get_ukb_data_dict()) {
 
   # extract column names - ukb_main can be a file path or a dataframe already
@@ -166,7 +166,7 @@ make_data_dict <- function(ukb_main,
 #'   variables labels and data values.
 #' @export
 read_ukb <- function(path,
-                     delim = "\t",
+                     delim = "auto",
                      data_dict = NULL,
                      ukb_data_dict = get_ukb_data_dict(),
                      ukb_codings = get_ukb_codings(),
@@ -627,7 +627,7 @@ indicate_coltype_in_data_dict <- function(data_dict,
 }
 
 read_ukb_raw_basis <- function(path,
-                               delim = "\t",
+                               delim = "auto",
                                data_dict,
                                ukb_data_dict = get_ukb_data_dict(),
                                ukb_codings = get_ukb_codings(),
@@ -882,7 +882,7 @@ update_column_classes <- function(df,
 read_ukb_chunked_to_file <- function(in_path,
                                      out_path,
                                      data_dict,
-                                     in_delim = "\t",
+                                     in_delim = "auto",
                                      ukb_data_dict = get_ukb_data_dict(),
                                      ukb_codings = get_ukb_codings(),
                                      max_n_labels = 22,

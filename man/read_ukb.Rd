@@ -6,7 +6,7 @@
 \usage{
 read_ukb(
   path,
-  delim = "\\t",
+  delim = "auto",
   data_dict = NULL,
   ukb_data_dict = get_ukb_data_dict(),
   ukb_codings = get_ukb_codings(),

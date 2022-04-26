@@ -4,15 +4,15 @@
 \alias{make_data_dict}
 \title{Generate a UK Biobank data dictionary}
 \usage{
-make_data_dict(ukb_main, delim = "\\t", ukb_data_dict = get_ukb_data_dict())
+make_data_dict(ukb_main, delim = "auto", ukb_data_dict = get_ukb_data_dict())
 }
 \arguments{
-\item{ukb_main}{Either the path to a UK Biobank main dataset file (character string)
-or a data frame.}
+\item{ukb_main}{Either the path to a UK Biobank main dataset file (character
+string) or a data frame.}
 
-\item{delim}{Delimiter for the UKB main dataset file. Default is "\\t".
-Ignored if the file name ends with \code{.dta} (i.e. is a \code{STATA}
-file) or if \code{ukb_main} is a data frame.}
+\item{delim}{Delimiter for the UKB main dataset file. Default is "auto" (see
+[data.table::fread]). Ignored if the file name ends with \code{.dta} (i.e.
+is a \code{STATA} file) or if \code{ukb_main} is a data frame.}
 
 \item{ukb_data_dict}{The UKB data dictionary (available online at the UK
 Biobank
