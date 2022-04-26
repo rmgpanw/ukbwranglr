@@ -5,8 +5,8 @@
 \title{Create a SQLite database with a \code{clinical_events} table}
 \usage{
 make_clinical_events_db(
+  ukb_main_path,
   ukb_db_path,
-  ukb_main_path = NULL,
   gp_clinical_path = NULL,
   gp_scripts_path = NULL,
   ukb_main_delim = "auto",
@@ -14,14 +14,14 @@ make_clinical_events_db(
   ukb_codings = get_ukb_codings(),
   overwrite = FALSE,
   strict = TRUE,
-  chunk_size = 10000
+  chunk_size = 5e+05
 )
 }
 \arguments{
+\item{ukb_main_path}{Path to the main UKB dataset file.}
+
 \item{ukb_db_path}{Path to the SQLite database file. The file name must end
 with '.db'. If no file with this name exists then one will be created.}
-
-\item{ukb_main_path}{Path to the main UKB dataset file.}
 
 \item{gp_clinical_path}{Path to the UKB primary care clinical events file
 (\code{gp_clinical.txt}).}
@@ -62,14 +62,14 @@ the primary care dataset.}
 Returns \code{NULL} invisibly.
 }
 \description{
-Adds tables called \code{clinical_events}, \code{gp_clinical_values} and
-\code{gp_scripts_names_and_quantities} to a SQLite database file (the latter
-2 are only added if `gp_clinical_path` and/or `gp_scripts_path` are provided
-respectively). This is a long format table combining all clinical events data
-from a UK Biobank main dataset and the UK Biobank primary care clinical
-events dataset, as listed by \code{link{clinical_events_sources}}. Indexes
-are set on the \code{source}, \code{code} and \code{eid} columns in the
-\code{clinical_events} table.
+Adds tables called \code{clinical_events}, and optionally
+\code{gp_clinical_values} and \code{gp_scripts_names_and_quantities} to a
+SQLite database file (the latter 2 are only added if `gp_clinical_path`
+and/or `gp_scripts_path` respectively are provided). This is a long format
+table combining all clinical events data from a UK Biobank main dataset and
+the UK Biobank primary care clinical events dataset, as listed by
+\code{link{clinical_events_sources}}. Indexes are set on the \code{source},
+\code{code} and \code{eid} columns in the \code{clinical_events} table.
 }
 \seealso{
 \code{\link{tidy_clinical_events}}, \code{\link{tidy_gp_clinical}}

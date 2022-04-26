@@ -7,18 +7,18 @@
 
 #' Create a SQLite database with a \code{clinical_events} table
 #'
-#' Adds tables called \code{clinical_events}, \code{gp_clinical_values} and
-#' \code{gp_scripts_names_and_quantities} to a SQLite database file (the latter
-#' 2 are only added if `gp_clinical_path` and/or `gp_scripts_path` are provided
-#' respectively). This is a long format table combining all clinical events data
-#' from a UK Biobank main dataset and the UK Biobank primary care clinical
-#' events dataset, as listed by \code{link{clinical_events_sources}}. Indexes
-#' are set on the \code{source}, \code{code} and \code{eid} columns in the
-#' \code{clinical_events} table.
+#' Adds tables called \code{clinical_events}, and optionally
+#' \code{gp_clinical_values} and \code{gp_scripts_names_and_quantities} to a
+#' SQLite database file (the latter 2 are only added if `gp_clinical_path`
+#' and/or `gp_scripts_path` respectively are provided). This is a long format
+#' table combining all clinical events data from a UK Biobank main dataset and
+#' the UK Biobank primary care clinical events dataset, as listed by
+#' \code{link{clinical_events_sources}}. Indexes are set on the \code{source},
+#' \code{code} and \code{eid} columns in the \code{clinical_events} table.
 #'
+#' @param ukb_main_path Path to the main UKB dataset file.
 #' @param ukb_db_path Path to the SQLite database file. The file name must end
 #'   with '.db'. If no file with this name exists then one will be created.
-#' @param ukb_main_path Path to the main UKB dataset file.
 #' @param ukb_main_delim Delimiter for \code{ukb_main_path}. Default value is
 #'   \code{"auto"}.
 #' @param gp_clinical_path Path to the UKB primary care clinical events file
@@ -39,11 +39,11 @@
 #' @return Returns \code{NULL} invisibly.
 #' @export
 #' @seealso \code{\link{tidy_clinical_events}}, \code{\link{tidy_gp_clinical}}
-make_clinical_events_db <- function(ukb_db_path,
-                                    ukb_main_path = NULL,
+make_clinical_events_db <- function(ukb_main_path,
+                                    ukb_db_path,
+                                    ukb_main_delim = "auto",
                                     gp_clinical_path = NULL,
                                     gp_scripts_path = NULL,
-                                    ukb_main_delim = "auto",
                                     ukb_data_dict = get_ukb_data_dict(),
                                     ukb_codings = get_ukb_codings(),
                                     overwrite = FALSE,
@@ -54,11 +54,8 @@ make_clinical_events_db <- function(ukb_db_path,
   # validate args
   assertthat::assert_that(!rlang::is_missing(ukb_db_path),
                           msg = "Error! argument 'ukb_db_path' is missing, with no default")
-  assertthat::assert_that(!(
-    is.null(ukb_main_path) &
-      is.null(gp_clinical_path) & is.null(gp_scripts_path)
-  ),
-  msg = "At least one of `ukb_main_path`, `gp_clinical_path` and `gp_scripts_path` must be provided.")
+  assertthat::assert_that(!rlang::is_missing(ukb_main_path),
+                          msg = "Error! argument 'ukb_main_path' is missing, with no default")
 
   ukb_db_ext <- extract_file_ext(ukb_db_path)
   if (!(ukb_db_ext == "db") | is.na(ukb_db_ext)) {
@@ -98,84 +95,84 @@ make_clinical_events_db <- function(ukb_db_path,
 
   # Main dataset -----
 
-  if (!is.null(ukb_main_path)) {
-    # make data dictionary and filter for required FieldIDs
-    message("***CREATING DATA DICTIONARY FOR UKB MAIN DATASET***")
-    data_dict <- make_data_dict(ukb_main_path,
-                                delim = ukb_main_delim,
-                                ukb_data_dict = ukb_data_dict)
+  # make data dictionary and filter for required FieldIDs
+  message("***CREATING DATA DICTIONARY FOR UKB MAIN DATASET***")
+  data_dict <- make_data_dict(ukb_main_path,
+                              delim = ukb_main_delim,
+                              ukb_data_dict = ukb_data_dict)
 
-    # check that all required cols are present
-    assertthat::assert_that("eid" %in% data_dict$FieldID,
-                            msg = "Error! 'eid' column  is missing from the main UKB dataset")
+  # check that all required cols are present
+  assertthat::assert_that("eid" %in% data_dict$FieldID,
+                          msg = "Error! 'eid' column  is missing from the main UKB dataset")
 
-    required_fields <- tidy_clinical_events(.details_only = TRUE) %>%
-      purrr::pluck("required_field_ids") %>%
-      purrr::flatten() %>%
-      as.character() %>%
-      unique()
+  required_fields <-
+    tidy_clinical_events(.details_only = TRUE) %>%
+    purrr::pluck("required_field_ids") %>%
+    purrr::flatten() %>%
+    as.character() %>%
+    unique()
 
-    missing_fields <- subset(required_fields,!(required_fields %in% data_dict$FieldID))
+  missing_fields <-
+    subset(required_fields, !(required_fields %in% data_dict$FieldID))
 
-    if (strict) {
-      assertthat::assert_that(
-        length(missing_fields) == 0,
-        msg = paste0(
-          "Error! Some required field IDs are missing from the main UKB dataset: ",
+  if (strict) {
+    assertthat::assert_that(
+      length(missing_fields) == 0,
+      msg = paste0(
+        "Error! Some required field IDs are missing from the main UKB dataset: ",
+        stringr::str_c(missing_fields, sep = "", collapse = ", ")
+      )
+    )
+  } else if (!strict) {
+    if (length(missing_fields) > 0) {
+      warning(
+        paste0(
+          "Some required field IDs are missing from the main UKB dataset: ",
           stringr::str_c(missing_fields, sep = "", collapse = ", ")
         )
       )
-    } else if (!strict) {
-      if (length(missing_fields) > 0) {
-        warning(
-          paste0(
-            "Some required field IDs are missing from the main UKB dataset: ",
-            stringr::str_c(missing_fields, sep = "", collapse = ", ")
-          )
-        )
 
-        data_dict <- data_dict %>%
-          dplyr::filter(.data[["FieldID"]] %in% c("eid", required_fields))
-      }
+      data_dict <- data_dict %>%
+        dplyr::filter(.data[["FieldID"]] %in% c("eid", required_fields))
     }
+  }
 
-    # tidy ukb_main clinical events ----------------------------------
+  # tidy ukb_main clinical events ----------------------------------
 
-    # read selected clinical events cols into R
-    message("***READING DIAGNOSIS COLUMNS FROM UKB MAIN DATASET INTO R***")
-    ukb_main <- read_ukb(
-      path = ukb_main_path,
-      delim = ukb_main_delim,
-      data_dict = data_dict,
+  # read selected clinical events cols into R
+  message("***READING DIAGNOSIS COLUMNS FROM UKB MAIN DATASET INTO R***")
+  ukb_main <- read_ukb(
+    path = ukb_main_path,
+    delim = ukb_main_delim,
+    data_dict = data_dict,
+    ukb_data_dict = ukb_data_dict,
+    ukb_codings = ukb_codings,
+    descriptive_colnames = TRUE,
+    labelled = FALSE
+  )
+
+  # create long format data frame containing all clinical events codes in main dataset
+  message("***TIDYING CLINICAL EVENTS DATA***")
+  ukb_main <-
+    tidy_clinical_events(
+      ukb_main = ukb_main,
       ukb_data_dict = ukb_data_dict,
       ukb_codings = ukb_codings,
-      descriptive_colnames = TRUE,
-      labelled = FALSE
-    )
+      strict = strict
+    ) %>%
+    dplyr::bind_rows()
 
-    # create long format data frame containing all clinical events codes in main dataset
-    message("***TIDYING CLINICAL EVENTS DATA***")
-    ukb_main <-
-      tidy_clinical_events(
-        ukb_main = ukb_main,
-        ukb_data_dict = ukb_data_dict,
-        ukb_codings = ukb_codings,
-        strict = strict
-      ) %>%
-      dplyr::bind_rows()
-
-    # add ukb_main clinical events to database ---------------------------------------------------------------
-    message(
-      "***WRITING CLINICAL EVENTS FROM MAIN UKB DATASET TO `clinical_events` TABLE IN DATABASE***"
-    )
-    DBI::dbWriteTable(
-      conn = con,
-      name = "clinical_events",
-      value = ukb_main,
-      overwrite = overwrite,
-      append = FALSE
-    )
-  }
+  # add ukb_main clinical events to database ---------------------------------------------------------------
+  message(
+    "***WRITING CLINICAL EVENTS FROM MAIN UKB DATASET TO `clinical_events` TABLE IN DATABASE***"
+  )
+  DBI::dbWriteTable(
+    conn = con,
+    name = "clinical_events",
+    value = ukb_main,
+    overwrite = overwrite,
+    append = FALSE
+  )
 
   # append primary care data codes/dates to 'clinical_events' table, adding other columns to separate tables ---------------------------------------------------------------
 
@@ -405,7 +402,8 @@ file_to_sqlite_db <- function(file,
                               # indexes = NULL,
                               verbose = TRUE,
                               append = FALSE,
-                              callback_function = function(x, ...) list("table" = x),
+                              callback_function = function(x, ...)
+                                list("table" = x),
                               quote = "\"",
                               escape_backslash = FALSE,
                               escape_double = TRUE,
@@ -420,7 +418,6 @@ file_to_sqlite_db <- function(file,
                               progress = readr::show_progress(),
                               skip_empty_rows = TRUE,
                               ...) {
-
   start_time <- proc.time()
 
   # Create sqlite db connection
@@ -545,12 +542,14 @@ tidy_gp_data_db <- function(gp_df,
         "value2",
         "value3"
       ),
-      clinical_events_cols = c("eid",
-                               "index",
-                               "data_provider",
-                               "event_dt",
-                               "read_2",
-                               "read_3"),
+      clinical_events_cols = c(
+        "eid",
+        "index",
+        "data_provider",
+        "event_dt",
+        "read_2",
+        "read_3"
+      ),
       code_cols = c("read_2",
                     "read_3"),
       date_col = "event_dt",
@@ -572,13 +571,15 @@ tidy_gp_data_db <- function(gp_df,
         "drug_name",
         "quantity"
       ),
-      clinical_events_cols = c( "eid",
-                                "index",
-                                "data_provider",
-                                "issue_date",
-                                "read_2",
-                                "bnf_code",
-                                "dmd_code"),
+      clinical_events_cols = c(
+        "eid",
+        "index",
+        "data_provider",
+        "issue_date",
+        "read_2",
+        "bnf_code",
+        "dmd_code"
+      ),
       code_cols = c("read_2",
                     "bnf_code",
                     "dmd_code"),
