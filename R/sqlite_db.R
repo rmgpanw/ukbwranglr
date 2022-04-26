@@ -48,7 +48,7 @@ make_clinical_events_db <- function(ukb_db_path,
                                     ukb_codings = get_ukb_codings(),
                                     overwrite = FALSE,
                                     strict = TRUE,
-                                    chunk_size = 10000) {
+                                    chunk_size = 500000) {
   start_time <- proc.time()
 
   # validate args
