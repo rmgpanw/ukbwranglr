@@ -77,6 +77,47 @@ stopifnot(validate_clinical_codes(dummy_clinical_codes))
 
 # TESTS -------------------------------------------------------------------
 
+# `tidy_clinical_events_basis()`  -----------------------------------------
+
+test_that(
+  "`tidy_clinical_events_basis()` removes empty string values", {
+
+    # create dummy data containing empty strings
+    dummy_main_dataset_clinical_events_empty_strings <- dummy_main_dataset_clinical_events()
+
+    dummy_main_dataset_clinical_events_empty_strings$operative_procedures_opcs4_f41272_0_0 <- c("", "  ")
+    dummy_main_dataset_clinical_events_empty_strings$operative_procedures_opcs4_f41272_0_3[1] <- NA_character_
+
+    expect_warning(
+      tidy_clinical_events_basis(ukb_main = dummy_main_dataset_clinical_events_empty_strings,
+                                 data_dict = make_data_dict(dummy_main_dataset_clinical_events_empty_strings,
+                                                            ukb_data_dict = ukb_data_dict),
+                                 ukb_codings = ukb_codings,
+                                 data_dict_colname_col = "colheaders_raw",
+                                 code_col_field_id = "41272",
+                                 date_col_field_id = "41282"),
+      regexp = "Detected 2 empty code values"
+    )
+
+    expect_equal(
+      suppressWarnings(tidy_clinical_events_basis(ukb_main = dummy_main_dataset_clinical_events_empty_strings,
+                                 data_dict = make_data_dict(dummy_main_dataset_clinical_events_empty_strings,
+                                                            ukb_data_dict = ukb_data_dict),
+                                 ukb_codings = ukb_codings,
+                                 data_dict_colname_col = "colheaders_raw",
+                                 code_col_field_id = "41272",
+                                 date_col_field_id = "41282")),
+      expected = data.table::data.table(
+        eid = c(2),
+        source = c("f41272"),
+        index = c("0_3"),
+        code = c("A02"),
+        date = c("1956-09-12")
+      )
+    )
+  }
+)
+
 # `tidy_clinical_events()`  -----------------------------------------
 
 test_that(

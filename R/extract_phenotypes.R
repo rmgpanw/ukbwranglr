@@ -760,7 +760,18 @@ tidy_clinical_events_basis <- function(ukb_main,
     strict = TRUE
   )
 
-  ukb_main <- ukb_main[!is.na(ukb_main$code)]
+  # check for empty values in code column. If present, convert to `NA` and raise warning
+  n_empty_strings_code_col <- sum(stringr::str_detect(ukb_main$code,
+                                                      "^\\s*$"),
+                                  na.rm = TRUE)
+
+  if (n_empty_strings_code_col > 0) {
+    warning(paste0("Detected ", n_empty_strings_code_col, " empty code values (e.g. '', ' '), these will be removed"))
+  }
+
+  # remove `NA` and empty string code values
+  ukb_main <- ukb_main[!(is.na(ukb_main$code) | (stringr::str_detect(ukb_main$code,
+                                                                    "^\\s*$")))]
 
   # make 'source' col
   ukb_main$source <- paste0("f", code_col_field_id)
