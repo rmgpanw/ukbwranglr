@@ -7,13 +7,12 @@
 make_clinical_events_db(
   ukb_main_path,
   ukb_db_path,
+  ukb_main_delim = "auto",
   gp_clinical_path = NULL,
   gp_scripts_path = NULL,
-  ukb_main_delim = "auto",
   ukb_data_dict = get_ukb_data_dict(),
   ukb_codings = get_ukb_codings(),
   overwrite = FALSE,
-  strict = TRUE,
   chunk_size = 5e+05
 )
 }
@@ -23,14 +22,14 @@ make_clinical_events_db(
 \item{ukb_db_path}{Path to the SQLite database file. The file name must end
 with '.db'. If no file with this name exists then one will be created.}
 
+\item{ukb_main_delim}{Delimiter for \code{ukb_main_path}. Default value is
+\code{"auto"}.}
+
 \item{gp_clinical_path}{Path to the UKB primary care clinical events file
 (\code{gp_clinical.txt}).}
 
 \item{gp_scripts_path}{Path to the UKB primary care prescriptions file
 (\code{gp_scripts.txt}).}
-
-\item{ukb_main_delim}{Delimiter for \code{ukb_main_path}. Default value is
-\code{"auto"}.}
 
 \item{ukb_data_dict}{The UKB data dictionary (available online at the UK
 Biobank
@@ -49,11 +48,6 @@ downloaded from the
 \item{overwrite}{If \code{TRUE}, then tables \code{clinical_events} and
 \code{gp_clinical_values} will be overwritten if they already exist in the
 database. Default value is \code{FALSE}.}
-
-\item{strict}{If \code{FALSE}, create database regardless of whether the main
-UKB dataset file is missing any required clinical events fields (see
-\code{\link{tidy_clinical_events}} for further details). Default is
-\code{TRUE}.}
 
 \item{chunk_size}{The number of rows to include in each chunk when processing
 the primary care dataset.}

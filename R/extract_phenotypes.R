@@ -366,8 +366,7 @@ extract_phenotypes <- function(
 #'   Results may be combined into a single data frame using
 #'   \code{\link[dplyr]{bind_rows}}.
 #'
-#' @param ukb_main A UK Biobank main dataset. Must be a
-#'   \code{\link[data.table]{data.table}}
+#' @param ukb_main A UK Biobank main dataset.
 #' @param clinical_events_sources A character vector of clinical events sources
 #'   to tidy. By default, all available options are included.
 #' @param strict If \code{TRUE}, raise an error if required columns for any
@@ -439,9 +438,14 @@ tidy_clinical_events <- function(ukb_main,
   }
 
   assertthat::assert_that(
-    data.table::is.data.table(ukb_main),
-    msg = "Error! `ukb_main` must be a data table (try `data.table::as.data.table(ukb_main)`)"
+    is.data.frame(ukb_main),
+    msg = "Error! `ukb_main` must be a data frame"
   )
+
+  if (! data.table::is.data.table(ukb_main)) {
+    warning("`ukb_main` must be a data table, attempting to coerce...")
+    ukb_main <- data.table::as.data.table(ukb_main)
+  }
 
   assertthat::assert_that(
     "eid" %in% names(ukb_main),

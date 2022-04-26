@@ -87,7 +87,6 @@ suppressWarnings(make_clinical_events_db(
   ukb_data_dict = ukb_data_dict,
   ukb_codings = ukb_codings,
   overwrite = TRUE,
-  strict = TRUE,
   chunk_size = 2
 ))
 
@@ -327,8 +326,7 @@ test_that("`make_clinical_events_db()` raises an error if table already exist", 
       ukb_db_path = dummy_ukb_db_path,
       ukb_data_dict = ukb_data_dict,
       ukb_codings = ukb_codings,
-      overwrite = FALSE,
-      strict = TRUE
+      overwrite = FALSE
     ),
     "Error! The following table")
 })
