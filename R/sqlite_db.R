@@ -25,10 +25,6 @@
 #'   (\code{gp_clinical.txt}).
 #' @param gp_scripts_path Path to the UKB primary care prescriptions file
 #'   (\code{gp_scripts.txt}).
-#' @param strict If \code{FALSE}, create database regardless of whether the main
-#'   UKB dataset file is missing any required clinical events fields (see
-#'   \code{\link{tidy_clinical_events}} for further details). Default is
-#'   \code{TRUE}.
 #' @param overwrite If \code{TRUE}, then tables \code{clinical_events} and
 #'   \code{gp_clinical_values} will be overwritten if they already exist in the
 #'   database. Default value is \code{FALSE}.
@@ -47,7 +43,6 @@ make_clinical_events_db <- function(ukb_main_path,
                                     ukb_data_dict = get_ukb_data_dict(),
                                     ukb_codings = get_ukb_codings(),
                                     overwrite = FALSE,
-                                    strict = TRUE,
                                     chunk_size = 500000) {
   start_time <- proc.time()
 
@@ -101,41 +96,39 @@ make_clinical_events_db <- function(ukb_main_path,
                               delim = ukb_main_delim,
                               ukb_data_dict = ukb_data_dict)
 
-  # check that all required cols are present
+  # check that eid col is present
   assertthat::assert_that("eid" %in% data_dict$FieldID,
                           msg = "Error! 'eid' column  is missing from the main UKB dataset")
 
-  required_fields <-
+  # check at least some clinical events fields are present
+  available_clinical_events_fields <-
     tidy_clinical_events(.details_only = TRUE) %>%
     purrr::pluck("required_field_ids") %>%
     purrr::flatten() %>%
     as.character() %>%
     unique()
 
-  missing_fields <-
-    subset(required_fields, !(required_fields %in% data_dict$FieldID))
+  # error if no clinical events fields present
+  if (length(least) == 0) {
+    stop("No clinical events fields identified in main UKB dataset. Use `ukbwranglr::clinical_events_sources()` for a list of valid clinical events Field IDs.")
+  }
 
-  if (strict) {
-    assertthat::assert_that(
-      length(missing_fields) == 0,
-      msg = paste0(
-        "Error! Some required field IDs are missing from the main UKB dataset: ",
-        stringr::str_c(missing_fields, sep = "", collapse = ", ")
-      )
-    )
-  } else if (!strict) {
+  # warning if any missing clinical events fields
+  missing_clinical_events_fields <-
+    subset(available_clinical_events_fields, !(available_clinical_events_fields %in% data_dict$FieldID))
+
     if (length(missing_fields) > 0) {
       warning(
         paste0(
-          "Some required field IDs are missing from the main UKB dataset: ",
+          "The following clinical events field IDs are missing from the main UKB dataset: ",
           stringr::str_c(missing_fields, sep = "", collapse = ", ")
         )
       )
-
-      data_dict <- data_dict %>%
-        dplyr::filter(.data[["FieldID"]] %in% c("eid", required_fields))
     }
-  }
+
+  # filter `data_dict` for 'eid' and clinical events fields only
+  data_dict <- data_dict %>%
+        dplyr::filter(.data[["FieldID"]] %in% c("eid", available_clinical_events_fields))
 
   # tidy ukb_main clinical events ----------------------------------
 
@@ -158,7 +151,7 @@ make_clinical_events_db <- function(ukb_main_path,
       ukb_main = ukb_main,
       ukb_data_dict = ukb_data_dict,
       ukb_codings = ukb_codings,
-      strict = strict
+      strict = FALSE
     ) %>%
     dplyr::bind_rows()
 
