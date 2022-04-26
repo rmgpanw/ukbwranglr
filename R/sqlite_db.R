@@ -32,7 +32,7 @@
 #'   the primary care dataset.
 #' @inheritParams tidy_clinical_events
 #'
-#' @return Returns \code{NULL} invisibly.
+#' @return Returns \code{ukb_db_path} invisibly.
 #' @export
 #' @seealso \code{\link{tidy_clinical_events}}, \code{\link{tidy_gp_clinical}}
 make_clinical_events_db <- function(ukb_main_path,
@@ -256,7 +256,7 @@ make_clinical_events_db <- function(ukb_main_path,
   message("SUCCESS! UKB DATABASE SETUP COMPLETE")
   time_taken_message(start_time)
 
-  invisible(NULL)
+  invisible(ukb_db_path)
 }
 
 #' Tidy UK Biobank primary care clinical events
