@@ -254,6 +254,7 @@ make_clinical_events_db <- function(ukb_main_path,
 
   # completion message
   message("SUCCESS! UKB DATABASE SETUP COMPLETE")
+  message(paste0("To connect to db: `con <- DBI::dbConnect(RSQLite::SQLite(), '", ukb_db_path, "')`, then `ukbdb <- ukbwranglr::db_tables_to_list(con)`"))
   time_taken_message(start_time)
 
   invisible(ukb_db_path)

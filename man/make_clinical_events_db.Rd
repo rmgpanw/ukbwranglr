@@ -53,7 +53,7 @@ database. Default value is \code{FALSE}.}
 the primary care dataset.}
 }
 \value{
-Returns \code{NULL} invisibly.
+Returns \code{ukb_db_path} invisibly.
 }
 \description{
 Adds tables called \code{clinical_events}, and optionally
