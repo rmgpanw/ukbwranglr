@@ -831,6 +831,8 @@ assert_all_df_cols_are_type_character <- function(df, arg_name) {
 identify_overlapping_disease_categories <- function(clinical_codes) {
   # helper function for validate_clinical_codes()
 
+  stopifnot(is.data.frame(clinical_codes))
+
   # make df of all disease/author and code/code_type combinations
   overlapping_disease_categories <- data.frame(disease_author = paste(clinical_codes$disease,
                                                                       clinical_codes$author,
