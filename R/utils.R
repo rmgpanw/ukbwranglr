@@ -6,63 +6,23 @@
 
 # Download data dictionary/codings ----------------------------------------
 
-#' Get UKB data dictionary
-#'
-#' Downloads the UK Biobank data dictionary from
-#' \href{https://github.com/rmgpanw/ukbwranglr_resources}{\code{ukbwranglr_resources}}
-#' github repo.
-#'
-#' @export
-get_ukb_data_dict <- function() {
-  # file destination in tempdir
-  ukb_data_dict_rds <- file.path(tmpdir = tempdir(),
-                                     "ukb_data_dict.rds")
-
-
-  # download from ukbwranglr_resources if not already downloaded
-  if(!file.exists(ukb_data_dict_rds)) {
-    utils::download.file(url = "https://github.com/rmgpanw/ukbwranglr_resources/raw/main/_targets/objects/UKB_DATA_DICT",
-                         destfile = ukb_data_dict_rds,
-                         mode = "wb")
-  }
-
-  # load
-  readRDS(ukb_data_dict_rds)
-}
-
-#' Get UKB codings file
-#'
-#' Downloads the UK Biobank codings dictionary from
-#' \href{https://github.com/rmgpanw/ukbwranglr_resources}{\code{ukbwranglr_resources}}
-#' github repo.
-#'
-#' @export
-get_ukb_codings <- function() {
-  # file destination in tempdir
-  ukb_codings_rds <- file.path(tmpdir = tempdir(),
-                                 "ukb_codings")
-
-
-  # download from ukbwranglr_resources if not already downloaded
-  if(!file.exists(ukb_codings_rds)) {
-    utils::download.file(url = "https://github.com/rmgpanw/ukbwranglr_resources/raw/main/_targets/objects/UKB_CODINGS",
-                         destfile = ukb_codings_rds,
-                         mode = "wb")
-  }
-
-  # load
-  readRDS(ukb_codings_rds)
-}
-
 #' Download UKB data dictionary directly from UKB website
 #'
 #' Downloads the UK Biobank data dictionary from the
 #' \href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{UK
 #' Biobank website} and reads into R with all columns as character type.
 #'
+#' @param path Path where file will be downloaded to. If a file already exists
+#'   at this path, then this will be read into R without re-downloading.
+#'
+#' @return A data frame.
 #' @export
-get_ukb_data_dict_direct <- function() {
-  fread_tsv_as_character("https://biobank.ctsu.ox.ac.uk/~bbdatan/Data_Dictionary_Showcase.tsv")
+#' @examples
+#' \dontrun{ get_ukb_data_dict() }
+get_ukb_data_dict <- function(path = file.path(tempdir(), "Data_Dictionary_Showcase.tsv")) {
+  download_file(download_url = "https://biobank.ctsu.ox.ac.uk/~bbdatan/Data_Dictionary_Showcase.tsv",
+                path = path)
+  fread_tsv_as_character(path)
 }
 
 #' Download UKB codings file directly from UKB website
@@ -71,159 +31,18 @@ get_ukb_data_dict_direct <- function() {
 #' \href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{UK
 #' Biobank website} and reads into R with all columns as character type.
 #'
+#' @param path Path where file will be downloaded to. If a file already exists
+#'   at this path, then this will be read into R without re-downloading.
+#'
+#' @return A data frame.
 #' @export
-get_ukb_codings_direct <- function() {
-  fread_tsv_as_character("https://biobank.ctsu.ox.ac.uk/~bbdatan/Codings.tsv")
-}
-
-
-# Download ukb clinical code mappings file -----------------------------------------------
-
-#' Get UK Biobank clinical code mappings file
-#'
-#' Downloads the UK Biobank code mappings file
-#' (\href{https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592}{resource 592})
-#' from the
-#' \href{https://github.com/rmgpanw/ukbwranglr_resources}{ukbwranglr_resources}
-#' github repo. The raw file is a large excel spreadsheet. This has been saved
-#' in \code{.rds} format in
-#' \href{https://github.com/rmgpanw/ukbwranglr_resources}{ukbwranglr_resources}
-#' as a named list of data frames, one for each sheet in the original file.
-#'
-#' This function downloads the \code{ukb_code_mappings.rds} file from
-#' \href{https://github.com/rmgpanw/ukbwranglr_resources}{ukbwranglr_resources}
-#' to a temporary directory before loading and returning the result.
-#'
-#' \strong{Note:} This is a large object (>450 MB)
-#'
-#' @return A named list.
-#' @export
-get_ukb_code_mappings <- function() {
-  # file destination in tempdir
-  ukb_code_mappings_rds <- file.path(tmpdir = tempdir(),
-                                       "ukb_code_mappings.rds")
-
-
-  # download from ukbwranglr_resources if not already downloaded
-  if(!file.exists(ukb_code_mappings_rds)) {
-    utils::download.file(url = "https://github.com/rmgpanw/ukbwranglr_resources/raw/main/_targets/objects/UKB_CODE_MAPPINGS",
-                  destfile = ukb_code_mappings_rds,
-                  mode = "wb")
-  }
-
-  # load
-  readRDS(ukb_code_mappings_rds)
-}
-
-# Download sqlite db containing ukb data dictionary/codings/code mappings --------
-
-#' Download essential UKB resources as a SQLite database file
-#'
-#' Downloads a file called \code{ukb.db} from the
-#' \href{https://github.com/rmgpanw/ukbwranglr_resources}{ukbwranglr_resources}
-#' repo to the specified directory. This is an SQLite database containing the
-#' \href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{UKB
-#' data dictionary and codings files}, UKB
-#' \href{https://biobank.ctsu.ox.ac.uk/crystal/refer.cgi?id=592}{resource 592}
-#' (lookup tables and code mappings for various clinical coding systems) and
-#' clinical code lists from the
-#' \href{https://github.com/spiros/chronological-map-phenotypes}{CALIBER repo}.
-#'
-#' @param directory_path character. The directory where \code{ukb.db} will be
-#'   downloaded to.
-#' @param overwrite logical. If \code{TRUE} and a file called \code{ukb.db} is
-#'   already present in the directory specified by \code{directory_path}, then
-#'   this will be deleted and replaced. Default value is \code{FALSE}.
-#'
-#' @return Returns path to \code{ukb.db} as a string invisibly
-#' @export
-get_ukb_db <- function(directory_path,
-                       overwrite = FALSE) {
-  # zipped file download destination in tempdir
-  ukb_db_esssentials_zip <- file.path(tmpdir = tempdir(),
-                                      "ukb_db_esssentials_zip")
-
-  # check ukb.db does not already exist in `directory_path`
-  if (file.exists(file.path(directory_path, "ukb.db"))) {
-    if (overwrite) {
-      message(paste0("***Removing `ukb.db` from `",
-                      directory_path))
-      file.remove(file.path(directory_path, "ukb.db"))
-    } else if (!overwrite) {
-      stop(paste0(
-        "Error! A file called `ukb.db` already exists in ",
-        directory_path
-      ))
-    }
-  }
-
-  # download from ukbwranglr_resources if not already downloaded
-  if(!file.exists(ukb_db_esssentials_zip)) {
-    message("Downloading `ukb.db.zip` to `tempdir()`")
-    utils::download.file(url = "https://github.com/rmgpanw/ukbwranglr_resources/raw/main/ukb.db.zip",
-                         destfile = ukb_db_esssentials_zip,
-                         mode = "wb")
-  }
-
-  # unzip to requested directory
-  message("Unzipping db file")
-  ukb_db_esssentials_unzipped = utils::unzip(ukb_db_esssentials_zip,
-                                             exdir = directory_path)
-
-  path_to_ukb_db <- file.path(directory_path, "ukb.db")
-
-  message(
-    paste0(
-      "Download complete. Use `con <- DBI::dbConnect(RSQLite::SQLite(), dbname = '",
-      path_to_ukb_db,
-      "')` to connect"
-    )
-  )
-
-  invisible(path_to_ukb_db)
-}
-
-
-# Download dummy ukb data -------------------------------------------------
-
-#' Download dummy UK Biobank data
-#'
-#' A dummy UKB data file is downloaded to \code{\link[base]{tempdir}}. This will
-#' be removed at the end of the current R session. The path to this file is
-#' returned as a string.
-#'
-#' @return The path to the downloaded file.
-#' @export
-#'
 #' @examples
-#'
-#' \dontrun{
-#' # download dummy data to tempdir() and get filepath
-#' # dummy_ukb_data_path <- download_dummy_ukb_data_to_tempdir()
-#'
-#' # make data dictionary make_data_dict(dummy_ukb_data_path, delim = ",",
-#' # ukb_data_dict = get_ukb_data_dict())
-#' }
-download_dummy_ukb_data_to_tempdir <- function() {
-  # file path in tempdir
-  dummy_ukb_data_tempdir_path <- file.path(tmpdir = tempdir(),
-                                           "dummy_ukb_data.csv")
-
-  # download dummy data from ukbwranglr
-  if (!file.exists(dummy_ukb_data_tempdir_path)) {
-    message("Downloaded dummy UKB data to `tempdir()`")
-    utils::download.file(
-      "https://raw.githubusercontent.com/rmgpanw/ukbwranglr_resources/main/dummy_ukb_data/dummy_ukb_data.csv",
-      destfile = dummy_ukb_data_tempdir_path,
-      mode = "wb"
-    )
-  }
-
-  # return file path
-  message("Returning path to dummy UKB data file")
-  return(dummy_ukb_data_tempdir_path)
+#' \dontrun{ get_ukb_codings() }
+get_ukb_codings <- function(path = file.path(tempdir(), "Codings.tsv")) {
+  download_file(download_url = "https://biobank.ctsu.ox.ac.uk/~bbdatan/Codings.tsv",
+                path = path)
+  fread_tsv_as_character(path)
 }
-
 
 # Validation helpers ------------------------------------------------------
 
@@ -389,6 +208,31 @@ clinical_events_sources <- function() {
 
 # PRIVATE FUNCTIONS -------------------------------------------------------
 
+# Download file -----------------------------------------------------------
+
+#' Download a file
+#'
+#' First checks if the file already exists at the download path. If so, the file
+#' path is returned invisibly without re-downloading.
+#'
+#' @param download_url Character
+#' @param path Character
+#'
+#' @return File path to downloaded file
+#' @noRd
+download_file <- function(download_url,
+                          path = tempfile()) {
+
+  if (file.exists(path)) {
+    invisible(path)
+  } else {
+    utils::download.file(url = download_url,
+                         destfile = path,
+                         mode = "wb")
+    invisible(path)
+  }
+}
+
 # fread - tsv as character ------------------------------------------------
 
 #' Read a tsv file with all columns as type character
@@ -540,223 +384,6 @@ extract_codings_for_fieldids <- function(field_ids,
         .$Coding %>%
         utils::head(n = 1)
     ))
-}
-
-
-#' Helper function for \code{\link{recode_ukbcol}}
-#'
-#' Generates a `mapping_df` for \code{\link{recode_ukbcol}}
-#'
-#' @inheritParams recode_ukbcol
-#' @noRd
-#' @family recode UKB values
-recode_column_coding_meaning_value_mapping_df <- function(field_id,
-                                                           ukb_data_dict,
-                                                           ukb_codings,
-                                                           mapping_direction = "meaning_code") {
-  # check user supplied a valid `mapping_direction` value - error if not
-  if (!(mapping_direction %in% c("meaning_code", "code_meaning"))) {
-    stop("Argument `mapping_direction` must be either 'meaning_code' or 'code_meaning'")
-  }
-
-  # get coding/meaning for the specified field_id
-  ukb_codings <- extract_codings_for_fieldids(
-    field_ids = field_id,
-    ukb_data_dict = ukb_data_dict,
-    ukb_codings = ukb_codings
-  )
-
-  # label according to mapping direction
-  if (mapping_direction == "meaning_code") {
-    ukb_codings <- rename_cols(df = ukb_codings,
-                               old_colnames = c("Meaning", "Value"),
-                               new_colnames = c("old_vals", "new_vals"))
-    ukb_codings <- ukb_codings %>%
-      dplyr::select(-.data[["Coding"]])
-  } else if (mapping_direction == "code_meaning") {
-    ukb_codings <- rename_cols(df = ukb_codings,
-                               old_colnames = c("Meaning", "Value"),
-                               new_colnames = c("new_vals", "old_vals"))
-    ukb_codings <- ukb_codings %>%
-      dplyr::select(-.data[["Coding"]])
-  }
-
-  return(ukb_codings)
-}
-
-
-#' Recode values in a UK Biobank dataframe for a single column
-#'
-#' Recodes values in a specified column from descriptive label to UK Biobank
-#' coding (default) or vice versa
-#'
-#' @section Under the hood:
-#'
-#' The UK Biobank codings for a given FieldID (\code{field_id}) are extracted into
-#'   a \code{mapping_df}, which is formatted for use with
-#'   \code{\link{recode_column}}. This then recodes the specified column
-#'   (\code{col_to_recode}) in \code{df} from either meaning to raw UK Biobank codings
-#'   (default) or vice versa.
-#'
-#' @seealso Columns "Value" and "Meaning" in the
-#'   \href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{UKB
-#'    codings dictionary}
-#'
-#' @param df A dataframe
-#' @param col_to_recode Name of column in \code{df} to be recoded
-#' @param field_id Character. A UK Biobank FieldID
-#' @inheritParams read_ukb
-#' @param mapping_direction Character. Either "meaning_code" (default) or
-#'   "code_meaning"
-#'
-#' @noRd
-#' @family recode UKB values
-recode_ukbcol <- function(df,
-                          col_to_recode,
-                          field_id,
-                          ukb_data_dict,
-                          ukb_codings,
-                          mapping_direction = "meaning_code") {
-  # make mapping_df with old and new col values
-  mapping_df <- recode_column_coding_meaning_value_mapping_df(field_id = field_id,
-                                                               ukb_data_dict = ukb_data_dict,
-                                                               ukb_codings = ukb_codings,
-                                                               mapping_direction = mapping_direction)
-
-  # remove coding values with multiple associated meanings for categorical fields
-  # (see also misc_ukb_codings.Rmd)
-  if (field_id %in% c("20001",
-                      "20002",
-                      "20004",
-                      "40013",
-                      "41203",
-                      "41205",
-                      "41271")) {
-    mapping_df <- mapping_df %>%
-      dplyr::filter(!(.data[["old_vals"]] %in% c("-1", "Chapter V")) &
-                      !(.data[["new_vals"]] %in% c("-1", "Chapter V")))
-  }
-
-  # for fieldid 20002, 'myasthenia gravis' has 2  associated codes - remove one of these if
-  # mapping from meaning back to codes. Also see:
-  # https://biobank.ndph.ox.ac.uk/ukb/coding.cgi?id=6
-  if (field_id == "20002" & mapping_direction == "meaning_code") {
-    mapping_df <- mapping_df %>%
-      dplyr::filter(.data[["new_vals"]] != "1260")
-  }
-
-  # relabel
-  dict <- mapping_df$new_vals
-  names(dict) <- mapping_df$old_vals
-
-  df[[col_to_recode]] <- revalue_vector(x = as.character(df[[col_to_recode]]),
-                                        dict = dict,
-                                        default_value = NULL,
-                                        suppress_warnings = FALSE)
-
-  return(df)
-}
-
-
-#' Recode values in a dataframe column
-#'
-#' Returns the input dataframe with recoded values in the specified
-#' \code{col_to_recode}
-#'
-#' Uses a \code{mapping_df} to recode the values for a selected column
-#' (\code{col_to_recode}) in a dataframe (\code{df}). The \code{mapping_df} should only contain
-#' 2 columns named "old_vals" (containing values in \code{df$col_to_recode} to be
-#' recoded) and "new_vals" (replacement values). There should also be no duplicated values in either column.
-#'
-#' A warning is generated if \code{mapping_df$old_vals} does not contain all values
-#' in \code{df}, or if the return value has more rows than the original \code{df} (i.e. a
-#' mutating join has been performed)
-#'
-#' @section Under the hood:
-#'
-#'   Uses \code{\link[dplyr]{left_join}} to merge \code{df} and \code{mapping_df},
-#'   retaining the "new_vals" in \code{mapping_df}.
-#'
-#' @param df a dataframe
-#' @param col_to_recode Character - name of column in \code{df} to be recoded
-#' @param mapping_df a dataframe with 2 columns named "old_vals" and "new_vals"
-#' @noRd
-#' @family recode UKB values
-recode_column <- function(df, col_to_recode, mapping_df) {
-
-  # check nrow for input df
-  original_nrow <- nrow(df)
-
-  # check mapping_df is valid
-  # - must have 2 columns named "old_vals" and "new_vals".
-  # - All values in both columns are unique
-  # Error if any checks fail
-  if (!(all(names(mapping_df) == c("old_vals", "new_vals")) |
-        all(names(mapping_df) == c("new_vals", "old_vals")))) {
-    stop("Invalid `mapping_df`: must be a dataframe with 2 columns named 'old_vals' and 'new_vals'")
-  }
-
- if(
-   length(unique(mapping_df$old_vals)) != nrow(mapping_df)
-    # length(unique(mapping_df$new_vals)) != nrow(mapping_df)
-   ) {
-   stop("`mapping_df` must contain only unique values in 'old_vals' column")
- }
-
-  # Warning if "old_vals" does not contain all values in df
-  if (length(setdiff(unique(stats::na.omit(df[[col_to_recode]])), mapping_df$old_vals)) > 0) {
-    warning("WARNING! `mapping_df` does not contain all unique values in `df[[col_to_Recode]]`.
-            Some values will not have been recoded - is this intentional?")
-  }
-
-  # rename col_to_recode before joining with mapper
-  names(df)[which(names(df) == col_to_recode)] <- "old_vals"
-
-  # join with mapper and drop old column - TODO replace this with
-  # a dictionary-like function (would be safer and faster?)
-
-  # TO DELETE- looping is very slow
-  # pb <- progress::progress_bar$new(format = "[:bar] :current/:total (:percent)",
-  #                        total = nrow(df))
-  # recode_helper <- function(x,
-  #                           mapping_df) {
-  #   # return the corresponding 'new_val' for an 'old_val'
-  #   pb$tick()
-  #   result <- mapping_df %>%
-  #     dplyr::filter(old_vals == x) %>%
-  #     .$new_vals
-  #
-  #   if (rlang::is_empty(result)) {
-  #     return(NA)
-  #   } else {
-  #     return(result)
-  #   }
-  # }
-  #
-  # message("\nrecoding...\n")
-  # df <- df %>%
-  #   dplyr::mutate(old_vals = map_chr(old_vals,
-  #                                    recode_helper,
-  #                                    mapping_df))
-
-  df <- df %>%
-    dplyr::left_join(mapping_df,
-              by = "old_vals")
-
-  df$old_vals <- df$new_vals
-
-  df <- df %>%
-    dplyr::select(-.data[["new_vals"]])
-
-  # rename to original colname
-  names(df)[which(names(df) == "old_vals")] <- col_to_recode
-
-  # # warning message if returns a result with more rows than the original input
-  if (nrow(df) > original_nrow) {
-    warning("WARNING! New dataframe has more rows than the original input. Was this intentional?")
-    }
-
-  return(df)
 }
 
 # Testing/assertion helpers -----------------------------------------------

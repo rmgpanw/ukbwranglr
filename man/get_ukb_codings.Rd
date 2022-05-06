@@ -2,12 +2,22 @@
 % Please edit documentation in R/utils.R
 \name{get_ukb_codings}
 \alias{get_ukb_codings}
-\title{Get UKB codings file}
+\title{Download UKB codings file directly from UKB website}
 \usage{
-get_ukb_codings()
+get_ukb_codings(path = file.path(tempdir(), "Codings.tsv"))
+}
+\arguments{
+\item{path}{Path where file will be downloaded to. If a file already exists
+at this path, then this will be read into R without re-downloading.}
+}
+\value{
+A data frame.
 }
 \description{
-Downloads the UK Biobank codings dictionary from
-\href{https://github.com/rmgpanw/ukbwranglr_resources}{\code{ukbwranglr_resources}}
-github repo.
+Downloads the UK Biobank codings list from the
+\href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{UK
+Biobank website} and reads into R with all columns as character type.
+}
+\examples{
+\dontrun{ get_ukb_codings() }
 }

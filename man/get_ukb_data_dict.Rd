@@ -2,12 +2,22 @@
 % Please edit documentation in R/utils.R
 \name{get_ukb_data_dict}
 \alias{get_ukb_data_dict}
-\title{Get UKB data dictionary}
+\title{Download UKB data dictionary directly from UKB website}
 \usage{
-get_ukb_data_dict()
+get_ukb_data_dict(path = file.path(tempdir(), "Data_Dictionary_Showcase.tsv"))
+}
+\arguments{
+\item{path}{Path where file will be downloaded to. If a file already exists
+at this path, then this will be read into R without re-downloading.}
+}
+\value{
+A data frame.
 }
 \description{
-Downloads the UK Biobank data dictionary from
-\href{https://github.com/rmgpanw/ukbwranglr_resources}{\code{ukbwranglr_resources}}
-github repo.
+Downloads the UK Biobank data dictionary from the
+\href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{UK
+Biobank website} and reads into R with all columns as character type.
+}
+\examples{
+\dontrun{ get_ukb_data_dict() }
 }
