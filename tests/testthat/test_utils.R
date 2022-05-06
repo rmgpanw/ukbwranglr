@@ -39,7 +39,11 @@ bad_dict <- dict
 names(bad_dict) <- rep("A", 5)
 
 # test_df
-test_df <- make_dummy_df()
+test_df <- data.frame(chr = c(letters[1:5], NA),
+                      int = c(1:5, NA),
+                      fac = as.factor(c(letters[1:5], NA)),
+                      log = c(rep(TRUE, 5), FALSE),
+                      chr_rpt = c(rep("a", 3), rep("c", 3)))
 
 # TESTS -------------------------------------------------------------------
 
