@@ -2,11 +2,11 @@
 
 # Steps to append additional `clinical_events_sources` for `tidy_clinical_events()`:
 
-# 1. Update `CLINICAL_EVENTS_FIELD_IDS` and `CLINICAL_EVENTS_SOURCES` in `DATASET.R`
+# 1. Update `CLINICAL_EVENTS_FIELD_IDS` and `CLINICAL_EVENTS_SOURCES` in `metadata.R`
 
 # 2. Update relevant details in `tidy_clinical_events()`
 
-# 3. Add dummy data fields to `DUMMY_UKB_MAIN_CLINICAL_EVENTS` in `DATASET.R`
+# 3. Add dummy data fields to `DUMMY_UKB_MAIN_CLINICAL_EVENTS` in `dummy_data.R`
 
 # 4. Update end of `filter_clinical_events()` (from comment '***Update this section ...)
 
