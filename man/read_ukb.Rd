@@ -11,7 +11,7 @@ read_ukb(
   ukb_data_dict = get_ukb_data_dict(),
   ukb_codings = get_ukb_codings(),
   descriptive_colnames = TRUE,
-  labelled = TRUE,
+  label = TRUE,
   max_n_labels = 30,
   na.strings = c("", "NA"),
   nrows = Inf,
@@ -47,13 +47,12 @@ downloaded from the
 descriptive names derived from the UK Biobank's data dictionary 'Field'
 column.}
 
-\item{labelled}{If \code{TRUE}, apply variable and value labels using
-\code{\link[haven]{labelled}}.}
+\item{label}{If \code{TRUE}, apply variable labels and label coded
+values as factors.}
 
-\item{max_n_labels}{Coded variables with associated value labels up to (and
-equal to) this threshold will be labelled using. If \code{NULL}, then all
-value labels will be applied. Default value is 30.
-\code{\link[haven]{labelled}} if \code{labelled} is \code{TRUE}.}
+\item{max_n_labels}{Coded variables with associated value labels less than or
+equal to this threshold will be labelled as factors. If \code{NULL}, then
+all value labels will be applied. Default value is 30.}
 
 \item{na.strings}{ A character vector of strings which are to be interpreted as \code{NA} values. By default, \code{",,"} for columns of all types, including type \code{character} is read as \code{NA} for consistency. \code{,"",} is unambiguous and read as an empty string. To read \code{,NA,} as \code{NA}, set \code{na.strings="NA"}. To read \code{,,} as blank string \code{""}, set \code{na.strings=NULL}. When they occur in the file, the strings in \code{na.strings} should not appear quoted since that is how the string literal \code{,"NA",} is distinguished from \code{,NA,}, for example, when \code{na.strings="NA"}. }
 
@@ -69,8 +68,8 @@ A UK Biobank phenotype dataset as a data table with human-readable
 \description{
 Reads a UK Biobank main dataset file into R using either
 \code{\link[data.table]{fread}} or \code{\link[haven]{read_dta}}. Optionally
-renames variables with descriptive names and applies STATA-style variable and
-value labels using the \code{\link[haven]{haven}} package.
+renames variables with descriptive names, add variable labels and label coded
+values as factors.
 }
 \details{
 Note that \code{na.strings} is not recognised by

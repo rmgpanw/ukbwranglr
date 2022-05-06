@@ -473,62 +473,56 @@ test_that("`extract_phenotypes()` returns expected results", {
                                colnames_prefix = "test_")
 
   expect_equivalent(
-    result$Disease1$test_a_test %>%
-      haven::zap_labels(),
+    result$Disease1$test_a_test,
     tibble::tibble(
       eid = c(1, 2),
       test_a_test_min_date = c("1910-02-19", NA),
-      test_a_test_indicator = c(2, 2)
+      test_a_test_indicator = c("Yes", "Yes")
     )
   )
 
   expect_equivalent(
-    result$Disease1$test_b_test %>%
-      haven::zap_labels(),
+    result$Disease1$test_b_test,
     tibble::tibble(
       eid = c(1, 2),
       test_b_test_min_date = c("1956-11-24", "1990-10-04"),
-      test_b_test_indicator = c(2, 2)
+      test_b_test_indicator = c("Yes", "Yes")
     )
   )
 
   expect_equivalent(
-    result$Disease1$test_DISEASE1_TEST %>%
-      haven::zap_labels(),
+    result$Disease1$test_DISEASE1_TEST,
     tibble::tibble(
       eid = c(1, 2),
       test_DISEASE1_TEST_min_date = c("1910-02-19", "1990-10-04"),
-      test_DISEASE1_TEST_indicator = c(2, 2)
+      test_DISEASE1_TEST_indicator = c("Yes", "Yes")
     )
   )
 
   expect_equivalent(
-    result$Disease2$test_c_test %>%
-      haven::zap_labels(),
+    result$Disease2$test_c_test,
     tibble::tibble(
       eid = 1,
       test_c_test_min_date = "1998-12-24",
-      test_c_test_indicator = 2
+      test_c_test_indicator = "Yes"
     )
   )
 
   expect_equivalent(
-    result$Disease2$test_d_test %>%
-      haven::zap_labels(),
+    result$Disease2$test_d_test,
     tibble::tibble(
       eid = 1,
       test_d_test_min_date = "1956-11-24",
-      test_d_test_indicator = 2
+      test_d_test_indicator = "Yes"
     )
   )
 
   expect_equivalent(
-    result$Disease2$test_DISEASE2_TEST %>%
-      haven::zap_labels(),
+    result$Disease2$test_DISEASE2_TEST,
     tibble::tibble(
       eid = 1,
       test_a_test_min_date = "1956-11-24",
-      test_a_test_indicator = 2
+      test_a_test_indicator = "Yes"
     )
   )
 })
@@ -554,12 +548,11 @@ test_that(
     )
 
     expect_equivalent(
-      result$Disease1$cancer_icd10_a_test %>%
-        haven::zap_labels(),
+      result$Disease1$cancer_icd10_a_test,
       tibble::tibble(
         eid = 2,
         cancer_icd10_a_test_min_date = as.character(NA),
-        cancer_icd10_a_test_indicator = 2
+        cancer_icd10_a_test_indicator = "Yes"
       )
     )
 
@@ -723,9 +716,7 @@ test_that(
       1, "2000-01-01", "2010-01-01"
     )
 
-    dummy_ukb$event_date <- haven::labelled(dummy_ukb$event_date,
-                                            labels = NULL,
-                                            label = "Event date (min)")
+    attributes(dummy_ukb$event_date)$label <- "Event date (min)"
 
     result <- mutate_age_at_event_cols(dummy_ukb,
                                        dob_col = "dob",

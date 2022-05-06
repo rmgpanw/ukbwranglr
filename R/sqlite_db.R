@@ -141,7 +141,7 @@ make_clinical_events_db <- function(ukb_main_path,
     ukb_data_dict = ukb_data_dict,
     ukb_codings = ukb_codings,
     descriptive_colnames = TRUE,
-    labelled = FALSE
+    label = FALSE
   )
 
   # create long format data frame containing all clinical events codes in main dataset

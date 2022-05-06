@@ -28,18 +28,16 @@ downloaded from the
 \item{colnames_col}{The name of the column in \code{data_dict} that contains
 column names matching those in \code{ukb_main}.}
 
-\item{max_n_labels}{Coded variables with associated value labels up to (and
-equal to) this threshold will be labelled using. If \code{NULL}, then all
-value labels will be applied. Default value is 30.
-\code{\link[haven]{labelled}} if \code{labelled} is \code{TRUE}.}
+\item{max_n_labels}{Coded variables with associated value labels less than or
+equal to this threshold will be labelled as factors. If \code{NULL}, then
+all value labels will be applied. Default value is 30.}
 }
 \value{
-A data frame with labelled
+A data frame.
 }
 \description{
-Adds variable and value labels a UK Biobank main dataset using
-\code{\link[haven]{labelled}}. Note that labels are only supported for
-numeric (integer or double) and character vectors.
+Applies variable labels and factor labels to coded values in a UK Biobank
+main dataset.
 }
 \examples{
 \dontrun{

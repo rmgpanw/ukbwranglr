@@ -330,3 +330,4 @@ test_that("`make_clinical_events_db()` raises an error if table already exist", 
     ),
     "Error! The following table")
 })
+

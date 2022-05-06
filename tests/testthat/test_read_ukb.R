@@ -36,7 +36,7 @@ read_ukb(
   dummy_ukb_data_raw_path,
   delim = ",",
   data_dict = dummy_ukb_data_dict,
-  labelled = FALSE,
+  label = FALSE,
   descriptive_colnames = FALSE
 ) %>%
   rename_cols(
@@ -87,14 +87,14 @@ test_that("`read_ukb()` works with default settings", {
   expect_equal(names(ukb_main),
                dummy_ukb_data_dict$descriptive_colnames)
 
-  expect_equal(attributes(ukb_main$sex_f31_0_0)$labels,
-               c(Female = 0, Male = 1))
+  expect_equal(attributes(ukb_main$sex_f31_0_0)$levels,
+               c("Female", "Male"))
 
   expect_equal(attributes(ukb_main$sex_f31_0_0)$label,
                "Sex (f31_0_0)")
 })
 
-test_that("`read_ukb()` works with `labelled` and `descriptive_colnames` set to `FALSE`", {
+test_that("`read_ukb()` works with `label` and `descriptive_colnames` set to `FALSE`", {
   ukb_main <- read_ukb(
     path = dummy_ukb_data_raw_path,
     delim = ",",
@@ -102,7 +102,7 @@ test_that("`read_ukb()` works with `labelled` and `descriptive_colnames` set to 
     ukb_data_dict = ukb_data_dict,
     ukb_codings = ukb_codings,
     na.strings = c("", "NA"),
-    labelled = FALSE,
+    label = FALSE,
     descriptive_colnames = FALSE
   )
 
@@ -114,7 +114,7 @@ test_that("`read_ukb()` works with `labelled` and `descriptive_colnames` set to 
   expect_null(attributes(ukb_main$sex_f31_0_0)$label)
 })
 
-test_that("`read_ukb()` works with `labelled = TRUE` and `descriptive_colnames = FALSE`", {
+test_that("`read_ukb()` works with `label = TRUE` and `descriptive_colnames = FALSE`", {
   ukb_main <- read_ukb(
     path = dummy_ukb_data_raw_path,
     delim = ",",
@@ -122,21 +122,21 @@ test_that("`read_ukb()` works with `labelled = TRUE` and `descriptive_colnames =
     ukb_data_dict = ukb_data_dict,
     ukb_codings = ukb_codings,
     na.strings = c("", "NA"),
-    labelled = TRUE,
+    label = TRUE,
     descriptive_colnames = FALSE
   )
 
   expect_equal(names(ukb_main),
                dummy_ukb_data_dict$colheaders_raw)
 
-  expect_equal(attributes(ukb_main$`31-0.0`)$labels,
-              c(Female = 0, Male = 1))
+  expect_equal(attributes(ukb_main$`31-0.0`)$levels,
+              c("Female", "Male"))
 
   expect_equal(attributes(ukb_main$`31-0.0`)$label,
               "Sex (f31_0_0)")
 })
 
-test_that("`read_ukb()` works with `labelled = FALSE` and `descriptive_colnames = TRUE`", {
+test_that("`read_ukb()` works with `label = FALSE` and `descriptive_colnames = TRUE`", {
   ukb_main <- read_ukb(
     path = dummy_ukb_data_raw_path,
     delim = ",",
@@ -144,7 +144,7 @@ test_that("`read_ukb()` works with `labelled = FALSE` and `descriptive_colnames 
     ukb_data_dict = ukb_data_dict,
     ukb_codings = ukb_codings,
     na.strings = c("", "NA"),
-    labelled = FALSE,
+    label = FALSE,
     descriptive_colnames = TRUE
   )
 
@@ -164,7 +164,7 @@ test_that("`read_ukb()` works with a stata file", {
     ukb_data_dict = ukb_data_dict,
     ukb_codings = ukb_codings,
     na.strings = c("", "NA"),
-    labelled = FALSE,
+    label = FALSE,
     descriptive_colnames = TRUE
   )
 
@@ -367,12 +367,11 @@ test_that("`label_ukb_main()` excludes duplicated labels e.g. coding 3 (for FID 
 
     result <- label_ukb_main(ukb_main = dummy_fid_20001_data,
                              make_data_dict(dummy_fid_20001_data),
-                             max_n_labels = NULL) %>%
-      haven::as_factor()
+                             max_n_labels = NULL)
 
     expect_equal(
       as.character(result$cancer_code_self_reported_f20001_0_0),
-      c("-1", "salivary gland cancer")
+      c(NA, "salivary gland cancer")
     )
   })
 
@@ -404,7 +403,7 @@ test_that("`read_ukb_chunked_to_file()` works", {
           ukb_codings = ukb_codings,
           max_n_labels = 22,
           chunk_size = 1,
-          labelled = TRUE,
+          label = TRUE,
           descriptive_colnames = FALSE
         )
     )

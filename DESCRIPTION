@@ -12,6 +12,7 @@ LazyData: true
 RoxygenNote: 7.1.2
 Suggests: 
     covr,
+    dbplyr,
     knitr,
     rmarkdown,
     testthat
@@ -20,7 +21,6 @@ Imports:
     assertthat,
     data.table,
     DBI,
-    dbplyr,
     dplyr,
     furrr,
     future,

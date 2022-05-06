@@ -168,10 +168,7 @@ summarise_numerical_variables <- function(ukb_main,
         ), na.rm = TRUE))
     }
 
-    ukb_main[[new_col_name]] <-
-      haven::labelled(x = ukb_main[[new_col_name]],
-                      labels = NULL,
-                      label = new_col)
+    attributes(ukb_main[[new_col_name]])$label <- new_col
 
     # warning if only one column was summarised (this column would equal the summary column if so)
     if (length(selected_cols) == 1) {

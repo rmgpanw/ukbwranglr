@@ -99,16 +99,14 @@ mutate_age_at_event_cols <- function(ukb_main,
       new_colname
     ))
     ukb_main[[new_colname]] <-
-      lubridate::time_length(as.Date(haven::zap_labels(ukb_main[[column]])) - as.Date(haven::zap_labels(ukb_main[[dob_col]])), unit = 'year')
+      lubridate::time_length(as.Date(ukb_main[[column]]) - as.Date(ukb_main[[dob_col]]), unit = 'year')
 
     new_colname_label <- stringr::str_replace(attributes(ukb_main[[column]])$label,
                                               pattern = "date (.+)$",
                                               replacement = "age")
 
     if (!rlang::is_empty(new_colname_label)) {
-      ukb_main[[new_colname]] <- haven::labelled(ukb_main[[new_colname]],
-                                                 labels = NULL,
-                                                 label = new_colname_label)
+      attributes(ukb_main[[new_colname]])$label <- new_colname_label
     }
   }
 
@@ -1173,7 +1171,7 @@ extract_clinical_events <- function(clinical_events,
   # date is unknown
   indicator_colname <- paste0(phenotype_colname, "_indicator")
 
-  clinical_events[[indicator_colname]] <- 2
+  clinical_events[[indicator_colname]] <- "Yes"
 
   # rename date col to `phenotype_colname`
   date_colname <- paste0(phenotype_colname, "_", min_max, "_date")
@@ -1182,22 +1180,9 @@ extract_clinical_events <- function(clinical_events,
     rename_cols(old_colnames = "date",
                 new_colnames = date_colname)
 
-  # add labels - N.B. order is important, the first item will become the
-  # baseline level when converting to a factor e.g. with labelled::unlabelled()
-  indicator_labels <- stats::setNames(c(1, 2),
-                               nm = c("No", "Yes"))
+  attributes(clinical_events[[indicator_colname]])$label <- phenotype
 
-  clinical_events[[indicator_colname]] <- haven::labelled(
-    x = clinical_events[[indicator_colname]],
-    labels = indicator_labels,
-    label = phenotype
-  )
-
-  clinical_events[[date_colname]] <- haven::labelled(
-    x = clinical_events[[date_colname]],
-    labels = NULL,
-    label = paste0(phenotype, " date (", min_max, ")")
-  )
+  attributes(clinical_events[[date_colname]])$label <- paste0(phenotype, " date (", min_max, ")")
 
   return(clinical_events)
 }
@@ -1373,7 +1358,7 @@ filter_clinical_events <- function(clinical_events,
   return(clinical_events)
 }
 
-# (mappers) ---------------------------------------------------------------
+## Mappers ---------------------------------------------------------------
 
 # Helper for `extract_single_record()`. A mapping function
 # to extract earliest diagnostic code data for each eid - returns a single
@@ -1423,33 +1408,4 @@ get_sources_for_code_type <- function(code_type) {
   CLINICAL_EVENTS_SOURCES %>%
     dplyr::filter(.data[["data_coding"]] == code_type) %>%
     .$source
-}
-
-# DEV ---------------------------------------------------------------------
-
-
-# Process output from `extract_phenotypes` --------------------------------
-
-
-na_to_labelled_no <- function(x) {
-  label <- attributes(x)$label
-
-  x <- ifelse(is.na(x),
-              yes = 1,
-              no = x)
-
-  haven::labelled(x,
-                  label = label,
-                  labels = c(No = 1, Yes = 2))
-}
-
-merge_phenotype_dfs <- function(phenotypes) {
-  phenotypes <- purrr::reduce(phenotypes,
-                              dplyr::full_join,
-                              by = "eid")
-
-
-  dplyr::mutate(phenotypes,
-                dplyr::across(tidyselect::ends_with("_indicator"),
-                              na_to_labelled_no))
 }

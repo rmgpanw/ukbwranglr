@@ -129,8 +129,8 @@ make_data_dict <- function(ukb_main,
 #'
 #' Reads a UK Biobank main dataset file into R using either
 #' \code{\link[data.table]{fread}} or \code{\link[haven]{read_dta}}. Optionally
-#' renames variables with descriptive names and applies STATA-style variable and
-#' value labels using the \code{\link[haven]{haven}} package.
+#' renames variables with descriptive names, add variable labels and label coded
+#' values as factors.
 #'
 #' Note that \code{na.strings} is not recognised by
 #' \code{\link[haven]{read_dta}}. Reading in a STATA file may therefore require
@@ -151,12 +151,11 @@ make_data_dict <- function(ukb_main,
 #' @param descriptive_colnames If \code{TRUE}, rename columns with longer
 #'   descriptive names derived from the UK Biobank's data dictionary 'Field'
 #'   column.
-#' @param labelled If \code{TRUE}, apply variable and value labels using
-#'   \code{\link[haven]{labelled}}.
-#' @param max_n_labels Coded variables with associated value labels up to (and
-#'   equal to) this threshold will be labelled using. If \code{NULL}, then all
-#'   value labels will be applied. Default value is 30.
-#'   \code{\link[haven]{labelled}} if \code{labelled} is \code{TRUE}.
+#' @param label If \code{TRUE}, apply variable labels and label coded
+#'   values as factors.
+#' @param max_n_labels Coded variables with associated value labels less than or
+#'   equal to this threshold will be labelled as factors. If \code{NULL}, then
+#'   all value labels will be applied. Default value is 30.
 #' @param ... Additional parameters are passed on to either
 #'   \code{\link[data.table]{fread}} or \code{\link[haven]{read_dta}}
 #' @inheritParams make_data_dict
@@ -171,7 +170,7 @@ read_ukb <- function(path,
                      ukb_data_dict = get_ukb_data_dict(),
                      ukb_codings = get_ukb_codings(),
                      descriptive_colnames = TRUE,
-                     labelled = TRUE,
+                     label = TRUE,
                      max_n_labels = 30,
                      na.strings = c("", "NA"),
                      nrows = Inf,
@@ -181,8 +180,8 @@ read_ukb <- function(path,
   # validate args
   assertthat::assert_that(is.logical(descriptive_colnames),
                           msg = "Error! 'descriptive_colnames' must be either TRUE or FALSE")
-  assertthat::assert_that(is.logical(labelled),
-                          msg = "Error! 'labelled' must be either TRUE or FALSE")
+  assertthat::assert_that(is.logical(label),
+                          msg = "Error! 'label' must be either TRUE or FALSE")
   assert_integer_ge_1(max_n_labels,
                       "max_n_labels")
 
@@ -206,11 +205,12 @@ read_ukb <- function(path,
   assertthat::assert_that(!is.null(read_with),
                           msg = paste0("Error! Unrecognised file extension: ", file_extension))
 
-  N_STEPS <-  1 + descriptive_colnames + labelled
+  N_STEPS <-  1 + descriptive_colnames + label
   STEP <- 1
 
   # read file
   message(paste0("STEP ", STEP, " of ", N_STEPS))
+  message("Reading data into R")
 
   result <- read_ukb_raw_basis(
     path = path,
@@ -228,6 +228,7 @@ read_ukb <- function(path,
   if (descriptive_colnames) {
     STEP <- STEP + 1
     message(paste0("STEP ", STEP, " of ", N_STEPS))
+    message("Renaming with descriptive column names")
 
     result <-  rename_cols(
       df = result,
@@ -237,9 +238,10 @@ read_ukb <- function(path,
   }
 
   # label
-  if (labelled) {
+  if (label) {
     STEP <- STEP + 1
     message(paste0("STEP ", STEP, " of ", N_STEPS))
+    message("Applying variable and value labels")
 
     if (descriptive_colnames) {
       colnames_col <- "descriptive_colnames"
@@ -263,9 +265,8 @@ read_ukb <- function(path,
 
 #' Label a UK Biobank main dataset
 #'
-#' Adds variable and value labels a UK Biobank main dataset using
-#' \code{\link[haven]{labelled}}. Note that labels are only supported for
-#' numeric (integer or double) and character vectors.
+#' Applies variable labels and factor labels to coded values in a UK Biobank
+#' main dataset.
 #'
 #' @param ukb_main A UK Biobank main dataset (data frame)
 #' @param data_dict A data dictionary specific to the UKB main dataset file,
@@ -275,7 +276,7 @@ read_ukb <- function(path,
 #'   column names matching those in \code{ukb_main}.
 #' @inheritParams read_ukb
 #'
-#' @return A data frame with labelled
+#' @return A data frame.
 #' @export
 #'
 #' @examples
@@ -659,7 +660,6 @@ read_ukb_raw_basis <- function(path,
     do.call(readr::cols_only, .)
 
   # read data
-  message("Reading data into R")
   switch(
     read_with,
     fread = data.table::fread(
@@ -751,9 +751,10 @@ label_df_by_coding <- function(df,
     # value labels for these columns
     if (single_coding %in% integer_codings) {
       value_labels <-
-        stats::setNames(object = as.integer(codings_list[[single_coding]][[codings_value_col]]),
-                        nm = codings_list[[single_coding]][[codings_meaning_col]])
+        sort(stats::setNames(object = as.integer(codings_list[[single_coding]][[codings_value_col]]),
+                        nm = codings_list[[single_coding]][[codings_meaning_col]]))
     } else {
+      browser()
       value_labels <-
         stats::setNames(object = codings_list[[single_coding]][[codings_value_col]],
                         nm = codings_list[[single_coding]][[codings_meaning_col]])
@@ -777,9 +778,11 @@ label_df_by_coding <- function(df,
       # for debugging
       # print(column)
 
-      df[[column]] <- haven::labelled(x = df[[column]],
-                                      labels = value_labels,
-                                      label = variable_label)
+      df[[column]] <- factor(df[[column]],
+                                      levels = value_labels,
+                                      labels = names(value_labels))
+
+      attributes(df[[column]])$label <- variable_label
     }
   }
 
@@ -790,9 +793,7 @@ label_df_by_coding <- function(df,
 
     # for debugging
     # print(column)
-    df[[column]] <- haven::labelled(x = df[[column]],
-                                    labels = NULL,
-                                    label = data_dict[data_dict[[data_dict_colname_col]] == column, data_dict_variable_label_col][[1]])
+    attributes(df[[column]])$label <- data_dict[data_dict[[data_dict_colname_col]] == column, data_dict_variable_label_col][[1]]
   }
 
   # error if nothing was labelled
@@ -867,7 +868,7 @@ update_column_classes <- function(df,
 #' @param ukb_codings .
 #' @param max_n_labels .
 #' @param descriptive_colnames .
-#' @param labelled .
+#' @param label .
 #' @param na.strings .
 #' @param chunk_size .
 #' @param ... additional arguments are passed to
@@ -887,7 +888,7 @@ read_ukb_chunked_to_file <- function(in_path,
                                      ukb_codings = get_ukb_codings(),
                                      max_n_labels = 22,
                                      descriptive_colnames = FALSE,
-                                     labelled = FALSE,
+                                     label = FALSE,
                                      na.strings = c("", "NA"),
                                      chunk_size = 10000,
                                      ...) {
@@ -934,7 +935,7 @@ read_ukb_chunked_to_file <- function(in_path,
                                                                                           ukb_codings = ukb_codings,
                                                                                           start_time = start_time,
                                                                                           descriptive_colnames = descriptive_colnames,
-                                                                                          labelled = labelled,
+                                                                                          label = label,
                                                                                           ...)),
     ...
   )
@@ -950,7 +951,7 @@ read_ukb_chunked_callback_write_to_file <-
            ukb_codings,
            start_time,
            descriptive_colnames = descriptive_colnames,
-           labelled = labelled,
+           label = label,
            ...) {
     # a function factory for `read_ukb_chunked_to_file()`
     progress_update <- function(start_time, pos) {
@@ -989,7 +990,7 @@ read_ukb_chunked_callback_write_to_file <-
         )
       }
 
-      if (labelled) {
+      if (label) {
         x <- label_ukb_main(
           ukb_main = x,
           data_dict = data_dict,
