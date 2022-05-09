@@ -1,63 +1,12 @@
 
 # SETUP -------------------------------------------------------------------
-ukb_data_dict <- get_ukb_data_dict()
-ukb_codings <- get_ukb_codings()
+ukb_data_dict <- get_ukb_data_dict_dummy()
+ukb_codings <- get_ukb_codings_dummy()
+
+dummy_gp_clinical <-
 
 # file paths
-dummy_ukb_main_clinical_events_path <- file.path(tempdir(), "DUMMY_UKB_MAIN_CLINICAL_EVENTS.tsv")
-dummy_gp_clinical_path <- file.path(tempdir(), "dummy_gp_clinical_path.tsv")
-dummy_gp_scripts_path <- file.path(tempdir(), "dummy_gp_scripts_path.tsv")
 dummy_ukb_db_path <- file.path(tempdir(), "ukb.db")
-
-# write dummy clinical events data to file
-readr::write_tsv(DUMMY_UKB_MAIN_CLINICAL_EVENTS,
-                 file = dummy_ukb_main_clinical_events_path)
-
-# make dummy gp_clinical data
-dummy_gp_clinical <- tibble::tibble(
-  eid = c(1, 1, 1, 3, 4, 8),
-  data_provider = c('1', '4', '3', '1', '2', '1'),
-  event_dt = c(
-    '03/03/1903',
-    '01/01/1901',
-    '07/07/2037',
-    '07/07/2037',
-    '01/02/1999',
-    '01/02/1999'
-  ),
-  read_2 = c('C', 'A', 'E', 'E', 'J', NA),
-  read_3 = c(NA, NA, NA, NA, NA, 'G'),
-  value1 = c('1', '1', '1', '1', '1', '1'),
-  value2 = c('2', '2', '2', '2', '2', '2'),
-  value3 = c('3', '3', '3', '3', '3', '3')
-)
-
-# write dummy gp_clinical data to file
-readr::write_tsv(dummy_gp_clinical,
-                 file = dummy_gp_clinical_path)
-
-# make dummy gp_scripts data
-dummy_gp_scripts <- tibble::tibble(
-  eid = c(1, 1, 1, 3, 4, 8),
-  data_provider = c('1', '4', '3', '1', '2', '1'),
-  issue_date = c(
-    '03/03/1903',
-    '01/01/1901',
-    '07/07/2037',
-    '07/07/2037',
-    '01/02/1999',
-    '01/02/1999'
-  ),
-  read_2 = c('bxi300', 'bxi3', NA, 'bd3j00', 'bd3j', NA),
-  bnf_code = c(NA, NA, "02.02.01.00.00", NA, "02020100", NA),
-  dmd_code = c('1', NA, NA, '1', NA, '1'),
-  drug_name = c('drug2', NA, 'drug2', 'drug2', 'drug2', '2'),
-  quantity = c('50', NA, '30', '30', '30', '30')
-)
-
-# write dummy gp_scripts data to file
-readr::write_tsv(dummy_gp_scripts,
-                 file = dummy_gp_scripts_path)
 
 # tidy gp_clinical
 dummy_gp_clinical_special_dates_rm <-

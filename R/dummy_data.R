@@ -73,20 +73,87 @@ DUMMY_UKB_MAIN_CLINICAL_EVENTS <- data.table::data.table(
 
 # PUBLIC ------------------------------------------------------
 
-#' Example clinical events data from a UK Biobank main dataset
+#' Dummy UK Biobank data
 #'
-#' Example dummy clinical events data that can be tidied with \code{\link{tidy_clinical_events}}
+#' Either read a dummy UK Biobank dataset into R or return the file path only.
 #'
-#' @return A data frame of dummy data
+#' The following dummy datasets are included with this package:
+#'
+#' * `dummy_Data_Dictionary_Showcase.tsv`: A subset of fields from the UK
+#' Biobank data dictionary (full version available from the UK Biobank [data
+#' showcase
+#' website](https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide)).
+#'
+#' * `dummy_Codings.tsv`: A subset of UK Biobank data codings (full version
+#' available from the UK Biobank [data showcase
+#' website](https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide)).
+#'
+#' * `dummy_ukb_main.tsv`: A dummy main UK Biobank dataset. May be read into R
+#' with [read_ukb()].
+#'
+#' * `dummy_ukb_main_clinical_events.tsv`: A dummy main UK Biobank dataset
+#' containing clinical events fields. May be read into R with [read_ukb()] and
+#' tidied with [tidy_clinical_events()].
+#'
+#' * `dummy_gp_clinical.txt`: A dummy UK Biobank primary care clinical event
+#' records dataset.
+#'
+#' * `dummy_gp_scripts.txt`: A dummy UK Biobank primary care prescription
+#' records dataset.
+#'
+#' @param file_name Name of dummy dataset file.
+#' @param path_only If `TRUE`, return the file path to the dummy dataset file,
+#'   otherwise if `FALSE` (default), read the dummy dataset into R.
+#'
+#' @return A data frame if `path_only` is `FALSE` (default) or a string if
+#'   `path_only` is `TRUE`.
 #' @export
 #'
-#' @seealso \code{\link{tidy_clinical_events}}
-#'
 #' @examples
-#' dummy_main_dataset_clinical_events()
-dummy_main_dataset_clinical_events <- function() {
-  DUMMY_UKB_MAIN_CLINICAL_EVENTS
+#' # available dummy datasets
+#' dummy_datasets <- c(
+#'   "dummy_Data_Dictionary_Showcase.tsv",
+#'   "dummy_Codings.tsv",
+#'   "dummy_ukb_main.tsv",
+#'   "dummy_ukb_main_clinical_events.tsv",
+#'   "dummy_gp_clinical.txt",
+#'   "dummy_gp_scripts.txt"
+#' )
+#'
+#' # file paths
+#' dummy_datasets %>%
+#'   purrr::map_chr(get_ukb_dummy, path_only = TRUE)
+#'
+#' # read into R
+#' dummy_datasets %>%
+#'   purrr::set_names() %>%
+#'   purrr::map(get_ukb_dummy, path_only = FALSE) %>%
+#'   purrr::map(tibble::as_tibble)
+get_ukb_dummy <- function(file_name,
+                          path_only = FALSE) {
+  match.arg(file_name,
+            choices = c(
+              "dummy_Data_Dictionary_Showcase.tsv",
+              "dummy_Codings.tsv",
+              "dummy_ukb_main.tsv",
+              "dummy_ukb_main_clinical_events.tsv",
+              "dummy_gp_clinical.txt",
+              "dummy_gp_scripts.txt"
+            ))
+
+  file_path <- system.file(file.path("extdata", "dummy_tsv"),
+                           file_name,
+                           package = "ukbwranglr")
+
+  if (path_only) {
+    return(file_path)
+  } else {
+    return(fread_tsv_as_character(file_path))
+  }
 }
 
-# PRIVATE -------------------------------------------------------
 
+list.files("inst/extdata/dummy_tsv/") %>%
+  set_names() %>%
+  map(get_ukb_dummy) %>%
+  map(as_tibble)

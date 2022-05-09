@@ -63,7 +63,6 @@ data.table::fread(DUMMY_DATA_PATH) %>%
 ```{r}
 data_dict <- ukbwranglr::make_data_dict(DUMMY_DATA_PATH, delim = ",")
 ukbwranglr::read_ukb(DUMMY_DATA_PATH, data_dict, delim = ",") %>% 
-  labelled::unlabelled() %>% 
   head()
 ```
 

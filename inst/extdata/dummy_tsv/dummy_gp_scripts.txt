@@ -1,0 +1,7 @@
+eid	data_provider	issue_date	read_2	bnf_code	dmd_code	drug_name	quantity
+1	1	03/03/1903	bxi300		1	drug2	50
+1	4	01/01/1901	bxi3				
+1	3	07/07/2037		02.02.01.00.00		drug2	30
+3	1	07/07/2037	bd3j00		1	drug2	30
+4	2	01/02/1999	bd3j	02020100		drug2	30
+8	1	01/02/1999			1	2	30
