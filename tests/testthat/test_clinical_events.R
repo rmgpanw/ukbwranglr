@@ -1,22 +1,26 @@
 
 # SETUP -------------------------------------------------------------------
 
-CLINICAL_EVENTS_FIELD_IDS <- ukbwranglr:::CLINICAL_EVENTS_FIELD_IDS
-CLINICAL_EVENTS_SOURCES <- ukbwranglr:::CLINICAL_EVENTS_SOURCES
+dummy_ukb_data_dict <- get_ukb_dummy("dummy_Data_Dictionary_Showcase.tsv")
+dummy_ukb_codings <- get_ukb_dummy("dummy_Codings.tsv")
 
-# Make dummy data ---------------------------------------------------------
+dummy_ukb_data_raw_path <- get_ukb_dummy("dummy_ukb_main.tsv",
+                                         path_only = TRUE)
 
-# get ukb data dict and codings
-ukb_data_dict <- get_ukb_data_dict()
-ukb_codings <- get_ukb_codings()
+dummy_data_dict <- make_data_dict(dummy_ukb_data_raw_path,
+                                  ukb_data_dict = dummy_ukb_data_dict)
 
+dummy_ukb_main <- read_ukb(dummy_ukb_data_raw_path,
+                           data_dict = dummy_data_dict,
+                           ukb_data_dict = dummy_ukb_data_dict,
+                           ukb_codings = dummy_ukb_codings)
 
 # tidy dummy clinical events
 dummy_clinical_events_list <-
   tidy_clinical_events(
-    ukb_main = dummy_main_dataset_clinical_events(),
-    ukb_data_dict = ukb_data_dict,
-    ukb_codings = ukb_codings,
+    ukb_main = dummy_ukb_main,
+    ukb_data_dict = dummy_ukb_data_dict,
+    ukb_codings = dummy_ukb_codings,
     clinical_events = names(CLINICAL_EVENTS_FIELD_IDS),
     strict = TRUE,
     .details_only = FALSE

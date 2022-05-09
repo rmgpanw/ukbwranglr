@@ -552,7 +552,7 @@ tidy_clinical_events <- function(ukb_main,
         make_self_report_special_decimal_dates_na() %>%
         dplyr::mutate("date" = as.character(
           lubridate::as_date(
-            lubridate::date_decimal(.data[["date"]])
+            lubridate::date_decimal(as.numeric(.data[["date"]]))
             )
           )),
 
@@ -565,7 +565,7 @@ tidy_clinical_events <- function(ukb_main,
         make_self_report_special_decimal_dates_na() %>%
         dplyr::mutate("date" = as.character(
           lubridate::as_date(
-            lubridate::date_decimal(.data[["date"]])
+            lubridate::date_decimal(as.numeric(.data[["date"]]))
           )
         )) %>%
         recode_self_report_non_cancer_diagnoses_to_icd10(data_dict = data_dict,
