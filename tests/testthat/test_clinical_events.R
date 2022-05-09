@@ -27,24 +27,14 @@ dummy_clinical_events_list <-
   )
 
 # add some dummy GP data
-dummy_gp_clinical_events <- tibble::tribble(
-  ~ eid, ~ source, ~ index, ~ code, ~ date,
-  1, "gpc1_r2", "5", "C108.", "1990-10-01",
-  2, "gpc2_r2", "6", "C109.", "1990-10-02",
-  1, "gpc3_r3", "7", "X40J4", "1990-10-03",
-  2, "gpc4_r3", "8", "X40J5", "1990-10-04",
-  1, "gpc1_r3", "9", "C108.", "1990-10-03",
-  2, "gpc2_r3", "10", "C109.", "1990-10-04"
-)
+dummy_gp_clinical_events_tidy <- get_ukb_dummy("dummy_gp_clinical.txt") %>%
+  tidy_gp_clinical() %>%
+  .$clinical_events
 
-assertthat::assert_that(all(dummy_gp_clinical_events$source %in% CLINICAL_EVENTS_SOURCES$source),
-                        msg = "Error! check `source` column in `dummy_gp_clinical_events")
-
+# combine all
 dummy_clinical_events <- dummy_clinical_events_list %>%
   dplyr::bind_rows() %>%
-  dplyr::bind_rows(
-    dummy_gp_clinical_events
-  )
+  dplyr::bind_rows(dummy_gp_clinical_events_tidy)
 
 # dummy_clinical_events as sqlite db
 # Create an ephemeral in-memory RSQLite database
@@ -83,44 +73,63 @@ stopifnot(validate_clinical_codes(dummy_clinical_codes))
 
 # `tidy_clinical_events_basis()`  -----------------------------------------
 
-test_that(
-  "`tidy_clinical_events_basis()` removes empty string values", {
+test_that("`tidy_clinical_events_basis()` removes empty string values", {
+  # create dummy data containing empty strings
+  dummy_ukb_main_clinical_events_empty_strings <-
+    dummy_ukb_main %>%
+    dplyr::select(eid,
+                  tidyselect::contains("opcs4")) %>%
+    head(2)
 
-    # create dummy data containing empty strings
-    dummy_main_dataset_clinical_events_empty_strings <- dummy_main_dataset_clinical_events()
+  dummy_ukb_main_clinical_events_empty_strings$operative_procedures_opcs4_f41272_0_0 <-
+    c("", "  ")
+  dummy_ukb_main_clinical_events_empty_strings$operative_procedures_opcs4_f41272_0_3[1] <-
+    NA_character_
 
-    dummy_main_dataset_clinical_events_empty_strings$operative_procedures_opcs4_f41272_0_0 <- c("", "  ")
-    dummy_main_dataset_clinical_events_empty_strings$operative_procedures_opcs4_f41272_0_3[1] <- NA_character_
+  expect_warning(
+    tidy_clinical_events_basis(
+      ukb_main = dummy_ukb_main_clinical_events_empty_strings,
+      data_dict = make_data_dict(
+        dummy_ukb_main_clinical_events_empty_strings,
+        ukb_data_dict = dummy_ukb_data_dict
+      ),
+      ukb_codings = dummy_ukb_codings,
+      data_dict_colname_col = "colheaders_raw",
+      code_col_field_id = "41272",
+      date_col_field_id = "41282"
+    ),
+    regexp = "Detected 2 empty code values"
+  )
 
-    expect_warning(
-      tidy_clinical_events_basis(ukb_main = dummy_main_dataset_clinical_events_empty_strings,
-                                 data_dict = make_data_dict(dummy_main_dataset_clinical_events_empty_strings,
-                                                            ukb_data_dict = ukb_data_dict),
-                                 ukb_codings = ukb_codings,
-                                 data_dict_colname_col = "colheaders_raw",
-                                 code_col_field_id = "41272",
-                                 date_col_field_id = "41282"),
-      regexp = "Detected 2 empty code values"
-    )
-
-    expect_equal(
-      suppressWarnings(tidy_clinical_events_basis(ukb_main = dummy_main_dataset_clinical_events_empty_strings,
-                                 data_dict = make_data_dict(dummy_main_dataset_clinical_events_empty_strings,
-                                                            ukb_data_dict = ukb_data_dict),
-                                 ukb_codings = ukb_codings,
-                                 data_dict_colname_col = "colheaders_raw",
-                                 code_col_field_id = "41272",
-                                 date_col_field_id = "41282")),
-      expected = data.table::data.table(
-        eid = c(2),
-        source = c("f41272"),
-        index = c("0_3"),
-        code = c("A02"),
-        date = c("1956-09-12")
+  expect_equal(
+    suppressWarnings(
+      tidy_clinical_events_basis(
+        ukb_main = dummy_ukb_main_clinical_events_empty_strings,
+        data_dict = make_data_dict(
+          dummy_ukb_main_clinical_events_empty_strings,
+          ukb_data_dict = dummy_ukb_data_dict
+        ),
+        ukb_codings = dummy_ukb_codings,
+        data_dict_colname_col = "colheaders_raw",
+        code_col_field_id = "41272",
+        date_col_field_id = "41282"
       )
+    ) %>%
+      # need to remove label attributes
+      dplyr::mutate(dplyr::across(tidyselect::everything(),
+                                  ~ {
+                                    attributes(.x) <- NULL
+                                    .x
+                                  })),
+    expected = data.table::data.table(
+      eid = c(2),
+      source = c("f41272"),
+      index = c("0_3"),
+      code = c("A02"),
+      date = c("1956-09-12")
     )
-  }
-)
+  )
+})
 
 # `tidy_clinical_events()`  -----------------------------------------
 
@@ -132,14 +141,15 @@ test_that(
                                                                                   pattern = "^gp"))))
   }
 )
+
 test_that(
   "`tidy_clinical_events()` raises warning message if any clinical event types are missing from ukb_main",
   {
     expect_warning(
-      tidy_clinical_events(ukb_main = dummy_main_dataset_clinical_events() %>%
+      tidy_clinical_events(ukb_main = dummy_ukb_main %>%
                              dplyr::select(-tidyselect::contains("operation")),
-                           ukb_data_dict = ukb_data_dict,
-                           ukb_codings = ukb_codings,
+                           ukb_data_dict = dummy_ukb_data_dict,
+                           ukb_codings = dummy_ukb_codings,
                            clinical_events = c(
                              "primary_death_icd10",
                              # "self_report_non_cancer",
@@ -163,10 +173,10 @@ test_that(
   "`tidy_clinical_events()` raises error if any clinical event types are missing from ukb_main and strict = TRUE",
   {
     expect_error(
-      tidy_clinical_events(ukb_main = dummy_main_dataset_clinical_events() %>%
+      tidy_clinical_events(ukb_main = dummy_ukb_main %>%
                              dplyr::select(-tidyselect::contains("operation")),
-                           ukb_data_dict = ukb_data_dict,
-                           ukb_codings = ukb_codings,
+                           ukb_data_dict = dummy_ukb_data_dict,
+                           ukb_codings = dummy_ukb_codings,
                            clinical_events = c(
                              "primary_death_icd10",
                              # "self_report_non_cancer",
@@ -185,9 +195,6 @@ test_that(
       ": self_report_operation. Use")
   }
 )
-
-# note: use `rawutil::print_df_as_call_to_tibble` to generate expected tibbles
-# after manually checking they are correct
 
 test_that(
   "`tidy_clinical_events` returns the expected results for 'primary_death_icd10'", {
@@ -228,29 +235,91 @@ test_that(
   }
 )
 
-test_that(
-  "`tidy_clinical_events` returns the expected results for 'self_report_non_cancer'", {
-    expect_equivalent(dummy_clinical_events_list$self_report_non_cancer,
-                      tibble::tibble(
-                        eid = c(1, 2, 1, 2, 1, 2, 2),
-                        source = c('f20002', 'f20002', 'f20002', 'f20002', 'f20002', 'f20002', 'f20002'),
-                        index = c('0_0', '0_0', '0_3', '0_3', '2_0', '2_0', '2_3'),
-                        code = c('1665', '1383', '1223', '1352', '1514', '1447', '1165'),
-                        date = c('1998-12-24', '2011-01-05', '2003-02-25', '2020-07-02', '2011-04-07', '1981-03-01', '1983-01-03'),
-                      ))
-  }
-)
+test_that("`tidy_clinical_events` returns the expected results for 'self_report_non_cancer'",
+          {
+            expect_equivalent(
+              dummy_clinical_events_list$self_report_non_cancer,
+              data.table::data.table(
+                eid = c(1L, 2L, 3L, 4L, 1L, 2L, 1L, 2L, 2L),
+                source = c(
+                  "f20002",
+                  "f20002",
+                  "f20002",
+                  "f20002",
+                  "f20002",
+                  "f20002",
+                  "f20002",
+                  "f20002",
+                  "f20002"
+                ),
+                index = c("0_0", "0_0", "0_0", "0_0", "0_3",
+                          "0_3", "2_0", "2_0", "2_3"),
+                code = c(
+                  "1665",
+                  "1383",
+                  "1665",
+                  "1383",
+                  "1223",
+                  "1352",
+                  "1514",
+                  "1447",
+                  "1165"
+                ),
+                date = c(
+                  "1998-12-24",
+                  "2011-01-05",
+                  NA,
+                  NA,
+                  "2003-02-25",
+                  "2020-07-02",
+                  "2011-04-07",
+                  "1981-03-01",
+                  "1983-01-03"
+                )
+              )
+            )
+          })
+
+test_that("`tidy_clinical_events` removes special date codings for 'self_report_non_cancer'", {
+  expect_equivalent(dummy_clinical_events_list$self_report_non_cancer$date[3:4],
+                    c(NA_character_, NA_character_))
+})
 
 test_that(
-  "`tidy_clinical_events` returns the expected results for 'self_report_non_cancer_icd10'", {
-    expect_equivalent(dummy_clinical_events_list$self_report_non_cancer_icd10,
-                      tibble::tibble(
-                        eid = c(1, 2, 1, 2, 1, 2, 2),
-                        source = c('f20002_icd10', 'f20002_icd10', 'f20002_icd10', 'f20002_icd10', 'f20002_icd10', 'f20002_icd10', 'f20002_icd10'),
-                        index = c('0_0', '0_0', '0_3', '0_3', '2_0', '2_0', '2_3'),
-                        code = c('N95', 'M33', 'E11', 'N84', 'N30', 'D61', 'K85'),
-                        date = c('1998-12-24', '2011-01-05', '2003-02-25', '2020-07-02', '2011-04-07', '1981-03-01', '1983-01-03'),
-                      ))
+  "`tidy_clinical_events` returns the expected results for 'self_report_non_cancer_icd10'",
+  {
+    expect_equivalent(
+      dummy_clinical_events_list$self_report_non_cancer_icd10,
+      data.table::data.table(
+        eid = c(1L, 2L, 3L, 4L, 1L, 2L, 1L, 2L, 2L),
+        source = c(
+          "f20002_icd10",
+          "f20002_icd10",
+          "f20002_icd10",
+          "f20002_icd10",
+          "f20002_icd10",
+          "f20002_icd10",
+          "f20002_icd10",
+          "f20002_icd10",
+          "f20002_icd10"
+        ),
+        index = c("0_0", "0_0", "0_0", "0_0", "0_3",
+                  "0_3", "2_0", "2_0", "2_3"),
+        code = c("N95", "M33", "N95", "M33", "E11",
+                 "N84", "N30", "D61", "K85"),
+        date = c(
+          "1998-12-24",
+          "2011-01-05",
+          NA,
+          NA,
+          "2003-02-25",
+          "2020-07-02",
+          "2011-04-07",
+          "1981-03-01",
+          "1983-01-03"
+        )
+      )
+    )
   }
 )
 
@@ -345,18 +414,63 @@ test_that(
   }
 )
 
-test_that(
-  "`tidy_clinical_events` returns the expected results for 'summary_hes_opcs4'", {
-    expect_equivalent(dummy_clinical_events_list$summary_hes_opcs4,
-                      tibble::tibble(
-                        eid = c(1, 2, 1, 2),
-                        source = c('f41272', 'f41272', 'f41272', 'f41272'),
-                        index = c('0_0', '0_0', '0_3', '0_3'),
-                        code = c('A01', 'A023', 'A018', 'A02'),
-                        date = c('1956-11-24', '1910-10-04', '1969-11-23', '1956-09-12'),
-                      ))
-  }
-)
+test_that("`tidy_clinical_events` returns the expected results for 'summary_hes_opcs4'",
+          {
+            expect_equivalent(
+              dummy_clinical_events_list$summary_hes_opcs4,
+              data.table::data.table(
+                eid = c(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 1L, 2L),
+                source = c(
+                  "f41272",
+                  "f41272",
+                  "f41272",
+                  "f41272",
+                  "f41272",
+                  "f41272",
+                  "f41272",
+                  "f41272",
+                  "f41272",
+                  "f41272"
+                ),
+                index = c(
+                  "0_0",
+                  "0_0",
+                  "0_0",
+                  "0_0",
+                  "0_0",
+                  "0_0",
+                  "0_0",
+                  "0_0",
+                  "0_3",
+                  "0_3"
+                ),
+                code = c(
+                  "A01",
+                  "A023",
+                  "H01",
+                  "H011",
+                  "H022",
+                  "H013",
+                  "H018",
+                  "H019",
+                  "A018",
+                  "A02"
+                ),
+                date = c(
+                  "1956-11-24",
+                  "1910-10-04",
+                  NA,
+                  NA,
+                  NA,
+                  NA,
+                  NA,
+                  NA,
+                  "1969-11-23",
+                  "1956-09-12"
+                )
+              )
+            )
+          })
 
 # `extract_phenotypes_single_disease()` --------------------------
 
@@ -505,11 +619,11 @@ test_that("`extract_phenotypes()` returns expected results", {
 
   expect_equivalent(
     result$Disease2$test_c_test,
-    tibble::tibble(
-      eid = 1,
-      test_c_test_min_date = "1998-12-24",
-      test_c_test_indicator = "Yes"
-    )
+    tibble::tribble(
+       ~eid, ~test_c_test_min_date, ~test_c_test_indicator,
+         1L,          "1998-12-24",                  "Yes",
+         3L,                    NA,                  "Yes"
+       )
   )
 
   expect_equivalent(
@@ -523,11 +637,11 @@ test_that("`extract_phenotypes()` returns expected results", {
 
   expect_equivalent(
     result$Disease2$test_DISEASE2_TEST,
-    tibble::tibble(
-      eid = 1,
-      test_a_test_min_date = "1956-11-24",
-      test_a_test_indicator = "Yes"
-    )
+    tibble::tribble(
+       ~eid, ~test_DISEASE2_TEST_min_date, ~test_DISEASE2_TEST_indicator,
+         1L,                 "1956-11-24",                         "Yes",
+         3L,                           NA,                         "Yes"
+       )
   )
 })
 
@@ -687,7 +801,7 @@ test_that(
     expected = tibble::tibble(
       eid = c(1, 2, 1, 1),
       source = c("f40002", "f40006", "gpc1_r2", "gpc1_r3"),
-      index = c("0_0", "2_0", "5", "9"),
+      index = c("0_0", "2_0", "7", "11"),
       code = c("W192", "W192", "C108.", "C108."),
       date = c("1917-10-08", NA, "1990-10-01", "1990-10-03")
     )

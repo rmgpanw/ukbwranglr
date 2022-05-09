@@ -22,35 +22,32 @@ Either read a dummy UK Biobank dataset into R or return the file path only.
 \details{
 The following dummy datasets are included with this package:
 
-* `dummy_Data_Dictionary_Showcase.tsv`: A subset of fields from the UK
+- `dummy_Data_Dictionary_Showcase.tsv`: A subset of fields from the UK
 Biobank data dictionary (full version available from the UK Biobank [data
 showcase
 website](https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide)).
 
-* `dummy_Codings.tsv`: A subset of UK Biobank data codings (full version
+- `dummy_Codings.tsv`: A subset of UK Biobank data codings (full version
 available from the UK Biobank [data showcase
 website](https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide)).
 
-* `dummy_ukb_main.tsv`: A dummy main UK Biobank dataset. May be read into R
-with [read_ukb()].
+- `dummy_ukb_main.tsv`: A dummy main UK Biobank dataset. May be read into R
+with [read_ukb()]. Tidy xlinical events fields with [tidy_clinical_events()].
 
-* `dummy_ukb_main_clinical_events.tsv`: A dummy main UK Biobank dataset
-containing clinical events fields. May be read into R with [read_ukb()] and
-tidied with [tidy_clinical_events()].
-
-* `dummy_gp_clinical.txt`: A dummy UK Biobank primary care clinical event
+- `dummy_gp_clinical.txt`: A dummy UK Biobank primary care clinical event
 records dataset.
 
-* `dummy_gp_scripts.txt`: A dummy UK Biobank primary care prescription
+- `dummy_gp_scripts.txt`: A dummy UK Biobank primary care prescription
 records dataset.
 }
 \examples{
+library(magrittr)
+
 # available dummy datasets
 dummy_datasets <- c(
   "dummy_Data_Dictionary_Showcase.tsv",
   "dummy_Codings.tsv",
   "dummy_ukb_main.tsv",
-  "dummy_ukb_main_clinical_events.tsv",
   "dummy_gp_clinical.txt",
   "dummy_gp_scripts.txt"
 )
@@ -62,5 +59,6 @@ dummy_datasets \%>\%
 # read into R
 dummy_datasets \%>\%
   purrr::set_names() \%>\%
-  purrr::map(get_ukb_dummy, path_only = FALSE)
+  purrr::map(get_ukb_dummy, path_only = FALSE) \%>\%
+  purrr::map(tibble::as_tibble)
 }

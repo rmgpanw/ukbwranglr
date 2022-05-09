@@ -41,9 +41,15 @@ the first date of the month.
 }
 \examples{
 ukb_main <- data.frame(eid = 1, f34_0_0 = 1990, f52_0_0 = 1)
+ # dummy UKB data dictionary
+ dummy_ukb_data_dict <- get_ukb_dummy("dummy_Data_Dictionary_Showcase.tsv")
+
  # keep input year/month of birth columns
- derive_dob(ukb_main)
+ derive_dob(ukb_main,
+            ukb_data_dict = dummy_ukb_data_dict)
 
  # remove input year/month of birth columns
- derive_dob(ukb_main, .drop = TRUE)
+ derive_dob(ukb_main,
+            ukb_data_dict = dummy_ukb_data_dict,
+            .drop = TRUE)
 }

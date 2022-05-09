@@ -1,31 +1,34 @@
 
 # SETUP -------------------------------------------------------------------
 
-# dummy data
-DUMMY_UKB_MAIN_CONTINUOUS <- tibble::tibble(
-  eid = c(1, 2, 3, 4),
-  body_mass_index_bmi_f21001_0_0 = c(20.1115, 30.1536, 22.8495, NA),
-  body_mass_index_bmi_f21001_1_0 = c(20.864, 20.2309, 26.7929, NA),
-  body_mass_index_bmi_f21001_2_0 = c(NA, 27.4936, 27.6286, NA),
-  systolic_blood_pressure_automated_reading_f4080_0_0 = c(NA, 146, 143, NA),
-  systolic_blood_pressure_automated_reading_f4080_0_1 = c(134, 145, 123, NA),
-  systolic_blood_pressure_automated_reading_f4080_0_2 = c(134, 145, 123, NA),
-  systolic_blood_pressure_automated_reading_f4080_0_3 = c(134, NA, 123, NA),
-  systolic_blood_pressure_automated_reading_f4080_1_0 = c(159, 129, 162, NA),
-  systolic_blood_pressure_automated_reading_f4080_1_1 = c(134, 145, 123, NA),
-  systolic_blood_pressure_automated_reading_f4080_1_2 = c(134, 145, 123, NA),
-  systolic_blood_pressure_automated_reading_f4080_1_3 = c(NA, 145, 123, NA)
-)
+dummy_ukb_data_dict <- get_ukb_dummy("dummy_Data_Dictionary_Showcase.tsv")
+dummy_ukb_codings <- get_ukb_dummy("dummy_Codings.tsv")
 
-data_dict <- make_data_dict(DUMMY_UKB_MAIN_CONTINUOUS)
+dummy_ukb_main_continuous <-
+  dummy_ukb_main <- read_ukb(
+    get_ukb_dummy("dummy_ukb_main.tsv",
+                  path_only = TRUE),
+    data_dict = NULL,
+    ukb_data_dict = dummy_ukb_data_dict,
+    ukb_codings = dummy_ukb_codings
+  ) %>%
+  dplyr::select(
+    eid,
+    tidyselect::contains("bmi"),
+    tidyselect::contains("systolic_blood_pressure")
+  ) %>%
+  head(4)
+
+dummy_data_dict <- make_data_dict(dummy_ukb_main_continuous,
+                                  ukb_data_dict = dummy_ukb_data_dict)
 
 # TESTS -------------------------------------------------------------------
 
 # `summarise_numerical_variables()` ----------------------------------------------------
 
 test_that("`summarise_numerical_variables()` returns the expected results for mean, summarising by FieldID", {
-  result <- summarise_numerical_variables(DUMMY_UKB_MAIN_CONTINUOUS,
-                                          data_dict = data_dict,
+  result <- summarise_numerical_variables(dummy_ukb_main_continuous,
+                                          data_dict = dummy_data_dict,
                                           summary_function = "mean")
 
   expect_equal(
@@ -42,8 +45,8 @@ test_that("`summarise_numerical_variables()` returns the expected results for me
 })
 
 test_that("`summarise_numerical_variables()` returns the expected results for max, summarising by FieldID", {
-  result <- summarise_numerical_variables(DUMMY_UKB_MAIN_CONTINUOUS,
-                                          data_dict = data_dict,
+  result <- summarise_numerical_variables(dummy_ukb_main_continuous,
+                                          data_dict = dummy_data_dict,
                                           summary_function = "max")
 
   expect_equal(
@@ -59,8 +62,8 @@ test_that("`summarise_numerical_variables()` returns the expected results for ma
 })
 
 test_that("`summarise_numerical_variables()` returns the expected results for min, summarising by FieldID", {
-  result <- summarise_numerical_variables(DUMMY_UKB_MAIN_CONTINUOUS,
-                                          data_dict = data_dict,
+  result <- summarise_numerical_variables(dummy_ukb_main_continuous,
+                                          data_dict = dummy_data_dict,
                                           summary_function = "min")
 
   expect_equal(
@@ -76,8 +79,8 @@ test_that("`summarise_numerical_variables()` returns the expected results for mi
 })
 
 test_that("`summarise_numerical_variables()` returns the expected results for sum, summarising by FieldID", {
-  result <- summarise_numerical_variables(DUMMY_UKB_MAIN_CONTINUOUS,
-                                          data_dict = data_dict,
+  result <- summarise_numerical_variables(dummy_ukb_main_continuous,
+                                          data_dict = dummy_data_dict,
                                           summary_function = "sum")
 
   expect_equal(
@@ -93,8 +96,8 @@ test_that("`summarise_numerical_variables()` returns the expected results for su
 })
 
 test_that("`summarise_numerical_variables()` returns the expected results for n values, summarising by FieldID", {
-  result <- summarise_numerical_variables(DUMMY_UKB_MAIN_CONTINUOUS,
-                                          data_dict = data_dict,
+  result <- summarise_numerical_variables(dummy_ukb_main_continuous,
+                                          data_dict = dummy_data_dict,
                                           summary_function = "n_values")
 
   expect_equal(
@@ -109,8 +112,8 @@ test_that("`summarise_numerical_variables()` returns the expected results for n 
 })
 
 test_that("`summarise_numerical_variables()` returns the expected results for n values, summarising by instance", {
-  result <- summarise_numerical_variables(DUMMY_UKB_MAIN_CONTINUOUS,
-                                          data_dict = data_dict,
+  result <- summarise_numerical_variables(dummy_ukb_main_continuous,
+                                          data_dict = dummy_data_dict,
                                           summary_function = "n_values",
                                           summarise_by = "Instance")
 
@@ -128,8 +131,8 @@ test_that("`summarise_numerical_variables()` returns the expected results for n 
 })
 
 test_that("`summarise_numerical_variables()` raises a warning if there are missing instances/arrays in data_dict", {
-  expect_warning(summarise_numerical_variables(DUMMY_UKB_MAIN_CONTINUOUS,
-                                          data_dict = data_dict %>%
+  expect_warning(summarise_numerical_variables(dummy_ukb_main_continuous,
+                                          data_dict = dummy_data_dict %>%
                                             dplyr::filter(descriptive_colnames == "body_mass_index_bmi_f21001_0_0"),
                                           summary_function = "n_values",
                                           summarise_by = "Field"),
@@ -141,8 +144,8 @@ test_that("`summarise_numerical_variables()` drops original summarised columns i
           {
             expect_equal(
               summarise_numerical_variables(
-                DUMMY_UKB_MAIN_CONTINUOUS,
-                data_dict = data_dict,
+                dummy_ukb_main_continuous,
+                data_dict = dummy_data_dict,
                 summary_function = "n_values",
                 summarise_by = "Field",
                 .drop = TRUE
@@ -156,15 +159,15 @@ test_that("`summarise_numerical_variables()` drops original summarised columns i
 test_that("`summarise_numerical_variables()` does not include previously generated summary cols", {
 
   # summarise once
-  result <- summarise_numerical_variables(DUMMY_UKB_MAIN_CONTINUOUS,
-                                          data_dict = data_dict,
+  result <- summarise_numerical_variables(dummy_ukb_main_continuous,
+                                          data_dict = dummy_data_dict,
                                           summary_function = "mean",
                                           summarise_by = "Field")
 
   # summarise again - `n_values` should not include the `mean` summary column
   # generated above
   result <- summarise_numerical_variables(result,
-                                          data_dict = data_dict,
+                                          data_dict = dummy_data_dict,
                                           summary_function = "n_values",
                                           summarise_by = "Field")
 

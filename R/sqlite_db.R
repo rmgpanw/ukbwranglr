@@ -683,13 +683,21 @@ tidy_gp_data_db <- function(gp_df,
     )
   }
 
-  result <- list(events = gp_df_codes[c("eid",
-                                        "source",
-                                        "index",
-                                        "code",
-                                        "date")],
-                 other = gp_df[c("index",
-                                 gp_df_details$other_cols)])
+  result <- list(
+    events = gp_df_codes %>%
+      dplyr::select(tidyselect::all_of(
+        c("eid",
+          "source",
+          "index",
+          "code",
+          "date")
+      )),
+    other = gp_df %>%
+      dplyr::select(tidyselect::all_of(c(
+        "index",
+        gp_df_details$other_cols
+      )))
+  )
 
   names(result) <- gp_df_details$output_table_names
 

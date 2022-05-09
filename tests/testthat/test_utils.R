@@ -1,35 +1,20 @@
 
 # SETUP ---------------------------------------------------------------
 
-ukb_data_dict <- get_ukb_data_dict()
-ukb_codings <- get_ukb_codings()
+dummy_ukb_data_dict <- get_ukb_dummy("dummy_Data_Dictionary_Showcase.tsv")
+dummy_ukb_codings <- get_ukb_dummy("dummy_Codings.tsv")
+dummy_ukb_data_raw_path <- get_ukb_dummy("dummy_ukb_main.tsv",
+                                         path_only = TRUE)
+dummy_data_dict <- make_data_dict(dummy_ukb_data_raw_path,
+                                  ukb_data_dict = dummy_ukb_data_dict)
 
 # make dummy data
-dummy_ukb_data_raw <- tibble::tibble(
-  eid = c(1, 2, 3, 4, 5, 6),
-  `31-0.0` = c(0, 0, 1, 0, NA, 1),
-  `34-0.0` = c(1952, 1946, 1951, 1956, NA, 1948),
-  `52-0.0` = c(8, 3, 4, 9, 4, 2),
-  `21000-0.0` = c(NA, 4001, 3, NA, -3, 3),
-  `20002-0.0` = c(1665, 1383, 1197, 1441, 1429, 1513),
-  `21001-0.0` = c(20.1115, 30.1536, 22.8495, 23.4904, 29.2752, 28.2567),
-  `21001-1.0` = c(20.864, 20.2309, 26.7929, 25.6826, 19.7576, 30.286),
-  `21001-2.0` = c(NA, 27.4936, 27.6286, 37.2294, 14.6641, 27.3534),
+dummy_ukb_main <- read_ukb(
+  dummy_ukb_data_raw_path,
+  data_dict = dummy_data_dict,
+  ukb_data_dict = dummy_ukb_data_dict,
+  ukb_codings = dummy_ukb_codings
 )
-
-dummy_ukb_data_raw_path <- file.path(tempdir(), "dummy_ukb_data_raw.csv")
-dummy_ukb_stata_path <- file.path(tempdir(), "dummy_ukb_data_raw.dta")
-
-readr::write_csv(dummy_ukb_data_raw, file = dummy_ukb_data_raw_path)
-
-dummy_ukb_data_dict <- make_data_dict(dummy_ukb_data_raw_path,
-                                      delim = ",",
-                                      ukb_data_dict = ukb_data_dict)
-dummy_ukb_data <- read_ukb(dummy_ukb_data_raw_path,
-                           delim =  ",",
-                           data_dict = dummy_ukb_data_dict,
-                           ukb_data_dict = ukb_data_dict,
-                           ukb_codings = ukb_codings)
 
 # named vector
 dict <- letters[6:10]
@@ -86,18 +71,18 @@ test_that("`rename_cols()` correctly renames columns", {
                c("y2", "x2"))
 })
 
-test_that("`rename_cols()` raises appropriate errors for invalid arguments", {
+test_that("`rename_cols()` raises expected errors for invalid arguments", {
   expect_error(rename_cols(df, "z", "x2"),
-               "Error! `old_colnames` contains values that are not present in `names\\(df\\)`")
+               "`old_colnames` contains values that are not present in `names\\(df\\)`")
 
   expect_error(rename_cols(df, c("x", "y"), c("x", "x")),
-               "Error! `old_colnames` and `new_colnames` must contain unique values only and be of the same length")
+               "`old_colnames` and `new_colnames` must contain unique values only and be of the same length")
 
   expect_error(rename_cols(df, c("x", "y"), "x"),
-               "Error! `old_colnames` and `new_colnames` must contain unique values only and be of the same length")
+               "`old_colnames` and `new_colnames` must contain unique values only and be of the same length")
 
   expect_error(rename_cols(df_duplicate_colnames, "x", "y"),
-               "Error! Some column names in `df` are duplicated")
+               "Some column names in `df` are duplicated")
 })
 
 
@@ -316,3 +301,4 @@ test_that("`summarise_first_non_na()` returns expected results", {
                                       new_col = "new_col")$new_col,
                c(2, 3, 3, 1))
 })
+

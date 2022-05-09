@@ -565,7 +565,7 @@ rename_cols <- function(df, old_colnames, new_colnames) {
   # validate args
   # colnames(df) must be unique
   assertthat::assert_that(length(names(df)) == length(unique(names(df))),
-                          msg = "Error! Some column names in `df` are duplicated")
+                          msg = "Some column names in `df` are duplicated")
 
   # old_colnames and new_colnames must be type character
   assertthat::is.string(old_colnames)
@@ -573,13 +573,13 @@ rename_cols <- function(df, old_colnames, new_colnames) {
 
   # all old_colnames must be in colnames(df)
   assertthat::assert_that(all(old_colnames %in% names(df)),
-                          msg = "Error! `old_colnames` contains values that are not present in `names(df)`")
+                          msg = "`old_colnames` contains values that are not present in `names(df)`")
 
   # old_colnames and new_colnames must be unique, same length and type character
   assertthat::assert_that((length(old_colnames) == length(unique(old_colnames))) &
                             (length(new_colnames) == length(unique(new_colnames))) &
                                (length(new_colnames) == length(old_colnames)),
-                          msg = "Error! `old_colnames` and `new_colnames` must contain unique values only and be of the same length")
+                          msg = "`old_colnames` and `new_colnames` must contain unique values only and be of the same length")
 
   # get indices for old colnames
   old_colname_indices <- old_colnames %>%
@@ -756,7 +756,7 @@ revalue_vector <-
   }
 
 extract_file_ext <- function(x) {
-  stringr::str_extract(x, "\\.[:alpha:]+") %>%
+  stringr::str_extract(x, "\\.[:alpha:]+$") %>%
     stringr::str_remove_all("\\.")
 }
 

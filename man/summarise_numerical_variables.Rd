@@ -7,6 +7,7 @@
 summarise_numerical_variables(
   ukb_main,
   data_dict = NULL,
+  ukb_data_dict = get_ukb_data_dict(),
   summary_function = "mean",
   summarise_by = "Field",
   .drop = FALSE
@@ -18,6 +19,14 @@ those under the \code{descriptive_colnames} column in \code{data_dict}.}
 
 \item{data_dict}{a data dictionary specific to the UKB main dataset file,
 created by \code{\link{make_data_dict}}.}
+
+\item{ukb_data_dict}{The UKB data dictionary (available online at the UK
+Biobank
+\href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{data
+ showcase}. This should be a data frame where all columns are of type
+\code{character}. By default, this is downloaded from the
+\href{https://github.com/rmgpanw/ukbwranglr_resources}{\code{ukbwranglr_resources}}
+ github repo.}
 
 \item{summary_function}{The summary function to be applied. Options: "mean",
 "min", "max", "sum" or "n_values"}
@@ -47,22 +56,38 @@ will summarised as \code{0}. See the documentation for
 \code{\link[base]{rowSums}} for further details.
 }
 \examples{
-# make dummy data
-dummy_ukb_data <- tibble::tibble(
-  f.eid = c(1, 2, 3, 4, 5, 6),
-  f.31.0.0 = c(0, 0, 1, 0, NA, 1),
-  f.34.0.0 = c(1952, 1946, 1951, 1956, NA, 1948),
-  f.52.0.0 = c(8, 3, 4, 9, 4, 2),
-  f.21000.0.0 = c(NA, 4001, 3, NA, -3, 3),
-  f.20002.0.0 = c(1665, 1383, 1197, 1441, 1429, 1513),
-  f.21001.0.0 = c(20.1115, 30.1536, 22.8495, 23.4904, 29.2752, 28.2567),
-  f.21001.1.0 = c(20.864, 20.2309, 26.7929, 25.6826, 19.7576, 30.286),
-  f.21001.2.0 = c(NA, 27.4936, 27.6286, 37.2294, 14.6641, 27.3534),
+library(magrittr)
+# dummy UKB data and data dictionary
+dummy_ukb_data_dict <- get_ukb_dummy("dummy_Data_Dictionary_Showcase.tsv")
+dummy_ukb_codings <- get_ukb_dummy("dummy_Codings.tsv")
+
+dummy_ukb_main <- read_ukb(
+  path = get_ukb_dummy("dummy_ukb_main.tsv", path_only = TRUE),
+  ukb_data_dict = dummy_ukb_data_dict,
+  ukb_codings = dummy_ukb_codings
+) \%>\%
+  dplyr::select(eid, tidyselect::contains("systolic_blood_pressure")) \%>\%
+  tibble::as_tibble()
+
+# summarise mean value by Field, keep original variables
+summarise_numerical_variables(
+  dummy_ukb_main,
+  ukb_data_dict = dummy_ukb_data_dict
 )
 
-# summarise, keep original variables
-summarise_numerical_variables(dummy_ukb_data)
+# summarise mean value by Field, drop original variables
+summarise_numerical_variables(
+  dummy_ukb_main,
+  ukb_data_dict = dummy_ukb_data_dict,
+  .drop = TRUE
+)
 
-# summarise, drop original variables
-summarise_numerical_variables(dummy_ukb_data, .drop = TRUE)
+# summarise min value by instance, dropping original variables
+summarise_numerical_variables(
+  dummy_ukb_main,
+  ukb_data_dict = dummy_ukb_data_dict,
+  summary_function = "min",
+  summarise_by = "Instance",
+  .drop = TRUE
+)
 }

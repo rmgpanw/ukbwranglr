@@ -1,8 +1,4 @@
 
-# NOTES -------------------------------------------------------------------
-
-
-
 # EXPORTED FUNCTIONS ------------------------------------------------------
 
 #' Generate a UK Biobank data dictionary
@@ -130,11 +126,11 @@ make_data_dict <- function(ukb_main,
 #' Reads a UK Biobank main dataset file into R using either
 #' \code{\link[data.table]{fread}} or \code{\link[haven]{read_dta}}. Optionally
 #' renames variables with descriptive names, add variable labels and label coded
-#' values as factors.
+#' values of type character as factors.
 #'
 #' Note that \code{na.strings} is not recognised by
 #' \code{\link[haven]{read_dta}}. Reading in a STATA file may therefore require
-#' careful checking for empty strings that ned converting to \code{NA}.
+#' careful checking for empty strings that need converting to \code{NA}.
 #'
 #' @param path The path to a UK Biobank main dataset file.
 #' @param delim Delimiter for the UK Biobank main dataset file. Default is
@@ -151,8 +147,8 @@ make_data_dict <- function(ukb_main,
 #' @param descriptive_colnames If \code{TRUE}, rename columns with longer
 #'   descriptive names derived from the UK Biobank's data dictionary 'Field'
 #'   column.
-#' @param label If \code{TRUE}, apply variable labels and label coded
-#'   values as factors.
+#' @param label If \code{TRUE}, apply variable labels and label coded values as
+#'   factors.
 #' @param max_n_labels Coded variables with associated value labels less than or
 #'   equal to this threshold will be labelled as factors. If \code{NULL}, then
 #'   all value labels will be applied. Default value is 30.
@@ -355,11 +351,13 @@ label_ukb_main <- function(ukb_main,
   # label ICD codes)
 
   if (!is.null(max_n_labels)) {
+    # filter internal data `n_labels_per_coding`
+    codings_to_include <- n_labels_per_coding %>%
+      dplyr::filter(.data[["n"]] <= max_n_labels) %>%
+      dplyr::pull(.data[["Coding"]])
+
     ukb_codings <- ukb_codings %>%
-      dplyr::group_by(.data[["Coding"]]) %>%
-      dplyr::mutate("n" = dplyr::n()) %>%
-      dplyr::ungroup() %>%
-      dplyr::filter(.data[["n"]] <= max_n_labels)
+      dplyr::filter(.data[["Coding"]] %in% codings_to_include)
   }
 
   # set 'Coding' col in `data_dict` to 'NA' if excluded from `ukb_codings`
@@ -598,12 +596,10 @@ indicate_coltype_in_data_dict <- function(data_dict,
     dplyr::filter(.data[["coercible_to_integer"]]) %>%
     dplyr::pull(.data[["Coding"]])
 
-  # add column to data_dict indicating column type (either 'ValueType` is
-  # already 'integer', or the coded value is coercible to integer as identified
-  # above)
+  # add column to data_dict indicating column type, and column indicating
+  # whether the coded value is coercible to integer (as identified above)
   data_dict <- data_dict %>%
     dplyr::mutate("col_types_readr" = dplyr::case_when(((.data[["ValueType"]] == "Integer") |
-                                                          (.data[["Coding"]] %in% ukb_codings_coercible_to_integer) |
                                                           (.data[["FieldID"]] == "eid")
     ) ~ "i",
     # Default is type character
@@ -620,6 +616,11 @@ indicate_coltype_in_data_dict <- function(data_dict,
         .data[["col_types_readr"]] == "d" ~ "double",
         .data[["col_types_readr"]] == "D" ~ "character",
         .data[["col_types_readr"]] == "c" ~ "character"
+      )
+    ) %>%
+    dplyr::mutate(
+      "coercible_to_integer" = dplyr::case_when(
+        .data[["Coding"]] %in% !!ukb_codings_coercible_to_integer ~ "Yes"
       )
     )
 
@@ -690,7 +691,7 @@ read_ukb_raw_basis <- function(path,
 
 #' Programmatically label variables/values in a data frame
 #'
-#' Low level helper function. Uses the \code{haven} package.
+#' Helper for [label_ukb_main()].
 #'
 #' @param df data frame
 #' @param data_dict data dictionary
@@ -718,6 +719,7 @@ label_df_by_coding <- function(df,
   # convert data_dict and codings to named lists
   data_dict_list <-
     split(data_dict, data_dict[[data_dict_coding_col]])
+
   codings_list <- split(codings, codings[[codings_coding_col]])
 
   # all codings to label
@@ -725,7 +727,7 @@ label_df_by_coding <- function(df,
 
   # integer/double codings - note that some continuous variables have coded
   # values (e.g. FID 20006, interpolated year when cancer first diagnosed)
-  integer_codings <- data_dict %>%
+  numeric_codings <- data_dict %>%
     dplyr::filter(.data[[data_dict_coltype_col]] %in% c("integer", "double")) %>%
     dplyr::filter(!is.na(.data[[data_dict_coding_col]])) %>%
     dplyr::pull(.data[[data_dict_coding_col]]) %>%
@@ -742,23 +744,20 @@ label_df_by_coding <- function(df,
 
   # loop through codings
   for (single_coding in all_codings) {
-
     # colnames using this coding
     columns_to_label <-
       data_dict_list[[single_coding]][[data_dict_colname_col]]
 
-    # value labels for these columns
-    if (single_coding %in% integer_codings) {
-      value_labels <-
-        sort(stats::setNames(object = as.integer(codings_list[[single_coding]][[codings_value_col]]),
-                        nm = codings_list[[single_coding]][[codings_meaning_col]]))
-    } else {
-      value_labels <-
-        stats::setNames(object = codings_list[[single_coding]][[codings_value_col]],
-                        nm = codings_list[[single_coding]][[codings_meaning_col]])
+    codings_single <- codings_list[[single_coding]]
+
+    # order by value numerically if values are coercible to integer
+    if((unique(data_dict_list[[single_coding]]$coercible_to_integer) == "Yes") |
+                                     (single_coding %in% numeric_codings)) {
+      codings_single <- codings_single %>%
+        dplyr::arrange(as.numeric(.data[["Value"]]))
     }
 
-    # label variables and values
+    # label variables (all) and values (type chracter)
     for (column in columns_to_label) {
       # progress bar
       pb$tick(1)
@@ -769,16 +768,16 @@ label_df_by_coding <- function(df,
       assertthat::assert_that(!is.null(df[[column]]),
                               msg = paste0("Error while labelling columns: column ", column, " does not exist. Try checking data dictionary"))
 
+
+      if (is.character(df[[column]])) {
+      df[[column]] <- factor(df[[column]],
+                                      levels = codings_single[[codings_value_col]],
+                                      labels = codings_single[[codings_meaning_col]])
+      }
+
       if (is.na(variable_label)) {
         variable_label <- NULL
       }
-
-      # for debugging
-      # print(column)
-
-      df[[column]] <- factor(df[[column]],
-                                      levels = value_labels,
-                                      labels = names(value_labels))
 
       attributes(df[[column]])$label <- variable_label
     }

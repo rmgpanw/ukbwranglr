@@ -51,7 +51,7 @@ test_that(
               "month_of_birth_f52_0_0")
           ),
           as.factor)),
-        ukb_data_dict = ukb_data_dict
+        ukb_data_dict = dummy_ukb_data_dict
       )$dob,
       derive_dob(
         ukb_main = dummy_ukb_main %>%
@@ -60,7 +60,7 @@ test_that(
               "month_of_birth_f52_0_0")
           ),
           as.integer)),
-        ukb_data_dict = ukb_data_dict
+        ukb_data_dict = dummy_ukb_data_dict
       )$dob
     )
   }

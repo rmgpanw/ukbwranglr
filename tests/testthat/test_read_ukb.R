@@ -1,47 +1,31 @@
 
-
 # SETUP -------------------------------------------------------------------
-# get ukb data dict and codings
-ukb_data_dict <- get_ukb_data_dict()
-ukb_codings <- get_ukb_codings()
 
-# make dummy data
-dummy_ukb_data_raw <- tibble::tibble(
-  eid = c(1, 2, 3, 4, 5, 6),
-  `31-0.0` = c(0, 0, 1, 0, NA, 1),
-  `34-0.0` = c(1952, 1946, 1951, 1956, NA, 1948),
-  `52-0.0` = c(8, 3, 4, 9, 4, 2),
-  `21000-0.0` = c(NA, 4001, 3, NA, -3, 3),
-  `20002-0.0` = c(1665, 1383, 1197, 1441, 1429, 1513),
-  `21001-0.0` = c(20.1115, 30.1536, 22.8495, 23.4904, 29.2752, 28.2567),
-  `21001-1.0` = c(20.864, 20.2309, 26.7929, 25.6826, 19.7576, 30.286),
-  `21001-2.0` = c(NA, 27.4936, 27.6286, 37.2294, 14.6641, 27.3534),
-)
+dummy_ukb_data_dict <-
+  get_ukb_dummy("dummy_Data_Dictionary_Showcase.tsv")
+dummy_ukb_codings <- get_ukb_dummy("dummy_Codings.tsv")
 
-dummy_ukb_data_raw_path <- file.path(tempdir(), "dummy_ukb_data_raw.csv")
-dummy_ukb_stata_path <- file.path(tempdir(), "dummy_ukb_data_raw.dta")
+dummy_ukb_data_raw_path <- get_ukb_dummy("dummy_ukb_main.tsv",
+                                         path_only = TRUE)
 
-readr::write_csv(dummy_ukb_data_raw, file = dummy_ukb_data_raw_path)
+dummy_data_dict <- make_data_dict(dummy_ukb_data_raw_path,
+                                  ukb_data_dict = dummy_ukb_data_dict)
 
-dummy_ukb_data_dict <- make_data_dict(dummy_ukb_data_raw_path,
-                                      delim = ",",
-                                      ukb_data_dict = ukb_data_dict)
-dummy_ukb_data <- read_ukb(dummy_ukb_data_raw_path,
-                           delim =  ",",
-                           data_dict = dummy_ukb_data_dict,
-                           ukb_data_dict = ukb_data_dict,
-                           ukb_codings = ukb_codings)
-
-read_ukb(
+dummy_ukb_main <- read_ukb(
   dummy_ukb_data_raw_path,
-  delim = ",",
-  data_dict = dummy_ukb_data_dict,
-  label = FALSE,
-  descriptive_colnames = FALSE
+  data_dict = dummy_data_dict,
+  ukb_data_dict = dummy_ukb_data_dict,
+  ukb_codings = dummy_ukb_codings
 ) %>%
+  head(6)
+
+dummy_ukb_stata_path <-
+  file.path(tempdir(), "dummy_ukb_data_raw.dta")
+
+dummy_ukb_main %>%
   rename_cols(
-    old_colnames = dummy_ukb_data_dict$colheaders_raw,
-    new_colnames = dummy_ukb_data_dict$colheaders_processed
+    old_colnames = dummy_data_dict$descriptive_colnames,
+    new_colnames = dummy_data_dict$colheaders_processed
   ) %>%
   haven::write_dta(dummy_ukb_stata_path)
 
@@ -58,9 +42,11 @@ example_colheaders_df <-
     r_ch = c("f.eid", "f.3.0.0", "f.40000.0.0"),
     processed_ch = c("feid", "f3_0_0", "f40000_0_0"),
     processed_ch_derived = c("feid", "f3_0", "f40000"),
-    descriptive_ch_derived = c("eid",
-                               "n_values_systolic_blood_pressure_automated_reading_f4080_0",
-                               "n_values_systolic_blood_pressure_automated_reading_f4080")
+    descriptive_ch_derived = c(
+      "eid",
+      "n_values_systolic_blood_pressure_automated_reading_f4080_0",
+      "n_values_systolic_blood_pressure_automated_reading_f4080"
+    )
   )
 
 # TESTS -------------------------------------------------------------------
@@ -68,112 +54,99 @@ example_colheaders_df <-
 # `make_data_dict()` ------------------------------------------------------
 
 test_that("`make_data_dict()` works", {
-  expect_equal(names(dummy_ukb_data_dict)[1:4],
+  expect_equal(names(dummy_data_dict)[1:4],
                c("descriptive_colnames", "colheaders_raw", "colheaders_processed", "FieldID"))
 })
 
 # `read_ukb()` ------------------------------------------------------------
 
 test_that("`read_ukb()` works with default settings", {
-  ukb_main <- read_ukb(
-    path = dummy_ukb_data_raw_path,
-    delim = ",",
-    dummy_ukb_data_dict,
-    ukb_data_dict = ukb_data_dict,
-    ukb_codings = ukb_codings,
-    na.strings = c("", "NA")
-  )
+  expect_equal(names(dummy_ukb_main),
+               dummy_data_dict$descriptive_colnames)
 
-  expect_equal(names(ukb_main),
-               dummy_ukb_data_dict$descriptive_colnames)
-
-  expect_equal(attributes(ukb_main$sex_f31_0_0)$levels,
+  expect_equal(attributes(dummy_ukb_main$sex_f31_0_0)$levels,
                c("Female", "Male"))
 
-  expect_equal(attributes(ukb_main$sex_f31_0_0)$label,
+  expect_equal(attributes(dummy_ukb_main$sex_f31_0_0)$label,
                "Sex (f31_0_0)")
 })
 
 test_that("`read_ukb()` works with `label` and `descriptive_colnames` set to `FALSE`", {
-  ukb_main <- read_ukb(
+  dummy_ukb_main_raw <- read_ukb(
     path = dummy_ukb_data_raw_path,
-    delim = ",",
-    dummy_ukb_data_dict,
-    ukb_data_dict = ukb_data_dict,
-    ukb_codings = ukb_codings,
+    data_dict = dummy_data_dict,
+    ukb_data_dict = dummy_ukb_data_dict,
+    ukb_codings = dummy_ukb_codings,
     na.strings = c("", "NA"),
     label = FALSE,
     descriptive_colnames = FALSE
   )
 
-  expect_equal(names(ukb_main),
-               dummy_ukb_data_dict$colheaders_raw)
+  expect_equal(names(dummy_ukb_main_raw),
+               dummy_data_dict$colheaders_raw)
 
-  expect_null(attributes(ukb_main$sex_f31_0_0)$labels)
+  expect_null(attributes(dummy_ukb_main_raw$sex_f31_0_0)$labels)
 
-  expect_null(attributes(ukb_main$sex_f31_0_0)$label)
+  expect_null(attributes(dummy_ukb_main_raw$sex_f31_0_0)$label)
 })
 
 test_that("`read_ukb()` works with `label = TRUE` and `descriptive_colnames = FALSE`", {
-  ukb_main <- read_ukb(
+  dummy_ukb_main_raw_labelled_raw_colnames <- read_ukb(
     path = dummy_ukb_data_raw_path,
-    delim = ",",
-    dummy_ukb_data_dict,
-    ukb_data_dict = ukb_data_dict,
-    ukb_codings = ukb_codings,
+    data_dict = dummy_data_dict,
+    ukb_data_dict = dummy_ukb_data_dict,
+    ukb_codings = dummy_ukb_codings,
     na.strings = c("", "NA"),
     label = TRUE,
     descriptive_colnames = FALSE
   )
 
-  expect_equal(names(ukb_main),
-               dummy_ukb_data_dict$colheaders_raw)
+  expect_equal(names(dummy_ukb_main_raw_labelled_raw_colnames),
+               dummy_data_dict$colheaders_raw)
 
-  expect_equal(attributes(ukb_main$`31-0.0`)$levels,
+  expect_equal(attributes(dummy_ukb_main_raw_labelled_raw_colnames$`31-0.0`)$levels,
               c("Female", "Male"))
 
-  expect_equal(attributes(ukb_main$`31-0.0`)$label,
+  expect_equal(attributes(dummy_ukb_main_raw_labelled_raw_colnames$`31-0.0`)$label,
               "Sex (f31_0_0)")
 })
 
 test_that("`read_ukb()` works with `label = FALSE` and `descriptive_colnames = TRUE`", {
-  ukb_main <- read_ukb(
+  dummy_ukb_main_raw_descriptive_colnames_unlabelled <- read_ukb(
     path = dummy_ukb_data_raw_path,
-    delim = ",",
-    dummy_ukb_data_dict,
-    ukb_data_dict = ukb_data_dict,
-    ukb_codings = ukb_codings,
+    data_dict = dummy_data_dict,
+    ukb_data_dict = dummy_ukb_data_dict,
+    ukb_codings = dummy_ukb_codings,
     na.strings = c("", "NA"),
     label = FALSE,
     descriptive_colnames = TRUE
   )
 
-  expect_equal(names(ukb_main),
-               dummy_ukb_data_dict$descriptive_colnames)
+  expect_equal(names(dummy_ukb_main_raw_descriptive_colnames_unlabelled),
+               dummy_data_dict$descriptive_colnames)
 
-  expect_null(attributes(ukb_main$sex_f31_0_0)$labels)
+  expect_null(attributes(dummy_ukb_main_raw_descriptive_colnames_unlabelled$sex_f31_0_0)$labels)
 
-  expect_null(attributes(ukb_main$sex_f31_0_0)$label)
+  expect_null(attributes(dummy_ukb_main_raw_descriptive_colnames_unlabelled$sex_f31_0_0)$label)
 })
 
 test_that("`read_ukb()` works with a stata file", {
-  ukb_main <- read_ukb(
+  dummy_ukb_main_stata <- read_ukb(
     path = dummy_ukb_stata_path,
-    delim = ",",
     data_dict = NULL,
-    ukb_data_dict = ukb_data_dict,
-    ukb_codings = ukb_codings,
+    ukb_data_dict = dummy_ukb_data_dict,
+    ukb_codings = dummy_ukb_codings,
     na.strings = c("", "NA"),
     label = FALSE,
     descriptive_colnames = TRUE
   )
 
-  expect_equal(names(ukb_main),
-               dummy_ukb_data_dict$descriptive_colnames)
+  expect_equal(names(dummy_ukb_main_stata),
+               dummy_data_dict$descriptive_colnames)
 
-  expect_null(attributes(ukb_main$sex_f31_0_0)$labels)
+  expect_null(attributes(dummy_ukb_main_stata$sex_f31_0_0)$labels)
 
-  expect_null(attributes(ukb_main$sex_f31_0_0)$label)
+  expect_null(attributes(dummy_ukb_main_stata$sex_f31_0_0)$label)
 })
 
 # `mutate_descriptive_columns()` ------------------------------------------
@@ -181,14 +154,15 @@ test_that("`read_ukb()` works with a stata file", {
 test_that(
   "`mutate_descriptive_columns()` works", {
     expect_equal(
-      dummy_ukb_data_dict$descriptive_colnames,
+      dummy_data_dict$descriptive_colnames[1:10],
       c(
         "eid",
         "sex_f31_0_0",
         "year_of_birth_f34_0_0",
         "month_of_birth_f52_0_0",
         "ethnic_background_f21000_0_0",
-        "non_cancer_illness_code_self_reported_f20002_0_0",
+        "ethnic_background_f21000_1_0",
+        "ethnic_background_f21000_2_0",
         "body_mass_index_bmi_f21001_0_0",
         "body_mass_index_bmi_f21001_1_0",
         "body_mass_index_bmi_f21001_2_0"
@@ -239,7 +213,8 @@ test_that(
      result <- make_data_dict(data.frame(eid = NA,
                                          systolic_blood_pressure_automated_reading_f4080_0_0 = NA,
                                          min_systolic_blood_pressure_automated_reading_f4080_0 = NA,
-                                         mean_systolic_blood_pressure_automated_reading_f4080 = NA))
+                                         mean_systolic_blood_pressure_automated_reading_f4080 = NA),
+                              ukb_data_dict = dummy_ukb_data_dict)
 
      expect_equal(
        result$descriptive_colnames,
@@ -306,10 +281,10 @@ test_that(
 
 test_that(
   "`indicate_coltype_in_data_dict()` returns the expected values", {
-    data_dict_coltypes <- indicate_coltype_in_data_dict(data_dict = dplyr::bind_rows(dummy_ukb_data_dict,
+    data_dict_coltypes <- indicate_coltype_in_data_dict(data_dict = dplyr::bind_rows(dummy_data_dict,
                                                                                      data.frame(ValueType = c("something_else",
                                                                                                               "Date"))),
-                                  ukb_codings = ukb_codings) %>%
+                                  ukb_codings = dummy_ukb_codings) %>%
       dplyr::group_by(.data[["ValueType"]]) %>%
       dplyr::slice(1L) %>%
       dplyr::select(tidyselect::all_of(c(
@@ -322,10 +297,10 @@ test_that(
                  c("Categorical multiple", "Categorical single", "Continuous", "Date", "Integer", "something_else"))
 
     expect_equal(data_dict_coltypes$col_types_readr,
-                 c("i", "i", "d", "c", "i", "c"))
+                 c("c", "c", "d", "c", "i", "c"))
 
     expect_equal(data_dict_coltypes$col_types_fread,
-                 c("integer", "integer", "double", "character", "integer", "character"))
+                 c("character", "character", "double", "character", "integer", "character"))
   }
 )
 
@@ -362,11 +337,13 @@ test_that("`label_ukb_main()` excludes duplicated labels e.g. coding 3 (for FID 
   # cancers) has multiple meanings for value '-1'", {
     dummy_fid_20001_data <- data.frame(
       eid = c(1, 2),
-      cancer_code_self_reported_f20001_0_0 = c(-1, 1005)
+      cancer_code_self_reported_f20001_0_0 = as.character(c(-1, 1005))
     )
 
     result <- label_ukb_main(ukb_main = dummy_fid_20001_data,
-                             make_data_dict(dummy_fid_20001_data),
+                             data_dict = make_data_dict(dummy_fid_20001_data,
+                                            ukb_data_dict = dummy_ukb_data_dict),
+                             ukb_codings = dummy_ukb_codings,
                              max_n_labels = NULL)
 
     expect_equal(
@@ -381,7 +358,7 @@ test_that("`label_ukb_main()` excludes duplicated labels e.g. coding 3 (for FID 
 # `read_ukb_chunked_to_file()` --------------------------------------------
 
 test_that("`read_ukb_chunked_to_file()` works", {
-  dummy_data_dict_selected <- dummy_ukb_data_dict[c(1,3,5,6,7), ]
+  dummy_data_dict_selected <- dummy_data_dict[c(1,3,5,6,7), ]
 
   outfile_list <- list(
     csv_file = tempfile(fileext = ".csv"),
@@ -398,9 +375,9 @@ test_that("`read_ukb_chunked_to_file()` works", {
           in_path = dummy_ukb_data_raw_path,
           out_path = .x,
           data_dict = dummy_data_dict_selected,
-          in_delim = ",",
-          ukb_data_dict = ukb_data_dict,
-          ukb_codings = ukb_codings,
+          in_delim = "\t",
+          ukb_data_dict = dummy_ukb_data_dict,
+          ukb_codings = dummy_ukb_codings,
           max_n_labels = 22,
           chunk_size = 1,
           label = TRUE,

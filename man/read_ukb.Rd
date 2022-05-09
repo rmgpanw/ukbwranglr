@@ -47,8 +47,8 @@ downloaded from the
 descriptive names derived from the UK Biobank's data dictionary 'Field'
 column.}
 
-\item{label}{If \code{TRUE}, apply variable labels and label coded
-values as factors.}
+\item{label}{If \code{TRUE}, apply variable labels and label coded values as
+factors.}
 
 \item{max_n_labels}{Coded variables with associated value labels less than or
 equal to this threshold will be labelled as factors. If \code{NULL}, then
@@ -69,10 +69,10 @@ A UK Biobank phenotype dataset as a data table with human-readable
 Reads a UK Biobank main dataset file into R using either
 \code{\link[data.table]{fread}} or \code{\link[haven]{read_dta}}. Optionally
 renames variables with descriptive names, add variable labels and label coded
-values as factors.
+values of type character as factors.
 }
 \details{
 Note that \code{na.strings} is not recognised by
 \code{\link[haven]{read_dta}}. Reading in a STATA file may therefore require
-careful checking for empty strings that ned converting to \code{NA}.
+careful checking for empty strings that need converting to \code{NA}.
 }

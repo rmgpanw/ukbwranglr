@@ -379,11 +379,16 @@ extract_phenotypes <- function(
 #' @export
 #'
 #' @examples
+#' # dummy UKB main dataset and metadata
+#' dummy_ukb_main <- get_ukb_dummy("dummy_ukb_main.tsv")
+#' dummy_ukb_data_dict <- get_ukb_dummy("dummy_Data_Dictionary_Showcase.tsv")
+#' dummy_ukb_codings <- get_ukb_dummy("dummy_Codings.tsv")
+#'
 #' # tidy clinical events in a UK Biobank main dataset
 #' tidy_clinical_events(
-#'   ukb_main = dummy_main_dataset_clinical_events(),
-#'   ukb_data_dict = get_ukb_data_dict(),
-#'   ukb_codings = get_ukb_codings()
+#'   ukb_main = dummy_ukb_main,
+#'   ukb_data_dict = dummy_ukb_data_dict,
+#'   ukb_codings = dummy_ukb_codings
 #' )
 #'
 #' # use .details_only = TRUE to return details of required Field IDs for
@@ -579,6 +584,17 @@ tidy_clinical_events <- function(ukb_main,
                                                           date_col_field_id = CLINICAL_EVENTS_FIELD_IDS[[event_type]]["date_fid"])
     )
   }
+
+  # check for any dfs with no rows - remove
+  result <- result %>%
+    purrr::imap(~ {
+      if (nrow(.x) == 0) {
+        message("No clinical events identified for ", .y)
+        NULL
+      } else {
+        .x
+      }
+    })
 
   return(result)
 }

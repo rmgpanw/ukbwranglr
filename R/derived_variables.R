@@ -43,11 +43,17 @@
 #' @export
 #' @examples
 #' ukb_main <- data.frame(eid = 1, f34_0_0 = 1990, f52_0_0 = 1)
+#'  # dummy UKB data dictionary
+#'  dummy_ukb_data_dict <- get_ukb_dummy("dummy_Data_Dictionary_Showcase.tsv")
+#'
 #'  # keep input year/month of birth columns
-#'  derive_dob(ukb_main)
+#'  derive_dob(ukb_main,
+#'             ukb_data_dict = dummy_ukb_data_dict)
 #'
 #'  # remove input year/month of birth columns
-#'  derive_dob(ukb_main, .drop = TRUE)
+#'  derive_dob(ukb_main,
+#'             ukb_data_dict = dummy_ukb_data_dict,
+#'             .drop = TRUE)
 derive_dob <- function(ukb_main,
                        ukb_data_dict = get_ukb_data_dict(),
                        .drop = FALSE,
@@ -141,18 +147,23 @@ derive_dob <- function(ukb_main,
 #' @export
 #'
 #' @examples
-#' dummy_ukb_data <- data.frame(
-#'   eid = c(1, 2, 3),
-#'   f.21000.0.0 = factor(c("White", "White and Black Caribbean", NA)),
-#'   f.21000.1.0 = factor(c("British", "Caribbean", NA)),
-#'   f.21000.2.0 = factor(c("Irish", NA, "Any other Asian background"))
+#' library(magrittr)
+#' # dummy UKB data and data dictionary
+#' dummy_ukb_data_dict <- get_ukb_dummy("dummy_Data_Dictionary_Showcase.tsv")
+#' dummy_ukb_codings <- get_ukb_dummy("dummy_Codings.tsv")
+#'
+#' dummy_ukb_main <- read_ukb(
+#'   path = get_ukb_dummy("dummy_ukb_main.tsv", path_only = TRUE),
+#'   ukb_data_dict = dummy_ukb_data_dict,
+#'   ukb_codings = dummy_ukb_codings
 #' )
 #'
+#' # derive ethnic background
 #' derive_ethnic_background_simplified(
-#'   ukb_main = dummy_ukb_data,
-#'   ukb_data_dict = get_ukb_data_dict()
-#' )
-#'
+#'   ukb_main = dummy_ukb_main,
+#'   ukb_data_dict = dummy_ukb_data_dict
+#' ) %>%
+#'   dplyr::select(tidyselect::contains("ethnic"))
 derive_ethnic_background_simplified <- function(ukb_main,
                                                 ukb_data_dict = get_ukb_data_dict(),
                                                 ethnicity_levels = c(
