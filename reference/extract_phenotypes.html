@@ -46,7 +46,7 @@ events' vignette on the ukbwranglr package website."><!-- mathjax --><script src
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Extract phenotypes from clinical events data</h1>
-    <small class="dont-index">Source: <a href="https://github.com/rmgpanw/ukbwranglr/blob/HEAD/R/extract_phenotypes.R" class="external-link"><code>R/extract_phenotypes.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/rmgpanw/ukbwranglr/blob/HEAD/R/clinical_events.R" class="external-link"><code>R/clinical_events.R</code></a></small>
     <div class="hidden name"><code>extract_phenotypes.Rd</code></div>
     </div>
 
@@ -117,7 +117,7 @@ nested data frame column named 'data'.</p></dd>
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="fu"><a href="dummy_main_dataset_clinical_events.html">dummy_main_dataset_clinical_events</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span class="r-in"><span class="fu">dummy_main_dataset_clinical_events</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span class="r-in">  <span class="fu"><a href="tidy_clinical_events.html">tidy_clinical_events</a></span><span class="op">(</span>clinical_events_sources <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"summary_hes_icd10"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span class="r-in">  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span class="r-in">  <span class="fu">extract_phenotypes</span><span class="op">(</span></span>

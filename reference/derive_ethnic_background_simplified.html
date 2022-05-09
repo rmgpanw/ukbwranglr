@@ -103,26 +103,54 @@ explicitly specified using the <code>ethnicity_levels</code> argument.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">dummy_ukb_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span class="r-in">  eid <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span>,</span>
-<span class="r-in">  f.21000.0.0 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"White"</span>, <span class="st">"White and Black Caribbean"</span>, <span class="cn">NA</span><span class="op">)</span><span class="op">)</span>,</span>
-<span class="r-in">  f.21000.1.0 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"British"</span>, <span class="st">"Caribbean"</span>, <span class="cn">NA</span><span class="op">)</span><span class="op">)</span>,</span>
-<span class="r-in">  f.21000.2.0 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Irish"</span>, <span class="cn">NA</span>, <span class="st">"Any other Asian background"</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org" class="external-link">magrittr</a></span><span class="op">)</span></span>
+<span class="r-in"><span class="co"># dummy UKB data and data dictionary</span></span>
+<span class="r-in"><span class="va">dummy_ukb_data_dict</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_ukb_dummy.html">get_ukb_dummy</a></span><span class="op">(</span><span class="st">"dummy_Data_Dictionary_Showcase.tsv"</span><span class="op">)</span></span>
+<span class="r-in"><span class="va">dummy_ukb_codings</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_ukb_dummy.html">get_ukb_dummy</a></span><span class="op">(</span><span class="st">"dummy_Codings.tsv"</span><span class="op">)</span></span>
 <span class="r-in"></span>
+<span class="r-in"><span class="va">dummy_ukb_main</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_ukb.html">read_ukb</a></span><span class="op">(</span></span>
+<span class="r-in">  path <span class="op">=</span> <span class="fu"><a href="get_ukb_dummy.html">get_ukb_dummy</a></span><span class="op">(</span><span class="st">"dummy_ukb_main.tsv"</span>, path_only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span class="r-in">  ukb_data_dict <span class="op">=</span> <span class="va">dummy_ukb_data_dict</span>,</span>
+<span class="r-in">  ukb_codings <span class="op">=</span> <span class="va">dummy_ukb_codings</span></span>
+<span class="r-in"><span class="op">)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating data dictionary</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> STEP 1 of 3</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Reading data into R</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> STEP 2 of 3</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Renaming with descriptive column names</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> STEP 3 of 3</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Applying variable and value labels</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Labelling dataset</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Time taken: 0 minutes, 1 seconds.</span>
+<span class="r-in"></span>
+<span class="r-in"><span class="co"># derive ethnic background</span></span>
 <span class="r-in"><span class="fu">derive_ethnic_background_simplified</span><span class="op">(</span></span>
-<span class="r-in">  ukb_main <span class="op">=</span> <span class="va">dummy_ukb_data</span>,</span>
-<span class="r-in">  ukb_data_dict <span class="op">=</span> <span class="fu"><a href="get_ukb_data_dict.html">get_ukb_data_dict</a></span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   eid               f.21000.0.0 f.21000.1.0                f.21000.2.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1   1                     White     British                      Irish</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2   2 White and Black Caribbean   Caribbean                       &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3   3                      &lt;NA&gt;        &lt;NA&gt; Any other Asian background</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ethnic_background_simplified</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1                        White</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2                        Mixed</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3       Asian or Asian British</span>
-<span class="r-in"></span>
+<span class="r-in">  ukb_main <span class="op">=</span> <span class="va">dummy_ukb_main</span>,</span>
+<span class="r-in">  ukb_data_dict <span class="op">=</span> <span class="va">dummy_ukb_data_dict</span></span>
+<span class="r-in"><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span class="r-in">  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu">tidyselect</span><span class="fu">::</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">contains</a></span><span class="op">(</span><span class="st">"ethnic"</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     ethnic_background_f21000_0_0 ethnic_background_f21000_1_0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1:                  Do not know                        Mixed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2:         Prefer not to answer    White and Black Caribbean</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3:                        White      White and Black African</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  4:                      British              White and Asian</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  5:                        Irish   Any other mixed background</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6:   Any other white background       Asian or Asian British</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  7:                         &lt;NA&gt;                       Indian</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  8:                         &lt;NA&gt;                      Chinese</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  9:                    Caribbean                         &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10:                    Caribbean                         &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     ethnic_background_f21000_2_0 ethnic_background_simplified</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1:                  Bangladeshi                        Mixed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2:   Any other Asian background                        Mixed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3:                  Do not know                        White</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  4:                    Caribbean                        White</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  5:                      African                        White</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6:   Any other Black background                        White</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  7:                      Chinese       Asian or Asian British</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  8:                         &lt;NA&gt;                      Chinese</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  9:                         &lt;NA&gt;       Black or Black British</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10:                         &lt;NA&gt;       Black or Black British</span>
 </code></pre></div>
     </div>
   </div>

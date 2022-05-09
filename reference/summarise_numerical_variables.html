@@ -59,6 +59,7 @@ minimum, maximum, sum and number of non-missing values.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">summarise_numerical_variables</span><span class="op">(</span>
   <span class="va">ukb_main</span>,
   data_dict <span class="op">=</span> <span class="cn">NULL</span>,
+  ukb_data_dict <span class="op">=</span> <span class="fu"><a href="get_ukb_data_dict.html">get_ukb_data_dict</a></span><span class="op">(</span><span class="op">)</span>,
   summary_function <span class="op">=</span> <span class="st">"mean"</span>,
   summarise_by <span class="op">=</span> <span class="st">"Field"</span>,
   .drop <span class="op">=</span> <span class="cn">FALSE</span>
@@ -73,6 +74,14 @@ those under the <code>descriptive_colnames</code> column in <code>data_dict</cod
 <dt>data_dict</dt>
 <dd><p>a data dictionary specific to the UKB main dataset file,
 created by <code><a href="make_data_dict.html">make_data_dict</a></code>.</p></dd>
+<dt>ukb_data_dict</dt>
+<dd><p>The UKB data dictionary (available online at the UK
+Biobank
+<a href="https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide" class="external-link">data
+ showcase</a>. This should be a data frame where all columns are of type
+<code>character</code>. By default, this is downloaded from the
+<a href="https://github.com/rmgpanw/ukbwranglr_resources" class="external-link"><code>ukbwranglr_resources</code></a>
+ github repo.</p></dd>
 <dt>summary_function</dt>
 <dd><p>The summary function to be applied. Options: "mean",
 "min", "max", "sum" or "n_values"</p></dd>
@@ -100,48 +109,100 @@ will summarised as <code>0</code>. See the documentation for
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co"># make dummy data</span></span>
-<span class="r-in"><span class="va">dummy_ukb_data</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
-<span class="r-in">  f.eid <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">5</span>, <span class="fl">6</span><span class="op">)</span>,</span>
-<span class="r-in">  f.31.0.0 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">0</span>, <span class="cn">NA</span>, <span class="fl">1</span><span class="op">)</span>,</span>
-<span class="r-in">  f.34.0.0 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1952</span>, <span class="fl">1946</span>, <span class="fl">1951</span>, <span class="fl">1956</span>, <span class="cn">NA</span>, <span class="fl">1948</span><span class="op">)</span>,</span>
-<span class="r-in">  f.52.0.0 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">8</span>, <span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">9</span>, <span class="fl">4</span>, <span class="fl">2</span><span class="op">)</span>,</span>
-<span class="r-in">  f.21000.0.0 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">4001</span>, <span class="fl">3</span>, <span class="cn">NA</span>, <span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>,</span>
-<span class="r-in">  f.20002.0.0 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1665</span>, <span class="fl">1383</span>, <span class="fl">1197</span>, <span class="fl">1441</span>, <span class="fl">1429</span>, <span class="fl">1513</span><span class="op">)</span>,</span>
-<span class="r-in">  f.21001.0.0 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">20.1115</span>, <span class="fl">30.1536</span>, <span class="fl">22.8495</span>, <span class="fl">23.4904</span>, <span class="fl">29.2752</span>, <span class="fl">28.2567</span><span class="op">)</span>,</span>
-<span class="r-in">  f.21001.1.0 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">20.864</span>, <span class="fl">20.2309</span>, <span class="fl">26.7929</span>, <span class="fl">25.6826</span>, <span class="fl">19.7576</span>, <span class="fl">30.286</span><span class="op">)</span>,</span>
-<span class="r-in">  f.21001.2.0 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">27.4936</span>, <span class="fl">27.6286</span>, <span class="fl">37.2294</span>, <span class="fl">14.6641</span>, <span class="fl">27.3534</span><span class="op">)</span>,</span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org" class="external-link">magrittr</a></span><span class="op">)</span></span>
+<span class="r-in"><span class="co"># dummy UKB data and data dictionary</span></span>
+<span class="r-in"><span class="va">dummy_ukb_data_dict</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_ukb_dummy.html">get_ukb_dummy</a></span><span class="op">(</span><span class="st">"dummy_Data_Dictionary_Showcase.tsv"</span><span class="op">)</span></span>
+<span class="r-in"><span class="va">dummy_ukb_codings</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_ukb_dummy.html">get_ukb_dummy</a></span><span class="op">(</span><span class="st">"dummy_Codings.tsv"</span><span class="op">)</span></span>
+<span class="r-in"></span>
+<span class="r-in"><span class="va">dummy_ukb_main</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_ukb.html">read_ukb</a></span><span class="op">(</span></span>
+<span class="r-in">  path <span class="op">=</span> <span class="fu"><a href="get_ukb_dummy.html">get_ukb_dummy</a></span><span class="op">(</span><span class="st">"dummy_ukb_main.tsv"</span>, path_only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span class="r-in">  ukb_data_dict <span class="op">=</span> <span class="va">dummy_ukb_data_dict</span>,</span>
+<span class="r-in">  ukb_codings <span class="op">=</span> <span class="va">dummy_ukb_codings</span></span>
+<span class="r-in"><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span class="r-in">  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">eid</span>, <span class="fu">tidyselect</span><span class="fu">::</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">contains</a></span><span class="op">(</span><span class="st">"systolic_blood_pressure"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span class="r-in">  <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="op">)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating data dictionary</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> STEP 1 of 3</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Reading data into R</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> STEP 2 of 3</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Renaming with descriptive column names</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> STEP 3 of 3</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Applying variable and value labels</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Labelling dataset</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Time taken: 0 minutes, 0 seconds.</span>
+<span class="r-in"></span>
+<span class="r-in"><span class="co"># summarise mean value by Field, keep original variables</span></span>
+<span class="r-in"><span class="fu">summarise_numerical_variables</span><span class="op">(</span></span>
+<span class="r-in">  <span class="va">dummy_ukb_main</span>,</span>
+<span class="r-in">  ukb_data_dict <span class="op">=</span> <span class="va">dummy_ukb_data_dict</span></span>
 <span class="r-in"><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># summarise, keep original variables</span></span>
-<span class="r-in"><span class="fu">summarise_numerical_variables</span><span class="op">(</span><span class="va">dummy_ukb_data</span><span class="op">)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Number of summary columns to make: 1</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Time taken: 0 minutes, 0 seconds.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 × 10</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   f.eid f.31.0.0 f.34.0.0 f.52.0.0 f.21000.0.0 f.20002.0.0 f.21001.0.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>     1        0     <span style="text-decoration: underline;">1</span>952        8          <span style="color: #BB0000;">NA</span>        <span style="text-decoration: underline;">1</span>665        20.1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>     2        0     <span style="text-decoration: underline;">1</span>946        3        <span style="text-decoration: underline;">4</span>001        <span style="text-decoration: underline;">1</span>383        30.2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>     3        1     <span style="text-decoration: underline;">1</span>951        4           3        <span style="text-decoration: underline;">1</span>197        22.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span>     4        0     <span style="text-decoration: underline;">1</span>956        9          <span style="color: #BB0000;">NA</span>        <span style="text-decoration: underline;">1</span>441        23.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span>     5       <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>        4          -<span style="color: #BB0000;">3</span>        <span style="text-decoration: underline;">1</span>429        29.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span>     6        1     <span style="text-decoration: underline;">1</span>948        2           3        <span style="text-decoration: underline;">1</span>513        28.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with 3 more variables: f.21001.1.0 &lt;dbl&gt;, f.21001.2.0 &lt;dbl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   mean_body_mass_index_bmi_x21001 &lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 10 × 10</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      eid systolic_blood_pres… systolic_blood_… systolic_blood_… systolic_blood_…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>     1                   <span style="color: #BB0000;">NA</span>              134              134              134</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>     2                  146              145              145               <span style="color: #BB0000;">NA</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>     3                  143              123              123              123</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>     4                   <span style="color: #BB0000;">NA</span>               <span style="color: #BB0000;">NA</span>               <span style="color: #BB0000;">NA</span>               <span style="color: #BB0000;">NA</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>     5                   <span style="color: #BB0000;">NA</span>               <span style="color: #BB0000;">NA</span>               <span style="color: #BB0000;">NA</span>               <span style="color: #BB0000;">NA</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>     6                   <span style="color: #BB0000;">NA</span>               <span style="color: #BB0000;">NA</span>               <span style="color: #BB0000;">NA</span>               <span style="color: #BB0000;">NA</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>     7                   <span style="color: #BB0000;">NA</span>               <span style="color: #BB0000;">NA</span>               <span style="color: #BB0000;">NA</span>               <span style="color: #BB0000;">NA</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>     8                   <span style="color: #BB0000;">NA</span>               <span style="color: #BB0000;">NA</span>               <span style="color: #BB0000;">NA</span>               <span style="color: #BB0000;">NA</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>     9                   <span style="color: #BB0000;">NA</span>               <span style="color: #BB0000;">NA</span>               <span style="color: #BB0000;">NA</span>               <span style="color: #BB0000;">NA</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>    10                   <span style="color: #BB0000;">NA</span>               <span style="color: #BB0000;">NA</span>               <span style="color: #BB0000;">NA</span>               <span style="color: #BB0000;">NA</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with 5 more variables:</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   systolic_blood_pressure_automated_reading_f4080_1_0 &lt;int&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   systolic_blood_pressure_automated_reading_f4080_1_1 &lt;int&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   systolic_blood_pressure_automated_reading_f4080_1_2 &lt;int&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   systolic_blood_pressure_automated_reading_f4080_1_3 &lt;int&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   mean_systolic_blood_pressure_automated_reading_x4080 &lt;dbl&gt;</span></span>
 <span class="r-in"></span>
-<span class="r-in"><span class="co"># summarise, drop original variables</span></span>
-<span class="r-in"><span class="fu">summarise_numerical_variables</span><span class="op">(</span><span class="va">dummy_ukb_data</span>, .drop <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span class="r-in"><span class="co"># summarise mean value by Field, drop original variables</span></span>
+<span class="r-in"><span class="fu">summarise_numerical_variables</span><span class="op">(</span></span>
+<span class="r-in">  <span class="va">dummy_ukb_main</span>,</span>
+<span class="r-in">  ukb_data_dict <span class="op">=</span> <span class="va">dummy_ukb_data_dict</span>,</span>
+<span class="r-in">  .drop <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span class="r-in"><span class="op">)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Number of summary columns to make: 1</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Time taken: 0 minutes, 0 seconds.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 × 7</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   f.eid f.31.0.0 f.34.0.0 f.52.0.0 f.21000.0.0 f.20002.0.0 mean_body_mass_index…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>     1        0     <span style="text-decoration: underline;">1</span>952        8          <span style="color: #BB0000;">NA</span>        <span style="text-decoration: underline;">1</span>665                  20.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>     2        0     <span style="text-decoration: underline;">1</span>946        3        <span style="text-decoration: underline;">4</span>001        <span style="text-decoration: underline;">1</span>383                  26.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>     3        1     <span style="text-decoration: underline;">1</span>951        4           3        <span style="text-decoration: underline;">1</span>197                  25.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span>     4        0     <span style="text-decoration: underline;">1</span>956        9          <span style="color: #BB0000;">NA</span>        <span style="text-decoration: underline;">1</span>441                  28.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span>     5       <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>        4          -<span style="color: #BB0000;">3</span>        <span style="text-decoration: underline;">1</span>429                  21.2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span>     6        1     <span style="text-decoration: underline;">1</span>948        2           3        <span style="text-decoration: underline;">1</span>513                  28.6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 10 × 2</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      eid mean_systolic_blood_pressure_automated_reading_x4080</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>                                                <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>     1                                                 138.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>     2                                                 143.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>     3                                                 130.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>     4                                                 <span style="color: #BB0000;">NaN</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>     5                                                 <span style="color: #BB0000;">NaN</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>     6                                                 <span style="color: #BB0000;">NaN</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>     7                                                 <span style="color: #BB0000;">NaN</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>     8                                                 <span style="color: #BB0000;">NaN</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>     9                                                 <span style="color: #BB0000;">NaN</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>    10                                                 <span style="color: #BB0000;">NaN</span> </span>
+<span class="r-in"></span>
+<span class="r-in"><span class="co"># summarise min value by instance, dropping original variables</span></span>
+<span class="r-in"><span class="fu">summarise_numerical_variables</span><span class="op">(</span></span>
+<span class="r-in">  <span class="va">dummy_ukb_main</span>,</span>
+<span class="r-in">  ukb_data_dict <span class="op">=</span> <span class="va">dummy_ukb_data_dict</span>,</span>
+<span class="r-in">  summary_function <span class="op">=</span> <span class="st">"min"</span>,</span>
+<span class="r-in">  summarise_by <span class="op">=</span> <span class="st">"Instance"</span>,</span>
+<span class="r-in">  .drop <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span class="r-in"><span class="op">)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Number of summary columns to make: 2</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Time taken: 0 minutes, 0 seconds.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 10 × 3</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      eid min_systolic_blood_pressure_automated_reading_x4080_0 min_systolic_blo…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>                                                 <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>     1                                                   134               134</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>     2                                                   145               129</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>     3                                                   123               123</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>     4                                                    <span style="color: #BB0000;">NA</span>                <span style="color: #BB0000;">NA</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>     5                                                    <span style="color: #BB0000;">NA</span>                <span style="color: #BB0000;">NA</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>     6                                                    <span style="color: #BB0000;">NA</span>                <span style="color: #BB0000;">NA</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>     7                                                    <span style="color: #BB0000;">NA</span>                <span style="color: #BB0000;">NA</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>     8                                                    <span style="color: #BB0000;">NA</span>                <span style="color: #BB0000;">NA</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>     9                                                    <span style="color: #BB0000;">NA</span>                <span style="color: #BB0000;">NA</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>    10                                                    <span style="color: #BB0000;">NA</span>                <span style="color: #BB0000;">NA</span></span>
 </code></pre></div>
     </div>
   </div>
