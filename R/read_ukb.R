@@ -179,9 +179,9 @@ read_ukb <- function(path,
 
   # validate args
   assertthat::assert_that(is.logical(descriptive_colnames),
-                          msg = "Error! 'descriptive_colnames' must be either TRUE or FALSE")
+                          msg = "Descriptive_colnames' must be either TRUE or FALSE")
   assertthat::assert_that(is.logical(label),
-                          msg = "Error! 'label' must be either TRUE or FALSE")
+                          msg = "'label' must be either TRUE or FALSE")
   assert_integer_ge_1(max_n_labels,
                       "max_n_labels")
 
@@ -203,7 +203,7 @@ read_ukb <- function(path,
          csv = "fread")
 
   assertthat::assert_that(!is.null(read_with),
-                          msg = paste0("Error! Unrecognised file extension: ", file_extension))
+                          msg = paste0("Unrecognised file extension: ", file_extension))
 
   N_STEPS <-  1 + descriptive_colnames + label
   STEP <- 1
@@ -297,12 +297,12 @@ label_ukb_main <- function(ukb_main,
 
   # check that ukb_main and data_dict match
   assertthat::assert_that(all(data_dict[[colnames_col]] %in% names(ukb_main)),
-                          msg = "Error! There are values in `data_dict[[colnames_col]]` that do not match `names(ukb_main)`. Check `data_dict`.")
+                          msg = "There are values in `data_dict[[colnames_col]]` that do not match `names(ukb_main)`. Check `data_dict`.")
 
   # warning if any fields in `data_dict` do not have a FieldID
   data_dict_fields_with_no_fid <- data_dict[is.na(data_dict$FieldID), ]$FieldID
   if (!rlang::is_empty(data_dict_fields_with_no_fid)) {
-    warning(paste0("Warning! The following items in `data_dict` could not be matched to a FieldID: ",
+    warning(paste0("The following items in `data_dict` could not be matched to a FieldID: ",
                    stringr::str_c(data_dict_fields_with_no_fid,
                                   sep = "",
                                   collapse = ", ")))
@@ -390,7 +390,6 @@ label_ukb_main <- function(ukb_main,
   assertthat::assert_that(
     rlang::is_empty(ukb_main_cols_unexpected_type),
     msg = paste0(
-      "Error! ",
       length(ukb_main_cols_unexpected_type),
       " column(s) are not of the expected type: ",
       stringr::str_c(ukb_main_cols_unexpected_type,
@@ -444,7 +443,7 @@ format_ukb_df_header <- function(colheaders,
   if (eid_first) {
     assertthat::assert_that(stringr::str_detect(colheaders[1],
                                                 "eid"),
-                            msg = "Error! First column name should include 'eid'")
+                            msg = "First column name should include 'eid'")
 
     colheaders[1] <- "feid"
   }
@@ -532,7 +531,7 @@ mutate_descriptive_columns <- function(data_dict) {
   if (nrow(duplicated_descriptive_colnames) > 0) {
 
     assertthat::assert_that(length(unique(data_dict$colheaders_raw)) == nrow(data_dict),
-                            msg = "Error! Data dictionary contains non-unique values in `colhedaers_raw` column")
+                            msg = "Data dictionary contains non-unique values in `colhedaers_raw` column")
 
     data_dict <- data_dict %>%
       dplyr::mutate(
@@ -754,7 +753,6 @@ label_df_by_coding <- function(df,
         sort(stats::setNames(object = as.integer(codings_list[[single_coding]][[codings_value_col]]),
                         nm = codings_list[[single_coding]][[codings_meaning_col]]))
     } else {
-      browser()
       value_labels <-
         stats::setNames(object = codings_list[[single_coding]][[codings_value_col]],
                         nm = codings_list[[single_coding]][[codings_meaning_col]])
@@ -769,7 +767,7 @@ label_df_by_coding <- function(df,
 
       # checks
       assertthat::assert_that(!is.null(df[[column]]),
-                              msg = paste0("Error while labelling columns! Column ", column, " does not exist. Try checking data dictionary"))
+                              msg = paste0("Error while labelling columns: column ", column, " does not exist. Try checking data dictionary"))
 
       if (is.na(variable_label)) {
         variable_label <- NULL
@@ -798,7 +796,7 @@ label_df_by_coding <- function(df,
 
   # error if nothing was labelled
   assertthat::assert_that(!rlang::is_empty(all_codings) | !rlang::is_empty(non_coded_columns_to_label),
-                          msg = "Error! No value or variable labels were applied")
+                          msg = "No value or variable labels were applied")
 
   return(df)
 }
@@ -899,14 +897,14 @@ read_ukb_chunked_to_file <- function(in_path,
   out_path_ext <- extract_file_ext(out_path)
 
   assertthat::assert_that(in_path_ext %in% c("txt", "tsv", "csv", "tab"),
-                          msg = "Error! `in_path` file extension must be one of 'txt', 'tsv', 'csv', 'tab'")
+                          msg = "`in_path` file extension must be one of 'txt', 'tsv', 'csv', 'tab'")
 
   assertthat::assert_that(out_path_ext %in% c("txt", "tsv", "csv", "dta", "rds"),
-                          msg = "Error! `in_path` file extension must be one of 'txt', 'tsv', 'csv', 'tab'")
+                          msg = "`in_path` file extension must be one of 'txt', 'tsv', 'csv', 'tab'")
 
   assertthat::assert_that(!((out_path_ext == "dta") &
                               (descriptive_colnames == TRUE)),
-                          msg = "Error! `descriptive_colnames` cannot be `TRUE` if writing to a STATA file")
+                          msg = "`descriptive_colnames` cannot be `TRUE` if writing to a STATA file")
 
   data_dict_full <- make_data_dict(in_path,
                                    delim = in_delim,
@@ -914,7 +912,7 @@ read_ukb_chunked_to_file <- function(in_path,
 
   # check that ukb_main and data_dict match
   assertthat::assert_that(all(data_dict$colheaders_raw %in% data_dict_full$colheaders_raw),
-                          msg = "Error! Values in `data_dict$colheaders_raw` do not match column names for file at `in_path`. Check `data_dict`.")
+                          msg = "Values in `data_dict$colheaders_raw` do not match column names for file at `in_path`. Check `data_dict`.")
 
 
 
