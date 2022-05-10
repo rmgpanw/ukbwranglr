@@ -94,19 +94,21 @@ character).</p>
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">ukb_main</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>eid <span class="op">=</span> <span class="fl">1</span>, f34_0_0 <span class="op">=</span> <span class="fl">1990</span>, f52_0_0 <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
-<span class="r-in"> <span class="co"># dummy UKB data dictionary</span></span>
-<span class="r-in"> <span class="va">dummy_ukb_data_dict</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_ukb_dummy.html">get_ukb_dummy</a></span><span class="op">(</span><span class="st">"dummy_Data_Dictionary_Showcase.tsv"</span><span class="op">)</span></span>
+<span class="r-in"><span class="co"># dummy UKB data dictionary</span></span>
+<span class="r-in"><span class="va">dummy_ukb_data_dict</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_ukb_dummy.html">get_ukb_dummy</a></span><span class="op">(</span><span class="st">"dummy_Data_Dictionary_Showcase.tsv"</span><span class="op">)</span></span>
 <span class="r-in"></span>
-<span class="r-in"> <span class="co"># keep input year/month of birth columns</span></span>
-<span class="r-in"> <span class="fu">derive_dob</span><span class="op">(</span><span class="va">ukb_main</span>,</span>
-<span class="r-in">            ukb_data_dict <span class="op">=</span> <span class="va">dummy_ukb_data_dict</span><span class="op">)</span></span>
+<span class="r-in"><span class="co"># keep input year/month of birth columns</span></span>
+<span class="r-in"><span class="fu">derive_dob</span><span class="op">(</span><span class="va">ukb_main</span>,</span>
+<span class="r-in">  ukb_data_dict <span class="op">=</span> <span class="va">dummy_ukb_data_dict</span></span>
+<span class="r-in"><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   eid f34_0_0 f52_0_0        dob</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1   1    1990       1 1990-01-01</span>
 <span class="r-in"></span>
-<span class="r-in"> <span class="co"># remove input year/month of birth columns</span></span>
-<span class="r-in"> <span class="fu">derive_dob</span><span class="op">(</span><span class="va">ukb_main</span>,</span>
-<span class="r-in">            ukb_data_dict <span class="op">=</span> <span class="va">dummy_ukb_data_dict</span>,</span>
-<span class="r-in">            .drop <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span class="r-in"><span class="co"># remove input year/month of birth columns</span></span>
+<span class="r-in"><span class="fu">derive_dob</span><span class="op">(</span><span class="va">ukb_main</span>,</span>
+<span class="r-in">  ukb_data_dict <span class="op">=</span> <span class="va">dummy_ukb_data_dict</span>,</span>
+<span class="r-in">  .drop <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span class="r-in"><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   eid        dob</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1   1 1990-01-01</span>
 </code></pre></div>
