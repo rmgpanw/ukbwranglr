@@ -32,7 +32,20 @@ test_df <- data.frame(chr = c(letters[1:5], NA),
 
 # TESTS -------------------------------------------------------------------
 
-# assert_integer_ge_n() -----------------------------------------------------------
+
+# `get_ukb_data_dict()` and `get_ukb_codings()` ---------------------------------------------------
+
+test_that("`get_ukb_data_dict()` and `get_ukb_codings()` work", {
+  expect_true(is.data.frame(get_ukb_data_dict(
+    get_ukb_dummy("dummy_Data_Dictionary_Showcase.tsv", path_only = TRUE)
+  )))
+
+  expect_true(is.data.frame(get_ukb_codings(
+    get_ukb_dummy("dummy_Codings.tsv", path_only = TRUE)
+  )))
+})
+
+# `assert_integer_ge_n()` -----------------------------------------------------------
 
 test_that("assert_integer_ge_n (helper function) raises an error if chunk_size is not an integer or is < 1", {
   expect_error(
@@ -44,7 +57,7 @@ test_that("assert_integer_ge_n (helper function) raises an error if chunk_size i
     regexp = "Error! chunk_size must be an integer that is greater than 2")
 })
 
-# rename_cols -------------------------------------------------------------
+# `rename_cols()` -------------------------------------------------------------
 
 # setup
 df <- data.frame(x = 1:3,

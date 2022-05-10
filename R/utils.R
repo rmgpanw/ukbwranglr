@@ -6,42 +6,61 @@
 
 # Download data dictionary/codings ----------------------------------------
 
-#' Download UKB data dictionary directly from UKB website
+#' Get the UK Biobank data dictionary
 #'
-#' Downloads the UK Biobank data dictionary from the
-#' \href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{UK
-#' Biobank website} and reads into R with all columns as character type.
+#' Reads the UK Biobank data dictionary into R with all columns as type
+#' character.
 #'
-#' @param path Path where file will be downloaded to. If a file already exists
-#'   at this path, then this will be read into R without re-downloading.
+#' By default, an attempt will be made to read from a file at the path specified
+#' by an environmental variable named `UKB_DATA_DICT` (see
+#' `vignette('ukbwranglr')` for further details), or if this variable is not
+#' found then the data dictionary will be downloaded directly from the [UK
+#' Biobank
+#' website](https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide)
+#' to [tempdir()] when the function is first called.
+#'
+#' @param path Either `NULL`, or a file path. If no file exists at this path,
+#'   then it will be downloaded directly from the UK Biobank data showcase
+#'   website to this location when the function is first called.
 #'
 #' @return A data frame.
 #' @export
 #' @examples
-#' \dontrun{ get_ukb_data_dict() }
-get_ukb_data_dict <- function(path = file.path(tempdir(), "Data_Dictionary_Showcase.tsv")) {
-  download_file(download_url = "https://biobank.ctsu.ox.ac.uk/~bbdatan/Data_Dictionary_Showcase.tsv",
-                path = path)
-  fread_tsv_as_character(path)
+#' get_ukb_data_dict(
+#'   get_ukb_dummy("dummy_Data_Dictionary_Showcase.tsv", path_only = TRUE)
+#' )
+get_ukb_data_dict <- function(path = NULL) {
+  get_ukb_data_dict_codings_helper(path = path,
+                                   env_var_name = "UKB_DATA_DICT",
+                                   file_name = "Data_Dictionary_Showcase.tsv",
+                                   download_url = "https://biobank.ctsu.ox.ac.uk/~bbdatan/Data_Dictionary_Showcase.tsv")
 }
 
-#' Download UKB codings file directly from UKB website
+#' Get the UK Biobank codings file
 #'
-#' Downloads the UK Biobank codings list from the
-#' \href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{UK
-#' Biobank website} and reads into R with all columns as character type.
+#' Reads the UK Biobank codings file into R with all columns as type character.
 #'
-#' @param path Path where file will be downloaded to. If a file already exists
-#'   at this path, then this will be read into R without re-downloading.
+#' By default, an attempt will be made to read from a file at the path specified
+#' by an environmental variable named `UKB_CODINGS` (see
+#' `vignette('ukbwranglr')` for further details), or if this variable is not
+#' found then the data dictionary will be downloaded directly from the [UK
+#' Biobank
+#' website](https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide)
+#' to [tempdir()] when the function is first called.
+#'
+#' @inheritParams get_ukb_data_dict
 #'
 #' @return A data frame.
 #' @export
 #' @examples
-#' \dontrun{ get_ukb_codings() }
-get_ukb_codings <- function(path = file.path(tempdir(), "Codings.tsv")) {
-  download_file(download_url = "https://biobank.ctsu.ox.ac.uk/~bbdatan/Codings.tsv",
-                path = path)
-  fread_tsv_as_character(path)
+#' get_ukb_data_dict(
+#'   get_ukb_dummy("dummy_Codings.tsv", path_only = TRUE)
+#' )
+get_ukb_codings <- function(path = NULL) {
+  get_ukb_data_dict_codings_helper(path = path,
+                                   env_var_name = "UKB_CODINGS",
+                                   file_name = "Codings.tsv",
+                                   download_url = "https://biobank.ctsu.ox.ac.uk/~bbdatan/Codings.tsv")
 }
 
 # Validation helpers ------------------------------------------------------
@@ -204,7 +223,7 @@ db_tables_to_list <- function(conn) {
 
 # PRIVATE FUNCTIONS -------------------------------------------------------
 
-# Download file -----------------------------------------------------------
+# Download files -----------------------------------------------------------
 
 #' Download a file
 #'
@@ -227,6 +246,29 @@ download_file <- function(download_url,
                          mode = "wb")
     invisible(path)
   }
+}
+
+#' Helper for get_ukb_data_dict() and get_ukb_codings()
+#'
+#'
+#'
+#' @return Data frame.
+#' @noRd
+get_ukb_data_dict_codings_helper <- function(path,
+                                      env_var_name,
+                                      file_name,
+                                      download_url) {
+  if (is.null(path)) {
+    if (Sys.getenv(env_var_name) != "") {
+      path <- Sys.getenv(env_var_name)
+    } else {
+      path <- file.path(tempdir(), file_name)
+    }
+  }
+
+  download_file(download_url = download_url,
+                path = path)
+  fread_tsv_as_character(path)
 }
 
 # fread - tsv as character ------------------------------------------------

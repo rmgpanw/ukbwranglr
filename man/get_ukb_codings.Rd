@@ -2,22 +2,30 @@
 % Please edit documentation in R/utils.R
 \name{get_ukb_codings}
 \alias{get_ukb_codings}
-\title{Download UKB codings file directly from UKB website}
+\title{Get the UK Biobank codings file}
 \usage{
-get_ukb_codings(path = file.path(tempdir(), "Codings.tsv"))
+get_ukb_codings(path = NULL)
 }
 \arguments{
-\item{path}{Path where file will be downloaded to. If a file already exists
-at this path, then this will be read into R without re-downloading.}
+\item{path}{Either \code{NULL}, or a file path. If no file exists at this path,
+then it will be downloaded directly from the UK Biobank data showcase
+website to this location when the function is first called.}
 }
 \value{
 A data frame.
 }
 \description{
-Downloads the UK Biobank codings list from the
-\href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{UK
-Biobank website} and reads into R with all columns as character type.
+Reads the UK Biobank codings file into R with all columns as type character.
+}
+\details{
+By default, an attempt will be made to read from a file at the path specified
+by an environmental variable named \code{UKB_CODINGS} (see
+\code{vignette('ukbwranglr')} for further details), or if this variable is not
+found then the data dictionary will be downloaded directly from the \href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{UK Biobank website}
+to \code{\link[=tempdir]{tempdir()}} when the function is first called.
 }
 \examples{
-\dontrun{ get_ukb_codings() }
+get_ukb_data_dict(
+  get_ukb_dummy("dummy_Codings.tsv", path_only = TRUE)
+)
 }
