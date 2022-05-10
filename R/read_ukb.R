@@ -834,7 +834,7 @@ label_df_by_coding <- function(df,
       # progress bar
       pb$tick(1)
 
-      variable_label = data_dict[data_dict[[data_dict_colname_col]] == column, data_dict_variable_label_col][[1]]
+      variable_label <- data_dict[data_dict[[data_dict_colname_col]] == column, data_dict_variable_label_col][[1]]
 
       # checks
       assertthat::assert_that(!is.null(df[[column]]),

@@ -244,14 +244,13 @@ extract_phenotypes <- function(
                         min_max,
                         colnames_prefix,
                         labels_prefix,
+                        counter,
                         db_path = NULL,
                         table_name = NULL,
                         keep_all) {
     message(paste0("\n***PROCESSING DISEASE ", counter, " OF ", n_diseases, "***"))
     time_taken_message(start_time)
     message("\n")
-
-    counter <<- counter + 1
 
     # see note below re non-exportable objects and parallel processing
     if (!is.null(db_path) & !is.null(table_name)) {
@@ -274,7 +273,6 @@ extract_phenotypes <- function(
 
   # loop through diseases in clinical_codes
   n_diseases <- length(unique(clinical_codes$disease))
-  counter = 1
 
   # PARALLEL PROCESSING -----
 
@@ -296,27 +294,30 @@ extract_phenotypes <- function(
     table_name <- gsub("`", "", as.character(clinical_events$op$x))[1]
 
     result <- unique(clinical_codes$disease) %>%
-      purrr::set_names() %>%
-      furrr::future_map(~ mapper_fn(.x,
-                                    db_path = db_path,
-                                    table_name = table_name,
-                                    clinical_events = clinical_events,
-                                    clinical_codes = clinical_codes,
-                                    data_sources = data_sources,
-                                    min_max = min_max,
-                                    colnames_prefix = colnames_prefix,
-                                    labels_prefix = labels_prefix,
-                                    keep_all = keep_all),
-                        .progress = TRUE,
-                        seed = TRUE)
+      furrr::future_imap( ~ {
+        mapper_fn(
+          .x,
+          db_path = db_path,
+          table_name = table_name,
+          clinical_events = clinical_events,
+          clinical_codes = clinical_codes,
+          data_sources = data_sources,
+          min_max = min_max,
+          colnames_prefix = colnames_prefix,
+          labels_prefix = labels_prefix,
+          counter = .y,
+          keep_all = keep_all
+        )
+      },
+      .progress = TRUE,
+      seed = TRUE)
 
     # clinical_events: df -----
   } else if ((clinical_events_type == "df") &
              !is.null(workers)) {
 
   result <- unique(clinical_codes$disease) %>%
-    purrr::set_names() %>%
-    furrr::future_map(~ mapper_fn(
+    furrr::future_imap(~ mapper_fn(
       .x,
       clinical_events = clinical_events,
       clinical_codes = clinical_codes,
@@ -324,6 +325,7 @@ extract_phenotypes <- function(
       min_max = min_max,
       colnames_prefix = colnames_prefix,
       labels_prefix = labels_prefix,
+      counter = .y,
       keep_all = keep_all
     ),
     .progress = TRUE,
@@ -333,8 +335,7 @@ extract_phenotypes <- function(
   } else if (is.null(workers)) {
 
       result <- unique(clinical_codes$disease) %>%
-        purrr::set_names() %>%
-        purrr::map(~ mapper_fn(
+        purrr::imap(~ mapper_fn(
           .x,
           clinical_events = clinical_events,
           clinical_codes = clinical_codes,
@@ -342,6 +343,7 @@ extract_phenotypes <- function(
           min_max = min_max,
           colnames_prefix = colnames_prefix,
           labels_prefix = labels_prefix,
+          counter = .y,
           keep_all = keep_all
         ))
 
@@ -350,6 +352,7 @@ extract_phenotypes <- function(
   }
 
   # return result
+  names(result) <- unique(clinical_codes$disease)
   message("COMPLETE!")
   time_taken_message(start_time)
   return(result)
