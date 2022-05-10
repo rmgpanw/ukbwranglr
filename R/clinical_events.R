@@ -335,6 +335,22 @@ extract_phenotypes <- function(
 
 # Tidy clinical events -------------------------------------------------------
 
+
+#' Details for UK Biobank clinical events data
+#'
+#' Returns a data frame with details of clinical events data that may be tidied
+#' by [tidy_clinical_events()].
+#'
+#' @return A data frame
+#' @export
+#'
+#' @seealso \code{\link{tidy_clinical_events}}
+#' @examples
+#' clinical_events_sources()
+clinical_events_sources <- function() {
+  CLINICAL_EVENTS_SOURCES
+}
+
 #' Tidy clinical events data from a UK Biobank main dataset
 #'
 #' Data in a UK Biobank main dataset is stored in wide format i.e. a single row
@@ -585,7 +601,7 @@ tidy_clinical_events <- function(ukb_main,
     )
   }
 
-  # check for any dfs with no rows - remove
+  # check for any dfs with no rows - set to `NULL`
   result <- result %>%
     purrr::imap(~ {
       if (nrow(.x) == 0) {

@@ -191,20 +191,6 @@ db_tables_to_list <- function(conn) {
   }
 }
 
-#' Details for UK Biobank clinical events data
-#'
-#' Returns a data frame with details of clinical events data that is currently
-#' processed by \code{\link{ukbwranglr}} functions.
-#'
-#' @return A data frame
-#' @export
-#'
-#' @seealso \code{\link{tidy_clinical_events}}
-#' @examples
-#' clinical_events_sources()
-clinical_events_sources <- function() {
-  CLINICAL_EVENTS_SOURCES
-}
 
 # PRIVATE FUNCTIONS -------------------------------------------------------
 
