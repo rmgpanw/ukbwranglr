@@ -31,7 +31,7 @@
 #' website](https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide)).
 #'
 #' - `dummy_ukb_main.tsv`: A dummy main UK Biobank dataset. May be read into R
-#' with [read_ukb()]. Tidy xlinical events fields with [tidy_clinical_events()].
+#' with [read_ukb()]. Tidy clinical events fields with [tidy_clinical_events()].
 #'
 #' - `dummy_gp_clinical.txt`: A dummy UK Biobank primary care clinical event
 #' records dataset.
