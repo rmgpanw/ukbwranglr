@@ -16,4 +16,3 @@ test_that("'eid' column is type integer", {
 test_that("Tidied `dummy_gp_clinical.txt` has valid data sources", {
   expect_true(all(dummy_gp_clinical_events_tidy$source %in% CLINICAL_EVENTS_SOURCES$source))
 })
-

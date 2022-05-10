@@ -54,7 +54,7 @@ make_data_dict <- function(ukb_main,
       # flat file
       colheaders_raw <- data.table::fread(
         ukb_main,
-        colClasses = c('character'),
+        colClasses = c("character"),
         na.strings = c("", "NA"),
         sep = delim,
         header = TRUE,
@@ -64,7 +64,6 @@ make_data_dict <- function(ukb_main,
       ) %>%
         names()
     }
-
   } else if (is.data.frame(ukb_main)) {
     colheaders_raw <- names(ukb_main)
   } else {
@@ -72,16 +71,20 @@ make_data_dict <- function(ukb_main,
   }
 
   # check no duplicated column names
-  check_all_vector_values_unique(colheaders_raw,
-                                 "`names(ukb_main)`")
+  check_all_vector_values_unique(
+    colheaders_raw,
+    "`names(ukb_main)`"
+  )
 
   # process header to this form: 'f.5912.0.0'
   colheaders_processed <- format_ukb_df_header(colheaders_raw)
 
   # make mapping df
   # convert column names to a tibble and append 'mapping' columns
-  data_dict <- dplyr::tibble(colheaders_raw = colheaders_raw,
-                             colheaders_processed = colheaders_processed) %>%
+  data_dict <- dplyr::tibble(
+    colheaders_raw = colheaders_raw,
+    colheaders_processed = colheaders_processed
+  ) %>%
     # Make columns for FieldID, instance and array
     tidyr::separate(
       col = "colheaders_processed",
@@ -91,14 +94,16 @@ make_data_dict <- function(ukb_main,
       extra = "drop",
       fill = "right" # 'eid' column will not separate so will raise an error without this option
     ) %>%
-
     # Remove "f"'s
-    dplyr::mutate("FieldID" = stringr::str_remove(string = .data[["FieldID"]],
-                                                  pattern = "^f")) %>%
-
+    dplyr::mutate("FieldID" = stringr::str_remove(
+      string = .data[["FieldID"]],
+      pattern = "^f"
+    )) %>%
     # join with full ukb data dictionary
-    dplyr::left_join(y = ukb_data_dict,
-                     by = "FieldID")
+    dplyr::left_join(
+      y = ukb_data_dict,
+      by = "FieldID"
+    )
 
   # remove non-existent FieldIDs from FieldID, instance and array columns
   data_dict <- data_dict %>%
@@ -108,12 +113,17 @@ make_data_dict <- function(ukb_main,
         TRUE ~ FALSE
       )
     ) %>%
-    dplyr::mutate(dplyr::across(tidyselect::all_of(c("FieldID",
-                                                     "instance",
-                                                     "array")),
-                                ~ ifelse(.data[["unrecognised_fid"]] == TRUE,
-                                         yes = NA,
-                                         no = .x))) %>%
+    dplyr::mutate(dplyr::across(
+      tidyselect::all_of(c(
+        "FieldID",
+        "instance",
+        "array"
+      )),
+      ~ ifelse(.data[["unrecognised_fid"]] == TRUE,
+        yes = NA,
+        no = .x
+      )
+    )) %>%
     dplyr::select(-.data[["unrecognised_fid"]])
 
   # mutate 'descriptive_colnames' column
@@ -121,13 +131,15 @@ make_data_dict <- function(ukb_main,
 
   # add ValueType column for eid - type 'Integer'
   data_dict$ValueType <- ifelse(data_dict$FieldID == "eid",
-                                yes = "Integer",
-                                no = data_dict$ValueType)
+    yes = "Integer",
+    no = data_dict$ValueType
+  )
 
   # update 'Field' to 'Participant identifier' for 'eid'
   data_dict$Field <- ifelse(data_dict$FieldID == "eid",
-                            yes = "Participant identifier ('eid')",
-                            no = data_dict$Field)
+    yes = "Participant identifier ('eid')",
+    no = data_dict$Field
+  )
 
   # return data_dict
   return(data_dict)
@@ -227,33 +239,41 @@ read_ukb <- function(path,
 
   # validate args
   assertthat::assert_that(is.logical(descriptive_colnames),
-                          msg = "Descriptive_colnames' must be either TRUE or FALSE")
+    msg = "Descriptive_colnames' must be either TRUE or FALSE"
+  )
   assertthat::assert_that(is.logical(label),
-                          msg = "'label' must be either TRUE or FALSE")
-  assert_integer_ge_1(max_n_labels,
-                      "max_n_labels")
+    msg = "'label' must be either TRUE or FALSE"
+  )
+  assert_integer_ge_1(
+    max_n_labels,
+    "max_n_labels"
+  )
 
   # make data_dict if not supplied
   if (is.null(data_dict)) {
     message("Creating data dictionary")
-    data_dict <- make_data_dict(ukb_main = path,
-                                delim = delim,
-                                ukb_data_dict = ukb_data_dict)
+    data_dict <- make_data_dict(
+      ukb_main = path,
+      delim = delim,
+      ukb_data_dict = ukb_data_dict
+    )
   }
 
   # read with haven or fread, dependent on file extension
   file_extension <- extract_file_ext(path)
   read_with <- switch(file_extension,
-         dta = "read_dta",
-         txt = "fread",
-         tsv = "fread",
-         tab = "fread",
-         csv = "fread")
+    dta = "read_dta",
+    txt = "fread",
+    tsv = "fread",
+    tab = "fread",
+    csv = "fread"
+  )
 
   assertthat::assert_that(!is.null(read_with),
-                          msg = paste0("Unrecognised file extension: ", file_extension))
+    msg = paste0("Unrecognised file extension: ", file_extension)
+  )
 
-  N_STEPS <-  1 + descriptive_colnames + label
+  N_STEPS <- 1 + descriptive_colnames + label
   STEP <- 1
 
   # read file
@@ -278,7 +298,7 @@ read_ukb <- function(path,
     message(paste0("STEP ", STEP, " of ", N_STEPS))
     message("Renaming with descriptive column names")
 
-    result <-  rename_cols(
+    result <- rename_cols(
       df = result,
       old_colnames = data_dict[["colheaders_raw"]],
       new_colnames = data_dict[["descriptive_colnames"]]
@@ -354,9 +374,11 @@ read_ukb <- function(path,
 #'   descriptive_colnames = TRUE,
 #'   label = FALSE
 #' ) %>%
-#'   label_ukb_main(data_dict = data_dict_selected,
-#'   ukb_codings = dummy_ukb_codings,
-#'   colnames_col = "descriptive_colnames")
+#'   label_ukb_main(
+#'     data_dict = data_dict_selected,
+#'     ukb_codings = dummy_ukb_codings,
+#'     colnames_col = "descriptive_colnames"
+#'   )
 #' }
 label_ukb_main <- function(ukb_main,
                            data_dict,
@@ -367,22 +389,28 @@ label_ukb_main <- function(ukb_main,
 
   # check that ukb_main and data_dict match
   assertthat::assert_that(all(data_dict[[colnames_col]] %in% names(ukb_main)),
-                          msg = "There are values in `data_dict[[colnames_col]]` that do not match `names(ukb_main)`. Check `data_dict`.")
+    msg = "There are values in `data_dict[[colnames_col]]` that do not match `names(ukb_main)`. Check `data_dict`."
+  )
 
   # warning if any fields in `data_dict` do not have a FieldID
   data_dict_fields_with_no_fid <- data_dict[is.na(data_dict$FieldID), ]$FieldID
   if (!rlang::is_empty(data_dict_fields_with_no_fid)) {
-    warning(paste0("The following items in `data_dict` could not be matched to a FieldID: ",
-                   stringr::str_c(data_dict_fields_with_no_fid,
-                                  sep = "",
-                                  collapse = ", ")))
+    warning(paste0(
+      "The following items in `data_dict` could not be matched to a FieldID: ",
+      stringr::str_c(data_dict_fields_with_no_fid,
+        sep = "",
+        collapse = ", "
+      )
+    ))
     # remove these items from data_dict
     data_dict <- data_dict[!is.na(data_dict$FieldID), ]$FieldID
   }
 
   # identify codings to be converted to integer type
-  data_dict <- indicate_coltype_in_data_dict(data_dict = data_dict,
-                                             ukb_codings = ukb_codings)
+  data_dict <- indicate_coltype_in_data_dict(
+    data_dict = data_dict,
+    ukb_codings = ukb_codings
+  )
 
   # filter ukb_codings for required codings only
   ukb_codings <- ukb_codings %>%
@@ -436,26 +464,32 @@ label_ukb_main <- function(ukb_main,
 
   # set 'Coding' col in `data_dict` to 'NA' if excluded from `ukb_codings`
   data_dict$Coding <- ifelse(data_dict$Coding %in% ukb_codings$Coding,
-                             yes = data_dict$Coding,
-                             no = NA)
+    yes = data_dict$Coding,
+    no = NA
+  )
 
   # check that column types match expected coltype from data_dict
-  expected_coltypes <- as.list(stats::setNames(data_dict$col_types_fread,
-                                               data_dict[[colnames_col]]))
+  expected_coltypes <- as.list(stats::setNames(
+    data_dict$col_types_fread,
+    data_dict[[colnames_col]]
+  ))
   expected_coltypes <- expected_coltypes %>%
     purrr::map(~ ifelse(.x %in% c("integer", "double"),
-                        yes = "numeric",
-                        no = .x))
+      yes = "numeric",
+      no = .x
+    ))
 
   ukb_main_cols_unexpected_type <- ukb_main %>%
     purrr::map(typeof) %>%
     .[data_dict[[colnames_col]]] %>%
     purrr::map(~ ifelse(.x %in% c("integer", "double"),
-                        yes = "numeric",
-                        no = .x)) %>%
+      yes = "numeric",
+      no = .x
+    )) %>%
     purrr::imap(~ ifelse(expected_coltypes[[.y]] == .x,
-                         yes = .x,
-                         no = NA)) %>%
+      yes = .x,
+      no = NA
+    )) %>%
     purrr::keep(is.na) %>%
     names()
 
@@ -465,8 +499,9 @@ label_ukb_main <- function(ukb_main,
       length(ukb_main_cols_unexpected_type),
       " column(s) are not of the expected type: ",
       stringr::str_c(ukb_main_cols_unexpected_type,
-                     sep = "",
-                     collapse = ", "),
+        sep = "",
+        collapse = ", "
+      ),
       ". Try `ukbwranglr:::indicate_coltype_in_data_dict(data_dict = data_dict, ukb_codings = ukb_codings)` and check the values under column `col_types_fread`"
     )
   )
@@ -475,23 +510,27 @@ label_ukb_main <- function(ukb_main,
   data_dict[["variable_label"]] <- ifelse(
     data_dict[[colnames_col]] == "eid",
     yes = "eid",
-    no = paste0(data_dict$Field,
-                " (",
-                data_dict$colheaders_processed,
-                ")")
+    no = paste0(
+      data_dict$Field,
+      " (",
+      data_dict$colheaders_processed,
+      ")"
+    )
   )
 
   # label
-  label_df_by_coding(df = ukb_main,
-                     data_dict = data_dict,
-                     codings = ukb_codings,
-                     data_dict_coding_col = "Coding",
-                     codings_coding_col = "Coding",
-                     data_dict_colname_col = colnames_col,
-                     data_dict_variable_label_col = "variable_label",
-                     codings_value_col = "Value",
-                     codings_meaning_col = "Meaning",
-                     data_dict_coltype_col = "col_types_fread")
+  label_df_by_coding(
+    df = ukb_main,
+    data_dict = data_dict,
+    codings = ukb_codings,
+    data_dict_coding_col = "Coding",
+    codings_coding_col = "Coding",
+    data_dict_colname_col = colnames_col,
+    data_dict_variable_label_col = "variable_label",
+    codings_value_col = "Value",
+    codings_meaning_col = "Meaning",
+    data_dict_coltype_col = "col_types_fread"
+  )
 }
 
 #' Processes a ukb main dataset header to match the form 'f_5912_0_0'
@@ -509,11 +548,13 @@ label_ukb_main <- function(ukb_main,
 #' @noRd
 format_ukb_df_header <- function(colheaders,
                                  eid_first = TRUE) {
-
   if (eid_first) {
-    assertthat::assert_that(stringr::str_detect(colheaders[1],
-                                                "eid"),
-                            msg = "First column name should include 'eid'")
+    assertthat::assert_that(stringr::str_detect(
+      colheaders[1],
+      "eid"
+    ),
+    msg = "First column name should include 'eid'"
+    )
 
     colheaders[1] <- "feid"
   }
@@ -524,28 +565,39 @@ format_ukb_df_header <- function(colheaders,
   colheaders <- extract_fid_instance_array_from_descriptive_or_processed_colheaders(colheaders)
 
   # ukb.txt format
-  ukb_txt_format_indices <- stringr::str_which(string = colheaders,
-                                               pattern = "^[:digit:]+-[:digit:]+\\.[:digit:]+$")
+  ukb_txt_format_indices <- stringr::str_which(
+    string = colheaders,
+    pattern = "^[:digit:]+-[:digit:]+\\.[:digit:]+$"
+  )
 
-  colheaders[ukb_txt_format_indices] <- paste0("f", gsub("-",
-                                                          "_",
-                                                          colheaders[ukb_txt_format_indices]))
-  colheaders[ukb_txt_format_indices] <- gsub("\\.",
-                                             "_",
-                                             colheaders[ukb_txt_format_indices])
+  colheaders[ukb_txt_format_indices] <- paste0("f", gsub(
+    "-",
+    "_",
+    colheaders[ukb_txt_format_indices]
+  ))
+  colheaders[ukb_txt_format_indices] <- gsub(
+    "\\.",
+    "_",
+    colheaders[ukb_txt_format_indices]
+  )
 
   # r format (this converts to dta style; 'f_' is then converted to 'f' below)
-  ukb_r_format_indices <- stringr::str_which(string = colheaders,
-                                             pattern = "f\\.[:digit:]+\\.[:digit:]+\\.[:digit:]+$")
+  ukb_r_format_indices <- stringr::str_which(
+    string = colheaders,
+    pattern = "f\\.[:digit:]+\\.[:digit:]+\\.[:digit:]+$"
+  )
   colheaders[ukb_r_format_indices] <- gsub("\\.", "_", colheaders[ukb_r_format_indices])
 
   # ukb.dta format
-  ukb_dta_format_indices <- stringr::str_which(string = colheaders,
-                                               pattern = "^[:alpha:]+_[:digit:]+_[:digit:]+_[:digit:]+$")
+  ukb_dta_format_indices <- stringr::str_which(
+    string = colheaders,
+    pattern = "^[:alpha:]+_[:digit:]+_[:digit:]+_[:digit:]+$"
+  )
 
   colheaders[ukb_dta_format_indices] <- paste0("f", stringr::str_replace(colheaders[ukb_dta_format_indices],
-                                                                                         pattern = "^[:alpha:]+_",
-                                                                                         replacement = ""))
+    pattern = "^[:alpha:]+_",
+    replacement = ""
+  ))
 
   return(colheaders)
 }
@@ -563,26 +615,32 @@ mutate_descriptive_columns <- function(data_dict) {
 
   # Create vector of column names and Field_FieldID names from Field
   # descriptions/instance/array indices
-  column_names <- paste(data_dict$Field,
-                        paste0("f", data_dict$FieldID),
-                        data_dict$instance,
-                        data_dict$array)
+  column_names <- paste(
+    data_dict$Field,
+    paste0("f", data_dict$FieldID),
+    data_dict$instance,
+    data_dict$array
+  )
 
-  Field_FieldID_names <- paste(data_dict$Field,
-                               paste0("f",
-                                      data_dict$FieldID))
+  Field_FieldID_names <- paste(
+    data_dict$Field,
+    paste0(
+      "f",
+      data_dict$FieldID
+    )
+  )
 
   # Replace the first with 'eid'
-  column_names[1] <- 'eid'
-  Field_FieldID_names[1] <- 'eid'
+  column_names[1] <- "eid"
+  Field_FieldID_names[1] <- "eid"
 
   # replace special characters and convert to lower case
   column_names <- remove_special_characters_and_make_lower_case(column_names)
   Field_FieldID_names <- remove_special_characters_and_make_lower_case(Field_FieldID_names)
 
   # mutate column with new, 'descriptive' column names and Field_FieldID_names
-  data_dict[['descriptive_colnames']] <- column_names
-  data_dict[['Field_FieldID']] <- Field_FieldID_names
+  data_dict[["descriptive_colnames"]] <- column_names
+  data_dict[["Field_FieldID"]] <- Field_FieldID_names
 
   # Rearrange columns
   data_dict <- data_dict %>%
@@ -599,9 +657,9 @@ mutate_descriptive_columns <- function(data_dict) {
     dplyr::filter(.data[["n"]] > 1)
 
   if (nrow(duplicated_descriptive_colnames) > 0) {
-
     assertthat::assert_that(length(unique(data_dict$colheaders_raw)) == nrow(data_dict),
-                            msg = "Data dictionary contains non-unique values in `colhedaers_raw` column")
+      msg = "Data dictionary contains non-unique values in `colhedaers_raw` column"
+    )
 
     data_dict <- data_dict %>%
       dplyr::mutate(
@@ -624,24 +682,29 @@ mutate_descriptive_columns <- function(data_dict) {
 
   # remove "_na"(s) from end of column names
   data_dict$descriptive_colnames <- stringr::str_remove(data_dict$descriptive_colnames,
-                                                         pattern = "[_na]+$")
+    pattern = "[_na]+$"
+  )
 
   # if original colnames include Field_FieldID, then use these as descriptive
   # colnames (apart from for 'eid' col) - this step is designed for colnames generated by
   # `summarise_numerical_variables()`
-  data_dict$descriptive_colnames <- ifelse((stringr::str_detect(string = data_dict$colheaders_raw,
-                                                               pattern = data_dict$Field_FieldID)) &
-                                             (data_dict$Field_FieldID != "eid"),
-                                           yes = data_dict$colheaders_raw,
-                                           no = data_dict$descriptive_colnames)
+  data_dict$descriptive_colnames <- ifelse((stringr::str_detect(
+    string = data_dict$colheaders_raw,
+    pattern = data_dict$Field_FieldID
+  )) &
+    (data_dict$Field_FieldID != "eid"),
+  yes = data_dict$colheaders_raw,
+  no = data_dict$descriptive_colnames
+  )
 
   # make `descriptive_colnames` = `colheaders_raw` if fields/instance/array are
   # all `NA`
   data_dict$descriptive_colnames <- ifelse((is.na(data_dict$FieldID)) &
-                                             (is.na(data_dict$instance) &
-                                                is.na(data_dict$array)),
-                                           yes = data_dict$colheaders_raw,
-                                           no = data_dict$descriptive_colnames)
+    (is.na(data_dict$instance) &
+      is.na(data_dict$array)),
+  yes = data_dict$colheaders_raw,
+  no = data_dict$descriptive_colnames
+  )
 
   # remove Field_FieldID column
   data_dict$Field_FieldID <- NULL
@@ -671,16 +734,20 @@ indicate_coltype_in_data_dict <- function(data_dict,
   # add column to data_dict indicating column type, and column indicating
   # whether the coded value is coercible to integer (as identified above)
   data_dict <- data_dict %>%
-    dplyr::mutate("col_types_readr" = dplyr::case_when(((.data[["ValueType"]] == "Integer") |
-                                                          (.data[["FieldID"]] == "eid")
-    ) ~ "i",
-    # Default is type character
-    TRUE ~ "c")) %>%
+    dplyr::mutate("col_types_readr" = dplyr::case_when(
+      ((.data[["ValueType"]] == "Integer") |
+        (.data[["FieldID"]] == "eid")
+      ) ~ "i",
+      # Default is type character
+      TRUE ~ "c"
+    )) %>%
     # ValueType 'Continuous' overrides the above
     dplyr::mutate(
-      "col_types_readr" = dplyr::case_when(.data[["ValueType"]] == "Continuous" ~ "d",
-                                           .data[["ValueType"]] == "Date" ~ "c",
-                                           TRUE ~ .data[["col_types_readr"]])
+      "col_types_readr" = dplyr::case_when(
+        .data[["ValueType"]] == "Continuous" ~ "d",
+        .data[["ValueType"]] == "Date" ~ "c",
+        TRUE ~ .data[["col_types_readr"]]
+      )
     ) %>%
     dplyr::mutate(
       "col_types_fread" = dplyr::case_when(
@@ -715,10 +782,13 @@ read_ukb_raw_basis <- function(path,
 
   # validate args
   match.arg(read_with,
-            choices = c("fread", "read_delim_chunked", "read_dta"))
+    choices = c("fread", "read_delim_chunked", "read_dta")
+  )
 
-  data_dict <- indicate_coltype_in_data_dict(data_dict = data_dict,
-                                             ukb_codings = ukb_codings)
+  data_dict <- indicate_coltype_in_data_dict(
+    data_dict = data_dict,
+    ukb_codings = ukb_codings
+  )
 
   # make coltype args (for both `fread` and `readr`)
   coltypes_fread <- stats::setNames(
@@ -726,14 +796,15 @@ read_ukb_raw_basis <- function(path,
     data_dict$colheaders_raw
   )
 
-  coltypes_readr <- stats::setNames(data_dict$col_types_readr,
-                                    data_dict$colheaders_raw) %>%
+  coltypes_readr <- stats::setNames(
+    data_dict$col_types_readr,
+    data_dict$colheaders_raw
+  ) %>%
     as.list() %>%
     do.call(readr::cols_only, .)
 
   # read data
-  switch(
-    read_with,
+  switch(read_with,
     fread = data.table::fread(
       path,
       select = coltypes_fread,
@@ -810,8 +881,10 @@ label_df_by_coding <- function(df,
     dplyr::pull(.data[[data_dict_colname_col]])
 
   # progress bar - one tick per column
-  pb <- progress::progress_bar$new(format = "[:bar] :current/:total (:percent)",
-                                   total = nrow(data_dict))
+  pb <- progress::progress_bar$new(
+    format = "[:bar] :current/:total (:percent)",
+    total = nrow(data_dict)
+  )
   pb$tick(0)
 
   # loop through codings
@@ -823,8 +896,8 @@ label_df_by_coding <- function(df,
     codings_single <- codings_list[[single_coding]]
 
     # order by value numerically if values are coercible to integer
-    if((unique(data_dict_list[[single_coding]]$coercible_to_integer) == "Yes") |
-                                     (single_coding %in% numeric_codings)) {
+    if ((unique(data_dict_list[[single_coding]]$coercible_to_integer) == "Yes") |
+      (single_coding %in% numeric_codings)) {
       codings_single <- codings_single %>%
         dplyr::arrange(as.numeric(.data[["Value"]]))
     }
@@ -838,13 +911,15 @@ label_df_by_coding <- function(df,
 
       # checks
       assertthat::assert_that(!is.null(df[[column]]),
-                              msg = paste0("Error while labelling columns: column ", column, " does not exist. Try checking data dictionary"))
+        msg = paste0("Error while labelling columns: column ", column, " does not exist. Try checking data dictionary")
+      )
 
 
       if (is.character(df[[column]])) {
-      df[[column]] <- factor(df[[column]],
-                                      levels = codings_single[[codings_value_col]],
-                                      labels = codings_single[[codings_meaning_col]])
+        df[[column]] <- factor(df[[column]],
+          levels = codings_single[[codings_value_col]],
+          labels = codings_single[[codings_meaning_col]]
+        )
       }
 
       if (is.na(variable_label)) {
@@ -857,7 +932,6 @@ label_df_by_coding <- function(df,
 
   # label remaining variables (i.e. those without associated codings/value labels)
   for (column in non_coded_columns_to_label) {
-
     pb$tick(1)
 
     # for debugging
@@ -867,7 +941,8 @@ label_df_by_coding <- function(df,
 
   # error if nothing was labelled
   assertthat::assert_that(!rlang::is_empty(all_codings) | !rlang::is_empty(non_coded_columns_to_label),
-                          msg = "No value or variable labels were applied")
+    msg = "No value or variable labels were applied"
+  )
 
   return(df)
 }
@@ -876,17 +951,21 @@ update_column_classes <- function(df,
                                   coltypes) {
   # coltypes must be a named character vector with the following allowed values
   assertthat::assert_that(all(
-    unique(coltypes) %in% c("character",
-                            "Date",
-                            "double",
-                            "integer")
+    unique(coltypes) %in% c(
+      "character",
+      "Date",
+      "double",
+      "integer"
+    )
   ))
 
   # for each class, coerce all relevant columns to this class
   message("Updating column classes")
 
-  pb <- progress::progress_bar$new(format = "[:bar] :current/:total (:percent)",
-                                   total = length(unique(coltypes)))
+  pb <- progress::progress_bar$new(
+    format = "[:bar] :current/:total (:percent)",
+    total = length(unique(coltypes))
+  )
   pb$tick(0)
 
   for (column_type in unique(coltypes)) {
@@ -896,24 +975,23 @@ update_column_classes <- function(df,
     columns_to_reclass <-
       names(subset(coltypes, coltypes == column_type))
 
-    df <- switch(
-      column_type,
+    df <- switch(column_type,
       character = df %>%
         dplyr::mutate(dplyr::across(
           tidyselect::all_of(columns_to_reclass),
           as.character
         )),
-      Date =  df %>%
+      Date = df %>%
         dplyr::mutate(dplyr::across(
           tidyselect::all_of(columns_to_reclass),
           as.Date
         )),
-      double =  df %>%
+      double = df %>%
         dplyr::mutate(dplyr::across(
           tidyselect::all_of(columns_to_reclass),
           as.double
         )),
-      integer =  df %>%
+      integer = df %>%
         dplyr::mutate(dplyr::across(
           tidyselect::all_of(columns_to_reclass),
           as.integer
@@ -948,6 +1026,7 @@ update_column_classes <- function(df,
 #'
 #' @examples
 #' \dontrun{
+#'
 #' }
 read_ukb_chunked_to_file <- function(in_path,
                                      out_path,
@@ -968,22 +1047,27 @@ read_ukb_chunked_to_file <- function(in_path,
   out_path_ext <- extract_file_ext(out_path)
 
   assertthat::assert_that(in_path_ext %in% c("txt", "tsv", "csv", "tab"),
-                          msg = "`in_path` file extension must be one of 'txt', 'tsv', 'csv', 'tab'")
+    msg = "`in_path` file extension must be one of 'txt', 'tsv', 'csv', 'tab'"
+  )
 
   assertthat::assert_that(out_path_ext %in% c("txt", "tsv", "csv", "dta", "rds"),
-                          msg = "`in_path` file extension must be one of 'txt', 'tsv', 'csv', 'tab'")
+    msg = "`in_path` file extension must be one of 'txt', 'tsv', 'csv', 'tab'"
+  )
 
   assertthat::assert_that(!((out_path_ext == "dta") &
-                              (descriptive_colnames == TRUE)),
-                          msg = "`descriptive_colnames` cannot be `TRUE` if writing to a STATA file")
+    (descriptive_colnames == TRUE)),
+  msg = "`descriptive_colnames` cannot be `TRUE` if writing to a STATA file"
+  )
 
   data_dict_full <- make_data_dict(in_path,
-                                   delim = in_delim,
-                                   ukb_data_dict = ukb_data_dict)
+    delim = in_delim,
+    ukb_data_dict = ukb_data_dict
+  )
 
   # check that ukb_main and data_dict match
   assertthat::assert_that(all(data_dict$colheaders_raw %in% data_dict_full$colheaders_raw),
-                          msg = "Values in `data_dict$colheaders_raw` do not match column names for file at `in_path`. Check `data_dict`.")
+    msg = "Values in `data_dict$colheaders_raw` do not match column names for file at `in_path`. Check `data_dict`."
+  )
 
 
 
@@ -997,15 +1081,17 @@ read_ukb_chunked_to_file <- function(in_path,
     na.strings = na.strings,
     read_with = "read_delim_chunked",
     chunk_size = chunk_size,
-    callback = readr::SideEffectChunkCallback$new(read_ukb_chunked_callback_write_to_file(out_path = out_path,
-                                                                                          out_path_ext = out_path_ext,
-                                                                                          max_n_labels = max_n_labels,
-                                                                                          data_dict = data_dict,
-                                                                                          ukb_codings = ukb_codings,
-                                                                                          start_time = start_time,
-                                                                                          descriptive_colnames = descriptive_colnames,
-                                                                                          label = label,
-                                                                                          ...)),
+    callback = readr::SideEffectChunkCallback$new(read_ukb_chunked_callback_write_to_file(
+      out_path = out_path,
+      out_path_ext = out_path_ext,
+      max_n_labels = max_n_labels,
+      data_dict = data_dict,
+      ukb_codings = ukb_codings,
+      start_time = start_time,
+      descriptive_colnames = descriptive_colnames,
+      label = label,
+      ...
+    )),
     ...
   )
 
@@ -1044,7 +1130,7 @@ read_ukb_chunked_callback_write_to_file <-
       if (descriptive_colnames) {
         NEW_COLNAMES_COL <- "descriptive_colnames"
 
-        x <-  rename_cols(
+        x <- rename_cols(
           df = x,
           old_colnames = data_dict[["colheaders_raw"]],
           new_colnames = data_dict[[NEW_COLNAMES_COL]]
@@ -1070,11 +1156,12 @@ read_ukb_chunked_callback_write_to_file <-
       }
 
 
-      switch(
-        out_path_ext,
-        dta = haven::write_dta(data = x,
-                               path = out_path,
-                               ...),
+      switch(out_path_ext,
+        dta = haven::write_dta(
+          data = x,
+          path = out_path,
+          ...
+        ),
         txt = readr::write_delim(
           x = x,
           file = out_path,
@@ -1093,9 +1180,11 @@ read_ukb_chunked_callback_write_to_file <-
           delim = ",",
           ...
         ),
-        rds = saveRDS(object = x,
-                      file = out_path,
-                      ...)
+        rds = saveRDS(
+          object = x,
+          file = out_path,
+          ...
+        )
       )
     }
   }

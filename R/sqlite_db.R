@@ -1,6 +1,6 @@
 # NOTES -------------------------------------------------------------------
 
-#TODO
+# TODO
 
 # EXPORTED FUNCTIONS ----------------------------------------------------
 
@@ -109,9 +109,11 @@ make_clinical_events_db <- function(ukb_main_path,
 
   # validate args
   assertthat::assert_that(!rlang::is_missing(ukb_db_path),
-                          msg = "Error! argument 'ukb_db_path' is missing, with no default")
+    msg = "Error! argument 'ukb_db_path' is missing, with no default"
+  )
   assertthat::assert_that(!rlang::is_missing(ukb_main_path),
-                          msg = "Error! argument 'ukb_main_path' is missing, with no default")
+    msg = "Error! argument 'ukb_main_path' is missing, with no default"
+  )
 
   ukb_db_ext <- extract_file_ext(ukb_db_path)
   if (!(ukb_db_ext == "db") | is.na(ukb_db_ext)) {
@@ -124,18 +126,24 @@ make_clinical_events_db <- function(ukb_main_path,
 
   # Error message if table already exists and append == FALSE
   tables_to_write <- c(
-    tidy_gp_data_db(gp_df_type = "gp_clinical",
-                    .details_only = TRUE),
-    tidy_gp_data_db(gp_df_type = "gp_scripts",
-                    .details_only = TRUE),
+    tidy_gp_data_db(
+      gp_df_type = "gp_clinical",
+      .details_only = TRUE
+    ),
+    tidy_gp_data_db(
+      gp_df_type = "gp_scripts",
+      .details_only = TRUE
+    ),
     "clinical_events"
   )
 
-  table_already_present_in_db <- subset(tables_to_write,
-                                        tables_to_write %in% DBI::dbListTables(con))
+  table_already_present_in_db <- subset(
+    tables_to_write,
+    tables_to_write %in% DBI::dbListTables(con)
+  )
 
   if (!rlang::is_empty(table_already_present_in_db) &
-      !overwrite) {
+    !overwrite) {
     stop(
       paste0(
         "Error! The following table(s) already exists in database: ",
@@ -154,12 +162,14 @@ make_clinical_events_db <- function(ukb_main_path,
   # make data dictionary and filter for required FieldIDs
   message("***CREATING DATA DICTIONARY FOR UKB MAIN DATASET***")
   data_dict <- make_data_dict(ukb_main_path,
-                              delim = ukb_main_delim,
-                              ukb_data_dict = ukb_data_dict)
+    delim = ukb_main_delim,
+    ukb_data_dict = ukb_data_dict
+  )
 
   # check that eid col is present
   assertthat::assert_that("eid" %in% data_dict$FieldID,
-                          msg = "Error! 'eid' column  is missing from the main UKB dataset")
+    msg = "Error! 'eid' column  is missing from the main UKB dataset"
+  )
 
   # check at least some clinical events fields are present
   available_clinical_events_fields <-
@@ -178,18 +188,18 @@ make_clinical_events_db <- function(ukb_main_path,
   missing_clinical_events_fields <-
     subset(available_clinical_events_fields, !(available_clinical_events_fields %in% data_dict$FieldID))
 
-    if (length(missing_clinical_events_fields) > 0) {
-      warning(
-        paste0(
-          "The following clinical events field IDs are missing from the main UKB dataset: ",
-          stringr::str_c(missing_clinical_events_fields, sep = "", collapse = ", ")
-        )
+  if (length(missing_clinical_events_fields) > 0) {
+    warning(
+      paste0(
+        "The following clinical events field IDs are missing from the main UKB dataset: ",
+        stringr::str_c(missing_clinical_events_fields, sep = "", collapse = ", ")
       )
-    }
+    )
+  }
 
   # filter `data_dict` for 'eid' and clinical events fields only
   data_dict <- data_dict %>%
-        dplyr::filter(.data[["FieldID"]] %in% c("eid", available_clinical_events_fields))
+    dplyr::filter(.data[["FieldID"]] %in% c("eid", available_clinical_events_fields))
 
   # tidy ukb_main clinical events ----------------------------------
 
@@ -236,7 +246,7 @@ make_clinical_events_db <- function(ukb_main_path,
     )
 
     if (overwrite &
-        ("gp_clinical_values" %in% DBI::dbListTables(con))) {
+      ("gp_clinical_values" %in% DBI::dbListTables(con))) {
       DBI::dbRemoveTable(con, "gp_clinical_values")
     }
 
@@ -259,7 +269,8 @@ make_clinical_events_db <- function(ukb_main_path,
       # set to `TRUE` as appending to an existing table
       verbose = TRUE,
       callback_function = purrr::partial(tidy_gp_data_db,
-                                         gp_df_type = "gp_clinical")
+        gp_df_type = "gp_clinical"
+      )
     )
   }
 
@@ -269,7 +280,7 @@ make_clinical_events_db <- function(ukb_main_path,
     )
 
     if (overwrite &
-        ("gp_scripts_names_and_quantities" %in% DBI::dbListTables(con))) {
+      ("gp_scripts_names_and_quantities" %in% DBI::dbListTables(con))) {
       DBI::dbRemoveTable(con, "gp_scripts_names_and_quantities")
     }
 
@@ -292,7 +303,8 @@ make_clinical_events_db <- function(ukb_main_path,
       # set to `TRUE` as appending to an existing table
       verbose = TRUE,
       callback_function = purrr::partial(tidy_gp_data_db,
-                                         gp_df_type = "gp_scripts")
+        gp_df_type = "gp_scripts"
+      )
     )
   }
 
@@ -457,8 +469,9 @@ file_to_sqlite_db <- function(file,
                               # indexes = NULL,
                               verbose = TRUE,
                               append = FALSE,
-                              callback_function = function(x, ...)
-                                list("table" = x),
+                              callback_function = function(x, ...) {
+                                list("table" = x)
+                              },
                               quote = "\"",
                               escape_backslash = FALSE,
                               escape_double = TRUE,
@@ -481,11 +494,13 @@ file_to_sqlite_db <- function(file,
 
   # Error message if table already exists and append == FALSE
   tables_to_write <- callback_function(.details_only = TRUE)
-  table_already_present_in_db <- subset(tables_to_write,
-                                        tables_to_write %in% DBI::dbListTables(con))
+  table_already_present_in_db <- subset(
+    tables_to_write,
+    tables_to_write %in% DBI::dbListTables(con)
+  )
 
   if (!rlang::is_empty(table_already_present_in_db) &
-      !append) {
+    !append) {
     stop(
       paste0(
         "Error! The following table(s) already exists in database: ,",
@@ -557,11 +572,13 @@ file_to_sqlite_db <- function(file,
 
   # Completion message
   time_taken <- proc.time() - start_time
-  message("Complete. Time taken: ",
-          (time_taken[3] %/% 60),
-          " minutes, ",
-          (round(time_taken[3] %% 60)),
-          " seconds")
+  message(
+    "Complete. Time taken: ",
+    (time_taken[3] %/% 60),
+    " minutes, ",
+    (round(time_taken[3] %% 60)),
+    " seconds"
+  )
 
   # return NULL invisibly
   invisible(NULL)
@@ -580,13 +597,15 @@ tidy_gp_data_db <- function(gp_df,
   # tests pass locally but not with github actions***
 
   match.arg(gp_df_type,
-            choices = c("gp_clinical", "gp_scripts"))
+    choices = c("gp_clinical", "gp_scripts")
+  )
 
-  gp_df_details <- switch(
-    gp_df_type,
+  gp_df_details <- switch(gp_df_type,
     gp_clinical = list(
-      output_table_names = c("clinical_events",
-                             "gp_clinical_values"),
+      output_table_names = c(
+        "clinical_events",
+        "gp_clinical_values"
+      ),
       input_col_names = c(
         "eid",
         "data_provider",
@@ -605,17 +624,23 @@ tidy_gp_data_db <- function(gp_df,
         "read_2",
         "read_3"
       ),
-      code_cols = c("read_2",
-                    "read_3"),
+      code_cols = c(
+        "read_2",
+        "read_3"
+      ),
       date_col = "event_dt",
-      other_cols = c("value1",
-                     "value2",
-                     "value3"),
+      other_cols = c(
+        "value1",
+        "value2",
+        "value3"
+      ),
       source_acronym = "gpc"
     ),
     gp_scripts = list(
-      output_table_names = c("clinical_events",
-                             "gp_scripts_names_and_quantities"),
+      output_table_names = c(
+        "clinical_events",
+        "gp_scripts_names_and_quantities"
+      ),
       input_col_names = c(
         "eid",
         "data_provider",
@@ -635,12 +660,16 @@ tidy_gp_data_db <- function(gp_df,
         "bnf_code",
         "dmd_code"
       ),
-      code_cols = c("read_2",
-                    "bnf_code",
-                    "dmd_code"),
+      code_cols = c(
+        "read_2",
+        "bnf_code",
+        "dmd_code"
+      ),
       date_col = "issue_date",
-      other_cols = c("drug_name",
-                     "quantity"),
+      other_cols = c(
+        "drug_name",
+        "quantity"
+      ),
       source_acronym = "gps"
     ),
   )
@@ -653,9 +682,11 @@ tidy_gp_data_db <- function(gp_df,
   # validate args
   assertthat::assert_that(
     all(names(gp_df) == gp_df_details$input_col_names),
-    msg = paste0("Error! `",
-                 gp_df_type,
-                 "` has unexpected column names")
+    msg = paste0(
+      "Error! `",
+      gp_df_type,
+      "` has unexpected column names"
+    )
   )
 
   assertthat::assert_that(
@@ -679,47 +710,60 @@ tidy_gp_data_db <- function(gp_df,
   # tidy clinical codes/dates
   gp_df_codes <- gp_df %>%
     dplyr::select(tidyselect::all_of(gp_df_details$clinical_events_cols)) %>%
-    tidyr::pivot_longer(cols = gp_df_details$code_cols,
-                        names_to = "source",
-                        values_to = "code") %>%
+    tidyr::pivot_longer(
+      cols = gp_df_details$code_cols,
+      names_to = "source",
+      values_to = "code"
+    ) %>%
     # remove redundant rows
     dplyr::filter(!is.na(.data[["code"]]))
 
   # relabel `source` col - combine 'gpc'/'gps' with data provider and code type
   if (gp_df_type == "gp_clinical") {
     gp_df_codes$source <- dplyr::case_when(
-      gp_df_codes$source == "read_2" ~ paste0(gp_df_details$source_acronym,
-                                              gp_df_codes[["data_provider"]],
-                                              "_",
-                                              "r2"),
-      gp_df_codes$source == "read_3" ~ paste0(gp_df_details$source_acronym,
-                                              gp_df_codes[["data_provider"]],
-                                              "_",
-                                              "r3"),
+      gp_df_codes$source == "read_2" ~ paste0(
+        gp_df_details$source_acronym,
+        gp_df_codes[["data_provider"]],
+        "_",
+        "r2"
+      ),
+      gp_df_codes$source == "read_3" ~ paste0(
+        gp_df_details$source_acronym,
+        gp_df_codes[["data_provider"]],
+        "_",
+        "r3"
+      ),
       TRUE ~ "gpc_unknown_coding"
     )
   } else if (gp_df_type == "gp_scripts") {
     gp_df_codes$source <- dplyr::case_when(
-      gp_df_codes$source == "read_2" ~ paste0(gp_df_details$source_acronym,
-                                              gp_df_codes[["data_provider"]],
-                                              "_",
-                                              "r2"),
-      gp_df_codes$source == "bnf_code" ~ paste0(gp_df_details$source_acronym,
-                                                gp_df_codes[["data_provider"]],
-                                                "_",
-                                                "bnf"),
-      gp_df_codes$source == "dmd_code" ~ paste0(gp_df_details$source_acronym,
-                                                gp_df_codes[["data_provider"]],
-                                                "_",
-                                                "dmd"),
+      gp_df_codes$source == "read_2" ~ paste0(
+        gp_df_details$source_acronym,
+        gp_df_codes[["data_provider"]],
+        "_",
+        "r2"
+      ),
+      gp_df_codes$source == "bnf_code" ~ paste0(
+        gp_df_details$source_acronym,
+        gp_df_codes[["data_provider"]],
+        "_",
+        "bnf"
+      ),
+      gp_df_codes$source == "dmd_code" ~ paste0(
+        gp_df_details$source_acronym,
+        gp_df_codes[["data_provider"]],
+        "_",
+        "dmd"
+      ),
       TRUE ~ "gpc_unknown_coding"
     )
   }
 
   # rename 'event_dt'/`issue_date` to 'date'
   gp_df_codes <- rename_cols(gp_df_codes,
-                             old_colnames = gp_df_details$date_col,
-                             new_colnames = "date")
+    old_colnames = gp_df_details$date_col,
+    new_colnames = "date"
+  )
 
   # reformat date
   gp_df_codes$date <- gp_df_codes$date %>%
@@ -730,10 +774,12 @@ tidy_gp_data_db <- function(gp_df,
   if (remove_special_dates == TRUE) {
     # primary care dates to remove
     # see https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=591
-    primary_care_special_dates_to_remove <- c("01/01/1901",
-                                              "02/02/1902",
-                                              "03/03/1903",
-                                              "07/07/2037") %>%
+    primary_care_special_dates_to_remove <- c(
+      "01/01/1901",
+      "02/02/1902",
+      "03/03/1903",
+      "07/07/2037"
+    ) %>%
       lubridate::dmy() %>%
       as.character()
 
@@ -747,11 +793,13 @@ tidy_gp_data_db <- function(gp_df,
   result <- list(
     events = gp_df_codes %>%
       dplyr::select(tidyselect::all_of(
-        c("eid",
+        c(
+          "eid",
           "source",
           "index",
           "code",
-          "date")
+          "date"
+        )
       )),
     other = gp_df %>%
       dplyr::select(tidyselect::all_of(c(

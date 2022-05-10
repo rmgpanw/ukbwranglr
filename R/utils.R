@@ -30,10 +30,12 @@
 #'   get_ukb_dummy("dummy_Data_Dictionary_Showcase.tsv", path_only = TRUE)
 #' )
 get_ukb_data_dict <- function(path = NULL) {
-  get_ukb_data_dict_codings_helper(path = path,
-                                   env_var_name = "UKB_DATA_DICT",
-                                   file_name = "Data_Dictionary_Showcase.tsv",
-                                   download_url = "https://biobank.ctsu.ox.ac.uk/~bbdatan/Data_Dictionary_Showcase.tsv")
+  get_ukb_data_dict_codings_helper(
+    path = path,
+    env_var_name = "UKB_DATA_DICT",
+    file_name = "Data_Dictionary_Showcase.tsv",
+    download_url = "https://biobank.ctsu.ox.ac.uk/~bbdatan/Data_Dictionary_Showcase.tsv"
+  )
 }
 
 #' Get the UK Biobank codings file
@@ -57,10 +59,12 @@ get_ukb_data_dict <- function(path = NULL) {
 #'   get_ukb_dummy("dummy_Codings.tsv", path_only = TRUE)
 #' )
 get_ukb_codings <- function(path = NULL) {
-  get_ukb_data_dict_codings_helper(path = path,
-                                   env_var_name = "UKB_CODINGS",
-                                   file_name = "Codings.tsv",
-                                   download_url = "https://biobank.ctsu.ox.ac.uk/~bbdatan/Codings.tsv")
+  get_ukb_data_dict_codings_helper(
+    path = path,
+    env_var_name = "UKB_CODINGS",
+    file_name = "Codings.tsv",
+    download_url = "https://biobank.ctsu.ox.ac.uk/~bbdatan/Codings.tsv"
+  )
 }
 
 # Validation helpers ------------------------------------------------------
@@ -99,52 +103,73 @@ validate_clinical_codes <- function(clinical_codes,
 
   # check is a data frame
   assertthat::assert_that(is.data.frame(clinical_codes),
-                          msg = paste0("Error! clinical_codes must be a data frame",
-                                       standard_message))
+    msg = paste0(
+      "Error! clinical_codes must be a data frame",
+      standard_message
+    )
+  )
 
   # check for expected column names
   assertthat::assert_that(all(names(clinical_codes) == names(example_clinical_codes())),
-                          msg = paste0("Error! clinical_codes should have the following column headers: ",
-                                       stringr::str_c(names(example_clinical_codes()),
-                                                      sep = "",
-                                                      collapse = ", "),
-                                       standard_message))
+    msg = paste0(
+      "Error! clinical_codes should have the following column headers: ",
+      stringr::str_c(names(example_clinical_codes()),
+        sep = "",
+        collapse = ", "
+      ),
+      standard_message
+    )
+  )
 
   # check all cols are type character
   assertthat::assert_that(
     all(
       (clinical_codes %>%
-          purrr::map_chr(class)) == "character"),
-    msg = paste0("Error! All columns in clinical_codes should be of type character. ",
-                 standard_message)
+        purrr::map_chr(class)) == "character"
+    ),
+    msg = paste0(
+      "Error! All columns in clinical_codes should be of type character. ",
+      standard_message
+    )
   )
 
   # check there are no NA values
   cols_with_NA <- clinical_codes %>%
-    purrr::map( ~ ifelse(sum(is.na(.x)) > 0,
-                         yes = TRUE,
-                         no = FALSE)) %>%
-    purrr::keep(~ .x) %>%
+    purrr::map(~ ifelse(sum(is.na(.x)) > 0,
+      yes = TRUE,
+      no = FALSE
+    )) %>%
+    purrr::keep(~.x) %>%
     names()
 
   assertthat::assert_that(rlang::is_empty(cols_with_NA),
-                          msg = paste0("Error! There should be no missing values in clinical_codes. The following columns contain NA's: ",
-                                       stringr::str_c(cols_with_NA,
-                                                      sep = "",
-                                                      collapse = ", "),
-                                       standard_message))
+    msg = paste0(
+      "Error! There should be no missing values in clinical_codes. The following columns contain NA's: ",
+      stringr::str_c(cols_with_NA,
+        sep = "",
+        collapse = ", "
+      ),
+      standard_message
+    )
+  )
 
   # check all values in code_type are recognised
   unique_clinical_code_types <- unique(clinical_codes$code_type)
-  unrecognised_code_types <- subset(unique_clinical_code_types,
-                                    !unique_clinical_code_types %in% unique(CLINICAL_EVENTS_SOURCES$data_coding))
+  unrecognised_code_types <- subset(
+    unique_clinical_code_types,
+    !unique_clinical_code_types %in% unique(CLINICAL_EVENTS_SOURCES$data_coding)
+  )
 
   assertthat::assert_that(rlang::is_empty(unrecognised_code_types),
-                          msg = paste0("Error! code_type column in clinical_codes contains unrecognised code types: ",
-                                       stringr::str_c(unrecognised_code_types,
-                                                      sep = "",
-                                                      collapse = ", "),
-                                       standard_message))
+    msg = paste0(
+      "Error! code_type column in clinical_codes contains unrecognised code types: ",
+      stringr::str_c(unrecognised_code_types,
+        sep = "",
+        collapse = ", "
+      ),
+      standard_message
+    )
+  )
 
   # check for overlapping disease categories - raise either warning or error if any detected
   overlapping_disease_categories <- identify_overlapping_disease_categories(clinical_codes)
@@ -155,18 +180,23 @@ validate_clinical_codes <- function(clinical_codes,
 
   if (allow_overlapping_categories) {
     if (!is.null(overlapping_disease_categories)) {
-      warning(paste0("Warning! Overlapping disease categories detected. The following ",
-             length(overlapping_disease_categories$disease_author),
-             " disease(s) (author) contain overlapping disease categories: ",
-             overlapping_disease_categories$disease_author_string))
+      warning(paste0(
+        "Warning! Overlapping disease categories detected. The following ",
+        length(overlapping_disease_categories$disease_author),
+        " disease(s) (author) contain overlapping disease categories: ",
+        overlapping_disease_categories$disease_author_string
+      ))
     }
   } else {
-  assertthat::assert_that(is.null(overlapping_disease_categories),
-                          msg = paste0("Error! Overlapping disease categories detected. Each disease/author in clinical_codes should have a unique set of clinical codes/code_type. The following ",
-                                       length(overlapping_disease_categories$disease_author),
-                                       " disease(s) (author) contain overlapping disease categories: ",
-                                       overlapping_disease_categories$disease_author_string,
-                                       ". Set `allow_overlapping_categories` to `TRUE` to ignore these."))
+    assertthat::assert_that(is.null(overlapping_disease_categories),
+      msg = paste0(
+        "Error! Overlapping disease categories detected. Each disease/author in clinical_codes should have a unique set of clinical codes/code_type. The following ",
+        length(overlapping_disease_categories$disease_author),
+        " disease(s) (author) contain overlapping disease categories: ",
+        overlapping_disease_categories$disease_author_string,
+        ". Set `allow_overlapping_categories` to `TRUE` to ignore these."
+      )
+    )
   }
 
   invisible(TRUE)
@@ -237,13 +267,14 @@ db_tables_to_list <- function(conn) {
 #' @noRd
 download_file <- function(download_url,
                           path = tempfile()) {
-
   if (file.exists(path)) {
     invisible(path)
   } else {
-    utils::download.file(url = download_url,
-                         destfile = path,
-                         mode = "wb")
+    utils::download.file(
+      url = download_url,
+      destfile = path,
+      mode = "wb"
+    )
     invisible(path)
   }
 }
@@ -255,9 +286,9 @@ download_file <- function(download_url,
 #' @return Data frame.
 #' @noRd
 get_ukb_data_dict_codings_helper <- function(path,
-                                      env_var_name,
-                                      file_name,
-                                      download_url) {
+                                             env_var_name,
+                                             file_name,
+                                             download_url) {
   if (is.null(path)) {
     if (Sys.getenv(env_var_name) != "") {
       path <- Sys.getenv(env_var_name)
@@ -266,8 +297,10 @@ get_ukb_data_dict_codings_helper <- function(path,
     }
   }
 
-  download_file(download_url = download_url,
-                path = path)
+  download_file(
+    download_url = download_url,
+    path = path
+  )
   fread_tsv_as_character(path)
 }
 
@@ -280,10 +313,11 @@ get_ukb_data_dict_codings_helper <- function(path,
 #' @param ... additional arguments are passed on to \code{\link[data.table]{fread}}
 #' @noRd
 fread_tsv_as_character <- purrr::partial(data.table::fread,
-                                         colClasses = c('character'),
-                                         sep = "\t",
-                                         quote = " ",
-                                         na.strings = c("", "NA"))
+  colClasses = c("character"),
+  sep = "\t",
+  quote = " ",
+  na.strings = c("", "NA")
+)
 
 
 # Data dictionary/codings helpers -----------------------------------------
@@ -313,12 +347,13 @@ get_colnames_for_fieldids <- function(field_ids,
                                       colname_col = "descriptive_colnames",
                                       scalar_output = FALSE,
                                       error_if_missing = TRUE) {
-
-  col_names <- filter_data_dict(data_dict = data_dict,
-                                filter_col = "FieldID",
-                                filter_value = field_ids,
-                                return_col = colname_col,
-                                error_if_missing = error_if_missing)
+  col_names <- filter_data_dict(
+    data_dict = data_dict,
+    filter_col = "FieldID",
+    filter_value = field_ids,
+    return_col = colname_col,
+    error_if_missing = error_if_missing
+  )
 
   if (scalar_output == TRUE) {
     assertthat::is.scalar(col_names)
@@ -372,7 +407,7 @@ filter_data_dict <- function(data_dict,
       )
     )
   } else if (any(!filter_value %in% data_dict[[filter_col]]) &
-             (error_if_missing == TRUE)) {
+    (error_if_missing == TRUE)) {
     stop(
       paste0(
         "Error! The following values are not present in the data dictionary (under column ",
@@ -443,8 +478,9 @@ assert_integer_ge_1 <- function(x, arg_name) {
 
   # assertion
   assertthat::assert_that(x >= 1,
-                          rlang::is_integerish(x),
-                          msg = error_message)
+    rlang::is_integerish(x),
+    msg = error_message
+  )
 }
 
 #' Assert number is an integer that is greater than or equal to n
@@ -463,15 +499,18 @@ assert_integer_ge_n <- function(x,
                                 arg_name,
                                 n) {
   # custom error message
-  error_message <- paste("Error!",
-                         arg_name,
-                         "must be an integer that is greater than",
-                         n)
+  error_message <- paste(
+    "Error!",
+    arg_name,
+    "must be an integer that is greater than",
+    n
+  )
 
   # assertion
   assertthat::assert_that(x >= n,
-                          rlang::is_integerish(x),
-                          msg = error_message)
+    rlang::is_integerish(x),
+    msg = error_message
+  )
 }
 
 
@@ -499,48 +538,62 @@ identify_overlapping_disease_categories <- function(clinical_codes) {
   stopifnot(is.data.frame(clinical_codes))
 
   # make df of all disease/author and code/code_type combinations
-  overlapping_disease_categories <- data.frame(disease_author = paste(clinical_codes$disease,
-                                                                      clinical_codes$author,
-                                                                      sep = "_DISEASE_AUTHOR_"),
-                                               code_code_type = paste(clinical_codes$code,
-                                                                      clinical_codes$code_type,
-                                                                      sep = "_DISEASE_AUTHOR_"))
+  overlapping_disease_categories <- data.frame(
+    disease_author = paste(clinical_codes$disease,
+      clinical_codes$author,
+      sep = "_DISEASE_AUTHOR_"
+    ),
+    code_code_type = paste(clinical_codes$code,
+      clinical_codes$code_type,
+      sep = "_DISEASE_AUTHOR_"
+    )
+  )
 
   # identify disease/author combinations with non-unique codes
   overlapping_disease_categories <- overlapping_disease_categories %>%
-    dplyr::group_by(.data[["disease_author"]],
-                    .data[["code_code_type"]]) %>%
+    dplyr::group_by(
+      .data[["disease_author"]],
+      .data[["code_code_type"]]
+    ) %>%
     dplyr::mutate(n = dplyr::n()) %>%
     dplyr::filter(.data[["n"]] > 1) %>%
     dplyr::ungroup()
 
   # if any are identified, filter clinical_codes for the relevant rows
   if (nrow(overlapping_disease_categories) > 0) {
-
     overlapping_disease_categories <- overlapping_disease_categories %>%
       tidyr::separate("disease_author",
-                      into = c("disease", "author"),
-                      sep = "_DISEASE_AUTHOR_",
-                      remove = FALSE) %>%
+        into = c("disease", "author"),
+        sep = "_DISEASE_AUTHOR_",
+        remove = FALSE
+      ) %>%
       tidyr::separate("code_code_type",
-                      into = c("code", "code_type"),
-                      sep = "_DISEASE_AUTHOR_")
+        into = c("code", "code_type"),
+        sep = "_DISEASE_AUTHOR_"
+      )
 
     clinical_codes <- clinical_codes %>%
       dplyr::semi_join(overlapping_disease_categories,
-                       by = c("disease", "code_type", "code", "author"))
+        by = c("disease", "code_type", "code", "author")
+      )
 
     # return list containing the subset of clinical_codes with duplicated codes
     # and unique disease_author combinations (both as a vector and a single
     # string for convenience)
-    return(list(clinical_codes = clinical_codes,
-                disease_author = unique(overlapping_disease_categories$disease_author),
-                disease_author_string = unique(overlapping_disease_categories$disease_author) %>%
-                  stringr::str_replace("_DISEASE_AUTHOR_",
-                                       " (") %>%
-                  paste0(")") %>%
-                  stringr::str_c(sep = "",
-                                 collapse = ", ")))
+    return(list(
+      clinical_codes = clinical_codes,
+      disease_author = unique(overlapping_disease_categories$disease_author),
+      disease_author_string = unique(overlapping_disease_categories$disease_author) %>%
+        stringr::str_replace(
+          "_DISEASE_AUTHOR_",
+          " ("
+        ) %>%
+        paste0(")") %>%
+        stringr::str_c(
+          sep = "",
+          collapse = ", "
+        )
+    ))
   } else {
     invisible(NULL)
   }
@@ -551,9 +604,12 @@ identify_overlapping_disease_categories <- function(clinical_codes) {
 check_all_vector_values_unique <- function(x,
                                            x_name) {
   assertthat::assert_that(length(x) == length(unique(x)),
-                          msg = paste0("Error! ",
-                                       x_name,
-                                       " contains non-unique values"))
+    msg = paste0(
+      "Error! ",
+      x_name,
+      " contains non-unique values"
+    )
+  )
 }
 
 #' Check required columns are present
@@ -576,10 +632,13 @@ check_required_cols_exist <- function(df,
     # make print-friendly version of required cols
     # paste(required_cols, collapse = "\n\n")
 
-    stop(paste0("Required columns not present in data. Required cols: ",
-                stringr::str_c(required_cols,
-                               sep = "",
-                               collapse = ", ")))
+    stop(paste0(
+      "Required columns not present in data. Required cols: ",
+      stringr::str_c(required_cols,
+        sep = "",
+        collapse = ", "
+      )
+    ))
   }
 }
 
@@ -603,7 +662,8 @@ rename_cols <- function(df, old_colnames, new_colnames) {
   # validate args
   # colnames(df) must be unique
   assertthat::assert_that(length(names(df)) == length(unique(names(df))),
-                          msg = "Some column names in `df` are duplicated")
+    msg = "Some column names in `df` are duplicated"
+  )
 
   # old_colnames and new_colnames must be type character
   assertthat::is.string(old_colnames)
@@ -611,13 +671,15 @@ rename_cols <- function(df, old_colnames, new_colnames) {
 
   # all old_colnames must be in colnames(df)
   assertthat::assert_that(all(old_colnames %in% names(df)),
-                          msg = "`old_colnames` contains values that are not present in `names(df)`")
+    msg = "`old_colnames` contains values that are not present in `names(df)`"
+  )
 
   # old_colnames and new_colnames must be unique, same length and type character
   assertthat::assert_that((length(old_colnames) == length(unique(old_colnames))) &
-                            (length(new_colnames) == length(unique(new_colnames))) &
-                               (length(new_colnames) == length(old_colnames)),
-                          msg = "`old_colnames` and `new_colnames` must contain unique values only and be of the same length")
+    (length(new_colnames) == length(unique(new_colnames))) &
+    (length(new_colnames) == length(old_colnames)),
+  msg = "`old_colnames` and `new_colnames` must contain unique values only and be of the same length"
+  )
 
   # get indices for old colnames
   old_colname_indices <- old_colnames %>%
@@ -657,27 +719,31 @@ remove_special_characters_and_make_lower_case <- function(string) {
   string <- stringr::str_replace_all(string, "&", "_and_")
 
   # characters to be replaced with "_"
-  to_underscore <- c("-",
-                     "\\s",
-                     "/",
-                     "\\.")
+  to_underscore <- c(
+    "-",
+    "\\s",
+    "/",
+    "\\."
+  )
 
   for (char in to_underscore) {
     string <- stringr::str_replace_all(string, char, "_")
   }
 
   # characters to replace with "" (i.e. to remove)
-  to_remove <- c("\\(",
-                 "\\)",
-                 "\\-",
-                 ",",
-                 ":",
-                 "`",
-                 "#",
-                 "\\[",
-                 "\\]",
-                 "_+$",
-                 "'")
+  to_remove <- c(
+    "\\(",
+    "\\)",
+    "\\-",
+    ",",
+    ":",
+    "`",
+    "#",
+    "\\[",
+    "\\]",
+    "_+$",
+    "'"
+  )
 
   for (char in to_remove) {
     string <- stringr::str_replace_all(string, char, "")
@@ -688,8 +754,9 @@ remove_special_characters_and_make_lower_case <- function(string) {
 
   # add 'x' at start if first character is a digit
   string <- ifelse(stringr::str_detect(string, "^[:digit:]+"),
-                   yes = paste0("x", string),
-                   no = string)
+    yes = paste0("x", string),
+    no = string
+  )
 
   # remove any repeated '_' (this should go last)
   string <- stringr::str_replace_all(string, "__+", "_")
@@ -732,7 +799,8 @@ revalue_vector <-
 
     # raise an error if column is not character/numeric/integer
     assertthat::assert_that(all(class(x) %in% c("numeric", "integer", "character", "ordered", "haven_labelled", "vctrs_vctr")),
-                            msg = paste("Error! Selected column must be of type numeric/integer/character/haven_labelled. x is type:", class(x)))
+      msg = paste("Error! Selected column must be of type numeric/integer/character/haven_labelled. x is type:", class(x))
+    )
 
     # `dict` is a named vector - check the names (keys) are unique
     if (length(unique(names(dict))) != length(dict)) {
@@ -746,7 +814,7 @@ revalue_vector <-
 
     # get any values not incldued in dict
     vals_missing_from_dict <-
-      subset(x,!(x %in% names(dict)))
+      subset(x, !(x %in% names(dict)))
 
     # strict - error if dict does not include all values in x
     if (strict) {
@@ -776,14 +844,14 @@ revalue_vector <-
     if (is.null(default_value)) {
       # if old value is not in `dict`, then keep unchanged
 
-      x <-  ifelse(
+      x <- ifelse(
         test = (x %in% names(dict)),
         yes = dict[x],
         no = x
       )
     } else {
       # if old value is not in `dict`, then change to default_value
-      x <-  ifelse(
+      x <- ifelse(
         test = (x %in% names(dict)),
         yes = dict[x],
         no = default_value
@@ -801,11 +869,15 @@ extract_file_ext <- function(x) {
 extract_fid_instance_array_from_descriptive_or_processed_colheaders <-
   function(colheaders) {
     ukb_descriptive_format_indices <-
-      stringr::str_which(string = colheaders,
-                         pattern = "^.*_*f[:digit:]+(_[:digit:]+){0,2}$")
+      stringr::str_which(
+        string = colheaders,
+        pattern = "^.*_*f[:digit:]+(_[:digit:]+){0,2}$"
+      )
     colheaders[ukb_descriptive_format_indices] <-
-      stringr::str_extract(string = colheaders[ukb_descriptive_format_indices],
-                           pattern = "f[:digit:]+(_[:digit:]+)*$")
+      stringr::str_extract(
+        string = colheaders[ukb_descriptive_format_indices],
+        pattern = "f[:digit:]+(_[:digit:]+)*$"
+      )
 
     return(colheaders)
   }
@@ -830,26 +902,32 @@ colname_to_field_inst_array_df <- function(x) {
     stringr::str_remove("^f")
 
   # make description column (descriptive colname minus fieldid_instance_array)
-  x$description <- stringr::str_remove(x$colnames,
-                                       paste0("_?f", x$fieldid_instance_array))
+  x$description <- stringr::str_remove(
+    x$colnames,
+    paste0("_?f", x$fieldid_instance_array)
+  )
 
   # separate into field_id, instance and array
   x <- x %>%
-    tidyr::separate(col = "fieldid_instance_array",
-                    into = c("fieldid", "instance", "array"),
-                    sep = "_",
-                    remove = FALSE,
-                    fill = "right")
+    tidyr::separate(
+      col = "fieldid_instance_array",
+      into = c("fieldid", "instance", "array"),
+      sep = "_",
+      remove = FALSE,
+      fill = "right"
+    )
 
   # mutate cols with all possible combinations
-  final_col_order <- c("colnames",
-                       "description",
-                       "fieldid_instance_array",
-                       "fieldid",
-                       "instance",
-                       "array",
-                       "fieldid_instance",
-                       "instance_array")
+  final_col_order <- c(
+    "colnames",
+    "description",
+    "fieldid_instance_array",
+    "fieldid",
+    "instance",
+    "array",
+    "fieldid_instance",
+    "instance_array"
+  )
 
   x <- x %>%
     tidyr::unite(
@@ -867,17 +945,22 @@ colname_to_field_inst_array_df <- function(x) {
       na.rm = TRUE
     ) %>%
     # set empty values to 'NA'
-    dplyr::mutate(dplyr::across(tidyselect::everything(),
-                                ~ ifelse(.x == "",
-                                         yes = NA,
-                                         no = .x))) %>%
+    dplyr::mutate(dplyr::across(
+      tidyselect::everything(),
+      ~ ifelse(.x == "",
+        yes = NA,
+        no = .x
+      )
+    )) %>%
     # rearrange
     dplyr::select(tidyselect::all_of(final_col_order))
 
-    # check expected number of cols present (to update if function is amended in
-    # future)
-    assertthat::are_equal(length(names(x)),
-                          length(final_col_order))
+  # check expected number of cols present (to update if function is amended in
+  # future)
+  assertthat::are_equal(
+    length(names(x)),
+    length(final_col_order)
+  )
 
   return(x)
 }
@@ -899,7 +982,7 @@ make_empty_clinical_codes_list <- function() {
   CLINICAL_EVENTS_SOURCES$data_coding %>%
     unique() %>%
     purrr::set_names() %>%
-    purrr::map( ~ NULL)
+    purrr::map(~NULL)
 }
 
 check_if_all_list_items_are_null <- function(a_list) {
@@ -924,11 +1007,13 @@ time_taken_message <- function(start_time) {
   time_taken <- proc.time() - start_time
 
   # display message
-  message("Time taken: ",
-          (time_taken[3] %/% 60),
-          " minutes, ",
-          (round(time_taken[3] %% 60)),
-          " seconds.")
+  message(
+    "Time taken: ",
+    (time_taken[3] %/% 60),
+    " minutes, ",
+    (round(time_taken[3] %% 60)),
+    " seconds."
+  )
 }
 
 summarise_first_non_na <- function(df,
@@ -944,8 +1029,9 @@ summarise_first_non_na <- function(df,
 
   for (i in columns) {
     df[[new_col]] <- ifelse(is.na(df[[new_col]]),
-                              yes = df[[i]],
-                              no = df[[new_col]])
+      yes = df[[i]],
+      no = df[[new_col]]
+    )
   }
 
   return(df)

@@ -41,9 +41,10 @@ dummy_ukb_main_data_dict <- get_ukb_dummy(file_name = "dummy_ukb_main.tsv") %>%
 
 # tidy clinical events
 dummy_ukb_main <- read_ukb(dummy_ukb_data_raw_path,
-                           data_dict = dummy_data_dict,
-                           ukb_data_dict = dummy_ukb_data_dict,
-                           ukb_codings = dummy_ukb_codings)
+  data_dict = dummy_data_dict,
+  ukb_data_dict = dummy_ukb_data_dict,
+  ukb_codings = dummy_ukb_codings
+)
 
 # tidy dummy clinical events
 dummy_clinical_events_list <-
@@ -94,12 +95,12 @@ dummy_Data_Dictionary_Showcase %>%
 dummy_Codings <- ukb_codings %>%
   # keep codings in dummy data dict, and 609 (map from self-reported non-cancer
   # illness to ICD10)
-  filter(Coding %in% c("609",
-                       dummy_ukb_main_data_dict$Coding)) %>%
-
+  filter(Coding %in% c(
+    "609",
+    dummy_ukb_main_data_dict$Coding
+  )) %>%
   # do not include ICD/Read/OPCS4 codings
   filter(!Coding %in% large_codings) %>%
-
   # add in selected_large_codings
   bind_rows(selected_large_codings)
 

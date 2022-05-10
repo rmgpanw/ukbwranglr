@@ -17,17 +17,21 @@
 
 # CONSTANTS ---------------------------------------------------------------
 
-CLINICAL_EVENTS_COLHEADERS <- c("eid",
-                                "source",
-                                "index",
-                                "code",
-                                "date")
+CLINICAL_EVENTS_COLHEADERS <- c(
+  "eid",
+  "source",
+  "index",
+  "code",
+  "date"
+)
 
-CLINICAL_EVENTS_COLTYPES <- c("numeric",
-                              "character",
-                              "character",
-                              "character",
-                              "character")
+CLINICAL_EVENTS_COLTYPES <- c(
+  "numeric",
+  "character",
+  "character",
+  "character",
+  "character"
+)
 
 # EXPORTED FUNCTIONS ----------------------------------------------------
 
@@ -56,8 +60,8 @@ CLINICAL_EVENTS_COLTYPES <- c("numeric",
 #' @examples
 #' # dummy data
 #' dummy_ukb_main <- tibble::tribble(
-#' ~ eid, ~ dob, ~ event_date,
-#' 1, "2000-01-01", "2010-01-01"
+#'   ~eid, ~dob, ~event_date,
+#'   1, "2000-01-01", "2010-01-01"
 #' )
 #'
 #' # mutate age at event col
@@ -99,11 +103,12 @@ mutate_age_at_event_cols <- function(ukb_main,
       new_colname
     ))
     ukb_main[[new_colname]] <-
-      lubridate::time_length(as.Date(ukb_main[[column]]) - as.Date(ukb_main[[dob_col]]), unit = 'year')
+      lubridate::time_length(as.Date(ukb_main[[column]]) - as.Date(ukb_main[[dob_col]]), unit = "year")
 
     new_colname_label <- stringr::str_replace(attributes(ukb_main[[column]])$label,
-                                              pattern = "date (.+)$",
-                                              replacement = "age")
+      pattern = "date (.+)$",
+      replacement = "age"
+    )
 
     if (!rlang::is_empty(new_colname_label)) {
       attributes(ukb_main[[new_colname]])$label <- new_colname_label
@@ -188,16 +193,14 @@ mutate_age_at_event_cols <- function(ukb_main,
 #' # returns a named list of data frames, one for each category in
 #' # lower case, and one for the overall disease in capitals
 #' cases
-extract_phenotypes <- function(
-  clinical_events,
-  clinical_codes,
-  data_sources = NULL,
-  min_max = "min",
-  colnames_prefix = NULL,
-  labels_prefix = NULL,
-  workers = NULL,
-  keep_all = FALSE
-) {
+extract_phenotypes <- function(clinical_events,
+                               clinical_codes,
+                               data_sources = NULL,
+                               min_max = "min",
+                               colnames_prefix = NULL,
+                               labels_prefix = NULL,
+                               workers = NULL,
+                               keep_all = FALSE) {
   start_time <- proc.time()
 
   # validate args
@@ -206,15 +209,20 @@ extract_phenotypes <- function(
 
   if (!is.null(data_sources)) {
     assertthat::assert_that(is.character(data_sources),
-                            msg = "Error! `data_sources` should be either `NULL` or a character vector")
+      msg = "Error! `data_sources` should be either `NULL` or a character vector"
+    )
     assertthat::assert_that(length(data_sources) == length(unique(data_sources)),
-                            msg = "Error! `data_sources` contains duplicated values")
+      msg = "Error! `data_sources` contains duplicated values"
+    )
     assertthat::assert_that(sum(is.na(data_sources)) == 0,
-                            msg = "Error! `NA` values are present in `data_sources`")
+      msg = "Error! `NA` values are present in `data_sources`"
+    )
 
     invalid_data_sources <-
-      subset(data_sources,
-             !data_sources %in% CLINICAL_EVENTS_SOURCES$source)
+      subset(
+        data_sources,
+        !data_sources %in% CLINICAL_EVENTS_SOURCES$source
+      )
     if (!rlang::is_empty(invalid_data_sources)) {
       stop(
         paste0(
@@ -281,7 +289,7 @@ extract_phenotypes <- function(
   # need to extract the SQLite db path and table name. Non-exportable objects
   # (like db connections) won't work with parallel processing
   if ((clinical_events_type == "tbl_dbi") &
-      !is.null(workers)) {
+    !is.null(workers)) {
 
     # get db_path and table_name from clinical_events
 
@@ -294,7 +302,7 @@ extract_phenotypes <- function(
     table_name <- gsub("`", "", as.character(clinical_events$op$x))[1]
 
     result <- unique(clinical_codes$disease) %>%
-      furrr::future_imap( ~ {
+      furrr::future_imap(~ {
         mapper_fn(
           .x,
           db_path = db_path,
@@ -310,44 +318,43 @@ extract_phenotypes <- function(
         )
       },
       .progress = TRUE,
-      seed = TRUE)
+      seed = TRUE
+      )
 
     # clinical_events: df -----
   } else if ((clinical_events_type == "df") &
-             !is.null(workers)) {
+    !is.null(workers)) {
+    result <- unique(clinical_codes$disease) %>%
+      furrr::future_imap(~ mapper_fn(
+        .x,
+        clinical_events = clinical_events,
+        clinical_codes = clinical_codes,
+        data_sources = data_sources,
+        min_max = min_max,
+        colnames_prefix = colnames_prefix,
+        labels_prefix = labels_prefix,
+        counter = .y,
+        keep_all = keep_all
+      ),
+      .progress = TRUE,
+      seed = TRUE
+      )
 
-  result <- unique(clinical_codes$disease) %>%
-    furrr::future_imap(~ mapper_fn(
-      .x,
-      clinical_events = clinical_events,
-      clinical_codes = clinical_codes,
-      data_sources = data_sources,
-      min_max = min_max,
-      colnames_prefix = colnames_prefix,
-      labels_prefix = labels_prefix,
-      counter = .y,
-      keep_all = keep_all
-    ),
-    .progress = TRUE,
-    seed = TRUE)
-
-  # SEQUENTIAL PROCESSING -----
+    # SEQUENTIAL PROCESSING -----
   } else if (is.null(workers)) {
-
-      result <- unique(clinical_codes$disease) %>%
-        purrr::imap(~ mapper_fn(
-          .x,
-          clinical_events = clinical_events,
-          clinical_codes = clinical_codes,
-          data_sources = data_sources,
-          min_max = min_max,
-          colnames_prefix = colnames_prefix,
-          labels_prefix = labels_prefix,
-          counter = .y,
-          keep_all = keep_all
-        ))
-
-    } else {
+    result <- unique(clinical_codes$disease) %>%
+      purrr::imap(~ mapper_fn(
+        .x,
+        clinical_events = clinical_events,
+        clinical_codes = clinical_codes,
+        data_sources = data_sources,
+        min_max = min_max,
+        colnames_prefix = colnames_prefix,
+        labels_prefix = labels_prefix,
+        counter = .y,
+        keep_all = keep_all
+      ))
+  } else {
     stop("Unexpected error! Please raise an issue at https://github.com/rmgpanw/ukbwranglr/issues")
   }
 
@@ -461,25 +468,32 @@ tidy_clinical_events <- function(ukb_main,
                                    "summary_hes_opcs4"
                                  ),
                                  strict = TRUE,
-                                 .details_only = FALSE
-) {
+                                 .details_only = FALSE) {
 
   # validate args
   assertthat::assert_that(length(clinical_events_sources) == length(unique(clinical_events_sources)),
-                          msg = "Error! `clinical_events_sources` contains duplicate values")
+    msg = "Error! `clinical_events_sources` contains duplicate values"
+  )
 
-  unrecognised_clinical_events <- subset(clinical_events_sources,
-                                         !clinical_events_sources %in% names(CLINICAL_EVENTS_FIELD_IDS))
+  unrecognised_clinical_events <- subset(
+    clinical_events_sources,
+    !clinical_events_sources %in% names(CLINICAL_EVENTS_FIELD_IDS)
+  )
 
   assertthat::assert_that(rlang::is_empty(unrecognised_clinical_events),
-                          msg = paste0("Error! `clinical_events_sources` includes unrecognised values: ",
-                                       stringr::str_c(unrecognised_clinical_events,
-                                                      sep = "",
-                                                      collapse = ", "),
-                                       ". Please choose from: ",
-                                       stringr::str_c(names(CLINICAL_EVENTS_FIELD_IDS),
-                                                      sep = "",
-                                                      collapse = ", ")))
+    msg = paste0(
+      "Error! `clinical_events_sources` includes unrecognised values: ",
+      stringr::str_c(unrecognised_clinical_events,
+        sep = "",
+        collapse = ", "
+      ),
+      ". Please choose from: ",
+      stringr::str_c(names(CLINICAL_EVENTS_FIELD_IDS),
+        sep = "",
+        collapse = ", "
+      )
+    )
+  )
 
   # if required field IDs requested
   if (.details_only) {
@@ -493,7 +507,7 @@ tidy_clinical_events <- function(ukb_main,
     msg = "Error! `ukb_main` must be a data frame"
   )
 
-  if (! data.table::is.data.table(ukb_main)) {
+  if (!data.table::is.data.table(ukb_main)) {
     warning("`ukb_main` must be a data table, attempting to coerce...")
     ukb_main <- data.table::as.data.table(ukb_main)
   }
@@ -505,7 +519,8 @@ tidy_clinical_events <- function(ukb_main,
 
   # make data dictionary
   data_dict <- make_data_dict(ukb_main,
-                              ukb_data_dict = ukb_data_dict)
+    ukb_data_dict = ukb_data_dict
+  )
 
   # check if required columns are present
   filter_data_dict_safely <- purrr::safely(filter_data_dict)
@@ -547,25 +562,30 @@ tidy_clinical_events <- function(ukb_main,
         warning(paste0("Warning! ", missing_required_cols_message))
         # subset for available clinical events only
         clinical_events_sources <- subset(clinical_events_sources,
-                                  subset = !(clinical_events_sources %in% clinical_events_with_missing_required_cols))
+          subset = !(clinical_events_sources %in% clinical_events_with_missing_required_cols)
+        )
       }
     }
   }
 
   # To use in loop below - determine how event_type should be processed
-  death_cancer_summary_hes_self_report_meds <- c("cancer_register_icd9",
-                              "cancer_register_icd10",
-                              "summary_hes_icd9",
-                              "summary_hes_icd10",
-                              "summary_hes_opcs3",
-                              "summary_hes_opcs4",
-                              "primary_death_icd10",
-                              "secondary_death_icd10",
-                              "self_report_medication")
+  death_cancer_summary_hes_self_report_meds <- c(
+    "cancer_register_icd9",
+    "cancer_register_icd10",
+    "summary_hes_icd9",
+    "summary_hes_icd10",
+    "summary_hes_opcs3",
+    "summary_hes_opcs4",
+    "primary_death_icd10",
+    "secondary_death_icd10",
+    "self_report_medication"
+  )
 
-  self_report <- c("self_report_non_cancer",
-                   "self_report_cancer",
-                   "self_report_operation")
+  self_report <- c(
+    "self_report_non_cancer",
+    "self_report_cancer",
+    "self_report_operation"
+  )
   self_report_non_cancer_icd10 <- "self_report_non_cancer_icd10"
 
   # (internal check that all options are covered)
@@ -575,7 +595,8 @@ tidy_clinical_events <- function(ukb_main,
       self_report,
       self_report_non_cancer_icd10
     )),
-    sort(names(CLINICAL_EVENTS_FIELD_IDS)))
+    sort(names(CLINICAL_EVENTS_FIELD_IDS))
+  )
 
   # make empty list for results
   result <- vector(mode = "list", length = length(clinical_events_sources))
@@ -593,43 +614,47 @@ tidy_clinical_events <- function(ukb_main,
     )
 
     # tidy clinical events
-    result[[event_type]] <- switch(
-      tidying_option,
-
-      self_report = tidy_clinical_events_basis(ukb_main = ukb_main,
-                                               data_dict = data_dict,
-                                               ukb_codings = ukb_codings,
-                                               data_dict_colname_col = "colheaders_raw",
-                                               code_col_field_id = CLINICAL_EVENTS_FIELD_IDS[[event_type]]["code_fid"],
-                                               date_col_field_id = CLINICAL_EVENTS_FIELD_IDS[[event_type]]["date_fid"]) %>%
+    result[[event_type]] <- switch(tidying_option,
+      self_report = tidy_clinical_events_basis(
+        ukb_main = ukb_main,
+        data_dict = data_dict,
+        ukb_codings = ukb_codings,
+        data_dict_colname_col = "colheaders_raw",
+        code_col_field_id = CLINICAL_EVENTS_FIELD_IDS[[event_type]]["code_fid"],
+        date_col_field_id = CLINICAL_EVENTS_FIELD_IDS[[event_type]]["date_fid"]
+      ) %>%
         make_self_report_special_decimal_dates_na() %>%
         dplyr::mutate("date" = as.character(
           lubridate::as_date(
             lubridate::date_decimal(as.numeric(.data[["date"]]))
-            )
-          )),
-
-      self_report_non_cancer_icd10 = tidy_clinical_events_basis(ukb_main = ukb_main,
-                                                                data_dict = data_dict,
-                                                                ukb_codings = ukb_codings,
-                                                                data_dict_colname_col = "colheaders_raw",
-                                                                code_col_field_id = CLINICAL_EVENTS_FIELD_IDS[[event_type]]["code_fid"],
-                                                                date_col_field_id = CLINICAL_EVENTS_FIELD_IDS[[event_type]]["date_fid"]) %>%
+          )
+        )),
+      self_report_non_cancer_icd10 = tidy_clinical_events_basis(
+        ukb_main = ukb_main,
+        data_dict = data_dict,
+        ukb_codings = ukb_codings,
+        data_dict_colname_col = "colheaders_raw",
+        code_col_field_id = CLINICAL_EVENTS_FIELD_IDS[[event_type]]["code_fid"],
+        date_col_field_id = CLINICAL_EVENTS_FIELD_IDS[[event_type]]["date_fid"]
+      ) %>%
         make_self_report_special_decimal_dates_na() %>%
         dplyr::mutate("date" = as.character(
           lubridate::as_date(
             lubridate::date_decimal(as.numeric(.data[["date"]]))
           )
         )) %>%
-        recode_self_report_non_cancer_diagnoses_to_icd10(data_dict = data_dict,
-                                                         ukb_codings = ukb_codings),
-
-      death_cancer_summary_hes_self_report_meds = tidy_clinical_events_basis(ukb_main = ukb_main,
-                                                          data_dict = data_dict,
-                                                          ukb_codings = ukb_codings,
-                                                          data_dict_colname_col = "colheaders_raw",
-                                                          code_col_field_id = CLINICAL_EVENTS_FIELD_IDS[[event_type]]["code_fid"],
-                                                          date_col_field_id = CLINICAL_EVENTS_FIELD_IDS[[event_type]]["date_fid"])
+        recode_self_report_non_cancer_diagnoses_to_icd10(
+          data_dict = data_dict,
+          ukb_codings = ukb_codings
+        ),
+      death_cancer_summary_hes_self_report_meds = tidy_clinical_events_basis(
+        ukb_main = ukb_main,
+        data_dict = data_dict,
+        ukb_codings = ukb_codings,
+        data_dict_colname_col = "colheaders_raw",
+        code_col_field_id = CLINICAL_EVENTS_FIELD_IDS[[event_type]]["code_fid"],
+        date_col_field_id = CLINICAL_EVENTS_FIELD_IDS[[event_type]]["date_fid"]
+      )
     )
   }
 
@@ -664,7 +689,7 @@ tidy_clinical_events <- function(ukb_main,
 #' example_clinical_codes()
 example_clinical_codes <- function() {
   tibble::tribble(
-    ~ disease, ~ description, ~ category, ~ code_type, ~ code, ~ author,
+    ~disease, ~description, ~category, ~code_type, ~code, ~author,
     "Diabetes", "diabetes", "Diabetes unspecified", "data_coding_6", "1220", "ukbwr",
     "Diabetes", "gestational diabetes", "Gestational diabetes", "data_coding_6", "1221", "ukbwr",
     "Diabetes", "type 1 diabetes", "Type 1 DM", "data_coding_6", "1222", "ukbwr",
@@ -702,11 +727,11 @@ example_clinical_codes <- function() {
 #' @return A data table with 'eid', 'source' (Field ID for the code column),
 #'   'index' (instance_array), 'code' and 'date' columns.
 tidy_clinical_events_basis <- function(ukb_main,
-                                   data_dict,
-                                   data_dict_colname_col,
-                                   ukb_codings,
-                                   code_col_field_id,
-                                   date_col_field_id) {
+                                       data_dict,
+                                       data_dict_colname_col,
+                                       ukb_codings,
+                                       code_col_field_id,
+                                       date_col_field_id) {
   start_time <- proc.time()
 
   assertthat::assert_that(
@@ -728,17 +753,21 @@ tidy_clinical_events_basis <- function(ukb_main,
   )
 
   # get lists of required columns
-  code_cols <- filter_data_dict(data_dict = data_dict,
-                                filter_col = "FieldID",
-                                filter_value = code_col_field_id,
-                                return_col = data_dict_colname_col,
-                                error_if_missing = TRUE)
+  code_cols <- filter_data_dict(
+    data_dict = data_dict,
+    filter_col = "FieldID",
+    filter_value = code_col_field_id,
+    return_col = data_dict_colname_col,
+    error_if_missing = TRUE
+  )
 
-  date_cols <- filter_data_dict(data_dict = data_dict,
-                                filter_col = "FieldID",
-                                filter_value = date_col_field_id,
-                                return_col = data_dict_colname_col,
-                                error_if_missing = TRUE)
+  date_cols <- filter_data_dict(
+    data_dict = data_dict,
+    filter_col = "FieldID",
+    filter_value = date_col_field_id,
+    return_col = data_dict_colname_col,
+    error_if_missing = TRUE
+  )
 
   # Note: `code_cols` and `date_cols` may be of different lengths e.g. try searching
   # the UKB data showcase for FieldIDs 40005 (date of cancer diagnosis) and
@@ -778,22 +807,25 @@ tidy_clinical_events_basis <- function(ukb_main,
 
   colnames_df <- code_cols_instance_arrays %>%
     dplyr::left_join(date_cols_instance_arrays,
-                     by = JOIN_COL,
-                     suffix = c(".code", ".date")) %>%
+      by = JOIN_COL,
+      suffix = c(".code", ".date")
+    ) %>%
     dplyr::arrange(as.numeric(.data[[ARRANGE_COL]])) %>%
     tibble::rownames_to_column() %>%
     dplyr::mutate("rowname" = as.integer(.data[["rowname"]]))
 
   assertthat::assert_that(!is.null(colnames_df$colnames.date),
-                          msg = "Error! in `tidy_clinical_events_basis`. Please raise an issue at https://github.com/rmgpanw/ukbwranglr/issues")
+    msg = "Error! in `tidy_clinical_events_basis`. Please raise an issue at https://github.com/rmgpanw/ukbwranglr/issues"
+  )
 
   assertthat::assert_that(
     sum(is.na(colnames_df$colnames.date)) == 0,
     msg = paste0(
       "Error! Some date columns appear to be missing. Check that all columns for Field ID ",
       stringr::str_c(code_col_field_id,
-                     sep = "",
-                     collapse = ", "),
+        sep = "",
+        collapse = ", "
+      ),
       " have a corresponding column for Field ID ",
       date_col_field_id
     )
@@ -804,9 +836,11 @@ tidy_clinical_events_basis <- function(ukb_main,
   date_cols <- colnames_df$colnames.date
 
   # check these are actually present in ukb_main
-  check_required_cols_exist(df = ukb_main,
-                            code_cols,
-                            date_cols)
+  check_required_cols_exist(
+    df = ukb_main,
+    code_cols,
+    date_cols
+  )
 
   # melt cols
   ukb_main <- data.table::melt(
@@ -818,25 +852,32 @@ tidy_clinical_events_basis <- function(ukb_main,
   # add instance_array col
   ukb_main$variable <- revalue_vector(
     x = as.integer(ukb_main$variable),
-    dict = stats::setNames(object = colnames_df[[INSTANCE_ARRAY_COL]],
-                           nm = colnames_df$rowname),
+    dict = stats::setNames(
+      object = colnames_df[[INSTANCE_ARRAY_COL]],
+      nm = colnames_df$rowname
+    ),
     default_value = NULL,
     suppress_warnings = FALSE,
     strict = TRUE
   )
 
   # check for empty values in code column. If present, convert to `NA` and raise warning
-  n_empty_strings_code_col <- sum(stringr::str_detect(ukb_main$code,
-                                                      "^\\s*$"),
-                                  na.rm = TRUE)
+  n_empty_strings_code_col <- sum(stringr::str_detect(
+    ukb_main$code,
+    "^\\s*$"
+  ),
+  na.rm = TRUE
+  )
 
   if (n_empty_strings_code_col > 0) {
     warning(paste0("Detected ", n_empty_strings_code_col, " empty code values (e.g. '', ' '), these will be removed"))
   }
 
   # remove `NA` and empty string code values
-  ukb_main <- ukb_main[!(is.na(ukb_main$code) | (stringr::str_detect(ukb_main$code,
-                                                                    "^\\s*$")))]
+  ukb_main <- ukb_main[!(is.na(ukb_main$code) | (stringr::str_detect(
+    ukb_main$code,
+    "^\\s*$"
+  )))]
 
   # make 'source' col
   ukb_main$source <- paste0("f", code_col_field_id)
@@ -863,7 +904,7 @@ recode_self_report_non_cancer_diagnoses_to_icd10 <-
     # recode to ICD10
     mapping_df <- ukb_codings %>%
       dplyr::filter(.data[["Coding"]] == 609 &
-                      .data[["Value"]] != -1) %>%
+        .data[["Value"]] != -1) %>%
       dplyr::select(tidyselect::all_of(c("Value", "Meaning")))
 
     dict <- mapping_df$Meaning
@@ -892,7 +933,7 @@ make_self_report_special_decimal_dates_na <- function(df) {
   # special dates to remove
   # FID 20006 and 20008; https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=20008
   # https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=20006
-  self_report_cancer_and_non_cancer_diagnoses_special_dates <- c(-3,-1)
+  self_report_cancer_and_non_cancer_diagnoses_special_dates <- c(-3, -1)
 
   # remove special dates
   df$date <- ifelse(
@@ -917,7 +958,8 @@ validate_clinical_events_and_check_type <- function(clinical_events) {
   }
 
   assertthat::assert_that(clinical_events_type %in% c("tbl_dbi", "df"),
-                          msg = "Error! clinical_events must either be a data frame or a tbl_dbi object")
+    msg = "Error! clinical_events must either be a data frame or a tbl_dbi object"
+  )
 
   # check colheaders
   assertthat::assert_that(
@@ -939,8 +981,9 @@ validate_clinical_events_and_check_type <- function(clinical_events) {
     purrr::map_chr(class)
 
   clinical_events_column_types[1] <- ifelse(clinical_events_column_types[1] == "integer",
-                                            yes = "numeric",
-                                            no = clinical_events_column_types[1])
+    yes = "numeric",
+    no = clinical_events_column_types[1]
+  )
 
   assertthat::assert_that(
     all(CLINICAL_EVENTS_COLTYPES == clinical_events_column_types),
@@ -989,13 +1032,13 @@ extract_phenotypes_single_disease <-
            colnames_prefix,
            labels_prefix,
            keep_all) {
-
     start_time <- proc.time()
 
     # validate args
     assertthat::is.string(disease)
     assertthat::assert_that(disease %in% clinical_codes$disease,
-                            msg = "Error! disease not present in clinical_codes$disease")
+      msg = "Error! disease not present in clinical_codes$disease"
+    )
 
 
     # general set up ------------------------------------------------------------------
@@ -1007,8 +1050,7 @@ extract_phenotypes_single_disease <-
     clinical_codes <- clinical_codes[clinical_codes$disease == disease, ]
 
     assertthat::assert_that(
-      !(disease %in% clinical_codes$category)
-      ,
+      !(disease %in% clinical_codes$category),
       msg = paste0(
         "Error! ",
         disease,
@@ -1019,9 +1061,11 @@ extract_phenotypes_single_disease <-
     # prepare clinical_codes so that overall summary columns (i.e. including all
     # codes across all categories for the disease) are also created in upper
     # case
-    clinical_codes <- dplyr::bind_rows(clinical_codes,
-                                          clinical_codes %>%
-                                            dplyr::mutate("category" = disease))
+    clinical_codes <- dplyr::bind_rows(
+      clinical_codes,
+      clinical_codes %>%
+        dplyr::mutate("category" = disease)
+    )
 
     # clinical_codes$category: remove special characters and convert to lower
     # case. This will be used to label the columns with
@@ -1030,9 +1074,11 @@ extract_phenotypes_single_disease <-
       remove_special_characters_and_make_lower_case(clinical_codes$category)
 
     clinical_codes$phenotype_colname <-
-      paste0(clinical_codes$phenotype_colname,
-             "_",
-             clinical_codes$author)
+      paste0(
+        clinical_codes$phenotype_colname,
+        "_",
+        clinical_codes$author
+      )
 
     clinical_codes$phenotype_colname <-
       ifelse(
@@ -1050,8 +1096,10 @@ extract_phenotypes_single_disease <-
     # make 2 named lists of code lists for each phenotype: 1 will contain code
     # lists, the other will contain the results from
     # `extract_first_or_last_clinical_event()`
-    list_of_phenotype_codelists <- vector(mode = "list",
-                                          length = length(unique(clinical_codes$phenotype_colname)))
+    list_of_phenotype_codelists <- vector(
+      mode = "list",
+      length = length(unique(clinical_codes$phenotype_colname))
+    )
     names(list_of_phenotype_codelists) <-
       sort(unique(clinical_codes$phenotype_colname))
 
@@ -1113,7 +1161,8 @@ extract_phenotypes_single_disease <-
     # this is used in the loop to get the label for a `phenotype_colname`
     phenotype_colname_to_phenotype <- clinical_codes %>%
       dplyr::distinct(phenotype_colname,
-                      .keep_all = TRUE) %>%
+        .keep_all = TRUE
+      ) %>%
       split(.$phenotype_colname) %>%
       purrr::map_chr(~ .x[["category"]])
 
@@ -1139,24 +1188,24 @@ extract_phenotypes_single_disease <-
       }
 
       # get result
-       result <- extract_clinical_events(
-          clinical_events = clinical_events,
-          clinical_codes_list = list_of_phenotype_codelists[[phenotype_colname]],
-          phenotype_colname = phenotype_colname,
-          phenotype = variable_label,
-          min_max = min_max,
-          keep_all = keep_all
-        )
+      result <- extract_clinical_events(
+        clinical_events = clinical_events,
+        clinical_codes_list = list_of_phenotype_codelists[[phenotype_colname]],
+        phenotype_colname = phenotype_colname,
+        phenotype = variable_label,
+        min_max = min_max,
+        keep_all = keep_all
+      )
 
-       # if result is `NULL`, it must be assigned as a list with single square
-       # brackets, otherwise it will remove this item will be completely removed
-       # from the list. See this stackoverflow post:
-       # https://stackoverflow.com/a/7945259
-       if (is.null(result)) {
-         list_of_phenotype_results[phenotype_colname] <- list(NULL)
-       } else {
-         list_of_phenotype_results[[phenotype_colname]] <- result
-       }
+      # if result is `NULL`, it must be assigned as a list with single square
+      # brackets, otherwise it will remove this item will be completely removed
+      # from the list. See this stackoverflow post:
+      # https://stackoverflow.com/a/7945259
+      if (is.null(result)) {
+        list_of_phenotype_results[phenotype_colname] <- list(NULL)
+      } else {
+        list_of_phenotype_results[[phenotype_colname]] <- result
+      }
 
       i <- i + 1
       time_taken_message(start_time)
@@ -1211,7 +1260,8 @@ extract_clinical_events <- function(clinical_events,
     clinical_events = clinical_events,
     clinical_codes_list = clinical_codes_list,
     mapping_function = purrr::partial(extract_first_or_last_record_mapper,
-                                      min_max = min_max),
+      min_max = min_max
+    ),
     keep_all = keep_all
   )
 
@@ -1240,8 +1290,10 @@ extract_clinical_events <- function(clinical_events,
   date_colname <- paste0(phenotype_colname, "_", min_max, "_date")
 
   clinical_events <- clinical_events %>%
-    rename_cols(old_colnames = "date",
-                new_colnames = date_colname)
+    rename_cols(
+      old_colnames = "date",
+      new_colnames = date_colname
+    )
 
   attributes(clinical_events[[indicator_colname]])$label <- phenotype
 
@@ -1281,13 +1333,16 @@ extract_single_record <- function(clinical_events,
 
   # validate args
   assertthat::assert_that(is.function(mapping_function),
-                          msg = "`mapping_function` must be a function")
+    msg = "`mapping_function` must be a function"
+  )
 
   # filter clinical events (a df or tbl_dbi object) for codes (a character
   # vector, or a named list of codes)
   clinical_events <-
-    filter_clinical_events(clinical_events = clinical_events,
-                           clinical_codes_list = clinical_codes_list)
+    filter_clinical_events(
+      clinical_events = clinical_events,
+      clinical_codes_list = clinical_codes_list
+    )
 
   # nest by eid and extract earliest date + code (or just a code if no dates
   # available)
@@ -1299,8 +1354,9 @@ extract_single_record <- function(clinical_events,
 
   clinical_events <- clinical_events %>%
     tidyr::separate(.data[["result"]],
-                    into = c("source", "index", "code", "date"),
-                    sep = "_SEP_") %>%
+      into = c("source", "index", "code", "date"),
+      sep = "_SEP_"
+    ) %>%
     suppressWarnings() # separate() raises a warning if there are rows with no dates - suppress these
 
   clinical_events <- clinical_events %>%
@@ -1331,7 +1387,7 @@ filter_clinical_events <- function(clinical_events,
     (all(names(clinical_codes_list) %in% CLINICAL_EVENTS_SOURCES$data_coding)) &
       (length(names(clinical_codes_list)) == length(unique(names(clinical_codes_list)))),
     msg = "Error! Names for clinical_codes_list should be unique and all present in CLINICAL_EVENTS_SOURCES$data_coding"
-    )
+  )
 
   # filter for selected codes
 
@@ -1339,21 +1395,23 @@ filter_clinical_events <- function(clinical_events,
   # CLINICAL_EVENTS_SOURCES$data_coding***
   assertthat::assert_that(all(
     unique(sort(CLINICAL_EVENTS_SOURCES$data_coding)) == sort(c(
-      'bnf',
-      'dmd',
-      'data_coding_3',
-      'data_coding_4',
-      'data_coding_6',
-      'data_coding_5',
-      'icd10',
-      'icd9',
-      'opcs3',
-      'opcs4',
-      'read2',
-      'read3',
-      'read2_drugs'
-    ))),
-    msg = "Error! check code for `CLINICAL_EVENTS_SOURCES$data_coding` and amend the filter statement in this function to address all possible code types")
+      "bnf",
+      "dmd",
+      "data_coding_3",
+      "data_coding_4",
+      "data_coding_6",
+      "data_coding_5",
+      "icd10",
+      "icd9",
+      "opcs3",
+      "opcs4",
+      "read2",
+      "read3",
+      "read2_drugs"
+    ))
+  ),
+  msg = "Error! check code for `CLINICAL_EVENTS_SOURCES$data_coding` and amend the filter statement in this function to address all possible code types"
+  )
 
   # filter Note: for tbl_dbi objects, cannot use
   # `get_sources_for_code_type("icd9")` or `clinical_codes_list$icd9` in the filter statement
@@ -1390,31 +1448,31 @@ filter_clinical_events <- function(clinical_events,
   clinical_events <- clinical_events %>%
     dplyr::filter(
       (.data[["source"]] %in% data_coding_3_sources &
-         .data[["code"]] %in% data_coding_3_codes) |
+        .data[["code"]] %in% data_coding_3_codes) |
         (.data[["source"]] %in% data_coding_6_sources &
-           .data[["code"]] %in% data_coding_6_codes) |
+          .data[["code"]] %in% data_coding_6_codes) |
         (.data[["source"]] %in% data_coding_4_sources &
-           .data[["code"]] %in% data_coding_4_codes) |
+          .data[["code"]] %in% data_coding_4_codes) |
         (.data[["source"]] %in% data_coding_5_sources &
-           .data[["code"]] %in% data_coding_5_codes) |
+          .data[["code"]] %in% data_coding_5_codes) |
         (.data[["source"]] %in% icd9_sources &
-           .data[["code"]] %in% icd9_codes) |
+          .data[["code"]] %in% icd9_codes) |
         (.data[["source"]] %in% icd10_sources &
-           .data[["code"]] %in% icd10_codes) |
+          .data[["code"]] %in% icd10_codes) |
         (.data[["source"]] %in% opcs3_sources &
-           .data[["code"]] %in% opcs3_codes) |
+          .data[["code"]] %in% opcs3_codes) |
         (.data[["source"]] %in% opcs4_sources &
-           .data[["code"]] %in% opcs4_codes) |
+          .data[["code"]] %in% opcs4_codes) |
         (.data[["source"]] %in% read2_sources &
-           .data[["code"]] %in% read2_codes) |
+          .data[["code"]] %in% read2_codes) |
         (.data[["source"]] %in% read3_sources &
-           .data[["code"]] %in% read3_codes) |
+          .data[["code"]] %in% read3_codes) |
         (.data[["source"]] %in% bnf_sources &
-           .data[["code"]] %in% bnf_codes) |
+          .data[["code"]] %in% bnf_codes) |
         (.data[["source"]] %in% dmd_sources &
-           .data[["code"]] %in% dmd_codes) |
+          .data[["code"]] %in% dmd_codes) |
         (.data[["source"]] %in% read2_drugs_sources &
-           .data[["code"]] %in% read2_drugs_codes)
+          .data[["code"]] %in% read2_drugs_codes)
     ) %>%
     dplyr::collect()
 
@@ -1429,25 +1487,28 @@ filter_clinical_events <- function(clinical_events,
 extract_first_or_last_record_mapper <- function(df,
                                                 min_max = "min") {
   # validate args
-  match.arg(arg = min_max,
-            choices = c("min", "max"))
+  match.arg(
+    arg = min_max,
+    choices = c("min", "max")
+  )
 
   # get row index for earliest/latest date. Note, `which.min` and `which.max` do
   # not work with dates as strings
   selected_date <- switch(min_max,
-                          min = which.min(as.Date(df$date)),
-                          max = which.max(as.Date(df$date)))
+    min = which.min(as.Date(df$date)),
+    max = which.max(as.Date(df$date))
+  )
 
   # if there are no dates, return the first row of codes
   if (rlang::is_empty(selected_date)) {
     return(df[1, ] %>%
-             dplyr::select(-date) %>%
-             tidyr::unite("result", sep = "_SEP_", remove = TRUE) %>%
-             .$result)
+      dplyr::select(-date) %>%
+      tidyr::unite("result", sep = "_SEP_", remove = TRUE) %>%
+      .$result)
   }
 
   # otherwise, return first date
-  df[selected_date,] %>%
+  df[selected_date, ] %>%
     tidyr::unite("result", sep = "_SEP_", remove = TRUE) %>%
     .$result
 }
@@ -1465,8 +1526,10 @@ extract_first_or_last_record_mapper <- function(df,
 #' @noRd
 #' @family extract specific diagnostic codes functions
 get_sources_for_code_type <- function(code_type) {
-  match.arg(code_type,
-            CLINICAL_EVENTS_SOURCES$data_coding)
+  match.arg(
+    code_type,
+    CLINICAL_EVENTS_SOURCES$data_coding
+  )
 
   CLINICAL_EVENTS_SOURCES %>%
     dplyr::filter(.data[["data_coding"]] == code_type) %>%

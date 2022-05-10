@@ -11,5 +11,6 @@ n_labels_per_coding <- ukb_codings %>%
   dplyr::count(.data[["Coding"]])
 
 usethis::use_data(n_labels_per_coding,
-                  overwrite = TRUE,
-                  internal = TRUE)
+  overwrite = TRUE,
+  internal = TRUE
+)

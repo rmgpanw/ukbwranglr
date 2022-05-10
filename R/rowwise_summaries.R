@@ -88,17 +88,21 @@ summarise_numerical_variables <- function(ukb_main,
 
   # validate args
   match.arg(summary_function,
-            choices = c("mean", "min", "max", "sum", "n_values"))
+    choices = c("mean", "min", "max", "sum", "n_values")
+  )
 
   match.arg(summarise_by,
-            choices = c("Field", "Instance"))
+    choices = c("Field", "Instance")
+  )
 
   if (is.null(data_dict)) {
     data_dict <- make_data_dict(ukb_main,
-                                ukb_data_dict = ukb_data_dict)
+      ukb_data_dict = ukb_data_dict
+    )
   } else if (!is.null(data_dict)) {
     assertthat::assert_that(all(data_dict$colheaders_raw %in% names(ukb_main)),
-                            msg = "Error! `data_dict` does not match `ukb_main`. All values in `colheaders_raw` should be present in `names(ukb_main)`. Try making a new data dictionary with `make_data_dict()`?")
+      msg = "Error! `data_dict` does not match `ukb_main`. All values in `colheaders_raw` should be present in `names(ukb_main)`. Try making a new data dictionary with `make_data_dict()`?"
+    )
   }
 
   # rowwise summary functions
@@ -120,38 +124,51 @@ summarise_numerical_variables <- function(ukb_main,
   if (summarise_by == "Field") {
     numerical_vars_to_summarise <- numerical_vars_to_summarise %>%
       dplyr::filter(as.numeric(.data[["Instances"]]) > 1) %>%
-      dplyr::mutate(summary_colname = paste0(stringr::str_replace_all(stringr::str_to_title(summary_function),
-                                                                   "_",
-                                                                   " "),
-                                             " ",
-                                             .data[["Field"]],
-                                             " (x",
-                                             .data[["FieldID"]],
-                                             ")"))
+      dplyr::mutate(summary_colname = paste0(
+        stringr::str_replace_all(
+          stringr::str_to_title(summary_function),
+          "_",
+          " "
+        ),
+        " ",
+        .data[["Field"]],
+        " (x",
+        .data[["FieldID"]],
+        ")"
+      ))
   } else if (summarise_by == "Instance") {
     numerical_vars_to_summarise <- numerical_vars_to_summarise %>%
       dplyr::filter(as.numeric(.data[["Array"]]) > 1) %>%
-      dplyr::mutate(summary_colname = paste0(stringr::str_replace_all(stringr::str_to_title(summary_function),
-                                                                   "_",
-                                                                   " "),
-                                             " ",
-                                             .data[["Field"]],
-                                             " (x",
-                                             .data[["FieldID"]],
-                                             " ",
-                                             .data[["instance"]],
-                                             ")"))
+      dplyr::mutate(summary_colname = paste0(
+        stringr::str_replace_all(
+          stringr::str_to_title(summary_function),
+          "_",
+          " "
+        ),
+        " ",
+        .data[["Field"]],
+        " (x",
+        .data[["FieldID"]],
+        " ",
+        .data[["instance"]],
+        ")"
+      ))
   }
 
   # exit if no variables to summarise
   assertthat::assert_that(nrow(numerical_vars_to_summarise) > 0,
-                          msg = paste0("Error! No numerical variables to summarise by ",
-                                       summarise_by,
-                                       ". Check data dictionary - are there any numerical variables with more than one instance/array?"))
+    msg = paste0(
+      "Error! No numerical variables to summarise by ",
+      summarise_by,
+      ". Check data dictionary - are there any numerical variables with more than one instance/array?"
+    )
+  )
 
   # split by new summary col labels
-  numerical_vars_to_summarise <- split(numerical_vars_to_summarise,
-                                       numerical_vars_to_summarise$summary_colname)
+  numerical_vars_to_summarise <- split(
+    numerical_vars_to_summarise,
+    numerical_vars_to_summarise$summary_colname
+  )
 
   # number of summary cols
   message(paste0("Number of summary columns to make: ", length(names(
@@ -159,8 +176,10 @@ summarise_numerical_variables <- function(ukb_main,
   ))))
 
   # progress bar - one tick per summary column
-  pb <- progress::progress_bar$new(format = "[:bar] :current/:total (:percent)",
-                                   total = length(names(numerical_vars_to_summarise)))
+  pb <- progress::progress_bar$new(
+    format = "[:bar] :current/:total (:percent)",
+    total = length(names(numerical_vars_to_summarise))
+  )
   pb$tick(0)
 
   for (new_col in names(numerical_vars_to_summarise)) {

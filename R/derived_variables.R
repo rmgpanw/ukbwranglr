@@ -43,17 +43,19 @@
 #' @export
 #' @examples
 #' ukb_main <- data.frame(eid = 1, f34_0_0 = 1990, f52_0_0 = 1)
-#'  # dummy UKB data dictionary
-#'  dummy_ukb_data_dict <- get_ukb_dummy("dummy_Data_Dictionary_Showcase.tsv")
+#' # dummy UKB data dictionary
+#' dummy_ukb_data_dict <- get_ukb_dummy("dummy_Data_Dictionary_Showcase.tsv")
 #'
-#'  # keep input year/month of birth columns
-#'  derive_dob(ukb_main,
-#'             ukb_data_dict = dummy_ukb_data_dict)
+#' # keep input year/month of birth columns
+#' derive_dob(ukb_main,
+#'   ukb_data_dict = dummy_ukb_data_dict
+#' )
 #'
-#'  # remove input year/month of birth columns
-#'  derive_dob(ukb_main,
-#'             ukb_data_dict = dummy_ukb_data_dict,
-#'             .drop = TRUE)
+#' # remove input year/month of birth columns
+#' derive_dob(ukb_main,
+#'   ukb_data_dict = dummy_ukb_data_dict,
+#'   .drop = TRUE
+#' )
 derive_dob <- function(ukb_main,
                        ukb_data_dict = get_ukb_data_dict(),
                        .drop = FALSE,
@@ -76,11 +78,12 @@ derive_dob <- function(ukb_main,
   }
 
   data_dict <- make_data_dict(ukb_main,
-                              ukb_data_dict = ukb_data_dict)
+    ukb_data_dict = ukb_data_dict
+  )
 
   # select only the 2 required Field IDs
   yob_col <- get_colnames_for_fieldids(
-    field_ids = list_of_details$required_field_ids['yob'],
+    field_ids = list_of_details$required_field_ids["yob"],
     data_dict = data_dict,
     scalar_output = TRUE,
     error_if_missing = TRUE,
@@ -88,7 +91,7 @@ derive_dob <- function(ukb_main,
   )
 
   mob_col <- get_colnames_for_fieldids(
-    field_ids = list_of_details$required_field_ids['mob'],
+    field_ids = list_of_details$required_field_ids["mob"],
     data_dict = data_dict,
     scalar_output = TRUE,
     error_if_missing = TRUE,
@@ -105,9 +108,10 @@ derive_dob <- function(ukb_main,
   new_dob_col <- names(list_of_details$new_columns)
 
   ukb_main[[new_dob_col]] <- paste(ukb_main[[yob_col]],
-                                as.integer(ukb_main[[mob_col]]), # need to extract if a factor integer value e.g. 'January' == 1
-                                01, # first day of month
-                                sep = '-')
+    as.integer(ukb_main[[mob_col]]), # need to extract if a factor integer value e.g. 'January' == 1
+    01, # first day of month
+    sep = "-"
+  )
 
   suppressWarnings(
     ukb_main[[new_dob_col]] <- as.character(lubridate::ymd(ukb_main$dob))
@@ -195,15 +199,19 @@ derive_ethnic_background_simplified <- function(ukb_main,
 
   # validate args
   assertthat::assert_that(!names(list_of_details$new_columns) %in% names(ukb_main),
-                          msg = paste0("Error! `ukb_main` already has a column named ",
-                                       names(list_of_details$new_columns)))
+    msg = paste0(
+      "Error! `ukb_main` already has a column named ",
+      names(list_of_details$new_columns)
+    )
+  )
 
   # get required cols
   data_dict <- make_data_dict(ukb_main,
-                              ukb_data_dict = ukb_data_dict)
+    ukb_data_dict = ukb_data_dict
+  )
 
   ethnic_background_cols <- get_colnames_for_fieldids(
-    field_ids = list_of_details$required_field_ids['ethnic_background'],
+    field_ids = list_of_details$required_field_ids["ethnic_background"],
     data_dict = data_dict,
     scalar_output = FALSE,
     error_if_missing = TRUE,
@@ -221,17 +229,21 @@ derive_ethnic_background_simplified <- function(ukb_main,
     old_ethnic_background_col <- params[i, ][["old_ethnic_background_col"]]
     new_ethnic_background_col <- params[i, ][["new_ethnic_background_col"]]
 
-    ukb_main <- derive_ethnic_background_simplified_single(ukb_main = ukb_main,
-                                               old_ethnic_background_col = old_ethnic_background_col,
-                                               new_ethnic_background_col = new_ethnic_background_col,
-                                               ethnicity_levels = ethnicity_levels,
-                                               .details_only = FALSE)
+    ukb_main <- derive_ethnic_background_simplified_single(
+      ukb_main = ukb_main,
+      old_ethnic_background_col = old_ethnic_background_col,
+      new_ethnic_background_col = new_ethnic_background_col,
+      ethnicity_levels = ethnicity_levels,
+      .details_only = FALSE
+    )
   }
 
   # create single summary col - take the first non-missing value
-  ukb_main <- summarise_first_non_na(df = ukb_main,
-                                     columns = params$new_ethnic_background_col,
-                                     new_col = names(list_of_details$new_columns))
+  ukb_main <- summarise_first_non_na(
+    df = ukb_main,
+    columns = params$new_ethnic_background_col,
+    new_col = names(list_of_details$new_columns)
+  )
 
   # drop individual simplified ethnicity columns
   ukb_main <- ukb_main %>%
@@ -240,7 +252,8 @@ derive_ethnic_background_simplified <- function(ukb_main,
   # reorder factor
   ukb_main[[names(list_of_details$new_columns)]] <-
     factor(ukb_main[[names(list_of_details$new_columns)]],
-           levels = ethnicity_levels)
+      levels = ethnicity_levels
+    )
 
   # label
   attributes(ukb_main[[names(list_of_details$new_columns)]])$label <- list_of_details$new_columns$ethnic_background_simplified$label
@@ -270,13 +283,14 @@ derive_ethnic_background_simplified_single <- function(ukb_main,
                                                          "Chinese",
                                                          "Other ethnic group"
                                                        ),
-                                                       .details_only = FALSE)
-{
+                                                       .details_only = FALSE) {
   all_ethnicity_categories <- list(
-    White = c("White",
-              "British",
-              "Irish",
-              "Any other white background"),
+    White = c(
+      "White",
+      "British",
+      "Irish",
+      "Any other white background"
+    ),
     Mixed = c(
       "Mixed",
       "White and Black Caribbean",
@@ -299,8 +313,10 @@ derive_ethnic_background_simplified_single <- function(ukb_main,
     ),
     Chinese = c("Chinese"),
     `Other ethnic group` = c("Other ethnic group"),
-    Do_not_know_Prefer_not_to_answer = c("Do not know",
-                                         "Prefer not to answer")
+    Do_not_know_Prefer_not_to_answer = c(
+      "Do not know",
+      "Prefer not to answer"
+    )
   )
 
   if (.details_only) {
@@ -311,26 +327,36 @@ derive_ethnic_background_simplified_single <- function(ukb_main,
 
   # validate args
   assertthat::assert_that(is.factor(ukb_main[[old_ethnic_background_col]]) |
-                            is.character(ukb_main[[old_ethnic_background_col]]),
-                          msg = paste0("Error! ",
-                                       old_ethnic_background_col,
-                                       " must be a factor"))
+    is.character(ukb_main[[old_ethnic_background_col]]),
+  msg = paste0(
+    "Error! ",
+    old_ethnic_background_col,
+    " must be a factor"
+  )
+  )
 
   ethnic_background_col_unique_values <- unique(as.character(ukb_main[[old_ethnic_background_col]]))
-  unrecognised_ethnicity_values <- subset(ethnic_background_col_unique_values,
-                                          (!ethnic_background_col_unique_values %in% all_ethnicity_categories_vector) &
-                                            (!is.na(ethnic_background_col_unique_values)))
+  unrecognised_ethnicity_values <- subset(
+    ethnic_background_col_unique_values,
+    (!ethnic_background_col_unique_values %in% all_ethnicity_categories_vector) &
+      (!is.na(ethnic_background_col_unique_values))
+  )
 
   assertthat::assert_that(rlang::is_empty(unrecognised_ethnicity_values),
-                          msg = paste0("Error! Column ",
-                                       old_ethnic_background_col,
-                                       " contains values that are not listed in UKB data coding 1001: ",
-                                       stringr::str_c(unrecognised_ethnicity_values,
-                                                      sep = "",
-                                                      collapse = ", ")))
+    msg = paste0(
+      "Error! Column ",
+      old_ethnic_background_col,
+      " contains values that are not listed in UKB data coding 1001: ",
+      stringr::str_c(unrecognised_ethnicity_values,
+        sep = "",
+        collapse = ", "
+      )
+    )
+  )
 
   assertthat::assert_that(length(unique(ethnicity_levels)) == length(ethnicity_levels),
-                          msg = "Error! `ethnicity_levels` contains duplicate values")
+    msg = "Error! `ethnicity_levels` contains duplicate values"
+  )
 
   assertthat::assert_that(
     all(ethnicity_levels %in% c(
@@ -345,7 +371,7 @@ derive_ethnic_background_simplified_single <- function(ukb_main,
   )
 
   # simplify ethnicity
-  ukb_main[[new_ethnic_background_col]] <-  dplyr::case_when(
+  ukb_main[[new_ethnic_background_col]] <- dplyr::case_when(
     ukb_main[[old_ethnic_background_col]] %in% all_ethnicity_categories$White ~ "White",
     ukb_main[[old_ethnic_background_col]] %in% all_ethnicity_categories$Mixed ~ "Mixed",
     ukb_main[[old_ethnic_background_col]] %in% all_ethnicity_categories$`Asian or Asian British` ~ "Asian or Asian British",
@@ -366,7 +392,7 @@ named_vector_to_string <- function(x) {
   stopifnot(!is.null(names(x)))
   x %>%
     as.list() %>%
-    purrr::imap_chr( ~ paste(.y, "=", .x)) %>%
+    purrr::imap_chr(~ paste(.y, "=", .x)) %>%
     stringr::str_c(sep = "", collapse = "; ")
 }
 
@@ -374,21 +400,24 @@ derived_var_details_to_data_dict <- function(derived_var_details) {
   # `derived_var_details` should be a list created by one of the `derive_` functions
   derived_var_details$new_columns %>%
     # loop through new columns
-  purrr::map( ~ {
-    # convert value labels (codings) to a single string
-    if (any(!is.na(derived_var_details$new_columns$dob_derived$value_labels))) {
-      derived_var_details$new_columns$dob_derived$value_labels <- named_vector_to_string(derived_var_details$new_columns$dob_derived$value_labels)
-    }
+    purrr::map(~ {
+      # convert value labels (codings) to a single string
+      if (any(!is.na(derived_var_details$new_columns$dob_derived$value_labels))) {
+        derived_var_details$new_columns$dob_derived$value_labels <- named_vector_to_string(derived_var_details$new_columns$dob_derived$value_labels)
+      }
 
-    # convert details to a data frame
-    as.data.frame(derived_var_details$new_columns$dob_derived) %>%
-      dplyr::rename(Field = label,
-                    Coding = value_labels)
-  }) %>%
+      # convert details to a data frame
+      as.data.frame(derived_var_details$new_columns$dob_derived) %>%
+        dplyr::rename(
+          Field = label,
+          Coding = value_labels
+        )
+    }) %>%
     dplyr::bind_rows(.id = "colheaders_raw") %>%
-    dplyr::mutate("Notes" = paste0("Required FieldIDs: ",
-                                   toString(derived_var_details$required_field_ids)))
+    dplyr::mutate("Notes" = paste0(
+      "Required FieldIDs: ",
+      toString(derived_var_details$required_field_ids)
+    ))
 }
 
 # DERIVED VARIABLES DATA DICTIONARY ---------------------------------------
-

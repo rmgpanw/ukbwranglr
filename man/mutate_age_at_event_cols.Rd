@@ -36,8 +36,8 @@ match the regex supplied to \code{date_col_regex}.
 \examples{
 # dummy data
 dummy_ukb_main <- tibble::tribble(
-~ eid, ~ dob, ~ event_date,
-1, "2000-01-01", "2010-01-01"
+  ~eid, ~dob, ~event_date,
+  1, "2000-01-01", "2010-01-01"
 )
 
 # mutate age at event col

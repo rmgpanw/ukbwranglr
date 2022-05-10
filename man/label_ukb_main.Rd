@@ -64,9 +64,11 @@ read_ukb(
   descriptive_colnames = TRUE,
   label = FALSE
 ) \%>\%
-  label_ukb_main(data_dict = data_dict_selected,
-  ukb_codings = dummy_ukb_codings,
-  colnames_col = "descriptive_colnames")
+  label_ukb_main(
+    data_dict = data_dict_selected,
+    ukb_codings = dummy_ukb_codings,
+    colnames_col = "descriptive_colnames"
+  )
 }
 }
 \keyword{internal}

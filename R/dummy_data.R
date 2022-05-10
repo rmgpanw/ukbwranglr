@@ -73,17 +73,19 @@
 get_ukb_dummy <- function(file_name,
                           path_only = FALSE) {
   match.arg(file_name,
-            choices = c(
-              "dummy_Data_Dictionary_Showcase.tsv",
-              "dummy_Codings.tsv",
-              "dummy_ukb_main.tsv",
-              "dummy_gp_clinical.txt",
-              "dummy_gp_scripts.txt"
-            ))
+    choices = c(
+      "dummy_Data_Dictionary_Showcase.tsv",
+      "dummy_Codings.tsv",
+      "dummy_ukb_main.tsv",
+      "dummy_gp_clinical.txt",
+      "dummy_gp_scripts.txt"
+    )
+  )
 
   file_path <- system.file("extdata",
-                           file_name,
-                           package = "ukbwranglr")
+    file_name,
+    package = "ukbwranglr"
+  )
 
   if (path_only) {
     return(file_path)
