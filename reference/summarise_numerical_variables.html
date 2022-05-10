@@ -26,6 +26,9 @@ minimum, maximum, sum and number of non-missing values."><!-- mathjax --><script
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav"><li>
+  <a href="../articles/ukbwranglr.html">Get started</a>
+</li>
+<li>
   <a href="../reference/index.html">Reference</a>
 </li>
       </ul><ul class="nav navbar-nav navbar-right"><li>
@@ -78,10 +81,8 @@ created by <code><a href="make_data_dict.html">make_data_dict</a></code>.</p></d
 <dd><p>The UKB data dictionary (available online at the UK
 Biobank
 <a href="https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide" class="external-link">data
- showcase</a>. This should be a data frame where all columns are of type
-<code>character</code>. By default, this is downloaded from the
-<a href="https://github.com/rmgpanw/ukbwranglr_resources" class="external-link"><code>ukbwranglr_resources</code></a>
- github repo.</p></dd>
+showcase</a>. This should be a data frame where all columns are of type
+<code>character</code>.</p></dd>
 <dt>summary_function</dt>
 <dd><p>The summary function to be applied. Options: "mean",
 "min", "max", "sum" or "n_values"</p></dd>
@@ -94,10 +95,10 @@ the result. Default value is <code>FALSE</code>.</p></dd>
     <div id="value">
     <h2>Value</h2>
     <p>A data frame with new columns summarising numerical variables. The
-  names for these new columns are prefixed by the value for
+names for these new columns are prefixed by the value for
 <code>summary_function</code> and end with 'x', FieldID +/- instance being
-  summarised e.g. if summarising FieldID 4080 instance 0, the new column
-  would be named 'mean_systolic_blood_pressure_automated_reading_x4080_0'.</p>
+summarised e.g. if summarising FieldID 4080 instance 0, the new column
+would be named 'mean_systolic_blood_pressure_automated_reading_x4080_0'.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -110,7 +111,7 @@ will summarised as <code>0</code>. See the documentation for
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org" class="external-link">magrittr</a></span><span class="op">)</span></span>
-<span class="r-in"><span class="co"># dummy UKB data and data dictionary</span></span>
+<span class="r-in"><span class="co"># get dummy UKB data and data dictionary</span></span>
 <span class="r-in"><span class="va">dummy_ukb_data_dict</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_ukb_dummy.html">get_ukb_dummy</a></span><span class="op">(</span><span class="st">"dummy_Data_Dictionary_Showcase.tsv"</span><span class="op">)</span></span>
 <span class="r-in"><span class="va">dummy_ukb_codings</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_ukb_dummy.html">get_ukb_dummy</a></span><span class="op">(</span><span class="st">"dummy_Codings.tsv"</span><span class="op">)</span></span>
 <span class="r-in"></span>
@@ -131,7 +132,7 @@ will summarised as <code>0</code>. See the documentation for
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Labelling dataset</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Time taken: 0 minutes, 0 seconds.</span>
 <span class="r-in"></span>
-<span class="r-in"><span class="co"># summarise mean value by Field, keep original variables</span></span>
+<span class="r-in"><span class="co"># summarise mean values by Field, keep original variables</span></span>
 <span class="r-in"><span class="fu">summarise_numerical_variables</span><span class="op">(</span></span>
 <span class="r-in">  <span class="va">dummy_ukb_main</span>,</span>
 <span class="r-in">  ukb_data_dict <span class="op">=</span> <span class="va">dummy_ukb_data_dict</span></span>
@@ -158,7 +159,7 @@ will summarised as <code>0</code>. See the documentation for
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   systolic_blood_pressure_automated_reading_f4080_1_3 &lt;int&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   mean_systolic_blood_pressure_automated_reading_x4080 &lt;dbl&gt;</span></span>
 <span class="r-in"></span>
-<span class="r-in"><span class="co"># summarise mean value by Field, drop original variables</span></span>
+<span class="r-in"><span class="co"># summarise mean values by Field, drop original variables</span></span>
 <span class="r-in"><span class="fu">summarise_numerical_variables</span><span class="op">(</span></span>
 <span class="r-in">  <span class="va">dummy_ukb_main</span>,</span>
 <span class="r-in">  ukb_data_dict <span class="op">=</span> <span class="va">dummy_ukb_data_dict</span>,</span>
@@ -180,7 +181,7 @@ will summarised as <code>0</code>. See the documentation for
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>     9                                                 <span style="color: #BB0000;">NaN</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>    10                                                 <span style="color: #BB0000;">NaN</span> </span>
 <span class="r-in"></span>
-<span class="r-in"><span class="co"># summarise min value by instance, dropping original variables</span></span>
+<span class="r-in"><span class="co"># summarise min values by instance, dropping original variables</span></span>
 <span class="r-in"><span class="fu">summarise_numerical_variables</span><span class="op">(</span></span>
 <span class="r-in">  <span class="va">dummy_ukb_main</span>,</span>
 <span class="r-in">  ukb_data_dict <span class="op">=</span> <span class="va">dummy_ukb_data_dict</span>,</span>

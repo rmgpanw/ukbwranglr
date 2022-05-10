@@ -23,6 +23,9 @@
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav"><li>
+  <a href="../articles/ukbwranglr.html">Get started</a>
+</li>
+<li>
   <a href="../reference/index.html">Reference</a>
 </li>
       </ul><ul class="nav navbar-nav navbar-right"><li>
@@ -58,31 +61,27 @@
     <dl><dt>file_name</dt>
 <dd><p>Name of dummy dataset file.</p></dd>
 <dt>path_only</dt>
-<dd><p>If `TRUE`, return the file path to the dummy dataset file,
-otherwise if `FALSE` (default), read the dummy dataset into R.</p></dd>
+<dd><p>If <code>TRUE</code>, return the file path to the dummy dataset file,
+otherwise if <code>FALSE</code> (default), read the dummy dataset into R.</p></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A data frame if `path_only` is `FALSE` (default) or a string if
-  `path_only` is `TRUE`.</p>
+    <p>A data frame if <code>path_only</code> is <code>FALSE</code> (default) or a string if
+<code>path_only</code> is <code>TRUE</code>.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
-    <p>The following dummy datasets are included with this package:</p>
-<p>- `dummy_Data_Dictionary_Showcase.tsv`: A subset of fields from the UK
-Biobank data dictionary (full version available from the UK Biobank [data
-showcase
-website](https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide)).</p>
-<p>- `dummy_Codings.tsv`: A subset of UK Biobank data codings (full version
-available from the UK Biobank [data showcase
-website](https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide)).</p>
-<p>- `dummy_ukb_main.tsv`: A dummy main UK Biobank dataset. May be read into R
-with [read_ukb()]. Tidy xlinical events fields with [tidy_clinical_events()].</p>
-<p>- `dummy_gp_clinical.txt`: A dummy UK Biobank primary care clinical event
-records dataset.</p>
-<p>- `dummy_gp_scripts.txt`: A dummy UK Biobank primary care prescription
-records dataset.</p>
-    </div>
+    <p>The following dummy datasets are included with this package:</p><ul><li><p><code>dummy_Data_Dictionary_Showcase.tsv</code>: A subset of fields from the UK
+Biobank data dictionary (full version available from the UK Biobank <a href="https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide" class="external-link">data showcase website</a>).</p></li>
+<li><p><code>dummy_Codings.tsv</code>: A subset of UK Biobank data codings (full version
+available from the UK Biobank <a href="https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide" class="external-link">data showcase website</a>).</p></li>
+<li><p><code>dummy_ukb_main.tsv</code>: A dummy main UK Biobank dataset. May be read into R
+with <code><a href="read_ukb.html">read_ukb()</a></code>. Tidy clinical events fields with <code><a href="tidy_clinical_events.html">tidy_clinical_events()</a></code>.</p></li>
+<li><p><code>dummy_gp_clinical.txt</code>: A dummy UK Biobank primary care clinical event
+records dataset.</p></li>
+<li><p><code>dummy_gp_scripts.txt</code>: A dummy UK Biobank primary care prescription
+records dataset.</p></li>
+</ul></div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
@@ -97,16 +96,124 @@ records dataset.</p>
 <span class="r-in">  <span class="st">"dummy_gp_scripts.txt"</span></span>
 <span class="r-in"><span class="op">)</span></span>
 <span class="r-in"></span>
-<span class="r-in"><span class="co"># file paths</span></span>
-<span class="r-in"><span class="va">dummy_datasets</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span class="r-in">  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_chr</a></span><span class="op">(</span><span class="va">get_ukb_dummy</span>, path_only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "/Users/runner/work/ukbwranglr/ukbwranglr/renv/library/R-4.2/x86_64-apple-darwin17.0/ukbwranglr/extdata/dummy_Data_Dictionary_Showcase.tsv"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2] "/Users/runner/work/ukbwranglr/ukbwranglr/renv/library/R-4.2/x86_64-apple-darwin17.0/ukbwranglr/extdata/dummy_Codings.tsv"                 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3] "/Users/runner/work/ukbwranglr/ukbwranglr/renv/library/R-4.2/x86_64-apple-darwin17.0/ukbwranglr/extdata/dummy_ukb_main.tsv"                </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [4] "/Users/runner/work/ukbwranglr/ukbwranglr/renv/library/R-4.2/x86_64-apple-darwin17.0/ukbwranglr/extdata/dummy_gp_clinical.txt"             </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [5] "/Users/runner/work/ukbwranglr/ukbwranglr/renv/library/R-4.2/x86_64-apple-darwin17.0/ukbwranglr/extdata/dummy_gp_scripts.txt"              </span>
+<span class="r-in"><span class="co"># read dummy dataset into R</span></span>
+<span class="r-in"><span class="fu">get_ukb_dummy</span><span class="op">(</span><span class="st">"dummy_ukb_main.tsv"</span><span class="op">)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     eid 31-0.0 34-0.0 52-0.0 21000-0.0 21000-1.0 21000-2.0 21001-0.0 21001-1.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1:   1      0   1952      8        -1         2      3003   20.1115    20.864</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2:   2      0   1946      3        -3      2001      3004   30.1536   20.2309</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3:   3      1   1951      4         1      2002        -1   22.8495   26.7929</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  4:   4      0   1956      9      1001      2003      4001      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  5:   5   &lt;NA&gt;   &lt;NA&gt;      4      1002      2004      4002   29.2752   19.7576</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6:   6      1   1948      2      1003         3      4003   28.2567    30.286</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  7:   7      0   1949     12      &lt;NA&gt;      3001         5      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  8:   8      1   1956     10      &lt;NA&gt;         5      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  9:   9      0   1962      4      4001      &lt;NA&gt;      &lt;NA&gt;   25.4016   21.9371</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10:  10      1   1953      2      4001      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;   25.1579</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     21001-2.0 4080-0.0 4080-0.1 4080-0.2 4080-0.3 4080-1.0 4080-1.1 4080-1.2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1:      &lt;NA&gt;     &lt;NA&gt;      134      134      134      159      134      134</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2:   27.4936      146      145      145     &lt;NA&gt;      129      145      145</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3:   27.6286      143      123      123      123      162      123      123</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  4:      &lt;NA&gt;     &lt;NA&gt;     &lt;NA&gt;     &lt;NA&gt;     &lt;NA&gt;     &lt;NA&gt;     &lt;NA&gt;     &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  5:   14.6641     &lt;NA&gt;     &lt;NA&gt;     &lt;NA&gt;     &lt;NA&gt;     &lt;NA&gt;     &lt;NA&gt;     &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6:   27.3534     &lt;NA&gt;     &lt;NA&gt;     &lt;NA&gt;     &lt;NA&gt;     &lt;NA&gt;     &lt;NA&gt;     &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  7:      &lt;NA&gt;     &lt;NA&gt;     &lt;NA&gt;     &lt;NA&gt;     &lt;NA&gt;     &lt;NA&gt;     &lt;NA&gt;     &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  8:      &lt;NA&gt;     &lt;NA&gt;     &lt;NA&gt;     &lt;NA&gt;     &lt;NA&gt;     &lt;NA&gt;     &lt;NA&gt;     &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  9:   24.4897     &lt;NA&gt;     &lt;NA&gt;     &lt;NA&gt;     &lt;NA&gt;     &lt;NA&gt;     &lt;NA&gt;     &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10:   30.0483     &lt;NA&gt;     &lt;NA&gt;     &lt;NA&gt;     &lt;NA&gt;     &lt;NA&gt;     &lt;NA&gt;     &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     4080-1.3 20001-0.0 20001-0.3 20001-2.0 20001-2.3 20002-0.0 20002-0.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1:     &lt;NA&gt;      1048      1005      1045      1017      1665      1223</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2:      145      1046      1003      1028      1039      1383      1352</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3:      123      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      1665      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  4:     &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      1383      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  5:     &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6:     &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  7:     &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  8:     &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  9:     &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10:     &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     20002-2.0 20002-2.3 20006-0.0 20006-0.3 20006-2.0 20006-2.3 20008-0.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1:      1514      &lt;NA&gt; 2012.8173 2007.0874 2023.2047 2014.7373 1998.9782</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2:      1447      1165 2016.0638 2023.1635 2024.0358 2013.2044 2011.0121</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3:      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;        -3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  4:      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;        -1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  5:      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6:      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  7:      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  8:      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  9:      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10:      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     20008-0.3 20008-2.0 20008-2.3 41270-0.0 41270-0.3 41271-0.0 41271-0.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1: 2003.1527 2011.2636  2018.786      X715       E10    E89115      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2:  2020.502 1981.1627 1983.0059       E11     M0087     E8326     75513</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3:      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  4:      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  5:      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6:      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  7:      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  8:      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  9:      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10:      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      41280-0.0  41280-0.3  41281-0.0  41281-0.3 40001-0.0 40001-1.0 40002-0.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1: 1955-11-12 1910-02-19 1917-10-08 1969-11-23      X095      X095      W192</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2: 1939-02-16 1965-08-08 1955-02-11 1956-09-12      A162      A162      V374</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3:       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  4:       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  5:       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6:       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  7:       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  8:       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  9:       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10:       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     40002-1.3  40000-0.0  40000-1.0  20003-0.0  20003-2.0  20003-2.3     53-0.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1:      X715 1917-10-08 1910-02-19 1140861958 1141146188 1141184722 1955-02-11</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2:      &lt;NA&gt; 1955-02-11 1965-08-08 1141146234 1141184722 1140861958 1965-08-08</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3:      &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  4:      &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  5:      &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6:      &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  7:      &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  8:      &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  9:      &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10:      &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         53-2.0  40005-0.0  40005-2.0 40006-0.0 40006-2.0 40013-0.0 40013-2.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1: 1910-02-19 1956-11-24 1962-09-04     M4815      C850     27134      2042</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2: 1915-03-18 1910-10-04       &lt;NA&gt;      &lt;NA&gt;      W192      9626    E90200</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3:       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  4:       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  5:       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6:       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  7:       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  8:       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  9:       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10:       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     41272-0.0 41272-0.3  41282-0.0  41282-0.3 41273-0.0 41273-0.3  41283-0.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1:       A01      A018 1956-11-24 1969-11-23       001      0081 1969-11-23</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2:      A023       A02 1910-10-04 1956-09-12      0011      0071 1956-09-12</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3:       H01      &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  4:      H011      &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  5:      H022      &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6:      H013      &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  7:      H018      &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  8:      H019      &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  9:      &lt;NA&gt;      &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10:      &lt;NA&gt;      &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      41283-0.3 20004-0.0 20004-0.3 20010-0.0 20010-0.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1: 1955-11-12      1102      1108 2012.8173 2008.2342</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2: 1939-02-16      1105      1109 2016.0638      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3:       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  4:       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  5:       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6:       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  7:       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  8:       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  9:       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10:       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
 <span class="r-in"></span>
-<span class="r-in"><span class="co"># read into R</span></span>
+<span class="r-in"><span class="co"># get file path to dummy dataset</span></span>
+<span class="r-in"><span class="fu">get_ukb_dummy</span><span class="op">(</span><span class="st">"dummy_ukb_main.tsv"</span>, path_only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "/Users/runner/work/ukbwranglr/ukbwranglr/renv/library/R-4.2/x86_64-apple-darwin17.0/ukbwranglr/extdata/dummy_ukb_main.tsv"</span>
+<span class="r-in"></span>
+<span class="r-in"><span class="co"># read all available dummy dataset into R</span></span>
 <span class="r-in"><span class="va">dummy_datasets</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span class="r-in">  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/set_names.html" class="external-link">set_names</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span class="r-in">  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="va">get_ukb_dummy</span>, path_only <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
