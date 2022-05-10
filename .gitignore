@@ -9,3 +9,4 @@ ukbwranglr*.tar.gz
 ukbwranglr*.tgz
 tests.Rmd
 docs/*
+.DS_Store
