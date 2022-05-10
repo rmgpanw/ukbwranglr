@@ -45,7 +45,7 @@ The basic workflow is as follows:
     `make_data_dict()`.
 2.  Read selected variables into R with `read_ukb()`.
 3.  Summarise continuous variables with
-    `summarise_continuous_variables()`.
+    `summarise_numerical_variables()`.
 4.  Tidy clinical events data and extract outcomes of interest with
     `tidy_clinical_events()` and `extract_phenotypes()`.
 5.  Analyse.
