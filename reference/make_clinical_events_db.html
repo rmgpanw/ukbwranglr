@@ -214,8 +214,8 @@ getting started with databases and <a href="https://dplyr.tidyverse.org/referenc
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Complete. Time taken: 0 minutes, 0 seconds</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ***SETTING INDEX ON `source`, `code` AND `eid` COLUMNS IN UKB DATABASE 'clinical_events' TABLE***</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> SUCCESS! UKB DATABASE SETUP COMPLETE</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> To connect to db: `con &lt;- DBI::dbConnect(RSQLite::SQLite(), '/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//Rtmp38iTpn/ukb.db')`, then `ukbdb &lt;- ukbwranglr::db_tables_to_list(con)`</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Time taken: 0 minutes, 2 seconds.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> To connect to db: `con &lt;- DBI::dbConnect(RSQLite::SQLite(), '/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//RtmpiPRsZt/ukb.db')`, then `ukbdb &lt;- ukbwranglr::db_tables_to_list(con)`</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Time taken: 0 minutes, 1 seconds.</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># connect to database</span></span>
 <span class="r-in"><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span></span>
@@ -234,7 +234,7 @@ getting started with databases and <a href="https://dplyr.tidyverse.org/referenc
 <span class="r-in"><span class="va">ukbdb</span><span class="op">$</span><span class="va">clinical_events</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Source:   table&lt;clinical_events&gt; [?? x 5]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: sqlite 3.38.5</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   [/private/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/Rtmp38iTpn/ukb.db]</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   [/private/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/RtmpiPRsZt/ukb.db]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      eid source index code       date      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>     1 f40001 0_0   X095       1917-10-08</span>
@@ -252,7 +252,7 @@ getting started with databases and <a href="https://dplyr.tidyverse.org/referenc
 <span class="r-in"><span class="va">ukbdb</span><span class="op">$</span><span class="va">gp_clinical_values</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Source:   table&lt;gp_clinical_values&gt; [?? x 4]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: sqlite 3.38.5</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   [/private/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/Rtmp38iTpn/ukb.db]</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   [/private/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/RtmpiPRsZt/ukb.db]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    index value1 value2 value3</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> 1     1      2      3     </span>
@@ -270,7 +270,7 @@ getting started with databases and <a href="https://dplyr.tidyverse.org/referenc
 <span class="r-in"><span class="va">ukbdb</span><span class="op">$</span><span class="va">gp_scripts_names_and_quantities</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Source:   table&lt;gp_scripts_names_and_quantities&gt; [?? x 3]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: sqlite 3.38.5</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   [/private/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/Rtmp38iTpn/ukb.db]</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   [/private/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/RtmpiPRsZt/ukb.db]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   index drug_name quantity</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> 1     drug2     50      </span>
