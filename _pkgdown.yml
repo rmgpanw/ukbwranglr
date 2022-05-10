@@ -47,8 +47,3 @@ reference:
   desc: Dummy UKB datasets, data dictionary and data codings
 - contents:
   - get_ukb_dummy
-
-- title: Package overview
-  desc: General summary of package contents
-- contents:
-  - ukbwranglr
