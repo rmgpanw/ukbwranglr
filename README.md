@@ -12,6 +12,7 @@ coverage](https://codecov.io/gh/rmgpanw/ukbwranglr/branch/main/graph/badge.svg)]
 [![pkgdown](https://github.com/rmgpanw/ukbwranglr/workflows/pkgdown/badge.svg)](https://github.com/rmgpanw/ukbwranglr/actions)
 [![Launch RStudio
 Cloud](https://img.shields.io/badge/RStudio-Cloud-blue)](https://rstudio.cloud/project/2528744)
+[![DOI](https://zenodo.org/badge/308650225.svg)](https://zenodo.org/badge/latestdoi/308650225)
 [![Project Status: WIP – Initial development is in progress, but there
 has not yet been a stable, usable release suitable for the
 public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)

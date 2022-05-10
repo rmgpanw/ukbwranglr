@@ -1,16 +1,20 @@
 # NOTES -------------------------------------------------------------------
 
-# Steps to append additional `clinical_events_sources` for `tidy_clinical_events()`:
+# Steps to append additional `clinical_events_sources` for
+# `tidy_clinical_events()`:
 
-# 1. Update `CLINICAL_EVENTS_FIELD_IDS` and `CLINICAL_EVENTS_SOURCES` in `metadata.R`
+# 1. Update `CLINICAL_EVENTS_FIELD_IDS` and `CLINICAL_EVENTS_SOURCES` in
+# `metadata.R`
 
 # 2. Update relevant details in `tidy_clinical_events()`
 
 # 3. Add dummy data fields to `DUMMY_UKB_MAIN_CLINICAL_EVENTS` in `dummy_data.R`
 
-# 4. Update end of `filter_clinical_events()` (from comment '***Update this section ...)
+# 4. Update end of `filter_clinical_events()` (from comment '***Update this
+# section ...)
 
-# 5. Add tests to `test_extract_phenotypes.R` under `tidy_clinical_events()` section
+# 5. Add tests to `test_extract_phenotypes.R` under `tidy_clinical_events()`
+# section
 
 # 6. Run tests in `test_extract_phenotypes.R` and fix as necessary
 
@@ -40,12 +44,12 @@ CLINICAL_EVENTS_COLTYPES <- c(
 
 #' Mutate age at event columns
 #'
-#' Mutates numeric columns with the age at event for all columns that
-#' match the regex supplied to \code{date_col_regex}.
+#' Mutates numeric columns with the age at event for all columns that match the
+#' regex supplied to \code{date_col_regex}.
 #'
-#' @param ukb_main a UKB main dataset (data frame) containing a column named "eid" and a date
-#'   of birth column, as well as date columns matching the regex supplied to
-#'   the \code{date_col_regex} argument.
+#' @param ukb_main a UKB main dataset (data frame) containing a column named
+#'   "eid" and a date of birth column, as well as date columns matching the
+#'   regex supplied to the \code{date_col_regex} argument.
 #' @param dob_col character. The name of the date of birth column in
 #'   \code{ukb_main}.
 #' @param date_col_regex character. A regular expression that matches the date
@@ -1001,16 +1005,15 @@ validate_clinical_events_and_check_type <- function(clinical_events) {
   invisible(clinical_events_type)
 }
 
-#' Helper function for \code{extract_phenotypes} - Get
-#' the earliest record date for multiple phenotype categories within a single
-#' disease
+#' Helper function for \code{extract_phenotypes} - Get the earliest record date
+#' for multiple phenotype categories within a single disease
 #'
-#' Uses \code{\link{extract_first_or_last_clinical_event}}, extracting
-#' either the first or last recorded clinical event for multiple phenotype
-#' categories within a single disease
+#' Uses \code{\link{extract_first_or_last_clinical_event}}, extracting either
+#' the first or last recorded clinical event for multiple phenotype categories
+#' within a single disease
 #'
-#' @param disease scalar character. \code{clinical_codes} will be filtered
-#'   for this value in the 'disease' column.
+#' @param disease scalar character. \code{clinical_codes} will be filtered for
+#'   this value in the 'disease' column.
 #' @param clinical_codes data frame. Must match the format as per
 #'   \code{\link{example_clinical_codes}}.
 #' @param colnames_prefix character. Optionally add a prefix to column names.
