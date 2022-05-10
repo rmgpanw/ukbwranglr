@@ -1,0 +1,9 @@
+citHeader("To cite ukbwranglr in publications use:")
+
+citEntry(
+  entry = "Manual",
+  title = "ukbwranglr: Functions to load and wrangle UK Biobank data",
+  author = as.person("Alasdair Warwick"),
+  year = 2022,
+  textVersion = "Warwick A (2022). ukbwranglr: Functions to load and wrangle UK Biobank data. https://rmgpanw.github.io/ukbwranglr/, https://github.com/rmgpanw/ukbwranglr."
+)

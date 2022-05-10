@@ -4,9 +4,11 @@ Title: Exploring UKB Data
 Version: 0.0.0.9000
 Authors@R: 
   person("Alasdair", "Warwick", email = "alasdair.warwick06@gmail.com", role = c("aut", "cre"))
-Description: Tools to load, pre-process and summarise UK Biobank data.
+Description: Functions to load and wrangle UK Biobank data.
 License: MIT + file LICENSE
-URL: https://github.com/rmgpanw/ukbwranglr
+URL: https://rmgpanw.github.io/ukbwranglr/,
+  https://github.com/rmgpanw/ukbwranglr
+BugReports: https://github.com/rmgpanw/ukbwranglr/issues
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
