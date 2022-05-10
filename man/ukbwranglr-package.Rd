@@ -6,12 +6,14 @@
 \alias{ukbwranglr-package}
 \title{ukbwranglr: Exploring UKB Data}
 \description{
-Tools to load, pre-process and summarise UK Biobank data.
+Functions to load and wrangle UK Biobank data.
 }
 \seealso{
 Useful links:
 \itemize{
+  \item \url{https://rmgpanw.github.io/ukbwranglr/}
   \item \url{https://github.com/rmgpanw/ukbwranglr}
+  \item Report bugs at \url{https://github.com/rmgpanw/ukbwranglr/issues}
 }
 
 }

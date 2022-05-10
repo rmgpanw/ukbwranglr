@@ -13,7 +13,8 @@
 #' provided). This is a long format table combining all clinical events data
 #' from a UK Biobank main dataset and the UK Biobank primary care clinical
 #' events dataset. Use [`clinical_events_sources()`] to see a list of all
-#' currently included clinical events sources.
+#' currently included clinical events sources. Expect this to take ~1 hour to
+#' finish running.
 #'
 #' See the [introduction to
 #' dbplyr](https://dbplyr.tidyverse.org/articles/dbplyr.html) vignette for

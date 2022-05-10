@@ -27,7 +27,7 @@ Biobank data dictionary (full version available from the UK Biobank \href{https:
 \item \code{dummy_Codings.tsv}: A subset of UK Biobank data codings (full version
 available from the UK Biobank \href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{data showcase website}).
 \item \code{dummy_ukb_main.tsv}: A dummy main UK Biobank dataset. May be read into R
-with \code{\link[=read_ukb]{read_ukb()}}. Tidy xlinical events fields with \code{\link[=tidy_clinical_events]{tidy_clinical_events()}}.
+with \code{\link[=read_ukb]{read_ukb()}}. Tidy clinical events fields with \code{\link[=tidy_clinical_events]{tidy_clinical_events()}}.
 \item \code{dummy_gp_clinical.txt}: A dummy UK Biobank primary care clinical event
 records dataset.
 \item \code{dummy_gp_scripts.txt}: A dummy UK Biobank primary care prescription
