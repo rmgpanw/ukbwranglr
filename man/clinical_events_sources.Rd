@@ -11,11 +11,16 @@ A data frame
 }
 \description{
 Returns a data frame with details of clinical events data that may be tidied
-by [tidy_clinical_events()].
+by \code{\link[=tidy_clinical_events]{tidy_clinical_events()}}.
 }
 \examples{
 clinical_events_sources()
 }
 \seealso{
-\code{\link{tidy_clinical_events}}
+Other clinical events: 
+\code{\link{example_clinical_codes}()},
+\code{\link{extract_phenotypes}()},
+\code{\link{make_clinical_events_db}()},
+\code{\link{tidy_clinical_events}()}
 }
+\concept{clinical events}

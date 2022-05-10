@@ -25,46 +25,109 @@ with '.db'. If no file with this name exists then one will be created.}
 \item{ukb_main_delim}{Delimiter for \code{ukb_main_path}. Default value is
 \code{"auto"}.}
 
-\item{gp_clinical_path}{Path to the UKB primary care clinical events file
-(\code{gp_clinical.txt}).}
+\item{gp_clinical_path}{(Optional) path to the UKB primary care clinical
+events file (\code{gp_clinical.txt}).}
 
-\item{gp_scripts_path}{Path to the UKB primary care prescriptions file
-(\code{gp_scripts.txt}).}
+\item{gp_scripts_path}{(Optional) path to the UKB primary care prescriptions
+file (\code{gp_scripts.txt}).}
 
 \item{ukb_data_dict}{The UKB data dictionary (available online at the UK
 Biobank
 \href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{data
- showcase}. This should be a data frame where all columns are of type
-\code{character}. By default, this is downloaded from the
-\href{https://github.com/rmgpanw/ukbwranglr_resources}{\code{ukbwranglr_resources}}
- github repo.}
+showcase}. This should be a data frame where all columns are of type
+\code{character}.}
 
-\item{ukb_codings}{The UKB codings dictionary. This should be a data frame
-where all columns are of type \code{character}. By default, this is
-downloaded from the
-\href{https://github.com/rmgpanw/ukbwranglr_resources}{\code{ukbwranglr_resources}}
- github repo.}
+\item{ukb_codings}{The UKB codings file (available online at the UK Biobank
+\href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{data
+showcase}. This should be a data frame where all columns are of type
+\code{character}.}
 
 \item{overwrite}{If \code{TRUE}, then tables \code{clinical_events} and
 \code{gp_clinical_values} will be overwritten if they already exist in the
 database. Default value is \code{FALSE}.}
 
 \item{chunk_size}{The number of rows to include in each chunk when processing
-the primary care dataset.}
+primary care datasets.}
 }
 \value{
 Returns \code{ukb_db_path} invisibly.
 }
 \description{
-Adds tables called \code{clinical_events}, and optionally
-\code{gp_clinical_values} and \code{gp_scripts_names_and_quantities} to a
-SQLite database file (the latter 2 are only added if `gp_clinical_path`
-and/or `gp_scripts_path` respectively are provided). This is a long format
-table combining all clinical events data from a UK Biobank main dataset and
-the UK Biobank primary care clinical events dataset, as listed by
-\code{link{clinical_events_sources}}. Indexes are set on the \code{source},
-\code{code} and \code{eid} columns in the \code{clinical_events} table.
+Adds tables named \code{clinical_events}, and optionally 'gp_clinical_values' and
+'gp_scripts_names_and_quantities' to a SQLite database file (the latter 2 are
+only added if \code{gp_clinical_path} and/or \code{gp_scripts_path} respectively are
+provided). This is a long format table combining all clinical events data
+from a UK Biobank main dataset and the UK Biobank primary care clinical
+events dataset. Use \code{\link[=clinical_events_sources]{clinical_events_sources()}} to see a list of all
+currently included clinical events sources.
+}
+\details{
+See the \href{https://dbplyr.tidyverse.org/articles/dbplyr.html}{introduction to dbplyr} vignette for
+getting started with databases and \link[dplyr:dplyr-package]{dplyr::dplyr}.
+
+Indexes are set on the \code{source}, \code{code} and \code{eid} columns in the
+\code{clinical_events} table for faster querying.
+}
+\examples{
+# dummy UKB data dictionary and codings
+dummy_ukb_data_dict <- get_ukb_dummy("dummy_Data_Dictionary_Showcase.tsv")
+dummy_ukb_codings <- get_ukb_dummy("dummy_Codings.tsv")
+
+# file paths to dummy UKB main and primary care datasets
+dummy_ukb_main_path <- get_ukb_dummy(
+  "dummy_ukb_main.tsv",
+  path_only = TRUE
+)
+
+dummy_gp_clinical_path <- get_ukb_dummy(
+  "dummy_gp_clinical.txt",
+  path_only = TRUE
+)
+
+dummy_gp_scripts_path <- get_ukb_dummy(
+  "dummy_gp_scripts.txt",
+  path_only = TRUE
+)
+
+# file path where SQLite database will be created
+dummy_ukb_db_path <- file.path(tempdir(), "ukb.db")
+
+# build database
+suppressWarnings(make_clinical_events_db(
+  ukb_main_path = dummy_ukb_main_path,
+  gp_clinical_path = dummy_gp_clinical_path,
+  gp_scripts_path = dummy_gp_scripts_path,
+  ukb_db_path = dummy_ukb_db_path,
+  ukb_data_dict = dummy_ukb_data_dict,
+  ukb_codings = dummy_ukb_codings,
+))
+
+# connect to database
+con <- DBI::dbConnect(
+  RSQLite::SQLite(),
+  dummy_ukb_db_path
+)
+
+ukbdb <- db_tables_to_list(con)
+
+# table names
+names(ukbdb)
+
+# view tables
+ukbdb$clinical_events
+
+ukbdb$gp_clinical_values
+
+ukbdb$gp_scripts_names_and_quantities
+
+# close database connection
+DBI::dbDisconnect(con)
 }
 \seealso{
-\code{\link{tidy_clinical_events}}, \code{\link{tidy_gp_clinical}}
+Other clinical events: 
+\code{\link{clinical_events_sources}()},
+\code{\link{example_clinical_codes}()},
+\code{\link{extract_phenotypes}()},
+\code{\link{tidy_clinical_events}()}
 }
+\concept{clinical events}

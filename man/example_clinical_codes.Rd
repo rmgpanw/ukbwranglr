@@ -7,19 +7,23 @@
 example_clinical_codes()
 }
 \value{
-A data frame of selected clinical codes for diabetes.
+A data frame of selected clinical codes (non-exhaustive) for diabetes.
 }
 \description{
 Data frames of this format may be used with \code{\link{extract_phenotypes}}.
 Use \code{\link{validate_clinical_codes}} to check whether a clinical codes
 data frame meets all requirements.
 }
-\details{
-Note: this example is not an exhaustive list of codes for diabetes.
-}
 \examples{
 example_clinical_codes()
 }
 \seealso{
 \code{\link{validate_clinical_codes}}
+
+Other clinical events: 
+\code{\link{clinical_events_sources}()},
+\code{\link{extract_phenotypes}()},
+\code{\link{make_clinical_events_db}()},
+\code{\link{tidy_clinical_events}()}
 }
+\concept{clinical events}

@@ -23,10 +23,8 @@ created by \code{\link{make_data_dict}}.}
 \item{ukb_data_dict}{The UKB data dictionary (available online at the UK
 Biobank
 \href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{data
- showcase}. This should be a data frame where all columns are of type
-\code{character}. By default, this is downloaded from the
-\href{https://github.com/rmgpanw/ukbwranglr_resources}{\code{ukbwranglr_resources}}
- github repo.}
+showcase}. This should be a data frame where all columns are of type
+\code{character}.}
 
 \item{summary_function}{The summary function to be applied. Options: "mean",
 "min", "max", "sum" or "n_values"}
@@ -38,10 +36,10 @@ the result. Default value is \code{FALSE}.}
 }
 \value{
 A data frame with new columns summarising numerical variables. The
-  names for these new columns are prefixed by the value for
-  \code{summary_function} and end with 'x', FieldID +/- instance being
-  summarised e.g. if summarising FieldID 4080 instance 0, the new column
-  would be named 'mean_systolic_blood_pressure_automated_reading_x4080_0'.
+names for these new columns are prefixed by the value for
+\code{summary_function} and end with 'x', FieldID +/- instance being
+summarised e.g. if summarising FieldID 4080 instance 0, the new column
+would be named 'mean_systolic_blood_pressure_automated_reading_x4080_0'.
 }
 \description{
 Summarises numerical variables with repeated measurements either by field

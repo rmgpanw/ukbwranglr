@@ -9,36 +9,30 @@ get_ukb_dummy(file_name, path_only = FALSE)
 \arguments{
 \item{file_name}{Name of dummy dataset file.}
 
-\item{path_only}{If `TRUE`, return the file path to the dummy dataset file,
-otherwise if `FALSE` (default), read the dummy dataset into R.}
+\item{path_only}{If \code{TRUE}, return the file path to the dummy dataset file,
+otherwise if \code{FALSE} (default), read the dummy dataset into R.}
 }
 \value{
-A data frame if `path_only` is `FALSE` (default) or a string if
-  `path_only` is `TRUE`.
+A data frame if \code{path_only} is \code{FALSE} (default) or a string if
+\code{path_only} is \code{TRUE}.
 }
 \description{
 Either read a dummy UK Biobank dataset into R or return the file path only.
 }
 \details{
 The following dummy datasets are included with this package:
-
-- `dummy_Data_Dictionary_Showcase.tsv`: A subset of fields from the UK
-Biobank data dictionary (full version available from the UK Biobank [data
-showcase
-website](https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide)).
-
-- `dummy_Codings.tsv`: A subset of UK Biobank data codings (full version
-available from the UK Biobank [data showcase
-website](https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide)).
-
-- `dummy_ukb_main.tsv`: A dummy main UK Biobank dataset. May be read into R
-with [read_ukb()]. Tidy xlinical events fields with [tidy_clinical_events()].
-
-- `dummy_gp_clinical.txt`: A dummy UK Biobank primary care clinical event
+\itemize{
+\item \code{dummy_Data_Dictionary_Showcase.tsv}: A subset of fields from the UK
+Biobank data dictionary (full version available from the UK Biobank \href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{data showcase website}).
+\item \code{dummy_Codings.tsv}: A subset of UK Biobank data codings (full version
+available from the UK Biobank \href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{data showcase website}).
+\item \code{dummy_ukb_main.tsv}: A dummy main UK Biobank dataset. May be read into R
+with \code{\link[=read_ukb]{read_ukb()}}. Tidy xlinical events fields with \code{\link[=tidy_clinical_events]{tidy_clinical_events()}}.
+\item \code{dummy_gp_clinical.txt}: A dummy UK Biobank primary care clinical event
 records dataset.
-
-- `dummy_gp_scripts.txt`: A dummy UK Biobank primary care prescription
+\item \code{dummy_gp_scripts.txt}: A dummy UK Biobank primary care prescription
 records dataset.
+}
 }
 \examples{
 library(magrittr)
@@ -52,11 +46,13 @@ dummy_datasets <- c(
   "dummy_gp_scripts.txt"
 )
 
-# file paths
-dummy_datasets \%>\%
-  purrr::map_chr(get_ukb_dummy, path_only = TRUE)
+# read dummy dataset into R
+get_ukb_dummy("dummy_ukb_main.tsv")
 
-# read into R
+# get file path to dummy dataset
+get_ukb_dummy("dummy_ukb_main.tsv", path_only = TRUE)
+
+# read all available dummy dataset into R
 dummy_datasets \%>\%
   purrr::set_names() \%>\%
   purrr::map(get_ukb_dummy, path_only = FALSE) \%>\%

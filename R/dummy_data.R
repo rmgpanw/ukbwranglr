@@ -59,11 +59,13 @@
 #'   "dummy_gp_scripts.txt"
 #' )
 #'
-#' # file paths
-#' dummy_datasets %>%
-#'   purrr::map_chr(get_ukb_dummy, path_only = TRUE)
+#' # read dummy dataset into R
+#' get_ukb_dummy("dummy_ukb_main.tsv")
 #'
-#' # read into R
+#' # get file path to dummy dataset
+#' get_ukb_dummy("dummy_ukb_main.tsv", path_only = TRUE)
+#'
+#' # read all available dummy dataset into R
 #' dummy_datasets %>%
 #'   purrr::set_names() %>%
 #'   purrr::map(get_ukb_dummy, path_only = FALSE) %>%

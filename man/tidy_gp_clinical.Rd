@@ -21,7 +21,7 @@ output table names only}
 }
 \value{
 A named list. Item 'clinical_events' contains the read codes with
-  event dates, and item 'gp_clinical_values' contains the 'value' columns.
+event dates, and item 'gp_clinical_values' contains the 'value' columns.
 }
 \description{
 Reformats the UK Biobank primary care clinical events dataset to match the
@@ -40,12 +40,13 @@ under the names 'clinical_events' and 'gp_clinical_values' respectively.
 \section{Other notes}{
 
 
-  By default, special date values (see
-  \href{https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=591}{resource 591} for
-  further details) are set to \code{NA}.
+By default, special date values (see
+\href{https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=591}{resource 591} for
+further details) are set to \code{NA}.
 }
 
 \seealso{
 \code{\link{tidy_clinical_events}},
-  \code{\link{make_clinical_events_db}}
+\code{\link{make_clinical_events_db}}
 }
+\keyword{internal}

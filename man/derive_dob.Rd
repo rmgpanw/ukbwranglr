@@ -17,10 +17,8 @@ derive_dob(
 \item{ukb_data_dict}{The UKB data dictionary (available online at the UK
 Biobank
 \href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{data
- showcase}. This should be a data frame where all columns are of type
-\code{character}. By default, this is downloaded from the
-\href{https://github.com/rmgpanw/ukbwranglr_resources}{\code{ukbwranglr_resources}}
- github repo.}
+showcase}. This should be a data frame where all columns are of type
+\code{character}.}
 
 \item{.drop}{If \code{TRUE}, remove the required input columns from the
 result}
@@ -31,7 +29,7 @@ name, label and values/value labels).}
 }
 \value{
 A data frame with a column called \code{dob} (type
-  character).
+character).
 }
 \description{
 Estimates dates of birth from year and month of birth (Field IDs

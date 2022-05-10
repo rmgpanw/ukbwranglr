@@ -11,23 +11,37 @@ make_data_dict(ukb_main, delim = "auto", ukb_data_dict = get_ukb_data_dict())
 string) or a data frame.}
 
 \item{delim}{Delimiter for the UKB main dataset file. Default is "auto" (see
-[data.table::fread]). Ignored if the file name ends with \code{.dta} (i.e.
-is a \code{STATA} file) or if \code{ukb_main} is a data frame.}
+\code{\link[data.table:fread]{data.table::fread()}}). Ignored if the file name ends with \code{.dta}
+(i.e. is a STATA file) or if \code{ukb_main} is a data frame.}
 
 \item{ukb_data_dict}{The UKB data dictionary (available online at the UK
 Biobank
 \href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{data
- showcase}. This should be a data frame where all columns are of type
-\code{character}. By default, this is downloaded from the
-\href{https://github.com/rmgpanw/ukbwranglr_resources}{\code{ukbwranglr_resources}}
- github repo.}
+showcase}. This should be a data frame where all columns are of type
+\code{character}.}
 }
 \value{
 A data dictionary (data frame) specific to \code{ukb_main}. This
-  includes columns with descriptive column names ("descriptive_colnames") and
-  the current column names ("colheaders_raw").
+includes columns with descriptive column names ("descriptive_colnames") and
+the current column names ("colheaders_raw").
 }
 \description{
-Creates a data dictionary from either a raw UK Biobank main dataset file or a
-data frame if this has already been loaded into R.
+Creates a data dictionary for a raw UK Biobank main dataset, either using
+file path or from a data frame if the dataset has already been loaded into R.
+}
+\examples{
+# dummy UKB data dictionary
+dummy_ukb_data_dict <- get_ukb_dummy("dummy_Data_Dictionary_Showcase.tsv")
+
+# create data dictionary specific to UKB main dataset, either using file path
+make_data_dict(
+  ukb_main = get_ukb_dummy("dummy_ukb_main.tsv", path_only = TRUE),
+  ukb_data_dict = dummy_ukb_data_dict
+)
+
+# ...or from data frame
+make_data_dict(
+  ukb_main = get_ukb_dummy("dummy_ukb_main.tsv"),
+  ukb_data_dict = dummy_ukb_data_dict
+)
 }

@@ -23,16 +23,13 @@ tidy_clinical_events(
 \item{ukb_data_dict}{The UKB data dictionary (available online at the UK
 Biobank
 \href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{data
- showcase}. This should be a data frame where all columns are of type
-\code{character}. By default, this is downloaded from the
-\href{https://github.com/rmgpanw/ukbwranglr_resources}{\code{ukbwranglr_resources}}
- github repo.}
+showcase}. This should be a data frame where all columns are of type
+\code{character}.}
 
-\item{ukb_codings}{The UKB codings dictionary. This should be a data frame
-where all columns are of type \code{character}. By default, this is
-downloaded from the
-\href{https://github.com/rmgpanw/ukbwranglr_resources}{\code{ukbwranglr_resources}}
- github repo.}
+\item{ukb_codings}{The UKB codings file (available online at the UK Biobank
+\href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{data
+showcase}. This should be a data frame where all columns are of type
+\code{character}.}
 
 \item{clinical_events_sources}{A character vector of clinical events sources
 to tidy. By default, all available options are included.}
@@ -64,19 +61,23 @@ following columns:
 \itemize{ \item \code{eid} - participant identifier \item \code{source} - the
 FieldID (prefixed by 'f') where clinical codes were extracted from. See
 \code{\link{clinical_events_sources}} for further details. \item \code{index}
-- the corresponding instance and array (e.g. '0-1' means instance 0 and array
-1) \item \code{code} - clinical code. The type of clinical codings system
+\itemize{
+\item the corresponding instance and array (e.g. '0-1' means instance 0 and array
+}
+\enumerate{
+\item \item \code{code} - clinical code. The type of clinical codings system
 used depends on \code{source}. \item \code{date} - associated date. Note that
 in cases where participants self-reported a medical condition but recorded
 the date as either 'Date uncertain or unknown' or 'Preferred not to answer'
 (see \href{https://biobank.ndph.ox.ac.uk/ukb/coding.cgi?id=13}{data coding
 13}) then the date is set to \code{NA}.}
 }
+}
 \section{Other notes}{
 
 
-  Results may be combined into a single data frame using
-  \code{\link[dplyr]{bind_rows}}.
+Results may be combined into a single data frame using
+\code{\link[dplyr]{bind_rows}}.
 }
 
 \examples{
@@ -86,13 +87,26 @@ dummy_ukb_data_dict <- get_ukb_dummy("dummy_Data_Dictionary_Showcase.tsv")
 dummy_ukb_codings <- get_ukb_dummy("dummy_Codings.tsv")
 
 # tidy clinical events in a UK Biobank main dataset
-tidy_clinical_events(
+clinical_events <- tidy_clinical_events(
   ukb_main = dummy_ukb_main,
   ukb_data_dict = dummy_ukb_data_dict,
   ukb_codings = dummy_ukb_codings
 )
 
+# returns a named list of data frames, one for each `clinical_events_source`
+names(clinical_events)
+
+clinical_events$summary_hes_icd10
+
 # use .details_only = TRUE to return details of required Field IDs for
 # specific clinical_events sources
 tidy_clinical_events(.details_only = TRUE)
 }
+\seealso{
+Other clinical events: 
+\code{\link{clinical_events_sources}()},
+\code{\link{example_clinical_codes}()},
+\code{\link{extract_phenotypes}()},
+\code{\link{make_clinical_events_db}()}
+}
+\concept{clinical events}

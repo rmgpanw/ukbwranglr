@@ -5,36 +5,96 @@
 # EXPORTED FUNCTIONS ----------------------------------------------------
 
 
-#' Create a SQLite database with a \code{clinical_events} table
+#' Create a SQLite database with a `clinical_events` table
 #'
-#' Adds tables called \code{clinical_events}, and optionally
-#' \code{gp_clinical_values} and \code{gp_scripts_names_and_quantities} to a
-#' SQLite database file (the latter 2 are only added if `gp_clinical_path`
-#' and/or `gp_scripts_path` respectively are provided). This is a long format
-#' table combining all clinical events data from a UK Biobank main dataset and
-#' the UK Biobank primary care clinical events dataset, as listed by
-#' \code{link{clinical_events_sources}}. Indexes are set on the \code{source},
-#' \code{code} and \code{eid} columns in the \code{clinical_events} table.
+#' Adds tables named `clinical_events`, and optionally 'gp_clinical_values' and
+#' 'gp_scripts_names_and_quantities' to a SQLite database file (the latter 2 are
+#' only added if `gp_clinical_path` and/or `gp_scripts_path` respectively are
+#' provided). This is a long format table combining all clinical events data
+#' from a UK Biobank main dataset and the UK Biobank primary care clinical
+#' events dataset. Use [`clinical_events_sources()`] to see a list of all
+#' currently included clinical events sources.
+#'
+#' See the [introduction to
+#' dbplyr](https://dbplyr.tidyverse.org/articles/dbplyr.html) vignette for
+#' getting started with databases and [dplyr::dplyr].
+#'
+#' Indexes are set on the `source`, `code` and `eid` columns in the
+#' `clinical_events` table for faster querying.
 #'
 #' @param ukb_main_path Path to the main UKB dataset file.
 #' @param ukb_db_path Path to the SQLite database file. The file name must end
 #'   with '.db'. If no file with this name exists then one will be created.
-#' @param ukb_main_delim Delimiter for \code{ukb_main_path}. Default value is
-#'   \code{"auto"}.
-#' @param gp_clinical_path Path to the UKB primary care clinical events file
-#'   (\code{gp_clinical.txt}).
-#' @param gp_scripts_path Path to the UKB primary care prescriptions file
-#'   (\code{gp_scripts.txt}).
-#' @param overwrite If \code{TRUE}, then tables \code{clinical_events} and
-#'   \code{gp_clinical_values} will be overwritten if they already exist in the
-#'   database. Default value is \code{FALSE}.
+#' @param ukb_main_delim Delimiter for `ukb_main_path`. Default value is
+#'   `"auto"`.
+#' @param gp_clinical_path (Optional) path to the UKB primary care clinical
+#'   events file (`gp_clinical.txt`).
+#' @param gp_scripts_path (Optional) path to the UKB primary care prescriptions
+#'   file (`gp_scripts.txt`).
+#' @param overwrite If `TRUE`, then tables `clinical_events` and
+#'   `gp_clinical_values` will be overwritten if they already exist in the
+#'   database. Default value is `FALSE`.
 #' @param chunk_size The number of rows to include in each chunk when processing
-#'   the primary care dataset.
+#'   primary care datasets.
 #' @inheritParams tidy_clinical_events
 #'
-#' @return Returns \code{ukb_db_path} invisibly.
+#' @return Returns `ukb_db_path` invisibly.
 #' @export
-#' @seealso \code{\link{tidy_clinical_events}}, \code{\link{tidy_gp_clinical}}
+#' @family clinical events
+#' @examples
+#' # dummy UKB data dictionary and codings
+#' dummy_ukb_data_dict <- get_ukb_dummy("dummy_Data_Dictionary_Showcase.tsv")
+#' dummy_ukb_codings <- get_ukb_dummy("dummy_Codings.tsv")
+#'
+#' # file paths to dummy UKB main and primary care datasets
+#' dummy_ukb_main_path <- get_ukb_dummy(
+#'   "dummy_ukb_main.tsv",
+#'   path_only = TRUE
+#' )
+#'
+#' dummy_gp_clinical_path <- get_ukb_dummy(
+#'   "dummy_gp_clinical.txt",
+#'   path_only = TRUE
+#' )
+#'
+#' dummy_gp_scripts_path <- get_ukb_dummy(
+#'   "dummy_gp_scripts.txt",
+#'   path_only = TRUE
+#' )
+#'
+#' # file path where SQLite database will be created
+#' dummy_ukb_db_path <- file.path(tempdir(), "ukb.db")
+#'
+#' # build database
+#' suppressWarnings(make_clinical_events_db(
+#'   ukb_main_path = dummy_ukb_main_path,
+#'   gp_clinical_path = dummy_gp_clinical_path,
+#'   gp_scripts_path = dummy_gp_scripts_path,
+#'   ukb_db_path = dummy_ukb_db_path,
+#'   ukb_data_dict = dummy_ukb_data_dict,
+#'   ukb_codings = dummy_ukb_codings,
+#' ))
+#'
+#' # connect to database
+#' con <- DBI::dbConnect(
+#'   RSQLite::SQLite(),
+#'   dummy_ukb_db_path
+#' )
+#'
+#' ukbdb <- db_tables_to_list(con)
+#'
+#' # table names
+#' names(ukbdb)
+#'
+#' # view tables
+#' ukbdb$clinical_events
+#'
+#' ukbdb$gp_clinical_values
+#'
+#' ukbdb$gp_scripts_names_and_quantities
+#'
+#' # close database connection
+#' DBI::dbDisconnect(con)
 make_clinical_events_db <- function(ukb_main_path,
                                     ukb_db_path,
                                     ukb_main_delim = "auto",
@@ -260,6 +320,8 @@ make_clinical_events_db <- function(ukb_main_path,
   invisible(ukb_db_path)
 }
 
+# PRIVATE FUNCTIONS -------------------------------------------------------
+
 #' Tidy UK Biobank primary care clinical events
 #'
 #' Reformats the UK Biobank primary care clinical events dataset to match the
@@ -286,7 +348,7 @@ make_clinical_events_db <- function(ukb_main_path,
 #' @param .details_only logical. If \code{TRUE}, return a character vector of
 #'   output table names only
 #'
-#' @export
+#' @keywords internal
 #' @return A named list. Item 'clinical_events' contains the read codes with
 #'   event dates, and item 'gp_clinical_values' contains the 'value' columns.
 #' @seealso \code{\link{tidy_clinical_events}},
@@ -330,7 +392,7 @@ tidy_gp_clinical <- function(gp_clinical,
 #' @param .details_only logical. If \code{TRUE}, return a character vector of
 #'   output table names only
 #'
-#' @export
+#' @keywords internal
 #' @return A named list. Item 'clinical_events' contains the read codes with
 #'   event dates, and item 'gp_scripts_names_and_quantities' contains the drug
 #'   names/quantities columns.
@@ -347,8 +409,6 @@ tidy_gp_scripts <- function(gp_scripts,
     .details_only = .details_only
   )
 }
-
-# PRIVATE FUNCTIONS -------------------------------------------------------
 
 #' Write a file to a database
 #'

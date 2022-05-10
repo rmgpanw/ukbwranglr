@@ -19,10 +19,8 @@ derive_ethnic_background_simplified(
 \item{ukb_data_dict}{The UKB data dictionary (available online at the UK
 Biobank
 \href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{data
- showcase}. This should be a data frame where all columns are of type
-\code{character}. By default, this is downloaded from the
-\href{https://github.com/rmgpanw/ukbwranglr_resources}{\code{ukbwranglr_resources}}
- github repo.}
+showcase}. This should be a data frame where all columns are of type
+\code{character}.}
 
 \item{ethnicity_levels}{The factor level order for the appended
 \code{ethnic_background_simplified} column. By default, the baseline level
@@ -37,7 +35,7 @@ name, label and values/value labels).}
 }
 \value{
 A data frame with a column called \code{ethnic_background_simplified}
-  (type factor).
+(type factor).
 }
 \description{
 Simplifies ethnic background in a UK Biobank main dataset to the main

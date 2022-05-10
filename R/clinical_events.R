@@ -154,17 +154,40 @@ mutate_age_at_event_cols <- function(ukb_main,
 #'   \code{clinical_codes} for that disease. If \code{keep_all} is \code{TRUE},
 #'   then there will also be additional nested data frame column called 'data'.
 #' @export
+#' @family clinical events
 #' @examples
-#' \dontrun{
-#' dummy_main_dataset_clinical_events() %>%
-#'   tidy_clinical_events(clinical_events_sources = c("summary_hes_icd10")) %>%
-#'   dplyr::bind_rows() %>%
-#'   extract_phenotypes(
-#'     clinical_codes = example_clinical_codes(),
-#'     data_sources = "f41270",
-#'     min_max = "min"
-#'   )
-#' }
+#' library(magrittr)
+#'
+#' # dummy clinical events data frame
+#' dummy_ukb_data_dict <- get_ukb_dummy("dummy_Data_Dictionary_Showcase.tsv")
+#' dummy_ukb_codings <- get_ukb_dummy("dummy_Codings.tsv")
+#'
+#' dummy_clinical_events <- read_ukb(
+#'   path = get_ukb_dummy("dummy_ukb_main.tsv", path_only = TRUE),
+#'   ukb_data_dict = dummy_ukb_data_dict,
+#'   ukb_codings = dummy_ukb_codings
+#' ) %>%
+#'   tidy_clinical_events(
+#'     ukb_data_dict = dummy_ukb_data_dict,
+#'     ukb_codings = dummy_ukb_codings
+#'   ) %>%
+#'   dplyr::bind_rows()
+#'
+#' head(dummy_clinical_events)
+#'
+#' # dummy clinical code list
+#' example_clinical_codes()
+#'
+#' # Filter for participants with matching clinical codes,
+#' # by default only the earliest date is extracted
+#' cases <- extract_phenotypes(
+#'   clinical_events = dummy_clinical_events,
+#'   clinical_codes = example_clinical_codes()
+#' )
+#'
+#' # returns a named list of data frames, one for each category in
+#' # lower case, and one for the overall disease in capitals
+#' cases
 extract_phenotypes <- function(
   clinical_events,
   clinical_codes,
@@ -344,7 +367,7 @@ extract_phenotypes <- function(
 #' @return A data frame
 #' @export
 #'
-#' @seealso \code{\link{tidy_clinical_events}}
+#' @family clinical events
 #' @examples
 #' clinical_events_sources()
 clinical_events_sources <- function() {
@@ -393,6 +416,7 @@ clinical_events_sources <- function() {
 #'
 #' @return A named list of clinical events data frames.
 #' @export
+#' @family clinical events
 #'
 #' @examples
 #' # dummy UKB main dataset and metadata
@@ -401,11 +425,16 @@ clinical_events_sources <- function() {
 #' dummy_ukb_codings <- get_ukb_dummy("dummy_Codings.tsv")
 #'
 #' # tidy clinical events in a UK Biobank main dataset
-#' tidy_clinical_events(
+#' clinical_events <- tidy_clinical_events(
 #'   ukb_main = dummy_ukb_main,
 #'   ukb_data_dict = dummy_ukb_data_dict,
 #'   ukb_codings = dummy_ukb_codings
 #' )
+#'
+#' # returns a named list of data frames, one for each `clinical_events_source`
+#' names(clinical_events)
+#'
+#' clinical_events$summary_hes_icd10
 #'
 #' # use .details_only = TRUE to return details of required Field IDs for
 #' # specific clinical_events sources
@@ -623,10 +652,9 @@ tidy_clinical_events <- function(ukb_main,
 #' Use \code{\link{validate_clinical_codes}} to check whether a clinical codes
 #' data frame meets all requirements.
 #'
-#' Note: this example is not an exhaustive list of codes for diabetes.
-#'
-#' @return A data frame of selected clinical codes for diabetes.
+#' @return A data frame of selected clinical codes (non-exhaustive) for diabetes.
 #' @export
+#' @family clinical events
 #' @seealso \code{\link{validate_clinical_codes}}
 #'
 #' @examples

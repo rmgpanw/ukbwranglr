@@ -6,14 +6,11 @@ reference:
 - contents:
   - make_data_dict
   - read_ukb
-  - label_ukb_main
 
 - title: Tidy clinical events data
   desc:  Convert clinical events data from multiple sources to a standardised long format table
 - contents:
   - tidy_clinical_events
-  - tidy_gp_clinical
-  - tidy_gp_scripts
   - make_clinical_events_db
   - clinical_events_sources
 

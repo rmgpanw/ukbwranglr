@@ -39,7 +39,7 @@ latest date that one of the codes appears in \code{clinical_codes} appears.}
 \item{workers}{The number of processes to run in parallel when
 \code{clinical_codes} includes multiple diseases. This is used to set the
 number of workers in \code{\link[future]{plan}} with \code{strategy =
-\link[future]{multisession}}, which is passed on to
+  \link[future]{multisession}}, which is passed on to
 \code{\link[furrr]{future_map}}. If \code{NULL}, then no processing is
 performed sequentially. Default value is \code{NULL}.}
 
@@ -48,10 +48,10 @@ nested data frame column named 'data'.}
 }
 \value{
 A named list of data frames, one for each disease. Each data frame
-  has an "eid" column, and "event_min/max_indicator" and "event_min/max_date"
-  columns for each phenotype in the 'category' column of
-  \code{clinical_codes} for that disease. If \code{keep_all} is \code{TRUE},
-  then there will also be additional nested data frame column called 'data'.
+has an "eid" column, and "event_min/max_indicator" and "event_min/max_date"
+columns for each phenotype in the 'category' column of
+\code{clinical_codes} for that disease. If \code{keep_all} is \code{TRUE},
+then there will also be additional nested data frame column called 'data'.
 }
 \description{
 Filters a clinical events table created by \code{\link{tidy_clinical_events}}
@@ -62,14 +62,44 @@ appears in an individual participant's record is extracted. See also the
 events'} vignette on the \code{ukbwranglr} package website.
 }
 \examples{
-\dontrun{
-dummy_main_dataset_clinical_events() \%>\%
-  tidy_clinical_events(clinical_events_sources = c("summary_hes_icd10")) \%>\%
-  dplyr::bind_rows() \%>\%
-  extract_phenotypes(
-    clinical_codes = example_clinical_codes(),
-    data_sources = "f41270",
-    min_max = "min"
-  )
+library(magrittr)
+
+# dummy clinical events data frame
+dummy_ukb_data_dict <- get_ukb_dummy("dummy_Data_Dictionary_Showcase.tsv")
+dummy_ukb_codings <- get_ukb_dummy("dummy_Codings.tsv")
+
+dummy_clinical_events <- read_ukb(
+  path = get_ukb_dummy("dummy_ukb_main.tsv", path_only = TRUE),
+  ukb_data_dict = dummy_ukb_data_dict,
+  ukb_codings = dummy_ukb_codings
+) \%>\%
+  tidy_clinical_events(
+    ukb_data_dict = dummy_ukb_data_dict,
+    ukb_codings = dummy_ukb_codings
+  ) \%>\%
+  dplyr::bind_rows()
+
+head(dummy_clinical_events)
+
+# dummy clinical code list
+example_clinical_codes()
+
+# Filter for participants with matching clinical codes,
+# by default only the earliest date is extracted
+cases <- extract_phenotypes(
+  clinical_events = dummy_clinical_events,
+  clinical_codes = example_clinical_codes()
+)
+
+# returns a named list of data frames, one for each category in
+# lower case, and one for the overall disease in capitals
+cases
 }
+\seealso{
+Other clinical events: 
+\code{\link{clinical_events_sources}()},
+\code{\link{example_clinical_codes}()},
+\code{\link{make_clinical_events_db}()},
+\code{\link{tidy_clinical_events}()}
 }
+\concept{clinical events}

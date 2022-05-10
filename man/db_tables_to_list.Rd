@@ -25,10 +25,20 @@ to dbplyr} vignette for getting started with databases and
 \code{\link[dplyr]{dplyr}}.
 }
 \examples{
+# create an SQLite database in memory
 con <- DBI::dbConnect(RSQLite::SQLite(), dbname = ":memory:")
+
+# populate with tables
 dplyr::copy_to(con, head(iris), "iris_head")
 dplyr::copy_to(con, head(mtcars), "mtcars_head")
+
+# create named list of tbl_dbi objects
 db_tables <- db_tables_to_list(con)
+
+# view tables
 db_tables$iris_head
 db_tables$mtcars_head
+
+# to import to R, use dplyr::collect()
+dplyr::collect(db_tables$iris_head)
 }
