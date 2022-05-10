@@ -57,7 +57,7 @@ will summarised as \code{0}. See the documentation for
 }
 \examples{
 library(magrittr)
-# dummy UKB data and data dictionary
+# get dummy UKB data and data dictionary
 dummy_ukb_data_dict <- get_ukb_dummy("dummy_Data_Dictionary_Showcase.tsv")
 dummy_ukb_codings <- get_ukb_dummy("dummy_Codings.tsv")
 
@@ -69,20 +69,20 @@ dummy_ukb_main <- read_ukb(
   dplyr::select(eid, tidyselect::contains("systolic_blood_pressure")) \%>\%
   tibble::as_tibble()
 
-# summarise mean value by Field, keep original variables
+# summarise mean values by Field, keep original variables
 summarise_numerical_variables(
   dummy_ukb_main,
   ukb_data_dict = dummy_ukb_data_dict
 )
 
-# summarise mean value by Field, drop original variables
+# summarise mean values by Field, drop original variables
 summarise_numerical_variables(
   dummy_ukb_main,
   ukb_data_dict = dummy_ukb_data_dict,
   .drop = TRUE
 )
 
-# summarise min value by instance, dropping original variables
+# summarise min values by instance, dropping original variables
 summarise_numerical_variables(
   dummy_ukb_main,
   ukb_data_dict = dummy_ukb_data_dict,
