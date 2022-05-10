@@ -20,102 +20,225 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 
-[![R build status](https://github.com/rmgpanw/ukbwranglr/workflows/R-CMD-check/badge.svg)](https://github.com/rmgpanw/ukbwranglr/actions) [![Codecov test coverage](https://codecov.io/gh/rmgpanw/ukbwranglr/branch/main/graph/badge.svg)](https://codecov.io/gh/rmgpanw/ukbwranglr?branch=main) [![pkgdown](https://github.com/rmgpanw/ukbwranglr/workflows/pkgdown/badge.svg)](https://github.com/rmgpanw/codemapper/actions) [![Launch RStudio Cloud](https://img.shields.io/badge/RStudio-Cloud-blue)](https://rstudio.cloud/project/2528744) [![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
+[![R build status](https://github.com/rmgpanw/ukbwranglr/workflows/R-CMD-check/badge.svg)](https://github.com/rmgpanw/ukbwranglr/actions) [![Codecov test coverage](https://codecov.io/gh/rmgpanw/ukbwranglr/branch/main/graph/badge.svg)](https://codecov.io/gh/rmgpanw/ukbwranglr?branch=main) [![pkgdown](https://github.com/rmgpanw/ukbwranglr/workflows/pkgdown/badge.svg)](https://github.com/rmgpanw/ukbwranglr/actions) [![Launch RStudio Cloud](https://img.shields.io/badge/RStudio-Cloud-blue)](https://rstudio.cloud/project/2528744) [![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
 
 <!-- badges: end -->
 
-***--UNDER CONSTRUCTION--***
-
 # Overview
 
-The goal of `ukbwranglr` is to facilitate analysing UK Biobank data. This includes:
+The goal of ukbwranglr is to facilitate analysing UK Biobank data, including:
 
-1. Reading selected UK Biobank variables into R
-2. Summarising continuous variables
-3. Identifying phenotypic outcomes from clinical events data (e.g. self-reported medical conditions and linked health records data)
+1.  Reading a selection of UK Biobank variables into R.
+2.  Summarising repeated continuous variable measurements.[^1]
+3.  Extracting phenotypic outcomes of interest from clinical events data.[^2]
 
-# Reading a selection of variables into R
+[^1]: For example, calculating a mean/minimum/maximum body mass index (BMI) from repeated BMI measurements.
 
-A UK Biobank main dataset file is typically too large to fit into memory on a personal computer. Often however, only a subset of the data is required.
+[^2]: For example, identifying participants with a diagnosis of hypertension from linked primary and secondary health care records.
 
-*Raw data appearance:*
+# Installation
 
-```{r}
-library(dplyr)
-library(ukbwranglr)
-
-# path to dummy data
-DUMMY_DATA_PATH <- system.file("extdata", "dummy_ukb_data.csv", package = "ukbwranglr")
-
-# appearance of raw data
-data.table::fread(DUMMY_DATA_PATH) %>% 
-  select(eid, 
-         `31-0.0`, 
-         `34-0.0`,
-         `21000-0.0`, 
-         `20002-0.0`, 
-         `21001-0.0`) %>% 
-  head(n = 5)
-```
-
-*Appearance when loaded using `ukbwranglr::read_ukb()`:*
-
-```{r}
-data_dict <- ukbwranglr::make_data_dict(DUMMY_DATA_PATH, delim = ",")
-ukbwranglr::read_ukb(DUMMY_DATA_PATH, data_dict, delim = ",") %>% 
-  head()
-```
-
-`ukbwranglr` can also help to:
-
--   Identify participants with certain health conditions or taking certain medications (with dates)
--   Summarise biomarker measurements (e.g. extract the mean systolic blood pressure across repeated measurements)
-
-Please see ['getting started'](https://rmgpanw.github.io/ukbwranglr/articles/ukbwranglr.html) on the [package documentation website](https://rmgpanw.github.io/ukbwranglr/index.html) for further details.
-
-## Installation
-
-You can install the development version of `ukbwranglr` with:
+You can install the development version of ukbwranglr with:
 
 ```{r eval=FALSE}
 # install.packages("devtools")
 devtools::install_github("rmgpanw/ukbwranglr")
 ```
 
-## Basic usage - reading selected columns from a UK Biobank dataset into R
+# Basic workflow
 
-**Steps:**
+The basic workflow is as follows:
 
-1.  Create a data dictionary specific to your UK Biobank file
-2.  Filter this for your required variables
-3.  Read your selected columns into R
+1.  Create a data dictionary for your main UK Biobank dataset.
+2.  Read selected variables into R.
+3.  Summarise continuous variables.
+4.  Tidy clinical events data and extract outcomes of interest.
+5.  Analyse.
 
-This process is outlined below for dummy UK Biobank data generated using the [tofu library](https://github.com/spiros/tofu) (*Spiros Denaxas. (2020). spiros/tofu: Updated release for DOI (Version v1.1). Zenodo. http://doi.org/10.5281/zenodo.3634604*).
+These steps are now illustrated with a dummy dataset included with ukbwranglr:
 
-#### 1. Create data dictionary
-
-```{r eval=FALSE}
-# load package
+```{r}
 library(ukbwranglr)
+library(dplyr)
+library(tidyselect)
+library(readr)
+library(tibble)
 
+# path to dummy data
+ukb_main_path <- get_ukb_dummy("dummy_ukb_main.tsv",
+                                     path_only = TRUE)
+
+# raw data
+read_tsv(ukb_main_path)
+```
+
+## 1. Create data dictionary
+
+First download a copy of the UK Biobank data dictionary and codings files from the [UK Biobank data showcase website](https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide). Dummy versions are used here:
+
+```{r}
+# get required metadata
+ukb_data_dict <- get_ukb_dummy("dummy_Data_Dictionary_Showcase.tsv")
+ukb_codings <- get_ukb_dummy("dummy_Codings.tsv")
+```
+
+Then create a data dictionary using `make_data_dict()`:
+
+```{r}
 # make data dictionary
-data_dict <- make_data_dict("MY_UKB_FILE.tab")
+data_dict <- make_data_dict(ukb_main_path, 
+                            ukb_data_dict = ukb_data_dict)
+
+data_dict
 ```
 
-#### 2. Filter data dictionary for required variables
+## 2. Read selected variables into R
 
-```{r eval=FALSE}
-# Filter for sex, year of birth, BMI and self-reported noncancer-illness fields
-data_dict <- data_dict %>%
-  dplyr::filter(FieldID %in% c("31",
-                               "34",
-                               "21001",
-                               "20002"))
+Read a main UK Biobank dataset into R using `read_ukb()`:
+
+```{r}
+read_ukb(path = ukb_main_path,
+         ukb_data_dict = ukb_data_dict,
+         ukb_codings = ukb_codings) %>% 
+  # (convert to tibble for concise print method)
+  as_tibble()
 ```
 
-#### 3. Read selected columns into R
+A UK Biobank main dataset file is typically too large to fit into memory on a personal computer. Often however, only a subset of the data is required. To read a selection of variables, filter the data dictionary created with `make_data_dict()` for a subset of variables and supply this to `read_ukb()`:[^3]
 
-```{re val=FALSE}
-read_ukb(path = "MY_UKB_FILE.tab", 
-                        pheno_data_dict = data_dict)
+[^3]: It may be preferable at this stage to write the data dictionary to a csv file (using `readr::write_csv()`), manually filter in a text editor like Microsoft Excel, then reload into R (using `readr::read_csv()`).
+
+```{r}
+# Filter data dictionary for sex, year of birth, body mass index, systolic blood pressure, self-reported non-cancer illness and summary hospital diagnoses (ICD10) fields
+data_dict_selected <- data_dict %>%
+  filter(FieldID %in% c(
+    # Participant ID
+    "eid",
+    
+    # Sex
+    "31",
+    
+    # Year of birth
+    "34",
+    
+    # Body mass index
+    "21001",
+    
+    # Systolic blood pressure
+    "4080",
+    
+    # Self-reported non-cancer medical conditions
+    "20002",
+    "20008",
+    
+    # Summary hospital diagnoses (ICD10)
+    "41270",
+    "41280"
+  ))
+
+# Read selected variables into R
+ukb_main <- read_ukb(path = ukb_main_path,
+         data_dict = data_dict_selected,
+         ukb_data_dict = ukb_data_dict,
+         ukb_codings = ukb_codings)
+
+# Convert to tibble for concise print method
+as_tibble(ukb_main)
 ```
+
+## 3. Summarise continuous variables
+
+Some variables such as body mass index and systolic blood pressure will have been measured on more than one occasion. In these cases it may be desirable to calculate a summary value (e.g. mean). Use `summarise_numerical_variables()`:
+
+```{r}
+# calculate the mean value across all repeated continuous variable measurements
+ukb_main_numerical_vars_summarised <- summarise_numerical_variables(
+  ukb_main = ukb_main,
+  ukb_data_dict = ukb_data_dict,
+  summary_function = "mean", 
+  .drop = TRUE
+) %>% 
+  # reorder variables
+  select(eid,
+         sex_f31_0_0,
+         year_of_birth_f34_0_0,
+         mean_body_mass_index_bmi_x21001,
+         mean_systolic_blood_pressure_automated_reading_x4080)
+
+as_tibble(ukb_main_numerical_vars_summarised)
+```
+
+## 4. Tidy clinical events data and extract outcomes of interest
+
+Use `tidy_clinical_events()` to reshape clinical events fields (such as self-reported non-cancer medical conditions) to long format:
+
+```{r}
+# tidy clinical events
+clinical_events <- tidy_clinical_events(
+  ukb_main = ukb_main, 
+  ukb_data_dict = ukb_data_dict, 
+  ukb_codings = ukb_codings,
+  clinical_events_sources = c("self_report_non_cancer",
+                              "summary_hes_icd10")
+)
+
+# returns a named list of data frames
+clinical_events
+
+# combine with dplyr
+clinical_events <- dplyr::bind_rows(clinical_events)
+
+clinical_events
+```
+
+To identify participants with a condition of interest, first decide which codes will capture this. For example, the following includes a (non-exhaustive) list of clinical codes for diabetes:
+
+```{r}
+example_clinical_codes()
+```
+
+Supply this to `extract_phenotypes()` to filter for participants who have any matching clinical codes in their records. By default, only the earliest date is extracted:
+
+```{r}
+# extract phenotypes
+diabetes_cases <- extract_phenotypes(clinical_events = clinical_events,
+                                     clinical_codes = example_clinical_codes())
+
+# returns a named list of data frames, one for each category in lower case, and one for the overall disease in capitals
+diabetes_cases
+```
+
+## 5. Analyse
+
+Merge the output from steps 4 and 5:
+
+```{r}
+ukb_main_processed <- dplyr::full_join(
+  ukb_main_numerical_vars_summarised,
+  diabetes_cases$Diabetes$DIABETES_UKBWR,
+  by = "eid"
+) %>% 
+  mutate(DIABETES_UKBWR_indicator = ifelse(
+    !is.na(DIABETES_UKBWR_indicator),
+    yes = DIABETES_UKBWR_indicator,
+    no = "No"
+  ))
+
+ukb_main_processed
+```
+
+Describe:
+
+```{r}
+ukb_main_processed %>%
+  select(-eid) %>%
+  group_by(DIABETES_UKBWR_indicator) %>%
+  summarise(pct_female = sum(sex_f31_0_0 == "Female", na.rm = TRUE) / n(),
+            across(where(is.numeric), ~ mean(.x, na.rm = TRUE)))
+```
+
+# Learn more
+
+See the vignettes on the ukbwranglr pkgdown website for further information. You can try out the steps either locally by installing ukbwranglr on your own machine, or online by clicking on the RStudio Cloud badge on this page[^4] and navigating to the Rmd files under 'vignettes'.
+
+[^4]: You will be asked to sign up for a free account if you do not have one already.
