@@ -759,7 +759,8 @@ indicate_coltype_in_data_dict <- function(data_dict,
     ) %>%
     dplyr::mutate(
       "coercible_to_integer" = dplyr::case_when(
-        .data[["Coding"]] %in% !!ukb_codings_coercible_to_integer ~ "Yes"
+        .data[["Coding"]] %in% !!ukb_codings_coercible_to_integer ~ "Yes",
+        TRUE ~ "No"
       )
     )
 
