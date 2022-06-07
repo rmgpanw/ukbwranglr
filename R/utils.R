@@ -262,11 +262,18 @@ db_tables_to_list <- function(conn) {
 #'
 #' @param download_url Character
 #' @param path Character
+#' @param timeout Integer. Passed to `options()` to determine how long
+#'   `download.file()` attempts to download for.
 #'
 #' @return File path to downloaded file
 #' @noRd
 download_file <- function(download_url,
-                          path = tempfile()) {
+                          path = tempfile(),
+                          timeout = 60) {
+  old_timeout <- getOption("timeout")
+  options(timeout = timeout)
+  on.exit(options(timeout = old_timeout))
+
   if (file.exists(path)) {
     invisible(path)
   } else {
