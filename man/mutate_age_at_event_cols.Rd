@@ -12,9 +12,9 @@ mutate_age_at_event_cols(
 )
 }
 \arguments{
-\item{ukb_main}{a UKB main dataset (data frame) containing a column named "eid" and a date
-of birth column, as well as date columns matching the regex supplied to
-the \code{date_col_regex} argument.}
+\item{ukb_main}{a UKB main dataset (data frame) containing a column named
+"eid" and a date of birth column, as well as date columns matching the
+regex supplied to the \code{date_col_regex} argument.}
 
 \item{dob_col}{character. The name of the date of birth column in
 \code{ukb_main}.}
@@ -27,11 +27,11 @@ have names matching those of the input date columns, replacing the regex
 supplied to \code{date_col_regex} with this string.}
 }
 \value{
-A data frame with additional "age at event" columns
+A data frame with additional "age at event" columns (in years).
 }
 \description{
-Mutates numeric columns with the age at event for all columns that
-match the regex supplied to \code{date_col_regex}.
+Mutates numeric columns with the age at event (in years) for all columns that match the
+regex supplied to \code{date_col_regex}.
 }
 \examples{
 # dummy data

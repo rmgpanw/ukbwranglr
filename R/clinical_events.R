@@ -44,7 +44,7 @@ CLINICAL_EVENTS_COLTYPES <- c(
 
 #' Mutate age at event columns
 #'
-#' Mutates numeric columns with the age at event for all columns that match the
+#' Mutates numeric columns with the age at event (in years) for all columns that match the
 #' regex supplied to \code{date_col_regex}.
 #'
 #' @param ukb_main a UKB main dataset (data frame) containing a column named
@@ -58,7 +58,7 @@ CLINICAL_EVENTS_COLTYPES <- c(
 #'   have names matching those of the input date columns, replacing the regex
 #'   supplied to \code{date_col_regex} with this string.
 #'
-#' @return A data frame with additional "age at event" columns
+#' @return A data frame with additional "age at event" columns (in years).
 #' @export
 #'
 #' @examples
