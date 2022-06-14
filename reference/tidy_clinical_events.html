@@ -22,7 +22,7 @@ standardised long format table."><!-- mathjax --><script src="https://cdnjs.clou
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ukbwranglr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9001</span>
       </span>
     </div>
 
@@ -81,32 +81,45 @@ standardised long format table.</p>
     <h2>Arguments</h2>
     <dl><dt>ukb_main</dt>
 <dd><p>A UK Biobank main dataset.</p></dd>
+
+
 <dt>ukb_data_dict</dt>
 <dd><p>The UKB data dictionary (available online at the UK
 Biobank
 <a href="https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide" class="external-link">data
 showcase</a>. This should be a data frame where all columns are of type
 <code>character</code>.</p></dd>
+
+
 <dt>ukb_codings</dt>
 <dd><p>The UKB codings file (available online at the UK Biobank
 <a href="https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide" class="external-link">data
 showcase</a>. This should be a data frame where all columns are of type
 <code>character</code>.</p></dd>
+
+
 <dt>clinical_events_sources</dt>
 <dd><p>A character vector of clinical events sources
 to tidy. By default, all available options are included.</p></dd>
+
+
 <dt>strict</dt>
 <dd><p>If <code>TRUE</code>, raise an error if required columns for any
 clinical events sources listed in <code>clinical_events</code> are not present in
 <code>ukb_main</code>. If <code>FALSE</code>, then a warning message will be displayed
 instead. Default value is <code>TRUE</code>.</p></dd>
+
+
 <dt>.details_only</dt>
 <dd><p>If <code>TRUE</code>, return a list detailing required Field
 IDs</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A named list of clinical events data frames.</p>
+    
+
+<p>A named list of clinical events data frames.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -277,7 +290,7 @@ the date as either 'Date uncertain or unknown' or 'Preferred not to answer'
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

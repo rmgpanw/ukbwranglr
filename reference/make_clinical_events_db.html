@@ -24,7 +24,7 @@ finish running."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ukbwranglr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9001</span>
       </span>
     </div>
 
@@ -84,40 +84,59 @@ finish running.</p>
     <h2>Arguments</h2>
     <dl><dt>ukb_main_path</dt>
 <dd><p>Path to the main UKB dataset file.</p></dd>
+
+
 <dt>ukb_db_path</dt>
 <dd><p>Path to the SQLite database file. The file name must end
 with '.db'. If no file with this name exists then one will be created.</p></dd>
+
+
 <dt>ukb_main_delim</dt>
 <dd><p>Delimiter for <code>ukb_main_path</code>. Default value is
 <code>"auto"</code>.</p></dd>
+
+
 <dt>gp_clinical_path</dt>
 <dd><p>(Optional) path to the UKB primary care clinical
 events file (<code>gp_clinical.txt</code>).</p></dd>
+
+
 <dt>gp_scripts_path</dt>
 <dd><p>(Optional) path to the UKB primary care prescriptions
 file (<code>gp_scripts.txt</code>).</p></dd>
+
+
 <dt>ukb_data_dict</dt>
 <dd><p>The UKB data dictionary (available online at the UK
 Biobank
 <a href="https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide" class="external-link">data
 showcase</a>. This should be a data frame where all columns are of type
 <code>character</code>.</p></dd>
+
+
 <dt>ukb_codings</dt>
 <dd><p>The UKB codings file (available online at the UK Biobank
 <a href="https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide" class="external-link">data
 showcase</a>. This should be a data frame where all columns are of type
 <code>character</code>.</p></dd>
+
+
 <dt>overwrite</dt>
 <dd><p>If <code>TRUE</code>, then tables <code>clinical_events</code> and
 <code>gp_clinical_values</code> will be overwritten if they already exist in the
 database. Default value is <code>FALSE</code>.</p></dd>
+
+
 <dt>chunk_size</dt>
 <dd><p>The number of rows to include in each chunk when processing
 primary care datasets.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>Returns <code>ukb_db_path</code> invisibly.</p>
+    
+
+<p>Returns <code>ukb_db_path</code> invisibly.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -214,7 +233,7 @@ getting started with databases and <a href="https://dplyr.tidyverse.org/referenc
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Complete. Time taken: 0 minutes, 0 seconds</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ***SETTING INDEX ON `source`, `code` AND `eid` COLUMNS IN UKB DATABASE 'clinical_events' TABLE***</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> SUCCESS! UKB DATABASE SETUP COMPLETE</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> To connect to db: `con &lt;- DBI::dbConnect(RSQLite::SQLite(), '/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//RtmpMWWnqK/ukb.db')`, then `ukbdb &lt;- ukbwranglr::db_tables_to_list(con)`</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> To connect to db: `con &lt;- DBI::dbConnect(RSQLite::SQLite(), '/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//RtmpU2ttlb/ukb.db')`, then `ukbdb &lt;- ukbwranglr::db_tables_to_list(con)`</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Time taken: 0 minutes, 2 seconds.</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># connect to database</span></span>
@@ -233,7 +252,7 @@ getting started with databases and <a href="https://dplyr.tidyverse.org/referenc
 <span class="r-in"><span class="co"># view tables</span></span>
 <span class="r-in"><span class="va">ukbdb</span><span class="op">$</span><span class="va">clinical_events</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Source:   table&lt;clinical_events&gt; [?? x 5]</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: sqlite 3.38.5 [/private/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/RtmpMWWnqK/ukb.db]</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: sqlite 3.38.5 [/private/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/RtmpU2ttlb/ukb.db]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      eid source index code       date      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>     1 f40001 0_0   X095       1917-10-08</span>
@@ -250,7 +269,7 @@ getting started with databases and <a href="https://dplyr.tidyverse.org/referenc
 <span class="r-in"></span>
 <span class="r-in"><span class="va">ukbdb</span><span class="op">$</span><span class="va">gp_clinical_values</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Source:   table&lt;gp_clinical_values&gt; [?? x 4]</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: sqlite 3.38.5 [/private/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/RtmpMWWnqK/ukb.db]</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: sqlite 3.38.5 [/private/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/RtmpU2ttlb/ukb.db]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    index value1 value2 value3</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> 1     1      2      3     </span>
@@ -267,7 +286,7 @@ getting started with databases and <a href="https://dplyr.tidyverse.org/referenc
 <span class="r-in"></span>
 <span class="r-in"><span class="va">ukbdb</span><span class="op">$</span><span class="va">gp_scripts_names_and_quantities</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Source:   table&lt;gp_scripts_names_and_quantities&gt; [6 x 3]</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: sqlite 3.38.5 [/private/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/RtmpMWWnqK/ukb.db]</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: sqlite 3.38.5 [/private/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/RtmpU2ttlb/ukb.db]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   index drug_name quantity</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> 1     drug2     50      </span>
@@ -293,7 +312,7 @@ getting started with databases and <a href="https://dplyr.tidyverse.org/referenc
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

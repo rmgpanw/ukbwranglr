@@ -19,7 +19,7 @@ Field ID 21000."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ukbwranglr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9001</span>
       </span>
     </div>
 
@@ -71,27 +71,41 @@ categories for
     <h2>Arguments</h2>
     <dl><dt>ukb_main</dt>
 <dd><p>A UK Biobank main dataset.</p></dd>
+
+
 <dt>ukb_data_dict</dt>
 <dd><p>The UKB data dictionary (available online at the UK
 Biobank
 <a href="https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide" class="external-link">data
 showcase</a>. This should be a data frame where all columns are of type
 <code>character</code>.</p></dd>
+
+
 <dt>ethnicity_levels</dt>
 <dd><p>The factor level order for the appended
 <code>ethnic_background_simplified</code> column. By default, the baseline level
 is set to "White" ethnicity.</p></dd>
+
+
 <dt>.drop</dt>
 <dd><p>If <code>TRUE</code>, remove the required input columns from the
 result</p></dd>
+
+
 <dt>.details_only</dt>
 <dd><p>If <code>TRUE</code>, return a list containing details of
 required input variables (Field IDs) and derived variables (new column
 name, label and values/value labels).</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A data frame with a column called <code>ethnic_background_simplified</code>(type factor).</p>
+    
+
+<p>A data frame with a column called <code>ethnic_background_simplified</code></p>
+
+
+<p>(type factor).</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -166,7 +180,7 @@ explicitly specified using the <code>ethnicity_levels</code> argument.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

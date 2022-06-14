@@ -22,7 +22,7 @@ events' vignette on the ukbwranglr package website."><!-- mathjax --><script src
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ukbwranglr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9001</span>
       </span>
     </div>
 
@@ -82,21 +82,33 @@ events'</a> vignette on the <code>ukbwranglr</code> package website.</p>
 <code><a href="tidy_clinical_events.html">tidy_clinical_events</a></code>, <code><a href="tidy_gp_clinical.html">tidy_gp_clinical</a></code>,
 <code><a href="tidy_gp_scripts.html">tidy_gp_scripts</a></code> or <code><a href="make_clinical_events_db.html">make_clinical_events_db</a></code>.
 This can also be a <code><a href="https://dbplyr.tidyverse.org/reference/tbl.src_dbi.html" class="external-link">tbl_dbi</a></code> object.</p></dd>
+
+
 <dt>clinical_codes</dt>
 <dd><p>data frame. Must match the format as per
 <code><a href="example_clinical_codes.html">example_clinical_codes</a></code>.</p></dd>
+
+
 <dt>data_sources</dt>
 <dd><p>A character vector of clinical events sources in
 <code>clinical_events</code> to extract phenotypes from. Use
 <code><a href="clinical_events_sources.html">clinical_events_sources</a></code> (<code>source column</code>) for a list of
 valid values.</p></dd>
+
+
 <dt>min_max</dt>
 <dd><p>Choose either "min" or "max" to extract either the earliest or
 latest date that one of the codes appears in <code>clinical_codes</code> appears.</p></dd>
+
+
 <dt>colnames_prefix</dt>
 <dd><p>Optionally add a prefix to column names.</p></dd>
+
+
 <dt>labels_prefix</dt>
 <dd><p>Optionally add a prefix to variable labels.</p></dd>
+
+
 <dt>workers</dt>
 <dd><p>The number of processes to run in parallel when
 <code>clinical_codes</code> includes multiple diseases. This is used to set the
@@ -104,13 +116,18 @@ number of workers in <code><a href="https://future.futureverse.org/reference/pla
   <a href="https://future.futureverse.org/reference/multisession.html" class="external-link">multisession</a></code>, which is passed on to
 <code><a href="https://furrr.futureverse.org/reference/future_map.html" class="external-link">future_map</a></code>. If <code>NULL</code>, then no processing is
 performed sequentially. Default value is <code>NULL</code>.</p></dd>
+
+
 <dt>keep_all</dt>
 <dd><p>If <code>TRUE</code>, keep all matching codes for each eid in a
 nested data frame column named 'data'.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A named list of data frames, one for each disease. Each data frame
+    
+
+<p>A named list of data frames, one for each disease. Each data frame
 has an "eid" column, and "event_min/max_indicator" and "event_min/max_date"
 columns for each phenotype in the 'category' column of
 <code>clinical_codes</code> for that disease. If <code>keep_all</code> is <code>TRUE</code>,
@@ -273,7 +290,7 @@ then there will also be additional nested data frame column called 'data'.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

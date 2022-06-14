@@ -20,7 +20,7 @@ minimum, maximum, sum and number of non-missing values."><!-- mathjax --><script
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ukbwranglr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9001</span>
       </span>
     </div>
 
@@ -74,27 +74,40 @@ minimum, maximum, sum and number of non-missing values.</p>
     <dl><dt>ukb_main</dt>
 <dd><p>A UK Biobank main dataset data frame. Column names must match
 those under the <code>descriptive_colnames</code> column in <code>data_dict</code>.</p></dd>
+
+
 <dt>data_dict</dt>
 <dd><p>a data dictionary specific to the UKB main dataset file,
 created by <code><a href="make_data_dict.html">make_data_dict</a></code>.</p></dd>
+
+
 <dt>ukb_data_dict</dt>
 <dd><p>The UKB data dictionary (available online at the UK
 Biobank
 <a href="https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide" class="external-link">data
 showcase</a>. This should be a data frame where all columns are of type
 <code>character</code>.</p></dd>
+
+
 <dt>summary_function</dt>
 <dd><p>The summary function to be applied. Options: "mean",
 "min", "max", "sum" or "n_values"</p></dd>
+
+
 <dt>summarise_by</dt>
 <dd><p>Whether to summarise by "Field" or by "Instance".</p></dd>
+
+
 <dt>.drop</dt>
 <dd><p>If <code>TRUE</code>, removes the original numerical variables from
 the result. Default value is <code>FALSE</code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A data frame with new columns summarising numerical variables. The
+    
+
+<p>A data frame with new columns summarising numerical variables. The
 names for these new columns are prefixed by the value for
 <code>summary_function</code> and end with 'x', FieldID +/- instance being
 summarised e.g. if summarising FieldID 4080 instance 0, the new column
@@ -218,7 +231,7 @@ will summarised as <code>0</code>. See the documentation for
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>
