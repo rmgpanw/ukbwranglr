@@ -128,6 +128,7 @@ DBI::dbDisconnect(con)
 Other clinical events: 
 \code{\link{clinical_events_sources}()},
 \code{\link{example_clinical_codes}()},
+\code{\link{extract_phenotypes2}()},
 \code{\link{extract_phenotypes}()},
 \code{\link{tidy_clinical_events}()}
 }

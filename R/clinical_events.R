@@ -129,10 +129,7 @@ mutate_age_at_event_cols <- function(ukb_main,
 #'
 #' Filters a clinical events table created by \code{\link{tidy_clinical_events}}
 #' for a set or sets of specified clinical codes that represent one or more
-#' phenotypes. By default, the \emph{earliest} date that any clinical code
-#' appears in an individual participant's record is extracted. See also the
-#' \href{https://rmgpanw.github.io/ukbwranglr/articles/ukb_clinical_events.html}{'Clinical
-#' events'} vignette on the \code{ukbwranglr} package website.
+#' phenotypes.
 #'
 #' @param clinical_events A long format data frame created by
 #'   \code{\link{tidy_clinical_events}}, \code{\link{tidy_gp_clinical}},
@@ -140,16 +137,13 @@ mutate_age_at_event_cols <- function(ukb_main,
 #'   This can also be a \code{\link[dbplyr]{tbl_dbi}} object.
 #' @param clinical_codes data frame. Must match the format as per
 #'   \code{\link{example_clinical_codes}}.
-#' @param data_sources A character vector of clinical events sources in
-#'   \code{clinical_events} to extract phenotypes from. Use
-#'   \code{\link{clinical_events_sources}} (\code{source column}) for a list of
-#'   valid values.
-#'
-#' @return A named list of data frames, one for each disease. Each data frame
-#'   has an "eid" column, and "event_min/max_indicator" and "event_min/max_date"
-#'   columns for each phenotype in the 'category' column of
-#'   \code{clinical_codes} for that disease. If \code{keep_all} is \code{TRUE},
-#'   then there will also be additional nested data frame column called 'data'.
+#' @param eid_filter Integer vector of eids to filter for.
+#' @param source_filter Character vetor of data sources to filter for.
+#' @param date_filter Character vector of length 2 that specifies a date range
+#'   to filter for. Dates must be formatted as 'YYYY-MM-DD'. The first date
+#'   should be earlier than the second date, for example: `c("2000-01-01",
+#'   "2010-01-01)`. \code{\link{example_clinical_codes}}.
+#' @return A data frame.
 #' @export
 #' @family clinical events
 #' @examples
@@ -175,16 +169,11 @@ mutate_age_at_event_cols <- function(ukb_main,
 #' # dummy clinical code list
 #' example_clinical_codes()
 #'
-#' # Filter for participants with matching clinical codes,
-#' # by default only the earliest date is extracted
-#' cases <- extract_phenotypes(
+#' # Filter for participants with matching clinical codes
+#' extract_phenotypes2(
 #'   clinical_events = dummy_clinical_events,
 #'   clinical_codes = example_clinical_codes()
 #' )
-#'
-#' # returns a named list of data frames, one for each category in
-#' # lower case, and one for the overall disease in capitals
-#' cases
 extract_phenotypes2 <- function(clinical_events,
                                 clinical_codes,
                                 eid_filter = NULL,

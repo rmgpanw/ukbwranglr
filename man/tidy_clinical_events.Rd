@@ -106,6 +106,7 @@ tidy_clinical_events(.details_only = TRUE)
 Other clinical events: 
 \code{\link{clinical_events_sources}()},
 \code{\link{example_clinical_codes}()},
+\code{\link{extract_phenotypes2}()},
 \code{\link{extract_phenotypes}()},
 \code{\link{make_clinical_events_db}()}
 }

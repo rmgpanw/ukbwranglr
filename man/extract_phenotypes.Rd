@@ -99,6 +99,7 @@ cases
 Other clinical events: 
 \code{\link{clinical_events_sources}()},
 \code{\link{example_clinical_codes}()},
+\code{\link{extract_phenotypes2}()},
 \code{\link{make_clinical_events_db}()},
 \code{\link{tidy_clinical_events}()}
 }

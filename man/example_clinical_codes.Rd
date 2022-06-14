@@ -22,6 +22,7 @@ example_clinical_codes()
 
 Other clinical events: 
 \code{\link{clinical_events_sources}()},
+\code{\link{extract_phenotypes2}()},
 \code{\link{extract_phenotypes}()},
 \code{\link{make_clinical_events_db}()},
 \code{\link{tidy_clinical_events}()}
