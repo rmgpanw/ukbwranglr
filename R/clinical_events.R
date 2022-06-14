@@ -144,6 +144,197 @@ mutate_age_at_event_cols <- function(ukb_main,
 #'   \code{clinical_events} to extract phenotypes from. Use
 #'   \code{\link{clinical_events_sources}} (\code{source column}) for a list of
 #'   valid values.
+#'
+#' @return A named list of data frames, one for each disease. Each data frame
+#'   has an "eid" column, and "event_min/max_indicator" and "event_min/max_date"
+#'   columns for each phenotype in the 'category' column of
+#'   \code{clinical_codes} for that disease. If \code{keep_all} is \code{TRUE},
+#'   then there will also be additional nested data frame column called 'data'.
+#' @export
+#' @family clinical events
+#' @examples
+#' library(magrittr)
+#'
+#' # dummy clinical events data frame
+#' dummy_ukb_data_dict <- get_ukb_dummy("dummy_Data_Dictionary_Showcase.tsv")
+#' dummy_ukb_codings <- get_ukb_dummy("dummy_Codings.tsv")
+#'
+#' dummy_clinical_events <- read_ukb(
+#'   path = get_ukb_dummy("dummy_ukb_main.tsv", path_only = TRUE),
+#'   ukb_data_dict = dummy_ukb_data_dict,
+#'   ukb_codings = dummy_ukb_codings
+#' ) %>%
+#'   tidy_clinical_events(
+#'     ukb_data_dict = dummy_ukb_data_dict,
+#'     ukb_codings = dummy_ukb_codings
+#'   ) %>%
+#'   dplyr::bind_rows()
+#'
+#' head(dummy_clinical_events)
+#'
+#' # dummy clinical code list
+#' example_clinical_codes()
+#'
+#' # Filter for participants with matching clinical codes,
+#' # by default only the earliest date is extracted
+#' cases <- extract_phenotypes(
+#'   clinical_events = dummy_clinical_events,
+#'   clinical_codes = example_clinical_codes()
+#' )
+#'
+#' # returns a named list of data frames, one for each category in
+#' # lower case, and one for the overall disease in capitals
+#' cases
+extract_phenotypes2 <- function(clinical_events,
+                                clinical_codes,
+                                eid_filter = NULL,
+                                source_filter = NULL,
+                                date_filter = NULL) {
+
+  start_time <- proc.time()
+
+  # validate args -----
+  # clinical_events
+  validate_clinical_events_and_check_type(clinical_events)
+
+  # clinical_codes
+  validate_clinical_codes(clinical_codes)
+
+  # eid_filter
+  if (!is.null(eid_filter)) {
+    assertthat::assert_that(is.integer(eid_filter),
+                            msg = "`eid_filter` should be type integer")
+
+    assertthat::assert_that(assertthat::noNA(eid_filter),
+                            msg = "`eid_filter` must not contain `NA` values")
+  }
+
+  # source_filter
+  if (!is.null(source_filter)) {
+    assertthat::assert_that(is.character(source_filter),
+                            msg = "`source_filter` should be type character")
+
+    assertthat::assert_that(assertthat::noNA(source_filter),
+                            msg = "`source_filter` must not contain `NA` values")
+
+    invalid_data_sources <-
+      subset(
+        source_filter,
+        !source_filter %in% clinical_events_sources()$source
+      )
+
+    assertthat::assert_that(
+      length(invalid_data_sources) == 0,
+      msg = paste0(
+        "Error! The following values in `source_filter` are not valid: ",
+        stringr::str_c(invalid_data_sources,
+                       sep = "",
+                       collapse = ", ")
+      )
+    )
+  }
+
+  ## check that date_filter contains valid dates
+  if (!is.null(date_filter)) {
+    assertthat::assert_that(is.character(date_filter),
+                            msg = "`date_filter` should be type character")
+
+    assertthat::assert_that(length(date_filter) == 2,
+                            msg = "`date_filter` should be a character vector of length 2")
+
+    invalid_dates <- date_filter %>%
+      purrr::map_chr(~ tryCatch({
+        as.Date(.x)
+        NA_character_
+      },
+      error = function(e)
+        .x)) %>%
+      subset(!is.na(.))
+
+    assertthat::assert_that(length(invalid_dates) == 0,
+                            msg = paste0(
+                              "`date_filter` contains invalid values: ",
+                              paste(invalid_dates,
+                                    collapse = ", ")
+                            ))
+
+    assertthat::assert_that(date_filter[1] < date_filter[2],
+                            msg = "The second date of `date_filter` must be later than the first date")
+  }
+
+  ## check that min date is greater than max date in date_filter
+
+
+  # filter `clinical_events` -------
+  # filter `clinical_events` for codes in `clinical_codes` (regardless of code
+  # type at this stage)
+  clinical_events <- clinical_events %>%
+    dplyr::filter(.data[["code"]] %in% local(unique(clinical_codes$code)))
+
+  # optional filters
+  if (!is.null(eid_filter)) {
+    clinical_events <- clinical_events %>%
+      dplyr::filter(.data[["eid"]] %in% local(unique(eid_filter)))
+  }
+
+  if (!is.null(source_filter)) {
+    clinical_events <- clinical_events %>%
+      dplyr::filter(.data[["source"]] %in% local(unique(source_filter)))
+  }
+
+  if (!is.null(date_filter)) {
+    clinical_events <- clinical_events %>%
+      dplyr::filter(
+        (.data[["date"]] < local(date_filter[1])) &
+          (.data[["date"]] >= local(date_filter[2]))
+      )
+  }
+
+  # collect from SQLITe db
+  clinical_events <- dplyr::collect(clinical_events)
+
+  # join with `clinical_codes` ---------
+  # append code_type
+  source_to_code_type_map <- clinical_events_sources() %>%
+    dplyr::select(.data[["source"]],
+                  "code_type" = .data[["data_coding"]])
+
+  # check that source-to-code_type mapping table has only unique values under `source` col
+  stopifnot(
+    dplyr::n_distinct(source_to_code_type_map$source) == nrow(source_to_code_type_map)
+  )
+
+  clinical_events <- clinical_events %>%
+    dplyr::left_join(source_to_code_type_map,
+                     by = "source")
+
+  # perform filtering join with clinical codelist
+  clinical_events %>%
+    dplyr::inner_join(clinical_codes %>%
+                        dplyr::select(-.data[["description"]]),
+                      by = c("code",
+                             "code_type"))
+}
+
+#' Extract phenotypes from clinical events data
+#'
+#' Filters a clinical events table created by \code{\link{tidy_clinical_events}}
+#' for a set or sets of specified clinical codes that represent one or more
+#' phenotypes. By default, the \emph{earliest} date that any clinical code
+#' appears in an individual participant's record is extracted. See also the
+#' \href{https://rmgpanw.github.io/ukbwranglr/articles/ukb_clinical_events.html}{'Clinical
+#' events'} vignette on the \code{ukbwranglr} package website.
+#'
+#' @param clinical_events A long format data frame created by
+#'   \code{\link{tidy_clinical_events}}, \code{\link{tidy_gp_clinical}},
+#'   \code{\link{tidy_gp_scripts}} or \code{\link{make_clinical_events_db}}.
+#'   This can also be a \code{\link[dbplyr]{tbl_dbi}} object.
+#' @param clinical_codes data frame. Must match the format as per
+#'   \code{\link{example_clinical_codes}}.
+#' @param data_sources A character vector of clinical events sources in
+#'   \code{clinical_events} to extract phenotypes from. Use
+#'   \code{\link{clinical_events_sources}} (\code{source column}) for a list of
+#'   valid values.
 #' @param min_max Choose either "min" or "max" to extract either the earliest or
 #'   latest date that one of the codes appears in \code{clinical_codes} appears.
 #' @param colnames_prefix Optionally add a prefix to column names.

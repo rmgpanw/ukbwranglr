@@ -1,7 +1,7 @@
 Package: ukbwranglr
 Type: Package
 Title: Exploring UKB Data
-Version: 0.0.0.9000
+Version: 0.0.0.9001
 Authors@R: 
   person("Alasdair", "Warwick", email = "alasdair.warwick06@gmail.com", role = c("aut", "cre"))
 Description: Functions to load and wrangle UK Biobank data.

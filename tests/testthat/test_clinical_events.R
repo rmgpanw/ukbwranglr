@@ -77,6 +77,9 @@ stopifnot(validate_clinical_codes(dummy_clinical_codes))
 
 # TESTS -------------------------------------------------------------------
 
+result2 <- extract_phenotypes2(clinical_events = dummy_clinical_events_db,
+                    clinical_codes = dummy_clinical_codes)
+
 # `tidy_clinical_events_basis()`  -----------------------------------------
 
 test_that("`tidy_clinical_events_basis()` removes empty string values", {
