@@ -19,6 +19,7 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(ukbwranglr)
 library(dplyr)
+library(tidyr)
 library(tidyselect)
 library(readr)
 library(tibble)
@@ -185,7 +186,6 @@ Supply this to `extract_phenotypes()` to filter for participants who have any ma
 diabetes_cases <- extract_phenotypes(clinical_events = clinical_events,
                                      clinical_codes = example_clinical_codes())
 
-# returns a named list of data frames, one for each category in lower case, and one for the overall disease in capitals
 diabetes_cases
 ```
 
@@ -194,16 +194,21 @@ diabetes_cases
 Merge the output from steps 4 and 5:
 
 ```{r}
-ukb_main_processed <- dplyr::full_join(
-  ukb_main_numerical_vars_summarised,
-  diabetes_cases$Diabetes$DIABETES_UKBWR,
-  by = "eid"
-) %>% 
-  mutate(DIABETES_UKBWR_indicator = ifelse(
-    !is.na(DIABETES_UKBWR_indicator),
-    yes = DIABETES_UKBWR_indicator,
-    no = "No"
-  ))
+ukb_main_processed <-
+  # first summarise `diabetes_cases` - for each eid, get the earliest date
+  diabetes_cases %>%
+  group_by(eid,
+           disease) %>%
+  summarise(diabetes_min_date = min(date, na.rm = TRUE)) %>%
+  ungroup() %>%
+  
+  # create indicator column for diabetes
+  mutate(diabetes_indicator = case_when(!is.na(diabetes_min_date) ~ "Yes",
+                                        TRUE ~ "No")) %>%
+  
+  # join with `ukb_main_numerical_vars_summarised`
+  dplyr::full_join(ukb_main_numerical_vars_summarised,
+                   by = "eid")
 
 ukb_main_processed
 ```
@@ -213,7 +218,7 @@ Describe:
 ```{r}
 ukb_main_processed %>%
   select(-eid) %>%
-  group_by(DIABETES_UKBWR_indicator) %>%
+  group_by(diabetes_indicator) %>%
   summarise(pct_female = sum(sex_f31_0_0 == "Female", na.rm = TRUE) / n(),
             across(where(is.numeric), ~ mean(.x, na.rm = TRUE)))
 ```
@@ -264,10 +269,9 @@ ukbdb
 # extract phenotypes
 diabetes_cases <-
   extract_phenotypes(clinical_events = ukbdb$clinical_events,
-                     clinical_codes = example_clinical_codes()) %>%
-  suppressMessages()
+                     clinical_codes = example_clinical_codes(),
+                     verbose = FALSE)
 
-# returns a named list of data frames, one for each category in lower case, and one for the overall disease in capitals
 diabetes_cases
 ```
 

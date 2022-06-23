@@ -7,12 +7,8 @@
 extract_phenotypes(
   clinical_events,
   clinical_codes,
-  data_sources = NULL,
-  min_max = "min",
-  colnames_prefix = NULL,
-  labels_prefix = NULL,
-  workers = NULL,
-  keep_all = FALSE
+  source_filter = NULL,
+  verbose = TRUE
 )
 }
 \arguments{
@@ -24,42 +20,17 @@ This can also be a \code{\link[dbplyr]{tbl_dbi}} object.}
 \item{clinical_codes}{data frame. Must match the format as per
 \code{\link{example_clinical_codes}}.}
 
-\item{data_sources}{A character vector of clinical events sources in
-\code{clinical_events} to extract phenotypes from. Use
-\code{\link{clinical_events_sources}} (\code{source column}) for a list of
-valid values.}
+\item{source_filter}{Character vector of data sources to filter for
+(optional).}
 
-\item{min_max}{Choose either "min" or "max" to extract either the earliest or
-latest date that one of the codes appears in \code{clinical_codes} appears.}
-
-\item{colnames_prefix}{Optionally add a prefix to column names.}
-
-\item{labels_prefix}{Optionally add a prefix to variable labels.}
-
-\item{workers}{The number of processes to run in parallel when
-\code{clinical_codes} includes multiple diseases. This is used to set the
-number of workers in \code{\link[future]{plan}} with \code{strategy =
-  \link[future]{multisession}}, which is passed on to
-\code{\link[furrr]{future_map}}. If \code{NULL}, then no processing is
-performed sequentially. Default value is \code{NULL}.}
-
-\item{keep_all}{If \code{TRUE}, keep all matching codes for each eid in a
-nested data frame column named 'data'.}
+\item{verbose}{If \code{TRUE} (default), display progress messages.}
 }
 \value{
-A named list of data frames, one for each disease. Each data frame
-has an "eid" column, and "event_min/max_indicator" and "event_min/max_date"
-columns for each phenotype in the 'category' column of
-\code{clinical_codes} for that disease. If \code{keep_all} is \code{TRUE},
-then there will also be additional nested data frame column called 'data'.
+A data frame.
 }
 \description{
 Filters a clinical events table created by \code{\link{tidy_clinical_events}}
-for a set or sets of specified clinical codes that represent one or more
-phenotypes. By default, the \emph{earliest} date that any clinical code
-appears in an individual participant's record is extracted. See also the
-\href{https://rmgpanw.github.io/ukbwranglr/articles/ukb_clinical_events.html}{'Clinical
-events'} vignette on the \code{ukbwranglr} package website.
+for a set clinical codes that represent one or more phenotypes.
 }
 \examples{
 library(magrittr)
@@ -84,22 +55,16 @@ head(dummy_clinical_events)
 # dummy clinical code list
 example_clinical_codes()
 
-# Filter for participants with matching clinical codes,
-# by default only the earliest date is extracted
-cases <- extract_phenotypes(
+# Filter for participants with matching clinical codes
+extract_phenotypes(
   clinical_events = dummy_clinical_events,
   clinical_codes = example_clinical_codes()
 )
-
-# returns a named list of data frames, one for each category in
-# lower case, and one for the overall disease in capitals
-cases
 }
 \seealso{
 Other clinical events: 
 \code{\link{clinical_events_sources}()},
 \code{\link{example_clinical_codes}()},
-\code{\link{extract_phenotypes2}()},
 \code{\link{make_clinical_events_db}()},
 \code{\link{tidy_clinical_events}()}
 }

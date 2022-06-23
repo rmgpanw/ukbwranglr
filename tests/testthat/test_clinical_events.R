@@ -77,9 +77,6 @@ stopifnot(validate_clinical_codes(dummy_clinical_codes))
 
 # TESTS -------------------------------------------------------------------
 
-result2 <- extract_phenotypes2(clinical_events = dummy_clinical_events_db,
-                    clinical_codes = dummy_clinical_codes)
-
 # `tidy_clinical_events_basis()`  -----------------------------------------
 
 test_that("`tidy_clinical_events_basis()` removes empty string values", {
@@ -531,377 +528,91 @@ test_that("`tidy_clinical_events` returns the expected results for 'summary_hes_
   )
 })
 
-# `extract_phenotypes_single_disease()` --------------------------
-
-test_that(
-  "`extract_phenotypes_single_disease()` returns the expected list names and column names",
-  {
-    result <-
-      extract_phenotypes_single_disease(
-        disease = "Disease1",
-        clinical_events = dummy_clinical_events,
-        clinical_codes = dummy_clinical_codes,
-        min_max = "min",
-        colnames_prefix = "test_",
-        labels_prefix = "Test! ",
-        data_sources = NULL,
-        keep_all = FALSE
-      )
-
-    expect_equal(
-      sort(names(result)),
-      sort(c(
-        "test_a_test",
-        "test_b_test",
-        "test_DISEASE1_TEST"
-      ))
-    )
-
-    expect_equal(
-      sort(names(result[["test_a_test"]])),
-      sort(c(
-        "eid",
-        "test_a_test_min_date",
-        "test_a_test_indicator"
-      ))
-    )
-  }
-)
-
 # `extract_phenotypes()` --------------------------
 
-test_that("`extract_phenotypes()` returns the expected column names", {
+test_that("`extract_phenotypes()` returns the expected result", {
   result <-
     extract_phenotypes(
       clinical_events = dummy_clinical_events,
       clinical_codes = dummy_clinical_codes,
-      min_max = "min",
-      colnames_prefix = "test_",
-      labels_prefix = "Test! "
     )
 
-  expect_equal(
-    sort(names(result[["Disease2"]])),
-    sort(c(
-      "test_c_test",
-      "test_d_test",
-      "test_DISEASE2_TEST"
-    ))
-  )
-
-  # test variable labels are prefixed
-  expect_equal(
-    attributes(result[["Disease2"]]$test_c_test$test_c_test_indicator)$label,
-    "Test! C"
-  )
-
-  expect_equal(
-    attributes(result[["Disease2"]]$test_c_test$test_c_test_min_date)$label,
-    "Test! C date (min)"
+  expect_equivalent(
+    result,
+    tibble::tribble(
+       ~eid,   ~source, ~index,   ~code,        ~date,      ~code_type,   ~disease, ~category, ~author,
+         1L,  "f40001",  "0_0",  "X095", "1917-10-08",         "icd10", "Disease1",       "A",  "test",
+         1L,  "f40001",  "1_0",  "X095", "1910-02-19",         "icd10", "Disease1",       "A",  "test",
+         1L,  "f40002",  "0_0",  "W192", "1917-10-08",         "icd10", "Disease1",       "A",  "test",
+         1L,  "f20002",  "0_0",  "1665", "1998-12-24", "data_coding_6", "Disease2",       "C",  "test",
+         3L,  "f20002",  "0_0",  "1665",           NA, "data_coding_6", "Disease2",       "C",  "test",
+         1L,  "f20001",  "2_0",  "1045", "2023-03-16", "data_coding_3", "Disease2",       "C",  "test",
+         1L,  "f20004",  "0_3",  "1108", "2008-03-26", "data_coding_5", "Disease2",       "D",  "test",
+         1L,  "f40013",  "0_0", "27134", "1956-11-24",          "icd9", "Disease1",       "B",  "test",
+         2L,  "f40006",  "2_0",  "W192",           NA,         "icd10", "Disease1",       "A",  "test",
+         1L,  "f41273",  "0_0",   "001", "1969-11-23",         "opcs3", "Disease2",       "D",  "test",
+         1L,  "f41272",  "0_0",   "A01", "1956-11-24",         "opcs4", "Disease2",       "D",  "test",
+         1L, "gpc1_r2",    "7", "C108.", "1990-10-01",         "read2", "Disease1",       "A",  "test",
+         2L, "gpc3_r3",   "10", "X40J5", "1990-10-04",         "read3", "Disease1",       "B",  "test",
+         1L, "gpc1_r2",   "11", "C108.", "1990-10-03",         "read2", "Disease1",       "A",  "test"
+       )
   )
 })
 
-# Note can test dummy_clinical_events_db locally but not with R CMD check
 test_that("`extract_phenotypes()` returns the expected column names with tbl_dbi object", {
   result <-
     extract_phenotypes(
       clinical_events = dummy_clinical_events_db,
       clinical_codes = dummy_clinical_codes,
-      min_max = "min",
-      colnames_prefix = "test_",
-      labels_prefix = "Test! "
     )
 
-  expect_equal(
-    sort(names(result[["Disease2"]])),
-    sort(c(
-      "test_c_test",
-      "test_d_test",
-      "test_DISEASE2_TEST"
-    ))
-  )
-
-  # test variable labels are prefixed
-  expect_equal(
-    attributes(result[["Disease2"]]$test_c_test$test_c_test_indicator)$label,
-    "Test! C"
-  )
-
-  expect_equal(
-    attributes(result[["Disease2"]]$test_c_test$test_c_test_min_date)$label,
-    "Test! C date (min)"
+  expect_equivalent(
+    result,
+    tibble::tribble(
+      ~eid,   ~source, ~index,   ~code,        ~date,      ~code_type,   ~disease, ~category, ~author,
+      1L,  "f40001",  "0_0",  "X095", "1917-10-08",         "icd10", "Disease1",       "A",  "test",
+      1L,  "f40001",  "1_0",  "X095", "1910-02-19",         "icd10", "Disease1",       "A",  "test",
+      1L,  "f40002",  "0_0",  "W192", "1917-10-08",         "icd10", "Disease1",       "A",  "test",
+      1L,  "f20002",  "0_0",  "1665", "1998-12-24", "data_coding_6", "Disease2",       "C",  "test",
+      3L,  "f20002",  "0_0",  "1665",           NA, "data_coding_6", "Disease2",       "C",  "test",
+      1L,  "f20001",  "2_0",  "1045", "2023-03-16", "data_coding_3", "Disease2",       "C",  "test",
+      1L,  "f20004",  "0_3",  "1108", "2008-03-26", "data_coding_5", "Disease2",       "D",  "test",
+      1L,  "f40013",  "0_0", "27134", "1956-11-24",          "icd9", "Disease1",       "B",  "test",
+      2L,  "f40006",  "2_0",  "W192",           NA,         "icd10", "Disease1",       "A",  "test",
+      1L,  "f41273",  "0_0",   "001", "1969-11-23",         "opcs3", "Disease2",       "D",  "test",
+      1L,  "f41272",  "0_0",   "A01", "1956-11-24",         "opcs4", "Disease2",       "D",  "test",
+      1L, "gpc1_r2",    "7", "C108.", "1990-10-01",         "read2", "Disease1",       "A",  "test",
+      2L, "gpc3_r3",   "10", "X40J5", "1990-10-04",         "read3", "Disease1",       "B",  "test",
+      1L, "gpc1_r2",   "11", "C108.", "1990-10-03",         "read2", "Disease1",       "A",  "test"
+    )
   )
 })
 
-test_that( # need to rebuild package to include any changes when running this test
-  "`extract_phenotypes()` works with parallel processing, data frame clinical events",
+
+test_that(
+  "`extract_phenotypes()` returns expected results when certain `source_filter` is applied",
   {
     result <-
       extract_phenotypes(
-        clinical_events = dummy_clinical_events,
-        clinical_codes = dummy_clinical_codes,
-        min_max = "min",
-        colnames_prefix = "test_",
-        workers = 2
-      )
-
-    expect_equal(
-      sort(names(result[["Disease2"]])),
-      sort(c(
-        "test_c_test",
-        "test_d_test",
-        "test_DISEASE2_TEST"
-      ))
-    )
-  }
-)
-
-test_that("`extract_phenotypes()` returns expected results", {
-  result <- extract_phenotypes(
-    clinical_events = dummy_clinical_events,
-    clinical_codes = dummy_clinical_codes,
-    min_max = "min",
-    colnames_prefix = "test_"
-  )
-
-  expect_equivalent(
-    result$Disease1$test_a_test,
-    tibble::tibble(
-      eid = c(1, 2),
-      test_a_test_min_date = c("1910-02-19", NA),
-      test_a_test_indicator = c("Yes", "Yes")
-    )
-  )
-
-  expect_equivalent(
-    result$Disease1$test_b_test,
-    tibble::tibble(
-      eid = c(1, 2),
-      test_b_test_min_date = c("1956-11-24", "1990-10-04"),
-      test_b_test_indicator = c("Yes", "Yes")
-    )
-  )
-
-  expect_equivalent(
-    result$Disease1$test_DISEASE1_TEST,
-    tibble::tibble(
-      eid = c(1, 2),
-      test_DISEASE1_TEST_min_date = c("1910-02-19", "1990-10-04"),
-      test_DISEASE1_TEST_indicator = c("Yes", "Yes")
-    )
-  )
-
-  expect_equivalent(
-    result$Disease2$test_c_test,
-    tibble::tribble(
-      ~eid, ~test_c_test_min_date, ~test_c_test_indicator,
-      1L, "1998-12-24", "Yes",
-      3L, NA, "Yes"
-    )
-  )
-
-  expect_equivalent(
-    result$Disease2$test_d_test,
-    tibble::tibble(
-      eid = 1,
-      test_d_test_min_date = "1956-11-24",
-      test_d_test_indicator = "Yes"
-    )
-  )
-
-  expect_equivalent(
-    result$Disease2$test_DISEASE2_TEST,
-    tibble::tribble(
-      ~eid, ~test_DISEASE2_TEST_min_date, ~test_DISEASE2_TEST_indicator,
-      1L, "1956-11-24", "Yes",
-      3L, NA, "Yes"
-    )
-  )
-})
-
-test_that(
-  "`extract_phenotypes()` returns expected results when certain `data_sources` are specified",
-  {
-    result <-
-      suppressWarnings(
-        # some warnings generated when no codes are found for a disease
-        extract_phenotypes(
-          clinical_events = dummy_clinical_events,
-          clinical_codes = dummy_clinical_codes,
-          min_max = "min",
-          colnames_prefix = "cancer_icd10_",
-          data_sources = c("f40006")
-        )
-      )
-
-    expect_equal(
-      names(result$Disease1$cancer_icd10_a_test),
-      c("eid", "cancer_icd10_a_test_min_date", "cancer_icd10_a_test_indicator")
-    )
-
-    expect_equivalent(
-      result$Disease1$cancer_icd10_a_test,
-      tibble::tibble(
-        eid = 2,
-        cancer_icd10_a_test_min_date = as.character(NA),
-        cancer_icd10_a_test_indicator = "Yes"
-      )
-    )
-
-    expect_equivalent(
-      result$Disease1$cancer_icd10_a_test,
-      result$Disease1$cancer_icd10_DISEASE1_TEST
-    )
-  }
-)
-
-test_that(
-  "`extract_phenotypes()` assigns `NULL` to disease categories where no codes are identified for any eids",
-  {
-    result <-
-      suppressWarnings(
-        # some warnings generated when no codes are found for a disease
-        extract_phenotypes(
-          clinical_events = dummy_clinical_events,
-          clinical_codes = dummy_clinical_codes,
-          min_max = "min",
-          colnames_prefix = "test_",
-          data_sources = c("f40006")
-        )
-      )
-
-    expect_null(result$Disease1$test_b_test)
-  }
-)
-
-# `filter_clinical_events()` ------------------------------------
-
-test_that("`filter_clinical_events()` returns the expected number of rows", {
-  expect_equal(
-    nrow(
-      filter_clinical_events(
-        clinical_events = dummy_clinical_events,
-        clinical_codes_list = list(
-          "read2" = "C108.",
-          "read3" = "C108."
-        )
-      )
-    ),
-    2
-  )
-
-  expect_equal(
-    nrow(
-      filter_clinical_events(
         clinical_events = dummy_clinical_events_db,
-        clinical_codes_list = list("read3" = "C108.")
+        clinical_codes = dummy_clinical_codes,
+        source_filter = c("f40001",
+                          "gpc1_r2")
       )
-    ),
-    0
-  )
-})
 
-test_that("`filter_clinical_events()` returns the expected 'sources' for each data coding type", {
-  # read2
-  expect_equal(sort(unique(
-    filter_clinical_events(dummy_clinical_events,
-      clinical_codes_list = list("read2" = "C108.")
-    )$source
-  )),
-  expected = "gpc1_r2"
-  )
-
-  # read3
-  expect_equal(sort(unique(
-    filter_clinical_events(dummy_clinical_events,
-      clinical_codes_list = list("read3" = "X40J4")
-    )$source
-  )),
-  expected = "gpc3_r3"
-  )
-
-  # icd9
-  expect_equal(sort(unique(
-    filter_clinical_events(dummy_clinical_events,
-      clinical_codes_list = list("icd9" = "27134")
-    )$source
-  )),
-  expected = "f40013"
-  )
-
-  # icd10
-  expect_equal(sort(unique(
-    filter_clinical_events(dummy_clinical_events,
-      clinical_codes_list = list("icd10" = "W192")
-    )$source
-  )),
-  expected = c("f40002", "f40006")
-  )
-
-  # data_coding_6
-  expect_equal(sort(unique(
-    filter_clinical_events(
-      dummy_clinical_events,
-      clinical_codes_list = list("data_coding_6" = "1665")
-    )$source
-  )),
-  expected = sort(get_sources_for_code_type("data_coding_6"))
-  )
-
-  # data_coding_3
-  expect_equal(sort(unique(
-    filter_clinical_events(
-      dummy_clinical_events,
-      clinical_codes_list = list("data_coding_3" = "1045")
-    )$source
-  )),
-  expected = sort(get_sources_for_code_type("data_coding_3"))
-  )
-
-  # data_coding_5
-  expect_equal(sort(unique(
-    filter_clinical_events(
-      dummy_clinical_events,
-      clinical_codes_list = list("data_coding_5" = "1108")
-    )$source
-  )),
-  expected = sort(get_sources_for_code_type("data_coding_5"))
-  )
-
-  # data_coding_4
-  expect_equal(sort(unique(
-    filter_clinical_events(
-      dummy_clinical_events,
-      clinical_codes_list = list("data_coding_4" = "1140861958")
-    )$source
-  )),
-  expected = sort(get_sources_for_code_type("data_coding_4"))
-  )
-})
-
-test_that(
-  "`filter_clinical_events()` returns the expected results",
-  {
-    # icd10
     expect_equivalent(
-      tibble::as_tibble(filter_clinical_events(dummy_clinical_events,
-        clinical_codes_list = list(
-          "icd10" = "W192",
-          "read2" = "C108.",
-          "read3" = "X40J4"
-        )
-      )),
-      expected = tibble::tribble(
-         ~eid,   ~source, ~index,   ~code,        ~date,
-           1L,  "f40002",  "0_0",  "W192", "1917-10-08",
-           2L,  "f40006",  "2_0",  "W192",           NA,
-           1L, "gpc1_r2",    "7", "C108.", "1990-10-01",
-           1L, "gpc3_r3",    "9", "X40J4", "1990-10-03",
-           1L, "gpc1_r2",   "11", "C108.", "1990-10-03"
+      result,
+      tibble::tribble(
+         ~eid,   ~source, ~index,   ~code,        ~date, ~code_type,   ~disease, ~category, ~author,
+           1L,  "f40001",  "0_0",  "X095", "1917-10-08",    "icd10", "Disease1",       "A",  "test",
+           1L,  "f40001",  "1_0",  "X095", "1910-02-19",    "icd10", "Disease1",       "A",  "test",
+           1L, "gpc1_r2",    "7", "C108.", "1990-10-01",    "read2", "Disease1",       "A",  "test",
+           1L, "gpc1_r2",   "11", "C108.", "1990-10-03",    "read2", "Disease1",       "A",  "test"
          )
     )
   }
 )
+
 
 # `make_self_report_special_decimal_dates_na()` ------------------------------
 
