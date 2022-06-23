@@ -74,18 +74,6 @@ summarise_numerical_variables <- function(ukb_main,
                                           .drop = FALSE) {
   start_time <- proc.time()
 
-  dummy_ukb_data <- tibble::tibble(
-    f.eid = c(1, 2, 3, 4, 5, 6),
-    f.31.0.0 = c(0, 0, 1, 0, NA, 1),
-    f.34.0.0 = c(1952, 1946, 1951, 1956, NA, 1948),
-    f.52.0.0 = c(8, 3, 4, 9, 4, 2),
-    f.21000.0.0 = c(NA, 4001, 3, NA, -3, 3),
-    f.20002.0.0 = c(1665, 1383, 1197, 1441, 1429, 1513),
-    f.21001.0.0 = c(20.1115, 30.1536, 22.8495, 23.4904, 29.2752, 28.2567),
-    f.21001.1.0 = c(20.864, 20.2309, 26.7929, 25.6826, 19.7576, 30.286),
-    f.21001.2.0 = c(NA, 27.4936, 27.6286, 37.2294, 14.6641, 27.3534),
-  )
-
   # validate args
   match.arg(summary_function,
     choices = c("mean", "min", "max", "sum", "n_values")
