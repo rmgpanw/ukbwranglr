@@ -17,7 +17,6 @@ reference:
 - title: Extract phenotypes
   desc:  Identify individuals with certain phenotypes based on clinical codes
 - contents:
-  - extract_phenotypes2
   - extract_phenotypes
   - example_clinical_codes
   - validate_clinical_codes
