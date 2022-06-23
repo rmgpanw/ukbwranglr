@@ -442,30 +442,6 @@ filter_data_dict <- function(data_dict,
   }
 }
 
-#' Get UKB codings for one or more FieldIDs
-#'
-#' General helper function - filters
-#' \href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{ukb_codings}
-#' for the codings associated with one or more FieldIDs.
-#'
-#' @param field_ids Character. One or more UKB FieldIDs
-#' @param ukb_data_dict UKB data dictionary
-#' @param ukb_codings UKB Codings dictionary
-#'
-#' @noRd
-#' @return Dataframe.
-extract_codings_for_fieldids <- function(field_ids,
-                                         ukb_data_dict,
-                                         ukb_codings) {
-  ukb_codings %>%
-    dplyr::filter(.data[["Coding"]] == (
-      ukb_data_dict %>%
-        dplyr::filter(.data[["FieldID"]] %in% field_ids) %>%
-        .$Coding %>%
-        utils::head(n = 1)
-    ))
-}
-
 # Testing/assertion helpers -----------------------------------------------
 
 #' Assert number is an integer that is greater than or equal to 1
@@ -970,34 +946,6 @@ colname_to_field_inst_array_df <- function(x) {
   )
 
   return(x)
-}
-
-
-#' Create an empty list to be populated with diagnostic codes
-#'
-#' Returns a named list, where names are for different clinical coding systems.
-#' This is to be populated with clinical codes and used with
-#' \code{\link{extract_first_or_last_clinical_event}} and its related functions.
-#'
-#' @return A named list
-#'
-#' @seealso \code{\link{extract_first_or_last_clinical_event}}
-#' @noRd
-#' @examples
-#' make_empty_clinical_codes_list()
-make_empty_clinical_codes_list <- function() {
-  CLINICAL_EVENTS_SOURCES$data_coding %>%
-    unique() %>%
-    purrr::set_names() %>%
-    purrr::map(~NULL)
-}
-
-check_if_all_list_items_are_null <- function(a_list) {
-  # returns TRUE if all items are NULL, otherwise returns FALSE
-  a_list %>%
-    purrr::map_lgl(is.null) %>%
-    purrr::keep(~ !.x) %>%
-    rlang::is_empty()
 }
 
 #' Display time taken message
