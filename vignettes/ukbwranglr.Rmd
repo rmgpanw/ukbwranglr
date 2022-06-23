@@ -236,22 +236,22 @@ The following setup is recommended to reduce duplicated steps between multiple p
 
 ```{r warning=FALSE, message=FALSE}
 # build dummy clinical events SQLite DB in tempdir
-dummy_ukb_db_path <- tempfile(fileext = ".db")
+ukb_db_path <- tempfile(fileext = ".db")
 
 make_clinical_events_db(ukb_main_path = ukb_main_path,
-                        ukb_db_path = dummy_ukb_db_path, 
+                        ukb_db_path = ukb_db_path, 
                         gp_clinical_path = get_ukb_dummy("dummy_gp_clinical.txt",
                                                          path_only = TRUE),
                         gp_scripts_path = get_ukb_dummy("dummy_gp_scripts.txt",
                                                          path_only = TRUE), 
-                        ukb_data_dict = dummy_ukb_data_dict,
-                        ukb_codings = dummy_ukb_codings)
+                        ukb_data_dict = ukb_data_dict,
+                        ukb_codings = ukb_codings)
 ```
 
 ```{r}
 # Connect to the database
 con <- DBI::dbConnect(RSQLite::SQLite(), 
-                      dummy_ukb_db_path)
+                      ukb_db_path)
 
 # Convert to a named list of dbplyr::tbl_dbi objects
 ukbdb <- ukbwranglr::db_tables_to_list(con)
