@@ -87,6 +87,7 @@
 <span class="co">#&gt; The following objects are masked from 'package:base':</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;     intersect, setdiff, setequal, union</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org" class="external-link">tidyr</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyselect.r-lib.org" class="external-link">tidyselect</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://readr.tidyverse.org" class="external-link">readr</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tibble.tidyverse.org/" class="external-link">tibble</a></span><span class="op">)</span></code></pre></div>
@@ -98,7 +99,7 @@
 <li>Create a data dictionary for your main UK Biobank dataset with <code><a href="../reference/make_data_dict.html">make_data_dict()</a></code>.</li>
 <li>Read selected variables into R with <code><a href="../reference/read_ukb.html">read_ukb()</a></code>.</li>
 <li>Summarise continuous variables with <code><a href="../reference/summarise_numerical_variables.html">summarise_numerical_variables()</a></code>.</li>
-<li>Tidy clinical events data and extract outcomes of interest with <code><a href="../reference/tidy_clinical_events.html">tidy_clinical_events()</a></code> and <code><a href="../reference/extract_phenotypes.html">extract_phenotypes()</a></code>.</li>
+<li>Tidy clinical events data with <code><a href="../reference/tidy_clinical_events.html">tidy_clinical_events()</a></code> or <code><a href="../reference/make_clinical_events_db.html">make_clinical_events_db()</a></code>, and extract outcomes of interest with <code><a href="../reference/extract_phenotypes.html">extract_phenotypes()</a></code>.</li>
 <li>Analyse.</li>
 </ol>
 <p>These steps are now illustrated with a dummy dataset included with ukbwranglr:</p>
@@ -393,117 +394,67 @@
 <code class="sourceCode R"><span class="co"># extract phenotypes</span>
 <span class="va">diabetes_cases</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_phenotypes.html">extract_phenotypes</a></span><span class="op">(</span>clinical_events <span class="op">=</span> <span class="va">clinical_events</span>,
                                      clinical_codes <span class="op">=</span> <span class="fu"><a href="../reference/example_clinical_codes.html">example_clinical_codes</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; ***PROCESSING DISEASE 1 OF 1***</span>
+<span class="co">#&gt; Filtering for requested clinical codes/sources</span>
+<span class="co">#&gt; Joining filtered events with clinical codelist</span>
 <span class="co">#&gt; Time taken: 0 minutes, 0 seconds.</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Extracting clinical events for disease: Diabetes</span>
-<span class="co">#&gt; Filtering clinical_events for all codes in clinical_codes</span>
-<span class="co">#&gt; EXTRACTING EVENT DATES FOR PHENOTYPES</span>
-<span class="co">#&gt; Extracting event dates for DIABETES_UKBWR (Phenotype 1 of 5)</span>
-<span class="co">#&gt; Time taken: 0 minutes, 1 seconds.</span>
-<span class="co">#&gt; Extracting event dates for diabetes_unspecified_ukbwr (Phenotype 2 of 5)</span>
-<span class="co">#&gt; Time taken: 0 minutes, 1 seconds.</span>
-<span class="co">#&gt; Extracting event dates for gestational_diabetes_ukbwr (Phenotype 3 of 5)</span>
-<span class="co">#&gt; Time taken: 0 minutes, 2 seconds.</span>
-<span class="co">#&gt; Extracting event dates for type_1_dm_ukbwr (Phenotype 4 of 5)</span>
-<span class="co">#&gt; Time taken: 0 minutes, 3 seconds.</span>
-<span class="co">#&gt; Extracting event dates for type_2_dm_ukbwr (Phenotype 5 of 5)</span>
-<span class="co">#&gt; Time taken: 0 minutes, 3 seconds.</span>
-<span class="co">#&gt; COMPLETE!</span>
-<span class="co">#&gt; Time taken: 0 minutes, 3 seconds.</span>
 
-<span class="co"># returns a named list of data frames, one for each category in lower case, and one for the overall disease in capitals</span>
 <span class="va">diabetes_cases</span>
-<span class="co">#&gt; $Diabetes</span>
-<span class="co">#&gt; $Diabetes$DIABETES_UKBWR</span>
-<span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 3</span></span>
-<span class="co">#&gt;     eid DIABETES_UKBWR_min_date DIABETES_UKBWR_indicator</span>
-<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                   </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     1 1910-02-19              Yes                     </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span>     2 1939-02-16              Yes                     </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $Diabetes$diabetes_unspecified_ukbwr</span>
-<span class="co">#&gt; NULL</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $Diabetes$gestational_diabetes_ukbwr</span>
-<span class="co">#&gt; NULL</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $Diabetes$type_1_dm_ukbwr</span>
-<span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 3</span></span>
-<span class="co">#&gt;     eid type_1_dm_ukbwr_min_date type_1_dm_ukbwr_indicator</span>
-<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                    </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     1 1910-02-19               Yes                      </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $Diabetes$type_2_dm_ukbwr</span>
-<span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 3</span></span>
-<span class="co">#&gt;     eid type_2_dm_ukbwr_min_date type_2_dm_ukbwr_indicator</span>
-<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                    </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     1 2003-02-25               Yes                      </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span>     2 1939-02-16               Yes</span></code></pre></div>
+<span class="co">#&gt;    eid source index code       date     code_type  disease  category author</span>
+<span class="co">#&gt; 1:   1 f20002   0_3 1223 2003-02-25 data_coding_6 Diabetes Type 2 DM  ukbwr</span>
+<span class="co">#&gt; 2:   2 f41270   0_0  E11 1939-02-16         icd10 Diabetes Type 2 DM  ukbwr</span>
+<span class="co">#&gt; 3:   1 f41270   0_3  E10 1910-02-19         icd10 Diabetes Type 1 DM  ukbwr</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="analyse">5. Analyse<a class="anchor" aria-label="anchor" href="#analyse"></a>
 </h3>
 <p>Merge the output from steps 4 and 5:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">ukb_main_processed</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">full_join</a></span><span class="op">(</span>
-  <span class="va">ukb_main_numerical_vars_summarised</span>,
-  <span class="va">diabetes_cases</span><span class="op">$</span><span class="va">Diabetes</span><span class="op">$</span><span class="va">DIABETES_UKBWR</span>,
-  by <span class="op">=</span> <span class="st">"eid"</span>
-<span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>DIABETES_UKBWR_indicator <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span>
-    <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">DIABETES_UKBWR_indicator</span><span class="op">)</span>,
-    yes <span class="op">=</span> <span class="va">DIABETES_UKBWR_indicator</span>,
-    no <span class="op">=</span> <span class="st">"No"</span>
-  <span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">ukb_main_processed</span> <span class="op">&lt;-</span>
+  <span class="co"># first summarise `diabetes_cases` - for each eid, get the earliest date</span>
+  <span class="va">diabetes_cases</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">eid</span>,
+           <span class="va">disease</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>diabetes_min_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">date</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  
+  <span class="co"># create indicator column for diabetes</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>diabetes_indicator <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">diabetes_min_date</span><span class="op">)</span> <span class="op">~</span> <span class="st">"Yes"</span>,
+                                        <span class="cn">TRUE</span> <span class="op">~</span> <span class="st">"No"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  
+  <span class="co"># join with `ukb_main_numerical_vars_summarised`</span>
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">full_join</a></span><span class="op">(</span><span class="va">ukb_main_numerical_vars_summarised</span>,
+                   by <span class="op">=</span> <span class="st">"eid"</span><span class="op">)</span>
+<span class="co">#&gt; `summarise()` has grouped output by 'eid'. You can override using the `.groups`</span>
+<span class="co">#&gt; argument.</span>
 
 <span class="va">ukb_main_processed</span>
-<span class="co">#&gt;     eid sex_f31_0_0 year_of_birth_f34_0_0 mean_body_mass_index_bmi_x21001</span>
-<span class="co">#&gt;  1:   1      Female                  1952                        20.48775</span>
-<span class="co">#&gt;  2:   2      Female                  1946                        25.95937</span>
-<span class="co">#&gt;  3:   3        Male                  1951                        25.75700</span>
-<span class="co">#&gt;  4:   4      Female                  1956                             NaN</span>
-<span class="co">#&gt;  5:   5        &lt;NA&gt;                    NA                        21.23230</span>
-<span class="co">#&gt;  6:   6        Male                  1948                        28.63203</span>
-<span class="co">#&gt;  7:   7      Female                  1949                             NaN</span>
-<span class="co">#&gt;  8:   8        Male                  1956                             NaN</span>
-<span class="co">#&gt;  9:   9      Female                  1962                        23.94280</span>
-<span class="co">#&gt; 10:  10        Male                  1953                        27.60310</span>
-<span class="co">#&gt;     mean_systolic_blood_pressure_automated_reading_x4080</span>
-<span class="co">#&gt;  1:                                             138.1667</span>
-<span class="co">#&gt;  2:                                             142.8571</span>
-<span class="co">#&gt;  3:                                             130.3750</span>
-<span class="co">#&gt;  4:                                                  NaN</span>
-<span class="co">#&gt;  5:                                                  NaN</span>
-<span class="co">#&gt;  6:                                                  NaN</span>
-<span class="co">#&gt;  7:                                                  NaN</span>
-<span class="co">#&gt;  8:                                                  NaN</span>
-<span class="co">#&gt;  9:                                                  NaN</span>
-<span class="co">#&gt; 10:                                                  NaN</span>
-<span class="co">#&gt;     DIABETES_UKBWR_min_date DIABETES_UKBWR_indicator</span>
-<span class="co">#&gt;  1:              1910-02-19                      Yes</span>
-<span class="co">#&gt;  2:              1939-02-16                      Yes</span>
-<span class="co">#&gt;  3:                    &lt;NA&gt;                       No</span>
-<span class="co">#&gt;  4:                    &lt;NA&gt;                       No</span>
-<span class="co">#&gt;  5:                    &lt;NA&gt;                       No</span>
-<span class="co">#&gt;  6:                    &lt;NA&gt;                       No</span>
-<span class="co">#&gt;  7:                    &lt;NA&gt;                       No</span>
-<span class="co">#&gt;  8:                    &lt;NA&gt;                       No</span>
-<span class="co">#&gt;  9:                    &lt;NA&gt;                       No</span>
-<span class="co">#&gt; 10:                    &lt;NA&gt;                       No</span></code></pre></div>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 10 × 8</span></span>
+<span class="co">#&gt;      eid disease  diabetes_min_da… diabetes_indica… sex_f31_0_0 year_of_birth_f…</span>
+<span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>     1 Diabetes 1910-02-19       Yes              Female                  <span style="text-decoration: underline;">1</span>952</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>     2 Diabetes 1939-02-16       Yes              Female                  <span style="text-decoration: underline;">1</span>946</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>     3 <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>               <span style="color: #BB0000;">NA</span>               Male                    <span style="text-decoration: underline;">1</span>951</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>     4 <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>               <span style="color: #BB0000;">NA</span>               Female                  <span style="text-decoration: underline;">1</span>956</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>     5 <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>               <span style="color: #BB0000;">NA</span>               <span style="color: #BB0000;">NA</span>                        <span style="color: #BB0000;">NA</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>     6 <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>               <span style="color: #BB0000;">NA</span>               Male                    <span style="text-decoration: underline;">1</span>948</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>     7 <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>               <span style="color: #BB0000;">NA</span>               Female                  <span style="text-decoration: underline;">1</span>949</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>     8 <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>               <span style="color: #BB0000;">NA</span>               Male                    <span style="text-decoration: underline;">1</span>956</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     9 <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>               <span style="color: #BB0000;">NA</span>               Female                  <span style="text-decoration: underline;">1</span>962</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">10</span>    10 <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>               <span style="color: #BB0000;">NA</span>               Male                    <span style="text-decoration: underline;">1</span>953</span>
+<span class="co">#&gt; <span style="color: #949494;"># … with 2 more variables: mean_body_mass_index_bmi_x21001 &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   mean_systolic_blood_pressure_automated_reading_x4080 &lt;dbl&gt;</span></span></code></pre></div>
 <p>Describe:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ukb_main_processed</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">eid</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">DIABETES_UKBWR_indicator</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">diabetes_indicator</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>pct_female <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">sex_f31_0_0</span> <span class="op">==</span> <span class="st">"Female"</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span>,
             <span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/where.html" class="external-link">where</a></span><span class="op">(</span><span class="va">is.numeric</span><span class="op">)</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">.x</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 5</span></span>
-<span class="co">#&gt;   DIABETES_UKBWR_… pct_female year_of_birth_f… mean_body_mass_… mean_systolic_b…</span>
+<span class="co">#&gt;   diabetes_indica… pct_female year_of_birth_f… mean_body_mass_… mean_systolic_b…</span>
 <span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> No                    0.375            <span style="text-decoration: underline;">1</span>954.             25.4             130.</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Yes                   1                <span style="text-decoration: underline;">1</span>949              23.2             141.</span></code></pre></div>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Yes                   1                <span style="text-decoration: underline;">1</span>949              23.2             141.</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> <span style="color: #BB0000;">NA</span>                    0.375            <span style="text-decoration: underline;">1</span>954.             25.4             130.</span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -518,8 +469,94 @@
 UKB_CODINGS=/PATH/TO/Codings.tsv</code></pre>
 <p>Functions with arguments <code>ukb_data_dict</code> and <code>ukb_codings</code> use <code><a href="../reference/get_ukb_data_dict.html">get_ukb_data_dict()</a></code> and <code><a href="../reference/get_ukb_codings.html">get_ukb_codings()</a></code> by default, which will automatically search for environmental variables <code>UKB_DATA_DICT</code> and <code>UKB_CODINGS</code> and read the files from these locations.</p>
 </li>
-<li><p>Create a clinical events database using <code><a href="../reference/make_clinical_events_db.html">make_clinical_events_db()</a></code>. This function includes the option to incorporate <a href="https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=3000" title="Primary care health-related outcomes" class="external-link">primary care data</a> - it will take ~1 hour to run if including both the primary care clinical event records and prescription records datasets.</p></li>
+<li><p>Create a clinical events database using <code><a href="../reference/make_clinical_events_db.html">make_clinical_events_db()</a></code>. This function includes the option to incorporate <a href="https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=3000" title="Primary care health-related outcomes" class="external-link">primary care data</a>.<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a> Having connected to the database, phenotypes may be extracted with <code><a href="../reference/extract_phenotypes.html">extract_phenotypes()</a></code>:</p></li>
 </ol>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># build dummy clinical events SQLite DB in tempdir</span>
+<span class="va">ukb_db_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".db"</span><span class="op">)</span>
+
+<span class="fu"><a href="../reference/make_clinical_events_db.html">make_clinical_events_db</a></span><span class="op">(</span>ukb_main_path <span class="op">=</span> <span class="va">ukb_main_path</span>,
+                        ukb_db_path <span class="op">=</span> <span class="va">ukb_db_path</span>, 
+                        gp_clinical_path <span class="op">=</span> <span class="fu"><a href="../reference/get_ukb_dummy.html">get_ukb_dummy</a></span><span class="op">(</span><span class="st">"dummy_gp_clinical.txt"</span>,
+                                                         path_only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,
+                        gp_scripts_path <span class="op">=</span> <span class="fu"><a href="../reference/get_ukb_dummy.html">get_ukb_dummy</a></span><span class="op">(</span><span class="st">"dummy_gp_scripts.txt"</span>,
+                                                         path_only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, 
+                        ukb_data_dict <span class="op">=</span> <span class="va">ukb_data_dict</span>,
+                        ukb_codings <span class="op">=</span> <span class="va">ukb_codings</span><span class="op">)</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Connect to the database</span>
+<span class="va">con</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="https://rsqlite.r-dbi.org/reference/SQLite.html" class="external-link">SQLite</a></span><span class="op">(</span><span class="op">)</span>, 
+                      <span class="va">ukb_db_path</span><span class="op">)</span>
+
+<span class="co"># Convert to a named list of dbplyr::tbl_dbi objects</span>
+<span class="va">ukbdb</span> <span class="op">&lt;-</span> <span class="fu">ukbwranglr</span><span class="fu">::</span><span class="fu"><a href="../reference/db_tables_to_list.html">db_tables_to_list</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span>
+
+<span class="co"># Value columns (from `gp_clinical.txt`) and prescription names/quantities (from `gp_scripts.txt`) are stored separately from the main `clinical_events` table</span>
+<span class="va">ukbdb</span>
+<span class="co">#&gt; $clinical_events</span>
+<span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;clinical_events&gt; [?? x 5]</span></span>
+<span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.38.5 [/private/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/Rtmp1Frwoe/fileb59b98a9c5.db]</span></span>
+<span class="co">#&gt;      eid source index code       date      </span>
+<span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>     1 f40001 0_0   X095       1917-10-08</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>     2 f40001 0_0   A162       1955-02-11</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>     1 f40001 1_0   X095       1910-02-19</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>     2 f40001 1_0   A162       1965-08-08</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>     1 f40002 0_0   W192       1917-10-08</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>     2 f40002 0_0   V374       1955-02-11</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>     1 f40002 1_3   X715       1910-02-19</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>     1 f20003 0_0   1140861958 1955-02-11</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     2 f20003 0_0   1141146234 1965-08-08</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">10</span>     1 f20003 2_0   1141146188 1910-02-19</span>
+<span class="co">#&gt; <span style="color: #949494;"># … with more rows</span></span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $gp_clinical_values</span>
+<span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;gp_clinical_values&gt; [?? x 4]</span></span>
+<span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.38.5 [/private/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/Rtmp1Frwoe/fileb59b98a9c5.db]</span></span>
+<span class="co">#&gt;    index value1 value2 value3</span>
+<span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 1     1      2      3     </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 2     1      2      3     </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 3     1      2      3     </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 4     1      2      3     </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 5     1      2      3     </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 6     1      2      3     </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 7     <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>    </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 8     <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>    </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 9     <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>    </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 10    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>    </span>
+<span class="co">#&gt; <span style="color: #949494;"># … with more rows</span></span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $gp_scripts_names_and_quantities</span>
+<span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;gp_scripts_names_and_quantities&gt; [6 x 3]</span></span>
+<span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.38.5 [/private/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/Rtmp1Frwoe/fileb59b98a9c5.db]</span></span>
+<span class="co">#&gt;   index drug_name quantity</span>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1     drug2     50      </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2     <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>      </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 3     drug2     30      </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 4     drug2     30      </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 5     drug2     30      </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 6     2         30</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># extract phenotypes</span>
+<span class="va">diabetes_cases</span> <span class="op">&lt;-</span>
+  <span class="fu"><a href="../reference/extract_phenotypes.html">extract_phenotypes</a></span><span class="op">(</span>clinical_events <span class="op">=</span> <span class="va">ukbdb</span><span class="op">$</span><span class="va">clinical_events</span>,
+                     clinical_codes <span class="op">=</span> <span class="fu"><a href="../reference/example_clinical_codes.html">example_clinical_codes</a></span><span class="op">(</span><span class="op">)</span>,
+                     verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
+
+<span class="va">diabetes_cases</span>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 8 × 9</span></span>
+<span class="co">#&gt;     eid source       index code  date       code_type    disease category author</span>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     1 f20002       0_3   1223  2003-02-25 data_coding… Diabet… Type 2 … ukbwr </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span>     1 gpc1_r2      7     C108. 1990-10-01 read2        Diabet… Type 1 … ukbwr </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span>     1 gpc1_r2      11    C108. 1990-10-03 read2        Diabet… Type 1 … ukbwr </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span>     2 gpc2_r2      8     C109. 1990-10-02 read2        Diabet… Type 2 … ukbwr </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">5</span>     2 gpc2_r2      12    C109. 1990-10-04 read2        Diabet… Type 2 … ukbwr </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">6</span>     1 f41270       0_3   E10   1910-02-19 icd10        Diabet… Type 1 … ukbwr </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">7</span>     1 f20002_icd10 0_3   E11   2003-02-25 icd10        Diabet… Type 2 … ukbwr </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">8</span>     2 f41270       0_0   E11   1939-02-16 icd10        Diabet… Type 2 … ukbwr</span></code></pre></div>
 </div>
 <div class="footnotes">
 <hr>
@@ -527,6 +564,7 @@ UKB_CODINGS=/PATH/TO/Codings.tsv</code></pre>
 <li id="fn1"><p>You will be asked to sign up for a free account if you do not have one already.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
 <li id="fn2"><p>It may be preferable at this stage to write the data dictionary to a csv file (using <code><a href="https://readr.tidyverse.org/reference/write_delim.html" class="external-link">readr::write_csv()</a></code>), manually filter in a text editor like Microsoft Excel, then reload into R (using <code><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">readr::read_csv()</a></code>).<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
 <li id="fn3"><p>The <a href="https://rmgpanw.github.io/codemapper/" title="codemapper" class="external-link">codemapper package</a> includes functions to facilitate building clinical code lists.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
+<li id="fn4"><p>It will take \~1 hour to run if including both the primary care clinical event records and prescription records datasets.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
   </div>
