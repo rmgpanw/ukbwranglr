@@ -794,10 +794,10 @@ test_that("`filter_clinical_events()` returns the expected number of rows", {
     nrow(
       filter_clinical_events(
         clinical_events = dummy_clinical_events_db,
-        clinical_codes_list = list("read2" = "C108.")
+        clinical_codes_list = list("read3" = "C108.")
       )
     ),
-    1
+    0
   )
 })
 
@@ -814,10 +814,10 @@ test_that("`filter_clinical_events()` returns the expected 'sources' for each da
   # read3
   expect_equal(sort(unique(
     filter_clinical_events(dummy_clinical_events,
-      clinical_codes_list = list("read3" = "C108.")
+      clinical_codes_list = list("read3" = "X40J4")
     )$source
   )),
-  expected = "gpc1_r3"
+  expected = "gpc3_r3"
   )
 
   # icd9
@@ -884,20 +884,21 @@ test_that(
   {
     # icd10
     expect_equivalent(
-      filter_clinical_events(dummy_clinical_events,
+      tibble::as_tibble(filter_clinical_events(dummy_clinical_events,
         clinical_codes_list = list(
           "icd10" = "W192",
           "read2" = "C108.",
-          "read3" = "C108."
+          "read3" = "X40J4"
         )
-      ),
-      expected = tibble::tibble(
-        eid = c(1, 2, 1, 1),
-        source = c("f40002", "f40006", "gpc1_r2", "gpc1_r3"),
-        index = c("0_0", "2_0", "7", "11"),
-        code = c("W192", "W192", "C108.", "C108."),
-        date = c("1917-10-08", NA, "1990-10-01", "1990-10-03")
-      )
+      )),
+      expected = tibble::tribble(
+         ~eid,   ~source, ~index,   ~code,        ~date,
+           1L,  "f40002",  "0_0",  "W192", "1917-10-08",
+           2L,  "f40006",  "2_0",  "W192",           NA,
+           1L, "gpc1_r2",    "7", "C108.", "1990-10-01",
+           1L, "gpc3_r3",    "9", "X40J4", "1990-10-03",
+           1L, "gpc1_r2",   "11", "C108.", "1990-10-03"
+         )
     )
   }
 )

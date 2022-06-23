@@ -126,13 +126,9 @@ test_that(
       sort(
         c(
           "gpc1_r2",
-          "gpc1_r3",
           "gpc2_r2",
-          "gpc2_r3",
-          "gpc3_r2",
           "gpc3_r3",
-          "gpc4_r2",
-          "gpc4_r3"
+          "gpc4_r2"
         )
       )
     )
@@ -232,12 +228,8 @@ test_that("`make_clinical_events_db()` works", {
     dplyr::filter(source %in% c(
       "gpc1_r2",
       "gpc2_r2",
-      "gpc3_r2",
       "gpc4_r2",
-      "gpc1_r3",
-      "gpc2_r3",
-      "gpc3_r3",
-      "gpc4_r3"
+      "gpc3_r3"
     )) %>%
     dplyr::collect() %>%
     dplyr::arrange(as.numeric(index))
@@ -248,16 +240,16 @@ test_that("`make_clinical_events_db()` works", {
       ~eid, ~source, ~index, ~code, ~date,
       1L, "gpc1_r2", "1", "C", NA,
       1L, "gpc4_r2", "2", "A", NA,
-      1L, "gpc3_r2", "3", "E", NA,
+      1L, "gpc3_r3", "3", "E", NA,
       3L, "gpc1_r2", "4", "E", NA,
       4L, "gpc2_r2", "5", "J", "1999-02-01",
-      8L, "gpc1_r3", "6", "G", "1999-02-01",
+      8L, "gpc1_r2", "6", "G", "1999-02-01",
       1L, "gpc1_r2", "7", "C108.", "1990-10-01",
       2L, "gpc2_r2", "8", "C109.", "1990-10-02",
       1L, "gpc3_r3", "9", "X40J4", "1990-10-03",
-      2L, "gpc4_r3", "10", "X40J5", "1990-10-04",
-      1L, "gpc1_r3", "11", "C108.", "1990-10-03",
-      2L, "gpc2_r3", "12", "C109.", "1990-10-04"
+      2L, "gpc3_r3", "10", "X40J5", "1990-10-04",
+      1L, "gpc1_r2", "11", "C108.", "1990-10-03",
+      2L, "gpc2_r2", "12", "C109.", "1990-10-04"
     )
   )
 
@@ -297,17 +289,17 @@ test_that("`make_clinical_events_db()` works", {
   expect_equivalent(
     gp_scripts_events,
     tibble::tribble(
-      ~eid, ~source, ~index, ~code, ~date,
-      1L, "gps1_dmd", "1", "1", NA,
-      1L, "gps1_r2", "1", "bxi300", NA,
-      1L, "gps4_r2", "2", "bxi3", NA,
-      1L, "gps3_bnf", "3", "02.02.01.00.00", NA,
-      3L, "gps1_dmd", "4", "1", NA,
-      3L, "gps1_r2", "4", "bd3j00", NA,
-      4L, "gps2_bnf", "5", "02020100", "1999-02-01",
-      4L, "gps2_r2", "5", "bd3j", "1999-02-01",
-      8L, "gps1_dmd", "6", "1", "1999-02-01"
-    )
+       ~eid,    ~source, ~index,            ~code,        ~date,
+         1L,  "gps1_r2",    "1",         "bxi300",           NA,
+         1L, "gps1_dmd",    "1",              "1",           NA,
+         1L,  "gps4_r2",    "2",           "bxi3",           NA,
+         1L, "gps3_bnf",    "3", "02.02.01.00.00",           NA,
+         3L,  "gps1_r2",    "4",         "bd3j00",           NA,
+         3L, "gps1_dmd",    "4",              "1",           NA,
+         4L,  "gps2_r2",    "5",           "bd3j", "1999-02-01",
+         4L, "gps2_bnf",    "5",       "02020100", "1999-02-01",
+         8L, "gps1_dmd",    "6",              "1", "1999-02-01"
+       )
   )
 
   expect_equivalent(
@@ -340,3 +332,4 @@ test_that("`make_clinical_events_db()` raises an error if table already exist", 
     "Error! The following table"
   )
 })
+
