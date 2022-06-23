@@ -47,8 +47,9 @@ The basic workflow is as follows:
 2.  Read selected variables into R with `read_ukb()`.
 3.  Summarise continuous variables with
     `summarise_numerical_variables()`.
-4.  Tidy clinical events data and extract outcomes of interest with
-    `tidy_clinical_events()` and `extract_phenotypes()`.
+4.  Tidy clinical events data with `tidy_clinical_events()` or
+    `make_clinical_events_db()`, and extract outcomes of interest with
+    `extract_phenotypes()`.
 5.  Analyse.
 
 Please see `vignette('ukbwranglr')` for further details.
