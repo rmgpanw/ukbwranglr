@@ -353,8 +353,6 @@ make_clinical_events_db <- function(ukb_main_path,
 #'   further details) are set to \code{NA}.
 #'
 #' @param gp_clinical The UK Biobank primary care clinical events dataset
-#' @param remove_special_dates Logical. Removes special date values if
-#'   requested. Default value is \code{TRUE}.
 #' @param .details_only logical. If \code{TRUE}, return a character vector of
 #'   output table names only
 #'
@@ -364,13 +362,11 @@ make_clinical_events_db <- function(ukb_main_path,
 #' @seealso \code{\link{tidy_clinical_events}},
 #'   \code{\link{make_clinical_events_db}}
 tidy_gp_clinical <- function(gp_clinical,
-                             remove_special_dates = TRUE,
                              .details_only = FALSE) {
   tidy_gp_data_db(
     gp_df = gp_clinical,
     gp_df_type = "gp_clinical",
     pos = NULL,
-    remove_special_dates = remove_special_dates,
     .details_only = .details_only
   )
 }
@@ -397,8 +393,6 @@ tidy_gp_clinical <- function(gp_clinical,
 #'   further details) are set to \code{NA}.
 #'
 #' @param gp_scripts The UK Biobank primary care prescriptions dataset
-#' @param remove_special_dates Logical. Removes special date values if
-#'   requested. Default value is \code{TRUE}.
 #' @param .details_only logical. If \code{TRUE}, return a character vector of
 #'   output table names only
 #'
@@ -409,13 +403,11 @@ tidy_gp_clinical <- function(gp_clinical,
 #' @seealso \code{\link{tidy_clinical_events}},
 #'   \code{\link{make_clinical_events_db}}
 tidy_gp_scripts <- function(gp_scripts,
-                            remove_special_dates = TRUE,
                             .details_only = FALSE) {
   tidy_gp_data_db(
     gp_df = gp_scripts,
     gp_df_type = "gp_scripts",
     pos = NULL,
-    remove_special_dates = remove_special_dates,
     .details_only = .details_only
   )
 }
@@ -584,7 +576,6 @@ file_to_sqlite_db <- function(file,
 tidy_gp_data_db <- function(gp_df,
                             gp_df_type,
                             pos,
-                            remove_special_dates = TRUE,
                             .details_only = FALSE) {
   # see documentation for `tidy_gp_clinical`/`tidy_gp_scripts` the `pos`
   # argument is required for use with `file_to_sqlite_db` - adds the row number
@@ -766,26 +757,6 @@ tidy_gp_data_db <- function(gp_df,
   gp_df_codes$date <- gp_df_codes$date %>%
     lubridate::dmy() %>%
     as.character()
-
-  # remove special dates if requested (default is to remove)
-  if (remove_special_dates == TRUE) {
-    # primary care dates to remove
-    # see https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=591
-    primary_care_special_dates_to_remove <- c(
-      "01/01/1901",
-      "02/02/1902",
-      "03/03/1903",
-      "07/07/2037"
-    ) %>%
-      lubridate::dmy() %>%
-      as.character()
-
-    gp_df_codes$date <- ifelse(
-      test = gp_df_codes$date %in% primary_care_special_dates_to_remove,
-      yes = NA,
-      no = gp_df_codes$date
-    )
-  }
 
   result <- list(
     events = gp_df_codes %>%

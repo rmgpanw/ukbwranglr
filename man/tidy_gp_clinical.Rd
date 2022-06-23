@@ -4,17 +4,10 @@
 \alias{tidy_gp_clinical}
 \title{Tidy UK Biobank primary care clinical events}
 \usage{
-tidy_gp_clinical(
-  gp_clinical,
-  remove_special_dates = TRUE,
-  .details_only = FALSE
-)
+tidy_gp_clinical(gp_clinical, .details_only = FALSE)
 }
 \arguments{
 \item{gp_clinical}{The UK Biobank primary care clinical events dataset}
-
-\item{remove_special_dates}{Logical. Removes special date values if
-requested. Default value is \code{TRUE}.}
 
 \item{.details_only}{logical. If \code{TRUE}, return a character vector of
 output table names only}
