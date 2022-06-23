@@ -313,16 +313,13 @@ make_clinical_events_db <- function(ukb_main_path,
 
   # set index on 'code'/'source'/'eid' columns for faster lookups
   message(
-    "***SETTING INDEX ON `source`, `code` AND `eid` COLUMNS IN UKB DATABASE 'clinical_events' TABLE***"
+    "***SETTING MULTICOLUMN INDEX ON `code`/`source`, AND INDEX ON `eid` COLUMNS IN UKB DATABASE 'clinical_events' TABLE***"
   )
-  sql_index_source <-
-    "CREATE INDEX idx_clinical_events_source ON clinical_events (source);"
-  sql_index_code <-
-    "CREATE INDEX idx_clinical_events_code ON clinical_events (code);"
+  sql_multiindex_code_source <-
+    "CREATE INDEX idx_clinical_events_source ON clinical_events (code, source);"
   sql_index_eid <-
     "CREATE INDEX idx_clinical_events_eid ON clinical_events (eid);"
-  DBI::dbSendQuery(con, statement = sql_index_source)
-  DBI::dbSendQuery(con, statement = sql_index_code)
+  DBI::dbSendQuery(con, statement = sql_multiindex_code_source)
   DBI::dbSendQuery(con, statement = sql_index_eid)
 
   # completion message

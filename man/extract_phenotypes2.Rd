@@ -4,13 +4,7 @@
 \alias{extract_phenotypes2}
 \title{Extract phenotypes from clinical events data}
 \usage{
-extract_phenotypes2(
-  clinical_events,
-  clinical_codes,
-  eid_filter = NULL,
-  source_filter = NULL,
-  date_filter = NULL
-)
+extract_phenotypes2(clinical_events, clinical_codes, source_filter = NULL)
 }
 \arguments{
 \item{clinical_events}{A long format data frame created by
@@ -21,13 +15,7 @@ This can also be a \code{\link[dbplyr]{tbl_dbi}} object.}
 \item{clinical_codes}{data frame. Must match the format as per
 \code{\link{example_clinical_codes}}.}
 
-\item{eid_filter}{Integer vector of eids to filter for.}
-
 \item{source_filter}{Character vetor of data sources to filter for.}
-
-\item{date_filter}{Character vector of length 2 that specifies a date range
-to filter for. Dates must be formatted as 'YYYY-MM-DD'. The first date
-should be earlier than the second date, for example: \verb{c("2000-01-01", "2010-01-01)}. \code{\link{example_clinical_codes}}.}
 }
 \value{
 A data frame.

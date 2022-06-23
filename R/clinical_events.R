@@ -137,12 +137,7 @@ mutate_age_at_event_cols <- function(ukb_main,
 #'   This can also be a \code{\link[dbplyr]{tbl_dbi}} object.
 #' @param clinical_codes data frame. Must match the format as per
 #'   \code{\link{example_clinical_codes}}.
-#' @param eid_filter Integer vector of eids to filter for.
 #' @param source_filter Character vetor of data sources to filter for.
-#' @param date_filter Character vector of length 2 that specifies a date range
-#'   to filter for. Dates must be formatted as 'YYYY-MM-DD'. The first date
-#'   should be earlier than the second date, for example: `c("2000-01-01",
-#'   "2010-01-01)`. \code{\link{example_clinical_codes}}.
 #' @return A data frame.
 #' @export
 #' @family clinical events
@@ -176,9 +171,7 @@ mutate_age_at_event_cols <- function(ukb_main,
 #' )
 extract_phenotypes2 <- function(clinical_events,
                                 clinical_codes,
-                                eid_filter = NULL,
-                                source_filter = NULL,
-                                date_filter = NULL) {
+                                source_filter = NULL) {
 
   start_time <- proc.time()
 
@@ -188,15 +181,6 @@ extract_phenotypes2 <- function(clinical_events,
 
   # clinical_codes
   validate_clinical_codes(clinical_codes)
-
-  # eid_filter
-  if (!is.null(eid_filter)) {
-    assertthat::assert_that(is.integer(eid_filter),
-                            msg = "`eid_filter` should be type integer")
-
-    assertthat::assert_that(assertthat::noNA(eid_filter),
-                            msg = "`eid_filter` must not contain `NA` values")
-  }
 
   # source_filter
   if (!is.null(source_filter)) {
@@ -221,66 +205,20 @@ extract_phenotypes2 <- function(clinical_events,
                        collapse = ", ")
       )
     )
+  } else {
+    source_filter <- clinical_events_sources()$source
   }
-
-  ## check that date_filter contains valid dates
-  if (!is.null(date_filter)) {
-    assertthat::assert_that(is.character(date_filter),
-                            msg = "`date_filter` should be type character")
-
-    assertthat::assert_that(length(date_filter) == 2,
-                            msg = "`date_filter` should be a character vector of length 2")
-
-    invalid_dates <- date_filter %>%
-      purrr::map_chr(~ tryCatch({
-        as.Date(.x)
-        NA_character_
-      },
-      error = function(e)
-        .x)) %>%
-      subset(!is.na(.))
-
-    assertthat::assert_that(length(invalid_dates) == 0,
-                            msg = paste0(
-                              "`date_filter` contains invalid values: ",
-                              paste(invalid_dates,
-                                    collapse = ", ")
-                            ))
-
-    assertthat::assert_that(date_filter[1] < date_filter[2],
-                            msg = "The second date of `date_filter` must be later than the first date")
-  }
-
-  ## check that min date is greater than max date in date_filter
 
 
   # filter `clinical_events` -------
   # filter `clinical_events` for codes in `clinical_codes` (regardless of code
   # type at this stage)
   clinical_events <- clinical_events %>%
-    dplyr::filter(.data[["code"]] %in% local(unique(clinical_codes$code)))
-
-  # optional filters
-  if (!is.null(eid_filter)) {
-    clinical_events <- clinical_events %>%
-      dplyr::filter(.data[["eid"]] %in% local(unique(eid_filter)))
-  }
-
-  if (!is.null(source_filter)) {
-    clinical_events <- clinical_events %>%
-      dplyr::filter(.data[["source"]] %in% local(unique(source_filter)))
-  }
-
-  if (!is.null(date_filter)) {
-    clinical_events <- clinical_events %>%
-      dplyr::filter(
-        (.data[["date"]] < local(date_filter[1])) &
-          (.data[["date"]] >= local(date_filter[2]))
-      )
-  }
-
-  # collect from SQLITe db
-  clinical_events <- dplyr::collect(clinical_events)
+    dplyr::filter((.data[["code"]] %in% local(unique(
+      clinical_codes$code
+    ))) &
+      (.data[["source"]] %in% local(unique(source_filter)))) %>%
+    dplyr::collect()
 
   # join with `clinical_codes` ---------
   # append code_type
