@@ -63,18 +63,18 @@ standardised long format table.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">tidy_clinical_events</span><span class="op">(</span>
-  <span class="va">ukb_main</span>,
-  ukb_data_dict <span class="op">=</span> <span class="fu"><a href="get_ukb_data_dict.html">get_ukb_data_dict</a></span><span class="op">(</span><span class="op">)</span>,
-  ukb_codings <span class="op">=</span> <span class="fu"><a href="get_ukb_codings.html">get_ukb_codings</a></span><span class="op">(</span><span class="op">)</span>,
-  clinical_events_sources <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"primary_death_icd10"</span>, <span class="st">"secondary_death_icd10"</span>,
-    <span class="st">"self_report_medication"</span>, <span class="st">"self_report_non_cancer"</span>, <span class="st">"self_report_non_cancer_icd10"</span>,
-    <span class="st">"self_report_cancer"</span>, <span class="st">"self_report_operation"</span>, <span class="st">"cancer_register_icd9"</span>,
-    <span class="st">"cancer_register_icd10"</span>, <span class="st">"summary_hes_icd9"</span>, <span class="st">"summary_hes_icd10"</span>,
-    <span class="st">"summary_hes_opcs3"</span>, <span class="st">"summary_hes_opcs4"</span><span class="op">)</span>,
-  strict <span class="op">=</span> <span class="cn">TRUE</span>,
-  .details_only <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">tidy_clinical_events</span><span class="op">(</span></span>
+<span>  <span class="va">ukb_main</span>,</span>
+<span>  ukb_data_dict <span class="op">=</span> <span class="fu"><a href="get_ukb_data_dict.html">get_ukb_data_dict</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  ukb_codings <span class="op">=</span> <span class="fu"><a href="get_ukb_codings.html">get_ukb_codings</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  clinical_events_sources <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"primary_death_icd10"</span>, <span class="st">"secondary_death_icd10"</span>,</span>
+<span>    <span class="st">"self_report_medication"</span>, <span class="st">"self_report_non_cancer"</span>, <span class="st">"self_report_non_cancer_icd10"</span>,</span>
+<span>    <span class="st">"self_report_cancer"</span>, <span class="st">"self_report_operation"</span>, <span class="st">"cancer_register_icd9"</span>,</span>
+<span>    <span class="st">"cancer_register_icd10"</span>, <span class="st">"summary_hes_icd9"</span>, <span class="st">"summary_hes_icd10"</span>,</span>
+<span>    <span class="st">"summary_hes_opcs3"</span>, <span class="st">"summary_hes_opcs4"</span><span class="op">)</span>,</span>
+<span>  strict <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  .details_only <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -147,7 +147,7 @@ the date as either 'Date uncertain or unknown' or 'Preferred not to answer'
 
 
 <p>Results may be combined into a single data frame using
-<code><a href="https://dplyr.tidyverse.org/reference/bind.html" class="external-link">bind_rows</a></code>.</p>
+<code><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></code>.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -160,17 +160,17 @@ the date as either 'Date uncertain or unknown' or 'Preferred not to answer'
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co"># dummy UKB main dataset and metadata</span></span>
-<span class="r-in"><span class="va">dummy_ukb_main</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_ukb_dummy.html">get_ukb_dummy</a></span><span class="op">(</span><span class="st">"dummy_ukb_main.tsv"</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">dummy_ukb_data_dict</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_ukb_dummy.html">get_ukb_dummy</a></span><span class="op">(</span><span class="st">"dummy_Data_Dictionary_Showcase.tsv"</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">dummy_ukb_codings</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_ukb_dummy.html">get_ukb_dummy</a></span><span class="op">(</span><span class="st">"dummy_Codings.tsv"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># tidy clinical events in a UK Biobank main dataset</span></span>
-<span class="r-in"><span class="va">clinical_events</span> <span class="op">&lt;-</span> <span class="fu">tidy_clinical_events</span><span class="op">(</span></span>
-<span class="r-in">  ukb_main <span class="op">=</span> <span class="va">dummy_ukb_main</span>,</span>
-<span class="r-in">  ukb_data_dict <span class="op">=</span> <span class="va">dummy_ukb_data_dict</span>,</span>
-<span class="r-in">  ukb_codings <span class="op">=</span> <span class="va">dummy_ukb_codings</span></span>
-<span class="r-in"><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># dummy UKB main dataset and metadata</span></span></span>
+<span class="r-in"><span><span class="va">dummy_ukb_main</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_ukb_dummy.html">get_ukb_dummy</a></span><span class="op">(</span><span class="st">"dummy_ukb_main.tsv"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dummy_ukb_data_dict</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_ukb_dummy.html">get_ukb_dummy</a></span><span class="op">(</span><span class="st">"dummy_Data_Dictionary_Showcase.tsv"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dummy_ukb_codings</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_ukb_dummy.html">get_ukb_dummy</a></span><span class="op">(</span><span class="st">"dummy_Codings.tsv"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># tidy clinical events in a UK Biobank main dataset</span></span></span>
+<span class="r-in"><span><span class="va">clinical_events</span> <span class="op">&lt;-</span> <span class="fu">tidy_clinical_events</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  ukb_main <span class="op">=</span> <span class="va">dummy_ukb_main</span>,</span></span>
+<span class="r-in"><span>  ukb_data_dict <span class="op">=</span> <span class="va">dummy_ukb_data_dict</span>,</span></span>
+<span class="r-in"><span>  ukb_codings <span class="op">=</span> <span class="va">dummy_ukb_codings</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Tidying clinical events for primary_death_icd10</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Time taken: 0 minutes, 0 seconds.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Tidying clinical events for secondary_death_icd10</span>
@@ -197,9 +197,9 @@ the date as either 'Date uncertain or unknown' or 'Preferred not to answer'
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Time taken: 0 minutes, 0 seconds.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Tidying clinical events for summary_hes_opcs4</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Time taken: 0 minutes, 0 seconds.</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># returns a named list of data frames, one for each `clinical_events_source`</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">clinical_events</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># returns a named list of data frames, one for each `clinical_events_source`</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">clinical_events</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1] "primary_death_icd10"          "secondary_death_icd10"       </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [3] "self_report_medication"       "self_report_non_cancer"      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [5] "self_report_non_cancer_icd10" "self_report_cancer"          </span>
@@ -207,8 +207,8 @@ the date as either 'Date uncertain or unknown' or 'Preferred not to answer'
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [9] "cancer_register_icd10"        "summary_hes_icd9"            </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [11] "summary_hes_icd10"            "summary_hes_opcs3"           </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [13] "summary_hes_opcs4"           </span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">clinical_events</span><span class="op">$</span><span class="va">summary_hes_icd10</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">clinical_events</span><span class="op">$</span><span class="va">summary_hes_icd10</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    eid source index  code       date</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1:   1 f41270    NA  X715 1955-11-12</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2:   2 f41270    NA   E11 1939-02-16</span>
@@ -218,10 +218,10 @@ the date as either 'Date uncertain or unknown' or 'Preferred not to answer'
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6:   2 f41270    NA M0087 1939-02-16</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 7:   1 f41270    NA   E10 1910-02-19</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 8:   2 f41270    NA M0087 1965-08-08</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># use .details_only = TRUE to return details of required Field IDs for</span></span>
-<span class="r-in"><span class="co"># specific clinical_events sources</span></span>
-<span class="r-in"><span class="fu">tidy_clinical_events</span><span class="op">(</span>.details_only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># use .details_only = TRUE to return details of required Field IDs for</span></span></span>
+<span class="r-in"><span><span class="co"># specific clinical_events sources</span></span></span>
+<span class="r-in"><span><span class="fu">tidy_clinical_events</span><span class="op">(</span>.details_only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $required_field_ids</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $required_field_ids$primary_death_icd10</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> code_fid date_fid </span>
@@ -290,7 +290,7 @@ the date as either 'Date uncertain or unknown' or 'Preferred not to answer'
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

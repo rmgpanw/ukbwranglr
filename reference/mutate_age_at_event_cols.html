@@ -55,12 +55,12 @@ regex supplied to <code>date_col_regex</code>.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">mutate_age_at_event_cols</span><span class="op">(</span>
-  <span class="va">ukb_main</span>,
-  dob_col <span class="op">=</span> <span class="st">"dob"</span>,
-  date_col_regex <span class="op">=</span> <span class="st">"_date$"</span>,
-  date_col_regex_replacement <span class="op">=</span> <span class="st">"_age"</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">mutate_age_at_event_cols</span><span class="op">(</span></span>
+<span>  <span class="va">ukb_main</span>,</span>
+<span>  dob_col <span class="op">=</span> <span class="st">"dob"</span>,</span>
+<span>  date_col_regex <span class="op">=</span> <span class="st">"_date$"</span>,</span>
+<span>  date_col_regex_replacement <span class="op">=</span> <span class="st">"_age"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -96,19 +96,19 @@ supplied to <code>date_col_regex</code> with this string.</p></dd>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co"># dummy data</span></span>
-<span class="r-in"><span class="va">dummy_ukb_main</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tribble.html" class="external-link">tribble</a></span><span class="op">(</span></span>
-<span class="r-in">  <span class="op">~</span><span class="va">eid</span>, <span class="op">~</span><span class="va">dob</span>, <span class="op">~</span><span class="va">event_date</span>,</span>
-<span class="r-in">  <span class="fl">1</span>, <span class="st">"2000-01-01"</span>, <span class="st">"2010-01-01"</span></span>
-<span class="r-in"><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># mutate age at event col</span></span>
-<span class="r-in"><span class="fu">mutate_age_at_event_cols</span><span class="op">(</span></span>
-<span class="r-in">  <span class="va">dummy_ukb_main</span>,</span>
-<span class="r-in">  dob_col <span class="op">=</span> <span class="st">"dob"</span>,</span>
-<span class="r-in">  date_col_regex <span class="op">=</span> <span class="st">"_date$"</span>,</span>
-<span class="r-in">  date_col_regex_replacement <span class="op">=</span> <span class="st">"_age"</span></span>
-<span class="r-in"><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># dummy data</span></span></span>
+<span class="r-in"><span><span class="va">dummy_ukb_main</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tribble.html" class="external-link">tribble</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="op">~</span><span class="va">eid</span>, <span class="op">~</span><span class="va">dob</span>, <span class="op">~</span><span class="va">event_date</span>,</span></span>
+<span class="r-in"><span>  <span class="fl">1</span>, <span class="st">"2000-01-01"</span>, <span class="st">"2010-01-01"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># mutate age at event col</span></span></span>
+<span class="r-in"><span><span class="fu">mutate_age_at_event_cols</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">dummy_ukb_main</span>,</span></span>
+<span class="r-in"><span>  dob_col <span class="op">=</span> <span class="st">"dob"</span>,</span></span>
+<span class="r-in"><span>  date_col_regex <span class="op">=</span> <span class="st">"_date$"</span>,</span></span>
+<span class="r-in"><span>  date_col_regex_replacement <span class="op">=</span> <span class="st">"_age"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Calculating age at event for event_date. New colname: event_age</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 4</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     eid dob        event_date event_age</span>
@@ -128,7 +128,7 @@ supplied to <code>date_col_regex</code> with this string.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

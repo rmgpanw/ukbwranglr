@@ -53,7 +53,7 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">get_ukb_dummy</span><span class="op">(</span><span class="va">file_name</span>, path_only <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_ukb_dummy</span><span class="op">(</span><span class="va">file_name</span>, path_only <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -90,19 +90,19 @@ records dataset.</p></li>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org" class="external-link">magrittr</a></span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># available dummy datasets</span></span>
-<span class="r-in"><span class="va">dummy_datasets</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span class="r-in">  <span class="st">"dummy_Data_Dictionary_Showcase.tsv"</span>,</span>
-<span class="r-in">  <span class="st">"dummy_Codings.tsv"</span>,</span>
-<span class="r-in">  <span class="st">"dummy_ukb_main.tsv"</span>,</span>
-<span class="r-in">  <span class="st">"dummy_gp_clinical.txt"</span>,</span>
-<span class="r-in">  <span class="st">"dummy_gp_scripts.txt"</span></span>
-<span class="r-in"><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># read dummy dataset into R</span></span>
-<span class="r-in"><span class="fu">get_ukb_dummy</span><span class="op">(</span><span class="st">"dummy_ukb_main.tsv"</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org" class="external-link">magrittr</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># available dummy datasets</span></span></span>
+<span class="r-in"><span><span class="va">dummy_datasets</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="st">"dummy_Data_Dictionary_Showcase.tsv"</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"dummy_Codings.tsv"</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"dummy_ukb_main.tsv"</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"dummy_gp_clinical.txt"</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"dummy_gp_scripts.txt"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># read dummy dataset into R</span></span></span>
+<span class="r-in"><span><span class="fu">get_ukb_dummy</span><span class="op">(</span><span class="st">"dummy_ukb_main.tsv"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     eid 31-0.0 34-0.0 52-0.0 21000-0.0 21000-1.0 21000-2.0 21001-0.0 21001-1.0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  1:   1      0   1952      8        -1         2      3003   20.1115    20.864</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  2:   2      0   1946      3        -3      2001      3004   30.1536   20.2309</span>
@@ -213,33 +213,34 @@ records dataset.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  8:       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  9:       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10:       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># get file path to dummy dataset</span></span>
-<span class="r-in"><span class="fu">get_ukb_dummy</span><span class="op">(</span><span class="st">"dummy_ukb_main.tsv"</span>, path_only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># get file path to dummy dataset</span></span></span>
+<span class="r-in"><span><span class="fu">get_ukb_dummy</span><span class="op">(</span><span class="st">"dummy_ukb_main.tsv"</span>, path_only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "/Users/runner/work/ukbwranglr/ukbwranglr/renv/library/R-4.2/x86_64-apple-darwin17.0/ukbwranglr/extdata/dummy_ukb_main.tsv"</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># read all available dummy dataset into R</span></span>
-<span class="r-in"><span class="va">dummy_datasets</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span class="r-in">  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/set_names.html" class="external-link">set_names</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span class="r-in">  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="va">get_ukb_dummy</span>, path_only <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span class="r-in">  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="fu">tibble</span><span class="fu">::</span><span class="va"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># read all available dummy dataset into R</span></span></span>
+<span class="r-in"><span><span class="va">dummy_datasets</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span>  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/set_names.html" class="external-link">set_names</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span>  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="va">get_ukb_dummy</span>, path_only <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span>  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="fu">tibble</span><span class="fu">::</span><span class="va"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $dummy_Data_Dictionary_Showcase.tsv</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 28 × 17</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Path      Category FieldID Field Participants Items Stability ValueType Units</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> Populati… 100094   31      Sex   502413       5024… Complete  Categori… <span style="color: #BB0000;">NA</span>   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> Populati… 100094   34      Year… 502413       5024… Complete  Integer   years</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> Populati… 100094   52      Mont… 502413       5024… Complete  Categori… <span style="color: #BB0000;">NA</span>   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> Assessme… 100024   53      Date… 502414       5795… Complete  Date      <span style="color: #BB0000;">NA</span>   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> Assessme… 100011   4080    Syst… 475231       1061… Complete  Integer   mmHg </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> Assessme… 100074   20001   Canc… 45950        54022 Complete  Categori… <span style="color: #BB0000;">NA</span>   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> Assessme… 100074   20002   Non-… 386743       1145… Complete  Categori… <span style="color: #BB0000;">NA</span>   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> Assessme… 100075   20003   Trea… 373347       1389… Complete  Categori… <span style="color: #BB0000;">NA</span>   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> Assessme… 100076   20004   Oper… 399178       1003… Complete  Categori… <span style="color: #BB0000;">NA</span>   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> Assessme… 100074   20006   Inte… 45950        54022 Complete  Continuo… years</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with 18 more rows, and 8 more variables: ItemType &lt;chr&gt;, Strata &lt;chr&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   Sexed &lt;chr&gt;, Instances &lt;chr&gt;, Array &lt;chr&gt;, Coding &lt;chr&gt;, Notes &lt;chr&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   Link &lt;chr&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    Path        Categ…¹ FieldID Field Parti…² Items Stabi…³ Value…⁴ Units ItemT…⁵</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> Population… 100094  31      Sex   502413  5024… Comple… Catego… <span style="color: #BB0000;">NA</span>    Data   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> Population… 100094  34      Year… 502413  5024… Comple… Integer years Data   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> Population… 100094  52      Mont… 502413  5024… Comple… Catego… <span style="color: #BB0000;">NA</span>    Data   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> Assessment… 100024  53      Date… 502414  5795… Comple… Date    <span style="color: #BB0000;">NA</span>    Data   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> Assessment… 100011  4080    Syst… 475231  1061… Comple… Integer mmHg  Data   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> Assessment… 100074  20001   Canc… 45950   54022 Comple… Catego… <span style="color: #BB0000;">NA</span>    Data   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> Assessment… 100074  20002   Non-… 386743  1145… Comple… Catego… <span style="color: #BB0000;">NA</span>    Data   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> Assessment… 100075  20003   Trea… 373347  1389… Comple… Catego… <span style="color: #BB0000;">NA</span>    Data   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> Assessment… 100076  20004   Oper… 399178  1003… Comple… Catego… <span style="color: #BB0000;">NA</span>    Data   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> Assessment… 100074  20006   Inte… 45950   54022 Comple… Contin… years Data   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with 18 more rows, 7 more variables: Strata &lt;chr&gt;, Sexed &lt;chr&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   Instances &lt;chr&gt;, Array &lt;chr&gt;, Coding &lt;chr&gt;, Notes &lt;chr&gt;, Link &lt;chr&gt;, and</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   abbreviated variable names ¹​Category, ²​Participants, ³​Stability,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   ⁴​ValueType, ⁵​ItemType</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $dummy_Codings.tsv</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 425 × 3</span></span>
@@ -259,25 +260,25 @@ records dataset.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $dummy_ukb_main.tsv</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 10 × 71</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      eid `31-0.0` `34-0.0` `52-0.0` `21000-0.0` `21000-1.0` `21000-2.0`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>     1 0        1952     8        -1          2           3003       </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>     2 0        1946     3        -3          2001        3004       </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>     3 1        1951     4        1           2002        -1         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>     4 0        1956     9        1001        2003        4001       </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>     5 <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>       4        1002        2004        4002       </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>     6 1        1948     2        1003        3           4003       </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>     7 0        1949     12       <span style="color: #BB0000;">NA</span>          3001        5          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>     8 1        1956     10       <span style="color: #BB0000;">NA</span>          5           <span style="color: #BB0000;">NA</span>         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>     9 0        1962     4        4001        <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>    10 1        1953     2        4001        <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with 64 more variables: `21001-0.0` &lt;chr&gt;, `21001-1.0` &lt;chr&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `21001-2.0` &lt;chr&gt;, `4080-0.0` &lt;chr&gt;, `4080-0.1` &lt;chr&gt;, `4080-0.2` &lt;chr&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `4080-0.3` &lt;chr&gt;, `4080-1.0` &lt;chr&gt;, `4080-1.1` &lt;chr&gt;, `4080-1.2` &lt;chr&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `4080-1.3` &lt;chr&gt;, `20001-0.0` &lt;chr&gt;, `20001-0.3` &lt;chr&gt;, `20001-2.0` &lt;chr&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `20001-2.3` &lt;chr&gt;, `20002-0.0` &lt;chr&gt;, `20002-0.3` &lt;chr&gt;, `20002-2.0` &lt;chr&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `20002-2.3` &lt;chr&gt;, `20006-0.0` &lt;chr&gt;, `20006-0.3` &lt;chr&gt;, `20006-2.0` &lt;chr&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `20006-2.3` &lt;chr&gt;, `20008-0.0` &lt;chr&gt;, `20008-0.3` &lt;chr&gt;, …</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      eid 31-0.…¹ 34-0.…² 52-0.…³ 21000…⁴ 21000…⁵ 21000…⁶ 21001…⁷ 21001…⁸ 21001…⁹</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>     1 0       1952    8       -1      2       3003    20.1115 20.864  <span style="color: #BB0000;">NA</span>     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>     2 0       1946    3       -3      2001    3004    30.1536 20.2309 27.4936</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>     3 1       1951    4       1       2002    -1      22.8495 26.7929 27.6286</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>     4 0       1956    9       1001    2003    4001    <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>     5 <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>      4       1002    2004    4002    29.2752 19.7576 14.6641</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>     6 1       1948    2       1003    3       4003    28.2567 30.286  27.3534</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>     7 0       1949    12      <span style="color: #BB0000;">NA</span>      3001    5       <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>     8 1       1956    10      <span style="color: #BB0000;">NA</span>      5       <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>     9 0       1962    4       4001    <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>      25.4016 21.9371 24.4897</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>    10 1       1953    2       4001    <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>      25.1579 30.0483</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with 61 more variables: `4080-0.0` &lt;chr&gt;, `4080-0.1` &lt;chr&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `4080-0.2` &lt;chr&gt;, `4080-0.3` &lt;chr&gt;, `4080-1.0` &lt;chr&gt;, `4080-1.1` &lt;chr&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `4080-1.2` &lt;chr&gt;, `4080-1.3` &lt;chr&gt;, `20001-0.0` &lt;chr&gt;, `20001-0.3` &lt;chr&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `20001-2.0` &lt;chr&gt;, `20001-2.3` &lt;chr&gt;, `20002-0.0` &lt;chr&gt;, `20002-0.3` &lt;chr&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `20002-2.0` &lt;chr&gt;, `20002-2.3` &lt;chr&gt;, `20006-0.0` &lt;chr&gt;, `20006-0.3` &lt;chr&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `20006-2.0` &lt;chr&gt;, `20006-2.3` &lt;chr&gt;, `20008-0.0` &lt;chr&gt;, `20008-0.3` &lt;chr&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `20008-2.0` &lt;chr&gt;, `20008-2.3` &lt;chr&gt;, `41270-0.0` &lt;chr&gt;, …</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $dummy_gp_clinical.txt</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 12 × 8</span></span>
@@ -298,14 +299,15 @@ records dataset.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $dummy_gp_scripts.txt</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 × 8</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     eid data_provider issue_date read_2 bnf_code     dmd_code drug_name quantity</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>     1 1             03/03/1903 bxi300 <span style="color: #BB0000;">NA</span>           1        drug2     50      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>     1 4             01/01/1901 bxi3   <span style="color: #BB0000;">NA</span>           <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>     1 3             07/07/2037 <span style="color: #BB0000;">NA</span>     02.02.01.00… <span style="color: #BB0000;">NA</span>       drug2     30      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span>     3 1             07/07/2037 bd3j00 <span style="color: #BB0000;">NA</span>           1        drug2     30      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span>     4 2             01/02/1999 bd3j   02020100     <span style="color: #BB0000;">NA</span>       drug2     30      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span>     8 1             01/02/1999 <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>           1        2         30      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     eid data_provider issue_date read_2 bnf_code       dmd_code drug_n…¹ quant…²</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>     1 1             03/03/1903 bxi300 <span style="color: #BB0000;">NA</span>             1        drug2    50     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>     1 4             01/01/1901 bxi3   <span style="color: #BB0000;">NA</span>             <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>     1 3             07/07/2037 <span style="color: #BB0000;">NA</span>     02.02.01.00.00 <span style="color: #BB0000;">NA</span>       drug2    30     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span>     3 1             07/07/2037 bd3j00 <span style="color: #BB0000;">NA</span>             1        drug2    30     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span>     4 2             01/02/1999 bd3j   02020100       <span style="color: #BB0000;">NA</span>       drug2    30     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span>     8 1             01/02/1999 <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>             1        2        30     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with abbreviated variable names ¹​drug_name, ²​quantity</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 </code></pre></div>
     </div>
@@ -321,7 +323,7 @@ records dataset.</p></li>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>
