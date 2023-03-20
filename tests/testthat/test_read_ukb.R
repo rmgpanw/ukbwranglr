@@ -427,6 +427,24 @@ test_that("`label_ukb_main()` excludes duplicated labels e.g. coding 3 (for FID 
   )
 })
 
+test_that("`label_ukb_main()` raises a warning if any fields in `data_dict` do not have a FieldID",
+          {
+            dummy_fid_20001_data <- data.frame(eid = c(1, 2),
+                                               # wrong fid (extra '0')
+                                               cancer_code_self_reported_f200001_0_0 = as.character(c(-1, 1005)))
+
+            expect_warning(
+              label_ukb_main(
+                ukb_main = dummy_fid_20001_data,
+                data_dict = make_data_dict(dummy_fid_20001_data,
+                                           ukb_data_dict = dummy_ukb_data_dict),
+                ukb_codings = dummy_ukb_codings,
+                max_n_labels = NULL
+              ),
+              regexp = "The following items in `data_dict` could not be matched to a FieldID: cancer_code_self_reported_f200001_0_0"
+            )
+          })
+
 # Dev ---------------------------------------------------------------------
 
 

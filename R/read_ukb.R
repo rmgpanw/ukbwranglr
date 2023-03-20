@@ -393,7 +393,7 @@ label_ukb_main <- function(ukb_main,
   )
 
   # warning if any fields in `data_dict` do not have a FieldID
-  data_dict_fields_with_no_fid <- data_dict[is.na(data_dict$FieldID), ]$FieldID
+  data_dict_fields_with_no_fid <- unique(data_dict[is.na(data_dict$FieldID), ]$colheaders_raw)
   if (!rlang::is_empty(data_dict_fields_with_no_fid)) {
     warning(paste0(
       "The following items in `data_dict` could not be matched to a FieldID: ",
@@ -403,7 +403,7 @@ label_ukb_main <- function(ukb_main,
       )
     ))
     # remove these items from data_dict
-    data_dict <- data_dict[!is.na(data_dict$FieldID), ]$FieldID
+    data_dict <- data_dict[!is.na(data_dict$FieldID), ]
   }
 
   # identify codings to be converted to integer type
