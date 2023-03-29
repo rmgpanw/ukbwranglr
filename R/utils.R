@@ -16,7 +16,7 @@
 #' `vignette('ukbwranglr')` for further details), or if this variable is not
 #' found then the data dictionary will be downloaded directly from the [UK
 #' Biobank
-#' website](https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide)
+#' website](https://biobank.ndph.ox.ac.uk/showcase/exinfo.cgi?src=AccessingData)
 #' to [tempdir()] when the function is first called.
 #'
 #' @param path Either `NULL`, or a file path. If no file exists at this path,
@@ -34,7 +34,7 @@ get_ukb_data_dict <- function(path = NULL) {
     path = path,
     env_var_name = "UKB_DATA_DICT",
     file_name = "Data_Dictionary_Showcase.tsv",
-    download_url = "https://biobank.ctsu.ox.ac.uk/~bbdatan/Data_Dictionary_Showcase.tsv"
+    download_url = "https://biobank.ndph.ox.ac.uk/~bbdatan/Data_Dictionary_Showcase.tsv"
   )
 }
 
@@ -47,7 +47,7 @@ get_ukb_data_dict <- function(path = NULL) {
 #' `vignette('ukbwranglr')` for further details), or if this variable is not
 #' found then the data dictionary will be downloaded directly from the [UK
 #' Biobank
-#' website](https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide)
+#' website](https://biobank.ndph.ox.ac.uk/showcase/exinfo.cgi?src=AccessingData)
 #' to [tempdir()] when the function is first called.
 #'
 #' @inheritParams get_ukb_data_dict
@@ -63,7 +63,7 @@ get_ukb_codings <- function(path = NULL) {
     path = path,
     env_var_name = "UKB_CODINGS",
     file_name = "Codings.tsv",
-    download_url = "https://biobank.ctsu.ox.ac.uk/~bbdatan/Codings.tsv"
+    download_url = "https://biobank.ndph.ox.ac.uk/~bbdatan/Codings.tsv"
   )
 }
 

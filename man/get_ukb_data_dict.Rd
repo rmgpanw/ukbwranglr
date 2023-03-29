@@ -22,7 +22,7 @@ character.
 By default, an attempt will be made to read from a file at the path specified
 by an environmental variable named \code{UKB_DATA_DICT} (see
 \code{vignette('ukbwranglr')} for further details), or if this variable is not
-found then the data dictionary will be downloaded directly from the \href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{UK Biobank website}
+found then the data dictionary will be downloaded directly from the \href{https://biobank.ndph.ox.ac.uk/showcase/exinfo.cgi?src=AccessingData}{UK Biobank website}
 to \code{\link[=tempdir]{tempdir()}} when the function is first called.
 }
 \examples{

@@ -24,11 +24,11 @@
 #' - `dummy_Data_Dictionary_Showcase.tsv`: A subset of fields from the UK
 #' Biobank data dictionary (full version available from the UK Biobank [data
 #' showcase
-#' website](https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide)).
+#' website](https://biobank.ndph.ox.ac.uk/showcase/exinfo.cgi?src=AccessingData)).
 #'
 #' - `dummy_Codings.tsv`: A subset of UK Biobank data codings (full version
 #' available from the UK Biobank [data showcase
-#' website](https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide)).
+#' website](https://biobank.ndph.ox.ac.uk/showcase/exinfo.cgi?src=AccessingData)).
 #'
 #' - `dummy_ukb_main.tsv`: A dummy main UK Biobank dataset. May be read into R
 #' with [read_ukb()]. Tidy clinical events fields with [tidy_clinical_events()].

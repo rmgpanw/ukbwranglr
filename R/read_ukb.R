@@ -13,7 +13,7 @@
 #'   (i.e. is a STATA file) or if \code{ukb_main} is a data frame.
 #' @param ukb_data_dict The UKB data dictionary (available online at the UK
 #'   Biobank
-#'   \href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{data
+#'   \href{https://biobank.ndph.ox.ac.uk/showcase/exinfo.cgi?src=AccessingData}{data
 #'    showcase}. This should be a data frame where all columns are of type
 #'   \code{character}.
 #'
@@ -163,7 +163,7 @@ make_data_dict <- function(ukb_main,
 #'   columns, supply a filtered copy of this data dictionary containing only the
 #'   required variables. If \code{NULL} (default) then all fields will be read.
 #' @param ukb_codings The UKB codings file (available online at the UK Biobank
-#'   \href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{data
+#'   \href{https://biobank.ndph.ox.ac.uk/showcase/exinfo.cgi?src=AccessingData}{data
 #'    showcase}. This should be a data frame where all columns are of type
 #'   \code{character}.
 #' @param descriptive_colnames If \code{TRUE}, rename columns with longer
@@ -608,7 +608,7 @@ format_ukb_df_header <- function(colheaders,
 #'
 #' @param data_dict A data dictionary formed by joining the column names
 #'   from a raw ukb pheno file with the ukb data dictionary
-#'   (https://biobank.ctsu.ox.ac.uk/~bbdatan/Data_Dictionary_Showcase.tsv)
+#'   (https://biobank.ndph.ox.ac.uk/~bbdatan/Data_Dictionary_Showcase.tsv)
 #'
 #' @noRd
 mutate_descriptive_columns <- function(data_dict) {

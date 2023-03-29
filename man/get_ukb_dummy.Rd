@@ -23,9 +23,9 @@ Either read a dummy UK Biobank dataset into R or return the file path only.
 The following dummy datasets are included with this package:
 \itemize{
 \item \code{dummy_Data_Dictionary_Showcase.tsv}: A subset of fields from the UK
-Biobank data dictionary (full version available from the UK Biobank \href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{data showcase website}).
+Biobank data dictionary (full version available from the UK Biobank \href{https://biobank.ndph.ox.ac.uk/showcase/exinfo.cgi?src=AccessingData}{data showcase website}).
 \item \code{dummy_Codings.tsv}: A subset of UK Biobank data codings (full version
-available from the UK Biobank \href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{data showcase website}).
+available from the UK Biobank \href{https://biobank.ndph.ox.ac.uk/showcase/exinfo.cgi?src=AccessingData}{data showcase website}).
 \item \code{dummy_ukb_main.tsv}: A dummy main UK Biobank dataset. May be read into R
 with \code{\link[=read_ukb]{read_ukb()}}. Tidy clinical events fields with \code{\link[=tidy_clinical_events]{tidy_clinical_events()}}.
 \item \code{dummy_gp_clinical.txt}: A dummy UK Biobank primary care clinical event

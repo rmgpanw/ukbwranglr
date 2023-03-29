@@ -16,7 +16,7 @@ derive_dob(
 
 \item{ukb_data_dict}{The UKB data dictionary (available online at the UK
 Biobank
-\href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{data
+\href{https://biobank.ndph.ox.ac.uk/showcase/exinfo.cgi?src=AccessingData}{data
 showcase}. This should be a data frame where all columns are of type
 \code{character}.}
 

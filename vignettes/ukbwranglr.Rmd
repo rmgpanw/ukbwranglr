@@ -54,7 +54,7 @@ You can try out the steps either locally by installing ukbwranglr on your own ma
 
 ## 1. Create data dictionary
 
-First download a copy of the UK Biobank data dictionary and codings files from the [UK Biobank data showcase website](https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide). Dummy versions are used here:
+First download a copy of the UK Biobank data dictionary and codings files from the [UK Biobank data showcase website](https://biobank.ndph.ox.ac.uk/showcase/exinfo.cgi?src=AccessingData). Dummy versions are used here:
 
 ```{r}
 # get required metadata
@@ -227,7 +227,7 @@ ukb_main_processed %>%
 
 The following setup is recommended to reduce duplicated steps between multiple projects that draw on the same datasets:
 
-1.  Download the UK Biobank data dictionary and codings files (available from the [UK Biobank data showcase](https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide)) and for each new R project, place the following `.Renviron` file in the project root directory (replacing `PATH/TO` with the correct file paths):
+1.  Download the UK Biobank data dictionary and codings files (available from the [UK Biobank data showcase](https://biobank.ndph.ox.ac.uk/showcase/exinfo.cgi?src=AccessingData)) and for each new R project, place the following `.Renviron` file in the project root directory (replacing `PATH/TO` with the correct file paths):
 
         UKB_DATA_DICT=/PATH/TO/Data_Dictionary_Showcase.tsv
 
