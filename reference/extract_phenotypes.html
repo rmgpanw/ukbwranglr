@@ -127,7 +127,7 @@ This can also be a <code><a href="https://dbplyr.tidyverse.org/reference/tbl.src
 <span class="r-msg co"><span class="r-pr">#&gt;</span> STEP 3 of 3</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Applying variable and value labels</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Labelling dataset</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Time taken: 0 minutes, 1 seconds.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Time taken: 0 minutes, 0 seconds.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Tidying clinical events for primary_death_icd10</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Time taken: 0 minutes, 0 seconds.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Tidying clinical events for secondary_death_icd10</span>
@@ -167,17 +167,16 @@ This can also be a <code><a href="https://dbplyr.tidyverse.org/reference/tbl.src
 <span class="r-in"><span><span class="co"># dummy clinical code list</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="example_clinical_codes.html">example_clinical_codes</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 8 × 6</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   disease  description                             category code_…¹ code  author</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Diabetes diabetes                                Diabete… data_c… 1220  ukbwr </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> Diabetes gestational diabetes                    Gestati… data_c… 1221  ukbwr </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> Diabetes type 1 diabetes                         Type 1 … data_c… 1222  ukbwr </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> Diabetes type 2 diabetes                         Type 2 … data_c… 1223  ukbwr </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> Diabetes Type 1 diabetes mellitus                Type 1 … icd10   E10   ukbwr </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> Diabetes Type 2 diabetes mellitus                Type 2 … icd10   E11   ukbwr </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">7</span> Diabetes Insulin dependent diabetes mellitus     Type 1 … read2   C108. ukbwr </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">8</span> Diabetes Non-insulin dependent diabetes mellitus Type 2 … read2   C109. ukbwr </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with abbreviated variable name ¹​code_type</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   disease  description                           category code_type code  author</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                 <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Diabetes diabetes                              Diabete… data_cod… 1220  ukbwr </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> Diabetes gestational diabetes                  Gestati… data_cod… 1221  ukbwr </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> Diabetes type 1 diabetes                       Type 1 … data_cod… 1222  ukbwr </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> Diabetes type 2 diabetes                       Type 2 … data_cod… 1223  ukbwr </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> Diabetes Type 1 diabetes mellitus              Type 1 … icd10     E10   ukbwr </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> Diabetes Type 2 diabetes mellitus              Type 2 … icd10     E11   ukbwr </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">7</span> Diabetes Insulin dependent diabetes mellitus   Type 1 … read2     C108. ukbwr </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">8</span> Diabetes Non-insulin dependent diabetes melli… Type 2 … read2     C109. ukbwr </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Filter for participants with matching clinical codes</span></span></span>
 <span class="r-in"><span><span class="fu">extract_phenotypes</span><span class="op">(</span></span></span>

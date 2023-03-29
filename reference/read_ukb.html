@@ -96,14 +96,14 @@ required variables. If <code>NULL</code> (default) then all fields will be read.
 <dt>ukb_data_dict</dt>
 <dd><p>The UKB data dictionary (available online at the UK
 Biobank
-<a href="https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide" class="external-link">data
+<a href="https://biobank.ndph.ox.ac.uk/showcase/exinfo.cgi?src=AccessingData" class="external-link">data
 showcase</a>. This should be a data frame where all columns are of type
 <code>character</code>.</p></dd>
 
 
 <dt>ukb_codings</dt>
 <dd><p>The UKB codings file (available online at the UK Biobank
-<a href="https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide" class="external-link">data
+<a href="https://biobank.ndph.ox.ac.uk/showcase/exinfo.cgi?src=AccessingData" class="external-link">data
 showcase</a>. This should be a data frame where all columns are of type
 <code>character</code>.</p></dd>
 
@@ -178,27 +178,27 @@ careful checking for empty strings that need converting to <code>NA</code>.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> STEP 3 of 3</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Applying variable and value labels</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Labelling dataset</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Time taken: 0 minutes, 1 seconds.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Time taken: 0 minutes, 0 seconds.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 10 × 71</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      eid sex_f…¹ year_…² month…³ ethni…⁴ ethni…⁵ ethni…⁶ body_…⁷ body_…⁸ body_…⁹</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>     1 Female     <span style="text-decoration: underline;">1</span>952 August  Do not… Mixed   Bangla…    20.1    20.9    <span style="color: #BB0000;">NA</span>  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>     2 Female     <span style="text-decoration: underline;">1</span>946 March   Prefer… White … Any ot…    30.2    20.2    27.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>     3 Male       <span style="text-decoration: underline;">1</span>951 April   White   White … Do not…    22.8    26.8    27.6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>     4 Female     <span style="text-decoration: underline;">1</span>956 Septem… British White … Caribb…    <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>     5 <span style="color: #BB0000;">NA</span>           <span style="color: #BB0000;">NA</span> April   Irish   Any ot… African    29.3    19.8    14.7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>     6 Male       <span style="text-decoration: underline;">1</span>948 Februa… Any ot… Asian … Any ot…    28.3    30.3    27.4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>     7 Female     <span style="text-decoration: underline;">1</span>949 Decemb… <span style="color: #BB0000;">NA</span>      Indian  Chinese    <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>     8 Male       <span style="text-decoration: underline;">1</span>956 October <span style="color: #BB0000;">NA</span>      Chinese <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>     9 Female     <span style="text-decoration: underline;">1</span>962 April   Caribb… <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>         25.4    21.9    24.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>    10 Male       <span style="text-decoration: underline;">1</span>953 Februa… Caribb… <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span>      25.2    30.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with 61 more variables:</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      eid sex_f31_0_0 year_of_birth_f34_0_0 month_of_birth_f52_0_0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>                       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>                 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>     1 Female                       <span style="text-decoration: underline;">1</span>952 August                </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>     2 Female                       <span style="text-decoration: underline;">1</span>946 March                 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>     3 Male                         <span style="text-decoration: underline;">1</span>951 April                 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>     4 Female                       <span style="text-decoration: underline;">1</span>956 September             </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>     5 <span style="color: #BB0000;">NA</span>                             <span style="color: #BB0000;">NA</span> April                 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>     6 Male                         <span style="text-decoration: underline;">1</span>948 February              </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>     7 Female                       <span style="text-decoration: underline;">1</span>949 December              </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>     8 Male                         <span style="text-decoration: underline;">1</span>956 October               </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>     9 Female                       <span style="text-decoration: underline;">1</span>962 April                 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>    10 Male                         <span style="text-decoration: underline;">1</span>953 February              </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 67 more variables: ethnic_background_f21000_0_0 &lt;fct&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   ethnic_background_f21000_1_0 &lt;fct&gt;, ethnic_background_f21000_2_0 &lt;fct&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   body_mass_index_bmi_f21001_0_0 &lt;dbl&gt;, body_mass_index_bmi_f21001_1_0 &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   body_mass_index_bmi_f21001_2_0 &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   systolic_blood_pressure_automated_reading_f4080_0_0 &lt;int&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   systolic_blood_pressure_automated_reading_f4080_0_1 &lt;int&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   systolic_blood_pressure_automated_reading_f4080_0_2 &lt;int&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   systolic_blood_pressure_automated_reading_f4080_0_3 &lt;int&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   systolic_blood_pressure_automated_reading_f4080_1_0 &lt;int&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   systolic_blood_pressure_automated_reading_f4080_1_1 &lt;int&gt;, …</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   systolic_blood_pressure_automated_reading_f4080_0_2 &lt;int&gt;, …</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># to read only a subset of variables, create a data dictionary and filter</span></span></span>
 <span class="r-in"><span><span class="co"># for selected variables, then supply to `read_ukb()`</span></span></span>
@@ -221,7 +221,7 @@ careful checking for empty strings that need converting to <code>NA</code>.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> STEP 3 of 3</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Applying variable and value labels</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Labelling dataset</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Time taken: 0 minutes, 1 seconds.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Time taken: 0 minutes, 0 seconds.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     eid sex_f31_0_0 year_of_birth_f34_0_0 body_mass_index_bmi_f21001_0_0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  1:   1      Female                  1952                        20.1115</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  2:   2      Female                  1946                        30.1536</span>

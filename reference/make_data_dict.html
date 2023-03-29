@@ -74,7 +74,7 @@ string) or a data frame.</p></dd>
 <dt>ukb_data_dict</dt>
 <dd><p>The UKB data dictionary (available online at the UK
 Biobank
-<a href="https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide" class="external-link">data
+<a href="https://biobank.ndph.ox.ac.uk/showcase/exinfo.cgi?src=AccessingData" class="external-link">data
 showcase</a>. This should be a data frame where all columns are of type
 <code>character</code>.</p></dd>
 
@@ -99,23 +99,23 @@ the current column names ("colheaders_raw").</p>
 <span class="r-in"><span>  ukb_data_dict <span class="op">=</span> <span class="va">dummy_ukb_data_dict</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 71 × 22</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    descripti…¹ colhe…² colhe…³ FieldID insta…⁴ array Path  Categ…⁵ Field Parti…⁶</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> eid         eid     feid    eid     <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>      Part… <span style="color: #BB0000;">NA</span>     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> sex_f31_0_0 31-0.0  f31_0_0 31      0       0     Popu… 100094  Sex   502413 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> year_of_bi… 34-0.0  f34_0_0 34      0       0     Popu… 100094  Year… 502413 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> month_of_b… 52-0.0  f52_0_0 52      0       0     Popu… 100094  Mont… 502413 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> ethnic_bac… 21000-… f21000… 21000   0       0     Asse… 100065  Ethn… 501521 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> ethnic_bac… 21000-… f21000… 21000   1       0     Asse… 100065  Ethn… 501521 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> ethnic_bac… 21000-… f21000… 21000   2       0     Asse… 100065  Ethn… 501521 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> body_mass_… 21001-… f21001… 21001   0       0     Asse… 100010  Body… 499421 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> body_mass_… 21001-… f21001… 21001   1       0     Asse… 100010  Body… 499421 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> body_mass_… 21001-… f21001… 21001   2       0     Asse… 100010  Body… 499421 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with 61 more rows, 12 more variables: Items &lt;chr&gt;, Stability &lt;chr&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   ValueType &lt;chr&gt;, Units &lt;chr&gt;, ItemType &lt;chr&gt;, Strata &lt;chr&gt;, Sexed &lt;chr&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   Instances &lt;chr&gt;, Array &lt;chr&gt;, Coding &lt;chr&gt;, Notes &lt;chr&gt;, Link &lt;chr&gt;, and</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   abbreviated variable names ¹​descriptive_colnames, ²​colheaders_raw,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   ³​colheaders_processed, ⁴​instance, ⁵​Category, ⁶​Participants</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    descriptive_colnames     colheaders_raw colheaders_processed FieldID instance</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> eid                      eid            feid                 eid     <span style="color: #BB0000;">NA</span>      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> sex_f31_0_0              31-0.0         f31_0_0              31      0       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> year_of_birth_f34_0_0    34-0.0         f34_0_0              34      0       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> month_of_birth_f52_0_0   52-0.0         f52_0_0              52      0       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> ethnic_background_f2100… 21000-0.0      f21000_0_0           21000   0       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> ethnic_background_f2100… 21000-1.0      f21000_1_0           21000   1       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> ethnic_background_f2100… 21000-2.0      f21000_2_0           21000   2       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> body_mass_index_bmi_f21… 21001-0.0      f21001_0_0           21001   0       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> body_mass_index_bmi_f21… 21001-1.0      f21001_1_0           21001   1       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> body_mass_index_bmi_f21… 21001-2.0      f21001_2_0           21001   2       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 61 more rows</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 17 more variables: array &lt;chr&gt;, Path &lt;chr&gt;, Category &lt;chr&gt;, Field &lt;chr&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   Participants &lt;chr&gt;, Items &lt;chr&gt;, Stability &lt;chr&gt;, ValueType &lt;chr&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   Units &lt;chr&gt;, ItemType &lt;chr&gt;, Strata &lt;chr&gt;, Sexed &lt;chr&gt;, Instances &lt;chr&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   Array &lt;chr&gt;, Coding &lt;chr&gt;, Notes &lt;chr&gt;, Link &lt;chr&gt;</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># ...or from data frame</span></span></span>
 <span class="r-in"><span><span class="fu">make_data_dict</span><span class="op">(</span></span></span>
@@ -123,23 +123,23 @@ the current column names ("colheaders_raw").</p>
 <span class="r-in"><span>  ukb_data_dict <span class="op">=</span> <span class="va">dummy_ukb_data_dict</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 71 × 22</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    descripti…¹ colhe…² colhe…³ FieldID insta…⁴ array Path  Categ…⁵ Field Parti…⁶</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> eid         eid     feid    eid     <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>      Part… <span style="color: #BB0000;">NA</span>     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> sex_f31_0_0 31-0.0  f31_0_0 31      0       0     Popu… 100094  Sex   502413 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> year_of_bi… 34-0.0  f34_0_0 34      0       0     Popu… 100094  Year… 502413 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> month_of_b… 52-0.0  f52_0_0 52      0       0     Popu… 100094  Mont… 502413 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> ethnic_bac… 21000-… f21000… 21000   0       0     Asse… 100065  Ethn… 501521 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> ethnic_bac… 21000-… f21000… 21000   1       0     Asse… 100065  Ethn… 501521 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> ethnic_bac… 21000-… f21000… 21000   2       0     Asse… 100065  Ethn… 501521 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> body_mass_… 21001-… f21001… 21001   0       0     Asse… 100010  Body… 499421 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> body_mass_… 21001-… f21001… 21001   1       0     Asse… 100010  Body… 499421 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> body_mass_… 21001-… f21001… 21001   2       0     Asse… 100010  Body… 499421 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with 61 more rows, 12 more variables: Items &lt;chr&gt;, Stability &lt;chr&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   ValueType &lt;chr&gt;, Units &lt;chr&gt;, ItemType &lt;chr&gt;, Strata &lt;chr&gt;, Sexed &lt;chr&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   Instances &lt;chr&gt;, Array &lt;chr&gt;, Coding &lt;chr&gt;, Notes &lt;chr&gt;, Link &lt;chr&gt;, and</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   abbreviated variable names ¹​descriptive_colnames, ²​colheaders_raw,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   ³​colheaders_processed, ⁴​instance, ⁵​Category, ⁶​Participants</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    descriptive_colnames     colheaders_raw colheaders_processed FieldID instance</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> eid                      eid            feid                 eid     <span style="color: #BB0000;">NA</span>      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> sex_f31_0_0              31-0.0         f31_0_0              31      0       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> year_of_birth_f34_0_0    34-0.0         f34_0_0              34      0       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> month_of_birth_f52_0_0   52-0.0         f52_0_0              52      0       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> ethnic_background_f2100… 21000-0.0      f21000_0_0           21000   0       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> ethnic_background_f2100… 21000-1.0      f21000_1_0           21000   1       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> ethnic_background_f2100… 21000-2.0      f21000_2_0           21000   2       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> body_mass_index_bmi_f21… 21001-0.0      f21001_0_0           21001   0       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> body_mass_index_bmi_f21… 21001-1.0      f21001_1_0           21001   1       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> body_mass_index_bmi_f21… 21001-2.0      f21001_2_0           21001   2       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 61 more rows</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 17 more variables: array &lt;chr&gt;, Path &lt;chr&gt;, Category &lt;chr&gt;, Field &lt;chr&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   Participants &lt;chr&gt;, Items &lt;chr&gt;, Stability &lt;chr&gt;, ValueType &lt;chr&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   Units &lt;chr&gt;, ItemType &lt;chr&gt;, Strata &lt;chr&gt;, Sexed &lt;chr&gt;, Instances &lt;chr&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   Array &lt;chr&gt;, Coding &lt;chr&gt;, Notes &lt;chr&gt;, Link &lt;chr&gt;</span></span>
 </code></pre></div>
     </div>
   </div>
