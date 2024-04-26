@@ -3,5 +3,8 @@ pkgdown: 2.0.9
 pkgdown_sha: ~
 articles:
   ukbwranglr: ukbwranglr.html
-last_built: 2024-04-26T08:17Z
+last_built: 2024-04-26T08:27Z
+urls:
+  reference: https://rmgpanw.github.io/ukbwranglr/reference
+  article: https://rmgpanw.github.io/ukbwranglr/articles
 

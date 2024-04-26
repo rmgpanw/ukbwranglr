@@ -1,90 +1,90 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>/404.html</loc>
+    <loc>https://rmgpanw.github.io/ukbwranglr/404.html</loc>
   </url>
   <url>
-    <loc>/CONTRIBUTING.html</loc>
+    <loc>https://rmgpanw.github.io/ukbwranglr/CONTRIBUTING.html</loc>
   </url>
   <url>
-    <loc>/LICENSE-text.html</loc>
+    <loc>https://rmgpanw.github.io/ukbwranglr/LICENSE-text.html</loc>
   </url>
   <url>
-    <loc>/LICENSE.html</loc>
+    <loc>https://rmgpanw.github.io/ukbwranglr/LICENSE.html</loc>
   </url>
   <url>
-    <loc>/articles/index.html</loc>
+    <loc>https://rmgpanw.github.io/ukbwranglr/articles/index.html</loc>
   </url>
   <url>
-    <loc>/articles/ukbwranglr.html</loc>
+    <loc>https://rmgpanw.github.io/ukbwranglr/articles/ukbwranglr.html</loc>
   </url>
   <url>
-    <loc>/authors.html</loc>
+    <loc>https://rmgpanw.github.io/ukbwranglr/authors.html</loc>
   </url>
   <url>
-    <loc>/index.html</loc>
+    <loc>https://rmgpanw.github.io/ukbwranglr/index.html</loc>
   </url>
   <url>
-    <loc>/reference/clinical_events_sources.html</loc>
+    <loc>https://rmgpanw.github.io/ukbwranglr/reference/clinical_events_sources.html</loc>
   </url>
   <url>
-    <loc>/reference/db_tables_to_list.html</loc>
+    <loc>https://rmgpanw.github.io/ukbwranglr/reference/db_tables_to_list.html</loc>
   </url>
   <url>
-    <loc>/reference/derive_dob.html</loc>
+    <loc>https://rmgpanw.github.io/ukbwranglr/reference/derive_dob.html</loc>
   </url>
   <url>
-    <loc>/reference/derive_ethnic_background_simplified.html</loc>
+    <loc>https://rmgpanw.github.io/ukbwranglr/reference/derive_ethnic_background_simplified.html</loc>
   </url>
   <url>
-    <loc>/reference/example_clinical_codes.html</loc>
+    <loc>https://rmgpanw.github.io/ukbwranglr/reference/example_clinical_codes.html</loc>
   </url>
   <url>
-    <loc>/reference/extract_phenotypes.html</loc>
+    <loc>https://rmgpanw.github.io/ukbwranglr/reference/extract_phenotypes.html</loc>
   </url>
   <url>
-    <loc>/reference/get_ukb_codings.html</loc>
+    <loc>https://rmgpanw.github.io/ukbwranglr/reference/get_ukb_codings.html</loc>
   </url>
   <url>
-    <loc>/reference/get_ukb_data_dict.html</loc>
+    <loc>https://rmgpanw.github.io/ukbwranglr/reference/get_ukb_data_dict.html</loc>
   </url>
   <url>
-    <loc>/reference/get_ukb_dummy.html</loc>
+    <loc>https://rmgpanw.github.io/ukbwranglr/reference/get_ukb_dummy.html</loc>
   </url>
   <url>
-    <loc>/reference/index.html</loc>
+    <loc>https://rmgpanw.github.io/ukbwranglr/reference/index.html</loc>
   </url>
   <url>
-    <loc>/reference/label_ukb_main.html</loc>
+    <loc>https://rmgpanw.github.io/ukbwranglr/reference/label_ukb_main.html</loc>
   </url>
   <url>
-    <loc>/reference/make_clinical_events_db.html</loc>
+    <loc>https://rmgpanw.github.io/ukbwranglr/reference/make_clinical_events_db.html</loc>
   </url>
   <url>
-    <loc>/reference/make_data_dict.html</loc>
+    <loc>https://rmgpanw.github.io/ukbwranglr/reference/make_data_dict.html</loc>
   </url>
   <url>
-    <loc>/reference/mutate_age_at_event_cols.html</loc>
+    <loc>https://rmgpanw.github.io/ukbwranglr/reference/mutate_age_at_event_cols.html</loc>
   </url>
   <url>
-    <loc>/reference/read_ukb.html</loc>
+    <loc>https://rmgpanw.github.io/ukbwranglr/reference/read_ukb.html</loc>
   </url>
   <url>
-    <loc>/reference/summarise_numerical_variables.html</loc>
+    <loc>https://rmgpanw.github.io/ukbwranglr/reference/summarise_numerical_variables.html</loc>
   </url>
   <url>
-    <loc>/reference/tidy_clinical_events.html</loc>
+    <loc>https://rmgpanw.github.io/ukbwranglr/reference/tidy_clinical_events.html</loc>
   </url>
   <url>
-    <loc>/reference/tidy_gp_clinical.html</loc>
+    <loc>https://rmgpanw.github.io/ukbwranglr/reference/tidy_gp_clinical.html</loc>
   </url>
   <url>
-    <loc>/reference/tidy_gp_scripts.html</loc>
+    <loc>https://rmgpanw.github.io/ukbwranglr/reference/tidy_gp_scripts.html</loc>
   </url>
   <url>
-    <loc>/reference/ukbwranglr-package.html</loc>
+    <loc>https://rmgpanw.github.io/ukbwranglr/reference/ukbwranglr-package.html</loc>
   </url>
   <url>
-    <loc>/reference/validate_clinical_codes.html</loc>
+    <loc>https://rmgpanw.github.io/ukbwranglr/reference/validate_clinical_codes.html</loc>
   </url>
 </urlset>
