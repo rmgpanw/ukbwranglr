@@ -124,7 +124,7 @@ make_data_dict <- function(ukb_main,
         no = .x
       )
     )) %>%
-    dplyr::select(-.data[["unrecognised_fid"]])
+    dplyr::select(-tidyselect::all_of("unrecognised_fid"))
 
   # mutate 'descriptive_colnames' column
   data_dict <- mutate_descriptive_columns(data_dict = data_dict)
@@ -446,7 +446,7 @@ label_ukb_main <- function(ukb_main,
       TRUE ~ FALSE
     )) %>%
     dplyr::filter(!.data[["to_remove"]]) %>%
-    dplyr::select(-.data[["to_remove"]])
+    dplyr::select(-tidyselect::all_of("to_remove"))
 
   # label categorical variables - set threshold for number of labels per code to
   # be applied (e.g. set threshold to 22 to label ethnic background, but not
@@ -456,7 +456,7 @@ label_ukb_main <- function(ukb_main,
     # filter internal data `n_labels_per_coding`
     codings_to_include <- n_labels_per_coding %>%
       dplyr::filter(.data[["n"]] <= max_n_labels) %>%
-      dplyr::pull(.data[["Coding"]])
+      dplyr::pull(tidyselect::all_of("Coding"))
 
     ukb_codings <- ukb_codings %>%
       dplyr::filter(.data[["Coding"]] %in% codings_to_include)
@@ -645,7 +645,7 @@ mutate_descriptive_columns <- function(data_dict) {
   # Rearrange columns
   data_dict <- data_dict %>%
     dplyr::select(
-      .data[["descriptive_colnames"]],
+      tidyselect::all_of("descriptive_colnames"),
       tidyselect::everything()
     )
 
@@ -729,7 +729,7 @@ indicate_coltype_in_data_dict <- function(data_dict,
       TRUE ~ FALSE
     )) %>%
     dplyr::filter(.data[["coercible_to_integer"]]) %>%
-    dplyr::pull(.data[["Coding"]])
+    dplyr::pull(tidyselect::all_of("Coding"))
 
   # add column to data_dict indicating column type, and column indicating
   # whether the coded value is coercible to integer (as identified above)
@@ -874,12 +874,12 @@ label_df_by_coding <- function(df,
   numeric_codings <- data_dict %>%
     dplyr::filter(.data[[data_dict_coltype_col]] %in% c("integer", "double")) %>%
     dplyr::filter(!is.na(.data[[data_dict_coding_col]])) %>%
-    dplyr::pull(.data[[data_dict_coding_col]]) %>%
+    dplyr::pull(tidyselect::all_of(data_dict_coding_col)) %>%
     as.integer()
 
   non_coded_columns_to_label <- data_dict %>%
     dplyr::filter(is.na(.data[[data_dict_coding_col]])) %>%
-    dplyr::pull(.data[[data_dict_colname_col]])
+    dplyr::pull(tidyselect::all_of(data_dict_colname_col))
 
   # progress bar - one tick per column
   pb <- progress::progress_bar$new(
