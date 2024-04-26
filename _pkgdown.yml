@@ -1,4 +1,6 @@
-destination: docs
+url: https://rmgpanw.github.io/ukbwranglr/
+template:
+  bootstrap: 5
 
 reference:
 - title: Loading UK Biobank data
