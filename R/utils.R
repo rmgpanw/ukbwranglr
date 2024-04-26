@@ -34,7 +34,7 @@ get_ukb_data_dict <- function(path = NULL) {
     path = path,
     env_var_name = "UKB_DATA_DICT",
     file_name = "Data_Dictionary_Showcase.tsv",
-    download_url = "https://biobank.ndph.ox.ac.uk/~bbdatan/Data_Dictionary_Showcase.tsv"
+    download_url = "https://raw.githubusercontent.com/rmgpanw/ukb_backup_files/main/Data_Dictionary_Showcase.tsv"
   )
 }
 
@@ -63,7 +63,7 @@ get_ukb_codings <- function(path = NULL) {
     path = path,
     env_var_name = "UKB_CODINGS",
     file_name = "Codings.tsv",
-    download_url = "https://biobank.ndph.ox.ac.uk/~bbdatan/Codings.tsv"
+    download_url = "https://raw.githubusercontent.com/rmgpanw/ukb_backup_files/main/Codings.tsv"
   )
 }
 
